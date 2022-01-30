@@ -542,8 +542,6 @@ namespace Kalitte.Trading.Algos
         //[Parameter(true)]
         public bool DoublePositions = true;
 
-        //[Parameter(true)]
-        //public bool EnableTakeProfit = true;
 
         //[Parameter(false)]
         public bool UseVirtualOrders = false;

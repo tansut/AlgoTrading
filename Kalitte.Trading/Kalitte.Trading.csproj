@@ -4,7 +4,7 @@
     <TargetFramework>net472</TargetFramework>
     <SignAssembly>False</SignAssembly>
     <AssemblyVersion>1.1.1.3</AssemblyVersion>
-    <FileVersion>1.1.1.2</FileVersion>
+    <FileVersion>1.1.1.3</FileVersion>
     
   </PropertyGroup>
 

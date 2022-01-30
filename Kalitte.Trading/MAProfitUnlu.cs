@@ -18,6 +18,7 @@ using System.Text;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.IO;
+using System.Threading;
 
 namespace Kalitte.Trading
 {
@@ -397,22 +398,22 @@ namespace Kalitte.Trading.Algos
 		//[SymbolParameter("F_XU0300222")]
 		public string Symbol = "F_XU0300222";
 
-		[Parameter(SymbolPeriod.Min10)]
+		//[Parameter(SymbolPeriod.Min10)]
 		public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
 
 		[Parameter(2)]
 		public decimal OrderQuantity = 2M;
 
-		[Parameter(5)]
+		//[Parameter(5)]
 		public int MovPeriod = 5;
 
-		[Parameter(9)]
+		//[Parameter(9)]
 		public int MovPeriod2 = 9;
 
 		//[Parameter(true)]
 		public bool DoublePositions = true;
 
-		[Parameter(true)]
+		//[Parameter(true)]
 		public bool EnableTakeProfit = true;
 
 		//[Parameter(false)]
@@ -431,19 +432,19 @@ namespace Kalitte.Trading.Algos
 		//public decimal LossPuan = 18;
 
 
-		[Parameter(0)]
+		//[Parameter(0)]
 		public int RsiLong = 0;
 
-		[Parameter(0)]
+		//[Parameter(0)]
 		public int RsiShort = 0;
 
-		[Parameter(0)]
+		//[Parameter(0)]
 		public int MACDLongPeriod = 0;
 
-		[Parameter(5)]
+		//[Parameter(5)]
 		public int MACDShortPeriod = 5;
 
-		[Parameter(4)]
+		//[Parameter(4)]
 		public int MACDTrigger = 3;
 
 		MACD macd;
@@ -641,25 +642,25 @@ namespace Kalitte.Trading.Algos
 			return this.positionRequest;
 		}
 
+		public bool ensureSignal(Func<BarDataCurrentValues, bool> func, BarDataCurrentValues values, string caption = "")
+        {
+			var result = func(values);
+			if (result)
+            {
+				var wait = 10;
+				Debug($"Waiting to confirm {caption} signal in {wait} seconds...");
+				Thread.Sleep(wait * 1000);
+				result = func(values);
+				if (!result)
+                {
+					Debug(@"{caption} signal not confirmed.");
+                }
+			}
+			return result;
+        }
+
 		public bool buySignal(BarDataCurrentValues barDataCurrentValues)
 		{
-			//if (CrossAbove(rsi, DownLevel))
-			//    SendMarketOrder(Symbol, OrderQuantity, (OrderSide.Buy));
-			//if (CrossBelow(rsi, UpLevel))
-			//    SendMarketOrder(Symbol, OrderQuantity, (OrderSide.Sell));
-
-			//if (CrossAbove(macd, macd.MacdTrigger))
-			//{
-			//    SendMarketOrder(Symbol, BuyOrderQuantity, OrderSide.Buy);
-			//    Debug("Alış Emri Gönderildi");
-			//}
-
-			//if (CrossBelow(macd, macd.MacdTrigger))
-			//{
-			//    SendMarketOrder(Symbol, SellOrderQuantity, OrderSide.Sell);
-			//    Debug("Satış Emri Gönderildi");
-			//}
-
 
 			if (SimulateOrderSignal) return buy;
 			var maSignal = MovPeriod > 0 ? CrossAbove(mov, mov2) : true;
@@ -721,7 +722,7 @@ namespace Kalitte.Trading.Algos
 			var portfolio = this.portfolios.GetPortfolio(Symbol);
 
 
-			if (buySignal(barDataCurrentValues))
+			if (ensureSignal(buySignal, barDataCurrentValues, "LONG"))
 			{
 				if (!portfolio.IsLong)
 				{
@@ -743,7 +744,7 @@ namespace Kalitte.Trading.Algos
 
 			}
 
-			else if (sellSignal(barDataCurrentValues))
+			else if (ensureSignal(sellSignal, barDataCurrentValues, "SELL"))
 			{
 				if (!portfolio.IsShort)
 				{

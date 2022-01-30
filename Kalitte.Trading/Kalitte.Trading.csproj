@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>1.1.1.2</AssemblyVersion>
+    <AssemblyVersion>1.1.1.3</AssemblyVersion>
     <FileVersion>1.1.1.2</FileVersion>
     
   </PropertyGroup>
@@ -14,76 +14,76 @@
 
   <ItemGroup>
     <Reference Include="Matriks.AI">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.AI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.AI.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Calculus.Core">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Calculus.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Calculus.Core.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Calculus.Spreadsheet">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Calculus.Spreadsheet.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Calculus.Spreadsheet.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Connection">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Connection.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Connection.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Core">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Core.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Data.StreamUtils">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Data.StreamUtils.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Data.StreamUtils.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Database">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Database.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Database.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Engines">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Engines.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Engines.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Indicators">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Indicators.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Indicators.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Injection">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Injection.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Injection.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Lean.Algorithm">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Lean.Algorithm.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Lean.Algorithm.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Lean.Algotrader">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Lean.Algotrader.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Lean.Algotrader.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Logger">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Logger.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Logger.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Terminal.Database">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Terminal.Database.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Terminal.Database.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Trader">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Trader.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Trader.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Trader.Core">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Trader.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Trader.Core.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Trader.Messaging">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Trader.Messaging.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Trader.Messaging.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Wpf.Chart">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Wpf.Chart.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Chart.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Wpf.Controls">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Wpf.Controls.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Controls.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Wpf.Price">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Wpf.Price.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Price.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Wpf.PriceSheet">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Wpf.PriceSheet.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.PriceSheet.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Wpf.Splash">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Wpf.Splash.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Splash.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Wpf.Templates">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Wpf.Templates.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Templates.dll</HintPath>
     </Reference>
     <Reference Include="Matriks.Wpf.Trader">
-      <HintPath>..\..\..\..\..\MatriksIQ\Matriks.Wpf.Trader.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Trader.dll</HintPath>
     </Reference>
   </ItemGroup>
 

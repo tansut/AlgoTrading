@@ -19,6 +19,7 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
@@ -403,31 +404,85 @@ namespace Kalitte.Trading
 
         //}
 
-       
+
     }
+
+
+    public class SignalResultX
+    {
+        public OrderSide? finalResult = null;
+        public Signal Signal { get; set; }
+
+        public SignalResultX(Signal signal)
+        {
+            this.Signal = signal;
+        }
+    }
+
+
+    public class SignalEventArgs : EventArgs
+    {
+        public SignalResultX Result { get; set; }
+
+    }
+
+    public delegate void SignalEventHandler(Signal signal, SignalEventArgs data);
 
     public abstract class Signal
     {
+        protected System.Timers.Timer _timer = null;
         public string Name { get; set; }
         public MatriksAlgo Owner { get; set; }
-        public bool Enabled { get; set; }        
+        public bool Enabled { get; set; }
+        public bool TimerEnabled { get; set; }
+
+        public event SignalEventHandler OnSignal;
 
         public Signal(string name, MatriksAlgo owner, bool enabled)
         {
             Name = name;
             Owner = owner;
-            Enabled = enabled;            
+            Enabled = enabled;
+
         }
 
-        //public abstract bool Long();
-        //public abstract bool Short();
+        protected virtual void onTick(Object source, ElapsedEventArgs e)
+        {
+            var result = this.Check();
+            if (result != null) raiseSignal(new SignalEventArgs() { Result = result });
+        }
 
-        public abstract OrderSide? Check(bool ensuring);
+        public abstract SignalResultX Check();
+
+        public virtual void Start()
+        {
+            if (Enabled && TimerEnabled)
+            {
+                _timer = new System.Timers.Timer(1000);
+                _timer.Elapsed += this.onTick;
+                _timer.Start();
+            }
+        }
+
+        public virtual void Stop()
+        {
+            if (Enabled && TimerEnabled)
+            {
+                _timer.Stop();
+                _timer.Dispose();
+            }
+        }
 
 
+        protected virtual void raiseSignal(SignalEventArgs data)
+        {
+            if (this.OnSignal != null) OnSignal(this, data);
+        }
     }
 
-    public class CrossSignal: Signal
+
+
+    public class CrossSignal : Signal
     {
         public IIndicator i1 = null;
         public IIndicator i2 = null;
@@ -438,50 +493,39 @@ namespace Kalitte.Trading
             this.Enabled = enabled;
         }
 
-        public override OrderSide? Check(bool ensuring)
+
+        public override SignalResultX Check()
         {
             OrderSide? result = null;
             if (Owner.CrossAbove(i1, i2)) result = OrderSide.Buy;
-            else if (Owner.CrossBelow(i1, i2)) result= OrderSide.Sell;
-            return result;
-        }        
+            else if (Owner.CrossBelow(i1, i2)) result = OrderSide.Sell;
+            return new SignalResultX(this) { finalResult = result };
+        }
     }
 
     public class FlipFlopSignal : Signal
     {
         public OrderSide Side { get; set; }
 
-        public FlipFlopSignal(string name, MatriksAlgo owner, bool enabled, OrderSide side=OrderSide.Buy): base(name, owner, enabled)
+        public FlipFlopSignal(string name, MatriksAlgo owner, bool enabled, OrderSide side = OrderSide.Buy) : base(name, owner, enabled)
         {
-            this.Side = side;            
+            this.Side = side;
         }
 
 
-
-        public override OrderSide? Check(bool ensuring)
-        {            
+        public override SignalResultX Check()
+        {
             var result = this.Side;
             this.Side = result == OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy;
-            return ensuring ? Check(false): result;
+            return new SignalResultX(this) { finalResult = result };
         }
+
+
+
+
     }
 
-    //public class ManualSignal : Signal
-    //{
-    //    public OrderSide? Side { get; set; }
 
-    //    public ManualSignal(string name, MatriksAlgo owner, OrderSide side = OrderSide.Buy, bool enabled = true) : base(name, owner)
-    //    {
-    //        this.Side = side;
-    //        this.Enabled = enabled;
-    //    }
-
-
-    //    public override OrderSide? Check()
-    //    {
-    //        return this.Side;
-    //    }
-    //}
 
 
     public class SignalResult
@@ -490,7 +534,7 @@ namespace Kalitte.Trading
         public List<Signal> Buys = new List<Signal>();
 
         public OrderSide? FinalResult()
-        {            
+        {
             if (Sells.Count > Buys.Count) return OrderSide.Sell;
             if (Buys.Count > Sells.Count) return OrderSide.Buy;
             return null;
@@ -503,7 +547,7 @@ namespace Kalitte.Trading
         }
 
         public List<Signal> FinalSignals()
-        {            
+        {
             if (Sells.Count > Buys.Count) return Sells;
             if (Buys.Count > Sells.Count) return Buys;
             return null;
@@ -543,10 +587,10 @@ namespace Kalitte.Trading.Algos
         }
 
         public List<Signal> signals = new List<Signal>();
+        public ConcurrentDictionary<string, SignalResultX> signalResults = new ConcurrentDictionary<string, SignalResultX>();
 
         public int GetSymbolPeriodSeconds(SymbolPeriod period)
         {
-
             int result;
             symbolPeriodCache.TryGetValue(period, out result);
             if (result == 0) throw new ArgumentException("Not supported period");
@@ -570,13 +614,14 @@ namespace Kalitte.Trading.Algos
         public string logDir = @"c:\kalitte\log";
         private MarketDataFileLogger priceLogger;
         private MarketDataFileLogger rsiLogger;
-        private MarketDataFileLogger ma59Logger;        
+        private MarketDataFileLogger ma59Logger;
         private MarketDataFileLogger macd953Logger;
 
         MOV mov;
         MOV mov2;
         RSI rsi;
         MACD macd;
+        VOLUME volume;
 
         SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
 
@@ -599,6 +644,7 @@ namespace Kalitte.Trading.Algos
             mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
             rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
+            volume = VolumeIndicator(Symbol, SymbolPeriod);
 
 
             this.priceLogger = new MarketDataFileLogger(Symbol, logDir, "price");
@@ -616,10 +662,10 @@ namespace Kalitte.Trading.Algos
             if (t >= t1 && t <= t2)
             {
                 var price = GetMarketData(Symbol, SymbolUpdateField.Last);
-                priceLogger.LogMarketData(DateTime.Now, price);
+                priceLogger.LogMarketData(DateTime.Now, new decimal[] { price, volume.CurrentValue });
                 rsiLogger.LogMarketData(DateTime.Now, new decimal[] { price, rsi.CurrentValue });
-                ma59Logger.LogMarketData(DateTime.Now, new decimal[] { price, mov.CurrentValue, mov2.CurrentValue, CrossBelow(mov, mov2) ? 1:0, CrossAbove(mov, mov2) ? 1:0 });
-                macd953Logger.LogMarketData(DateTime.Now, new decimal[] { price, macd.CurrentValue, macd.MacdTrigger.CurrentValue, CrossBelow(macd, macd.MacdTrigger) ? 1:0, CrossAbove(macd, macd.MacdTrigger) ? 1:0 });
+                ma59Logger.LogMarketData(DateTime.Now, new decimal[] { price, mov.CurrentValue, mov2.CurrentValue, CrossBelow(mov, mov2) ? 1 : 0, CrossAbove(mov, mov2) ? 1 : 0 });
+                macd953Logger.LogMarketData(DateTime.Now, new decimal[] { price, macd.CurrentValue, macd.MacdTrigger.CurrentValue, CrossBelow(macd, macd.MacdTrigger) ? 1 : 0, CrossAbove(macd, macd.MacdTrigger) ? 1 : 0 });
             }
         }
     }
@@ -628,7 +674,7 @@ namespace Kalitte.Trading.Algos
     {
         private ManualResetEvent orderWait = new ManualResetEvent(true);
         private ManualResetEvent operationWait = new ManualResetEvent(true);
-        private ManualResetEvent signalWait = new ManualResetEvent(true);
+        //private ManualResetEvent signalWait = new ManualResetEvent(true);
 
         private bool ensuringOrder = false;
 
@@ -670,7 +716,7 @@ namespace Kalitte.Trading.Algos
         public decimal ProfitPuan = 9;
 
         [Parameter(12)]
-        public decimal LossPuan = 12;
+        public decimal LossPuan = 9;
 
         //[Parameter(0)]
         public int RsiLong = 0;
@@ -704,7 +750,7 @@ namespace Kalitte.Trading.Algos
         decimal takeProfitTotal = 0;
         decimal stopLossTotal = 0;
 
-        bool buy = true;
+
 
 
         PortfolioList portfolios = new PortfolioList();
@@ -722,14 +768,17 @@ namespace Kalitte.Trading.Algos
             rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
 
-            this.signals.Add(new CrossSignal("MA59Cross", this, !SimulateOrderSignal && MovPeriod > 0, mov, mov2));
-            this.signals.Add(new CrossSignal("MACD59Cross", this, !SimulateOrderSignal && MACDLongPeriod > 0, macd, macd.MacdTrigger));
-            this.signals.Add(new FlipFlopSignal("FlipFlop", this,  SimulateOrderSignal, OrderSide.Buy));
-            
+
+            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("MA59Cross", this, !SimulateOrderSignal && MovPeriod > 0, mov, mov2));
+            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("MACD59Cross", this, !SimulateOrderSignal && MACDLongPeriod > 0, macd, macd.MacdTrigger));
+            if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("FlipFlop", this, SimulateOrderSignal, OrderSide.Buy));
+
+            signals.ForEach(p => p.TimerEnabled = !BackTestMode);
+            signals.ForEach(p => p.OnSignal += SignalReceieved);
 
             WorkWithPermanentSignal(true);
             SendOrderSequential(false);
-            orderTimer = new System.Timers.Timer(1000);
+            orderTimer = new System.Timers.Timer(3000);
             if ((ProfitQuantity > 0 || LossQuantity > 0) && !BackTestMode)
             {
                 AddSymbolMarketData(Symbol);
@@ -737,6 +786,8 @@ namespace Kalitte.Trading.Algos
             }
             this.fileLogger = new MarketDataFileLogger(Symbol, logDir, "price");
         }
+
+
 
         public decimal GetMarketPrice(DateTime? t = null)
         {
@@ -783,17 +834,101 @@ namespace Kalitte.Trading.Algos
             Log($"Inited with {assembly.FullName}");
             LoadRealPositions();
             orderTimer.Elapsed += OnOrderTimerEvent;
-            orderTimer.AutoReset = true;
+            signals.ForEach(p => p.Start());
             orderTimer.Enabled = true;
         }
 
         private void OnOrderTimerEvent(Object source, ElapsedEventArgs e)
         {
             if (BackTestMode) return;
-            this.CreateOrders(null);
+            orderTimer.Enabled = false;
+            try
+            {
+                Decide();
+            }
+            finally
+            {
+                orderTimer.Enabled = true;
+            }
 
         }
 
+        private void SignalReceieved(Signal signal, SignalEventArgs data)
+        {
+            if (BackTestMode) return;
+            Log($"Signal received from {signal.Name} as {data.Result.finalResult }");
+            signalResults[signal.Name] = data.Result;
+        }
+
+
+        private void Decide()
+        {
+            var result = signalResults.Where(p => p.Value.finalResult.HasValue).FirstOrDefault().Value;
+            if (result != null)
+            {
+                operationWait.WaitOne();
+                orderWait.WaitOne();
+                operationWait.Reset();
+                try
+                {
+                    Log($"Decided signal as {result.finalResult} from {result.Signal.Name}");
+                    CreateOrders(result);
+                }
+                finally
+                {
+                    operationWait.Set();
+                }
+
+            }
+        }
+
+        public void CreateOrders(SignalResultX signalResult)
+        {
+                decimal doubleMultiplier = 1.0M;
+            OrderSide? side = null;
+            var portfolio = this.portfolios.GetPortfolio(Symbol);
+
+            if (signalResult.finalResult == OrderSide.Buy && portfolio.IsLong) return;
+            if (signalResult.finalResult == OrderSide.Sell && portfolio.IsShort) return;
+
+
+            if (signalResult.finalResult == OrderSide.Buy)
+            {
+                if (!portfolio.IsLong)
+                {
+                    side = OrderSide.Buy;
+                    if (this.DoublePositions)
+                    {
+                        if (portfolio.IsShort)
+                        {
+                            doubleMultiplier = ((portfolio.Quantity == OrderQuantity / 2.0M) && (ProfitQuantity > 0)) ? 1.5M : 2.0M;
+                        }
+                    }
+                }
+            }
+
+            else if (signalResult.finalResult == OrderSide.Sell)
+            {
+                if (!portfolio.IsShort)
+                {
+                    side = OrderSide.Sell;
+                    if (this.DoublePositions)
+                    {
+                        if (portfolio.IsLong)
+                        {
+                            doubleMultiplier = ((portfolio.Quantity == OrderQuantity / 2.0M) && (ProfitQuantity > 0)) ? 1.5M : 2.0M;
+                        }
+                    }
+                }
+
+            }
+            if (side != null)
+            {
+                sendOrder(Symbol, OrderQuantity * doubleMultiplier, side.Value, "[" + signalResult.Signal.Name + "]");
+            }
+
+
+        }
 
 
 
@@ -907,104 +1042,53 @@ namespace Kalitte.Trading.Algos
             return this.positionRequest;
         }
 
-        public SignalResult ensureSignal()
-        {
-            this.ensuringOrder = true;
-            signalWait.Reset();
-            SignalResult check = null;            
-            try
-            {
-                check = CheckSignals(false);
-                var result = check.FinalResult();
-
-                if (result.HasValue  && !BackTestMode)
-                {
-                    Log($"{(result == OrderSide.Sell ? 'S': 'L')} signal received. Waiting to confirm.");
-                    var wait = 30;                    
-                    Thread.Sleep(wait * 1000);
-                    check = CheckSignals(true);
-                    var newResult = check.FinalResult();
-                    if (newResult != result)
-                    {
-                        check.Reset();
-                        Log($"{(result == OrderSide.Sell ? 'S' : 'L')} signal not confirmed after {wait} seconds.");
-                    };
-                }
-            }
-            finally
-            {
-                signalWait.Set();
-                this.ensuringOrder = false;
-            }
-            return check;
-        }
-
-
-        //public bool ensureSignal(Func<BarDataCurrentValues, bool> func, BarDataCurrentValues values, string caption = "")
+        //public SignalResult ensureSignal(SignalResult check)
         //{
         //    this.ensuringOrder = true;
-        //    var result = false;
+        //    signalWait.Reset();
+
         //    try
-        //    {
-        //        result = func(values);
-        //        if (result && !BackTestMode)
+        //    {                
+        //        var result = check.FinalResult();
+
+        //        if (result.HasValue  && !BackTestMode)
         //        {
-        //            var wait = 10;
-        //            Log($"Waiting to confirm {caption} signal in {wait} seconds...");
+        //            Log($"{(result == OrderSide.Sell ? 'S': 'L')} signal received. Waiting to confirm.");
+        //            var wait = 30;                    
         //            Thread.Sleep(wait * 1000);
-        //            result = func(values);
-        //            if (!result)
+        //            check = CheckSignals(true);
+        //            var newResult = check.FinalResult();
+        //            if (newResult != result)
         //            {
-        //                Log($"{caption} signal not confirmed.");
+        //                check.Reset();
+        //                Log($"{(result == OrderSide.Sell ? 'S' : 'L')} signal not confirmed after {wait} seconds.");
         //            };
         //        }
         //    }
         //    finally
         //    {
+        //        signalWait.Set();
         //        this.ensuringOrder = false;
         //    }
-        //    return result;
-        //}
-
-        //public bool buySignal(BarDataCurrentValues barDataCurrentValues)
-        //{
-        //    if (SimulateOrderSignal) return buy;
-        //    var result = this.CheckSignals();
-        //    return result.FinalResult() == OrderSide.Buy;
-
-        //    //var maSignal = MovPeriod > 0 ? CrossAbove(mov, mov2) : true;
-        //    //var rsiSignal = RsiLong > 0 ? CrossAbove(rsi, RsiLong) : true;
-        //    //var macdSignal = MACDLongPeriod > 0 ? CrossAbove(macd, macd.MacdTrigger) : true;
-
-        //    //return maSignal && rsiSignal && macdSignal;
+        //    return check;
         //}
 
 
-        //public bool sellSignal(BarDataCurrentValues barDataCurrentValues)
-        //{
-        //    if (SimulateOrderSignal) return !buy;
-
-        //    var maSignal = MovPeriod > 0 ? CrossBelow(mov, mov2) : true;
-        //    var rsiSignal = RsiShort > 0 ? CrossBelow(rsi, RsiShort) : true;
-        //    var macdSignal = MACDLongPeriod > 0 ? CrossBelow(macd, macd.MacdTrigger) : true;
-
-        //    return maSignal && rsiSignal && macdSignal;
-        //}
 
 
-        public SignalResult CheckSignals(bool ensuring)
-        {            
+        public SignalResult CheckSignals()
+        {
             var results = new SignalResult();
-            foreach(var signal in this.signals)
+            foreach (var signal in this.signals)
             {
                 if (signal.Enabled)
                 {
-                    var res = signal.Check(ensuring);
-                    if (res == OrderSide.Buy) results.Buys.Add(signal);
-                    else if (res == OrderSide.Sell) results.Sells.Add(signal);
+                    var res = signal.Check();
+                    if (res.finalResult == OrderSide.Buy) results.Buys.Add(signal);
+                    else if (res.finalResult == OrderSide.Sell) results.Sells.Add(signal);
                 }
             }
-           
+
             return results;
         }
 
@@ -1036,67 +1120,19 @@ namespace Kalitte.Trading.Algos
                     }
                 }
             }
-            this.CreateOrders(barDataCurrentValues);
-        }
 
-        public void CreateOrders(BarDataCurrentValues barDataCurrentValues)
-        {
-            if (!this.ensureWaitingPositions()) return;
-            operationWait.WaitOne();
-            orderWait.WaitOne();
-            signalWait.WaitOne();
-            decimal doubleMultiplier = 1.0M;
-            OrderSide? side = null;
-
-            operationWait.Reset();
-            try
+            foreach (var signal in signals)
             {
-                var portfolio = this.portfolios.GetPortfolio(Symbol);
-                
-                var check = ensureSignal();
-                var result = check.FinalResult();
-
-                if (result == OrderSide.Buy)
-                {                    
-                    if (!portfolio.IsLong)
-                    {
-                        side = OrderSide.Buy;
-                        if (this.DoublePositions)
-                        {
-                            if (portfolio.IsShort)
-                            {
-                                doubleMultiplier = ((portfolio.Quantity == OrderQuantity / 2.0M) && (ProfitQuantity > 0)) ? 1.5M : 2.0M;
-                            }
-                        }
-                    }
-                }
-
-                else if (result == OrderSide.Sell)
-                {
-                    if (!portfolio.IsShort)
-                    {                        
-                        side = OrderSide.Sell;
-                        if (this.DoublePositions)
-                        {
-                            if (portfolio.IsLong)
-                            {
-                                doubleMultiplier = ((portfolio.Quantity == OrderQuantity / 2.0M) && (ProfitQuantity > 0)) ? 1.5M : 2.0M;
-                            }
-                        }
-                    }
-
-                }
-                if (side != null)
-                {                    
-                    sendOrder(Symbol, OrderQuantity * doubleMultiplier, side.Value, "[" + string.Join(",", check.FinalSignals().Select(p => p.Name).ToArray()) + "]");
-                }
-            }
-            finally
-            {
-                operationWait.Set();
+                var result = signal.Check();
+                SignalReceieved(signal, new SignalEventArgs() { Result = result });
             }
 
+            Decide();
+
+
+            //this.CreateOrders(barDataCurrentValues);
         }
+
 
         public void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
         {
@@ -1132,10 +1168,12 @@ namespace Kalitte.Trading.Algos
 
         public override void OnStopped()
         {
-            if (orderTimer != null)
-            {
-                orderTimer.Stop();
-            }
+
+
+            orderTimer.Stop();
+
+
+            signals.ForEach(p => p.Stop());
             Log($"Portfolio ended: {portfolios.Print()}");
         }
     }
@@ -1155,6 +1193,15 @@ namespace Matriks.Lean.Algotrader
         public override void OnInit()
         {
             this.BackTestMode = true;
+            base.OnInit();
+        }
+    }
+
+    public class testsignal : Kalitte.Trading.Algos.MaProfit
+    {
+        public override void OnInit()
+        {
+
             base.OnInit();
         }
     }

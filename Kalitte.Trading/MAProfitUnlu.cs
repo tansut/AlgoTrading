@@ -750,7 +750,10 @@ namespace Kalitte.Trading.Algos
         MACD macd;
 
         public string logDir = @"c:\kalitte\log";
-        private MarketDataFileLogger fileLogger;
+
+        private MarketDataFileLogger priceLog;
+        private MarketDataFileLogger maLog;
+        private MarketDataFileLogger macdLog;
 
 
         [Parameter(false)]
@@ -771,15 +774,18 @@ namespace Kalitte.Trading.Algos
         public override bool CrossAboveX(Signal s, DateTime? t = null)
         {
             var cross = (CrossSignal)s;
-            if (!BackTestMode) return this.CrossAbove(cross.i1, cross.i2);
+            return this.CrossAbove(cross.i1, cross.i2);
+
+            //if (BackTestMode) return priceLog.GetMarketData(t.HasValue ? t.Value : DateTime.Now);
 
 
         }
 
-        //public override bool CrossBelowX(Signal s, DateTime? t = null)
-        //{
-        //    if (!BackTestMode) return this.CrossBelow(i1, i2);
-        //}
+        public override bool CrossBelowX(Signal s, DateTime? t = null)
+        {
+            var cross = (CrossSignal)s;
+            return this.CrossBelow(cross.i1, cross.i2);
+        }
 
 
 
@@ -793,7 +799,7 @@ namespace Kalitte.Trading.Algos
 
 
             if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("ma59", this, !SimulateOrderSignal && MovPeriod > 0, mov, mov2));
-            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("MACD59Cross", this, !SimulateOrderSignal && MACDLongPeriod > 0, macd, macd.MacdTrigger));
+            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("macd953", this, !SimulateOrderSignal && MACDLongPeriod > 0, macd, macd.MacdTrigger));
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("FlipFlop", this, SimulateOrderSignal, OrderSide.Buy));
 
             signals.ForEach(p => p.TimerEnabled = !BackTestMode);
@@ -808,14 +814,16 @@ namespace Kalitte.Trading.Algos
                 AddSymbolMarketData(Symbol);
                 SetTimerInterval(1);
             }
-            this.fileLogger = new MarketDataFileLogger(Symbol, logDir, "price");
+            this.priceLog = new MarketDataFileLogger(Symbol, logDir, "price");
+            this.maLog = new MarketDataFileLogger(Symbol, logDir, "ma59");
+            this.macdLog = new MarketDataFileLogger(Symbol, logDir, "macd593");
         }
 
 
 
         public decimal GetMarketPrice(DateTime? t = null)
         {
-            if (BackTestMode) return fileLogger.GetMarketData(t.HasValue ? t.Value : DateTime.Now);
+            if (BackTestMode) return priceLog.GetMarketData(t.HasValue ? t.Value : DateTime.Now);
             var price = this.GetMarketData(Symbol, SymbolUpdateField.Last);
             return price;
         }

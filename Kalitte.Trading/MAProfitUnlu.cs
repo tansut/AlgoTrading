@@ -496,6 +496,12 @@ namespace Kalitte.Trading
             return null;
         }
 
+        public void Reset()
+        {
+            Buys.Clear();
+            Sells.Clear();
+        }
+
         public List<Signal> FinalSignals()
         {            
             if (Sells.Count > Buys.Count) return Sells;
@@ -622,7 +628,7 @@ namespace Kalitte.Trading.Algos
     {
         private ManualResetEvent orderWait = new ManualResetEvent(true);
         private ManualResetEvent operationWait = new ManualResetEvent(true);
-        //private ManualResetEvent ensureSignalWait = new ManualResetEvent(true);
+        private ManualResetEvent signalWait = new ManualResetEvent(true);
 
         private bool ensuringOrder = false;
 
@@ -663,8 +669,8 @@ namespace Kalitte.Trading.Algos
         [Parameter(9)]
         public decimal ProfitPuan = 9;
 
-        [Parameter(18)]
-        public decimal LossPuan = 18;
+        [Parameter(12)]
+        public decimal LossPuan = 12;
 
         //[Parameter(0)]
         public int RsiLong = 0;
@@ -904,7 +910,8 @@ namespace Kalitte.Trading.Algos
         public SignalResult ensureSignal()
         {
             this.ensuringOrder = true;
-            SignalResult check = null;
+            signalWait.Reset();
+            SignalResult check = null;            
             try
             {
                 check = CheckSignals(false);
@@ -912,19 +919,21 @@ namespace Kalitte.Trading.Algos
 
                 if (result.HasValue  && !BackTestMode)
                 {
-                    var wait = 10;                    
+                    Log($"{(result == OrderSide.Sell ? 'S': 'L')} signal received. Waiting to confirm.");
+                    var wait = 30;                    
                     Thread.Sleep(wait * 1000);
                     check = CheckSignals(true);
                     var newResult = check.FinalResult();
-
                     if (newResult != result)
                     {
-                        Log($"Signals not confirmed.");
+                        check.Reset();
+                        Log($"{(result == OrderSide.Sell ? 'S' : 'L')} signal not confirmed after {wait} seconds.");
                     };
                 }
             }
             finally
             {
+                signalWait.Set();
                 this.ensuringOrder = false;
             }
             return check;
@@ -1035,6 +1044,7 @@ namespace Kalitte.Trading.Algos
             if (!this.ensureWaitingPositions()) return;
             operationWait.WaitOne();
             orderWait.WaitOne();
+            signalWait.WaitOne();
             decimal doubleMultiplier = 1.0M;
             OrderSide? side = null;
 

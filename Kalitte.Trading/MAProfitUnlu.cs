@@ -504,11 +504,12 @@ namespace Kalitte.Trading
         public override SignalResultX Check(DateTime? t = null)
         {
             OrderSide? result = null;
+
             if (Owner.CrossAboveX(i1, i2, t)) result = OrderSide.Buy;
             else if (Owner.CrossBelowX(i1, i2, t)) result = OrderSide.Sell;
 
             if (Simulation) return new SignalResultX(this) { finalResult = result };
-
+            
             if (firstSignal != result)
             {
                 firstSignal = result;
@@ -573,6 +574,7 @@ namespace Kalitte.Trading
             return null;
         }
 
+
         public void Reset()
         {
             Buys.Clear();
@@ -629,6 +631,9 @@ namespace Kalitte.Trading.Algos
             if (result == 0) throw new ArgumentException("Not supported period");
             return result;
         }
+
+        decimal i1val = 0.0M;
+
 
         public virtual bool CrossAboveX(IIndicator i1, IIndicator i2, DateTime? t = null)
         {
@@ -717,6 +722,7 @@ namespace Kalitte.Trading.Algos
     {
         private ManualResetEvent orderWait = new ManualResetEvent(true);
         private ManualResetEvent operationWait = new ManualResetEvent(true);
+        private ManualResetEvent backtestWait = new ManualResetEvent(false);
 
 
         //[SymbolParameter("F_XU0300222")]
@@ -868,17 +874,64 @@ namespace Kalitte.Trading.Algos
 
 
 
+        public void startBackTest()
+        {
+            var start = new DateTime(2022, 01, 28, 9, 30, 0);
+            var end = new DateTime(2022, 01, 28, 18, 0, 0);
 
+            var seconds = (end - start).TotalSeconds;
+
+            for(var i = 0; i < seconds; i++)
+            {
+                var t = start.AddSeconds(i);
+                //            var result = this.ManageProfitLoss(price, date);
+                //            if (result.HasValue) break;
+            }
+
+
+
+            //var portfolio = portfolios.GetPortfolio(Symbol);
+            //if (ProfitQuantity > 0 && !portfolio.IsEmpty)
+            //{
+            //    var t = barDataCurrentValues.LastUpdate.DTime;
+            //    var periodsToBack = GetSymbolPeriodSeconds(SymbolPeriod);
+
+            //    var start = t - TimeSpan.FromSeconds(periodsToBack - 1);
+            //    Log($"Backtest starting to check take profit. Bar: {t}, start: {start}  seconds back: {periodsToBack}", LogLevel.Debug);
+            //    for (var i = 0; i < periodsToBack; i++)
+            //    {
+            //        var date = start.AddSeconds(i);
+            //        var price = GetMarketPrice(date);
+            //        if (price != 0)
+            //        {                        
+            //            var result = this.ManageProfitLoss(price, date);
+            //            if (result.HasValue) break;
+            //        }
+            //    }
+            //}
+
+            //foreach (var signal in signals)
+            //{
+            //    var result = signal.Check();
+            //    SignalReceieved(signal, new SignalEventArgs() { Result = result });
+            //}
+            //Decide();
+
+            backtestWait.Set();
+        }
 
 
         public override void OnInitCompleted()
         {
             var assembly = typeof(MaProfit).Assembly.GetName();
             Log($"Inited with {assembly.FullName}");
-            LoadRealPositions();
-            orderTimer.Elapsed += OnOrderTimerEvent;
+            LoadRealPositions();            
             signals.ForEach(p => p.Start());
-            orderTimer.Enabled = true;
+            if (!BackTestMode)
+            {
+                orderTimer.Elapsed += OnOrderTimerEvent;
+                orderTimer.Enabled = true;
+            }            
         }
 
         private void OnOrderTimerEvent(Object source, ElapsedEventArgs e)
@@ -909,7 +962,7 @@ namespace Kalitte.Trading.Algos
         {
             lock (signalResults)
             {
-                //Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
+                Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
                 var result = signalResults.Where(p => p.Value.finalResult.HasValue).FirstOrDefault().Value;
                 if (result != null)
                 {
@@ -918,14 +971,15 @@ namespace Kalitte.Trading.Algos
                     operationWait.Reset();
                     try
                     {
-                        //Log($"Decided signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
+                        Log($"Decided signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
                         CreateOrders(result);
                     }
                     finally
                     {
                         operationWait.Set();
                     }
-                }                
+                }
+                else Log("Bot decided", LogLevel.Debug);
             }
         }
 
@@ -1154,6 +1208,9 @@ namespace Kalitte.Trading.Algos
         public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
         {
             if (!this.BackTestMode) return;
+
+
+
             var portfolio = portfolios.GetPortfolio(Symbol);
             if (ProfitQuantity > 0 && !portfolio.IsEmpty)
             {
@@ -1167,7 +1224,7 @@ namespace Kalitte.Trading.Algos
                     var date = start.AddSeconds(i);
                     var price = GetMarketPrice(date);
                     if (price != 0)
-                    {                        
+                    {
                         var result = this.ManageProfitLoss(price, date);
                         if (result.HasValue) break;
                     }

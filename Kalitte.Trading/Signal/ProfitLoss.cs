@@ -47,7 +47,7 @@ namespace Kalitte.Trading
         }
 
 
-        public override SignalResultX Check(DateTime? t = null)
+        protected override SignalResultX CheckInternal(DateTime? t = null)
         {
 
             OrderSide? result = null;
@@ -96,7 +96,7 @@ namespace Kalitte.Trading
         }
 
 
-        public override SignalResultX Check(DateTime? t = null)
+        protected override SignalResultX CheckInternal(DateTime? t = null)
         {
 
             OrderSide? result = null;

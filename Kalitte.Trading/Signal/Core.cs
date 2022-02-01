@@ -52,6 +52,8 @@ namespace Kalitte.Trading
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
+        public OrderSide? LastSignal { get; protected set; }
+        public int CheckCount { get; private set; }
 
         public event SignalEventHandler OnSignal;
 
@@ -63,6 +65,8 @@ namespace Kalitte.Trading
             Enabled = true;
             TimerEnabled = false;
             Simulation = false;
+            LastSignal = null;
+            CheckCount = 0;
 
         }
 
@@ -72,13 +76,28 @@ namespace Kalitte.Trading
             if (result != null) raiseSignal(new SignalEventArgs() { Result = result });
         }
 
-        public abstract SignalResultX Check(DateTime? t = null);
+        protected abstract SignalResultX CheckInternal(DateTime? t = null);
+
+        public virtual SignalResultX Check(DateTime? t = null)
+        {
+            var result = CheckInternal(t);
+            CheckCount++;
+            return result;
+
+            //var saveLast = LastSignal;
+            //LastSignal = result.finalResult;
+            //
+            //if (saveLast != result.finalResult)
+            //{                                
+            //    return new SignalResultX(this) {  finalResult = result.finalResult };
+            //} else return new SignalResultX(this) { finalResult = null };
+        }
 
         public virtual void Start()
         {
             if (Enabled && TimerEnabled)
             {
-                _timer = new System.Timers.Timer(500);
+                _timer = new System.Timers.Timer(1000);
                 _timer.Elapsed += this.onTick;
                 _timer.Start();
             }
@@ -95,8 +114,9 @@ namespace Kalitte.Trading
 
 
         protected virtual void raiseSignal(SignalEventArgs data)
-        {
+        {            
             if (this.OnSignal != null) OnSignal(this, data);
+            //if (data.Result.finalResult.HasValue) LastSignal = data.Result;
         }
     }
 

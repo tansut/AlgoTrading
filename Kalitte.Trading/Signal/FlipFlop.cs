@@ -33,7 +33,7 @@ namespace Kalitte.Trading
         }
 
 
-        public override SignalResultX Check(DateTime? t = null)
+        protected override SignalResultX CheckInternal(DateTime? t = null)
         {
             var result = this.Side;
             this.Side = result == OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy;

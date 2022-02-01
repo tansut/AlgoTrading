@@ -39,7 +39,7 @@ namespace Kalitte.Trading.Algos
         //[SymbolParameter("F_XU0300222")]
         public string Symbol = "F_XU0300222";
 
-        //[Parameter(SymbolPeriod.Min10)]
+        [Parameter(SymbolPeriod.Min10)]
         public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
 
         [Parameter(2)]
@@ -317,24 +317,7 @@ namespace Kalitte.Trading.Algos
 
         }
 
-
-
-        //public bool ensureWaitingPositions()
-        //{
-        //    if (this.positionRequest != null)
-        //    {
-        //        //Log($"active position waiting: {positionRequest.Id}/{positionRequest.Symbol}/{positionRequest.Side}/{positionRequest.Quantity}");
-
-        //        return false;
-        //    }
-        //    else return true;
-
-        //}
-
-        
-
-
-
+       
         protected ExchangeOrder sendOrder(string symbol, decimal quantity, OrderSide side, string comment = "", decimal lprice = 0, ChartIcon icon = ChartIcon.None)
         {
             Log($"Order received: {symbol} {quantity} {side} {comment}", LogLevel.Debug);
@@ -370,28 +353,6 @@ namespace Kalitte.Trading.Algos
         public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
         {
             if (!this.BackTestMode) return;
-
-
-
-            //var portfolio = UserPortfolioList.GetPortfolio(Symbol);
-            //if (ProfitQuantity > 0 && !portfolio.IsEmpty)
-            //{
-            //    var t = barDataCurrentValues.LastUpdate.DTime;
-            //    var periodsToBack = GetSymbolPeriodSeconds(SymbolPeriod);
-
-            //    var start = t - TimeSpan.FromSeconds(periodsToBack - 1);
-            //    Log($"Backtest starting to check take profit. Bar: {t}, start: {start}  seconds back: {periodsToBack}", LogLevel.Debug);
-            //    for (var i = 0; i < periodsToBack; i++)
-            //    {
-            //        var date = start.AddSeconds(i);
-            //        var price = GetMarketPrice(this.Symbol, date);
-            //        if (price != 0)
-            //        {
-            //            var result = this.ManageProfitLoss(price, date);
-            //            if (result.HasValue) break;
-            //        }
-            //    }
-            //}
 
             foreach (var signal in signals)
             {

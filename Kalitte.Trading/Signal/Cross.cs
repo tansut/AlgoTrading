@@ -29,7 +29,10 @@ namespace Kalitte.Trading
         public IIndicator i2 = null;
 
         private OrderSide? firstSignal = null;
-        private decimal split = 1M;
+        private decimal split = 0.3M;
+        private int periods = 5;
+        private List<decimal> lastSignals = new List<decimal>();
+        private OrderSide? initialPeriodSignal;
 
         public CrossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
         {
@@ -38,40 +41,72 @@ namespace Kalitte.Trading
         }
 
 
-        public override SignalResultX Check(DateTime? t = null)
+        protected override SignalResultX CheckInternal(DateTime? t = null)
         {
-            OrderSide? result = null;
+            OrderSide? currentSignal = null;
+            OrderSide? periodSignal = null;
 
-            if (Algo.CrossAboveX(i1, i2, t)) result = OrderSide.Buy;
-            else if (Algo.CrossBelowX(i1, i2, t)) result = OrderSide.Sell;
+            if (Algo.CrossAboveX(i1, i2, t)) periodSignal = OrderSide.Buy;
+            else if (Algo.CrossBelowX(i1, i2, t)) periodSignal = OrderSide.Sell;
 
-            if (Simulation) return new SignalResultX(this) { finalResult = result };
-
-            if (firstSignal != result)
+            if (!initialPeriodSignal.HasValue && periodSignal.HasValue)
             {
-                firstSignal = result;
-                if (result.HasValue)
+                initialPeriodSignal = periodSignal;
+            }
+
+            if (!initialPeriodSignal.HasValue) return new SignalResultX(this) { finalResult = null };
+
+            if (i1.CurrentValue > i2.CurrentValue) currentSignal = OrderSide.Buy;
+            else if (i1.CurrentValue < i2.CurrentValue) currentSignal = OrderSide.Sell;
+
+            if (Simulation) return new SignalResultX(this) { finalResult = periodSignal };
+
+            if (firstSignal != currentSignal)
+            {
+                lastSignals.Clear();
+                if (currentSignal.HasValue)
                 {
-                    Algo.Log($"Set first signal to {result}");
-                    result = null;
+                    Algo.Log($"Set first signal to {currentSignal}");
+                    firstSignal = currentSignal;
+                    currentSignal = null;
+                }
+                else if (firstSignal.HasValue)
+                {
+                    Algo.Log($" first signal: {firstSignal} going to null");
+                    firstSignal = currentSignal;
                 }
             }
-            else if (result.HasValue)
+            else if (currentSignal.HasValue)
             {
                 var dif = Math.Abs(i1.CurrentValue - i2.CurrentValue);
-                if (dif >= split)
+                lastSignals.Add(dif);
+                if (lastSignals.Count >= periods)
                 {
-                    Algo.Log($"{result} confirmed with diff {dif}");
-                    firstSignal = null;
+                    var avg = lastSignals.Average();
+                    lastSignals.RemoveAt(0);
+                    if (avg >= split)
+                    {
+                        Algo.Log($"{currentSignal} confirmed with diff {dif}");
+                        lastSignals.Clear();
+                        firstSignal = null;
+                    }
+                    else
+                    {
+                        Algo.Log($"{currentSignal} NOT confirmed with diff {dif}");
+                        currentSignal = null;
+                    }
                 }
                 else
                 {
-                    Algo.Log($"{result} NOT confirmed with diff {dif}");
-                    result = null;
+                    currentSignal = null;
                 }
+
+
             }
 
-            return new SignalResultX(this) { finalResult = result };
+
+
+            return new SignalResultX(this) { finalResult = currentSignal };
         }
     }
 

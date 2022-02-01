@@ -29,10 +29,12 @@ namespace Kalitte.Trading
         public IIndicator i2 = null;
 
         private OrderSide? firstSignal = null;
-        private decimal split = 0.3M;
-        private int periods = 5;
+
+        public decimal Split = 0.3M;
+
+        public int Periods = 5;
         private List<decimal> lastSignals = new List<decimal>();
-        private OrderSide? initialPeriodSignal;
+        private OrderSide? initialPeriodSignal = null;
 
         public CrossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
         {
@@ -40,8 +42,7 @@ namespace Kalitte.Trading
             this.i2 = i2;
         }
 
-
-        protected override SignalResultX CheckInternal(DateTime? t = null)
+        protected  SignalResultX CalculateSignal(DateTime? t = null)
         {
             OrderSide? currentSignal = null;
             OrderSide? periodSignal = null;
@@ -49,9 +50,18 @@ namespace Kalitte.Trading
             if (Algo.CrossAboveX(i1, i2, t)) periodSignal = OrderSide.Buy;
             else if (Algo.CrossBelowX(i1, i2, t)) periodSignal = OrderSide.Sell;
 
+            //periodSignal = OrderSide.Sell;
+            //Algo.Log($"cacl initial period {initialPeriodSignal}", LogLevel.Debug);
+
             if (!initialPeriodSignal.HasValue && periodSignal.HasValue)
             {
                 initialPeriodSignal = periodSignal;
+                Algo.Log($"Setting initial period signal to {initialPeriodSignal}", LogLevel.Debug);
+            }
+
+            if (CheckCount == 0 && !initialPeriodSignal.HasValue)
+            {
+                Algo.Log($"No initial signal for {Name}. Suspended until a valid initial signal", LogLevel.Warning);
             }
 
             if (!initialPeriodSignal.HasValue) return new SignalResultX(this) { finalResult = null };
@@ -61,53 +71,31 @@ namespace Kalitte.Trading
 
             if (Simulation) return new SignalResultX(this) { finalResult = periodSignal };
 
-            if (firstSignal != currentSignal)
-            {
-                lastSignals.Clear();
-                if (currentSignal.HasValue)
-                {
-                    Algo.Log($"Set first signal to {currentSignal}");
-                    firstSignal = currentSignal;
-                    currentSignal = null;
-                }
-                else if (firstSignal.HasValue)
-                {
-                    Algo.Log($" first signal: {firstSignal} going to null");
-                    firstSignal = currentSignal;
-                }
-            }
-            else if (currentSignal.HasValue)
-            {
-                var dif = Math.Abs(i1.CurrentValue - i2.CurrentValue);
-                lastSignals.Add(dif);
-                if (lastSignals.Count >= periods)
-                {
-                    var avg = lastSignals.Average();
-                    lastSignals.RemoveAt(0);
-                    if (avg >= split)
-                    {
-                        Algo.Log($"{currentSignal} confirmed with diff {dif}");
-                        lastSignals.Clear();
-                        firstSignal = null;
-                    }
-                    else
-                    {
-                        Algo.Log($"{currentSignal} NOT confirmed with diff {dif}");
-                        currentSignal = null;
-                    }
-                }
-                else
-                {
-                    currentSignal = null;
-                }
+            var dif = i1.CurrentValue - i2.CurrentValue;
+            //Algo.Log($"{i1.CurrentValue} - {i2.CurrentValue}", LogLevel.Debug);
 
+            lastSignals.Add(dif);
+            if (lastSignals.Count > Periods) lastSignals.RemoveAt(0);
 
+            OrderSide? finalResult = null;
+
+            if (lastSignals.Count >= Periods)
+            {                
+                var avg = lastSignals.Average();
+                Algo.Log($"Average: {avg} slip: {Split}");
+                if (avg >= Split) finalResult = OrderSide.Buy;
+                else if (avg <= -Split) finalResult = OrderSide.Sell;
             }
 
-
-
-            return new SignalResultX(this) { finalResult = currentSignal };
+            return new SignalResultX(this) { finalResult = finalResult };
         }
+
+        protected override SignalResultX CheckInternal(DateTime? t = null)
+        {
+            var current = CalculateSignal(t);
+            //if (current.finalResult == LastSignal) return new SignalResultX(this) { finalResult = null };
+            return current;
+         }
     }
 
 }

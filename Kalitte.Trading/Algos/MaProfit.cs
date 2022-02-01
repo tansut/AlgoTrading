@@ -106,7 +106,7 @@ namespace Kalitte.Trading.Algos
 
         public override void OnInit()
         {
-            AddSymbol(Symbol, BackTestMode ? SymbolPeriod.Min: SymbolPeriod);
+            AddSymbol(Symbol, BackTestMode ? SymbolPeriod.Min : SymbolPeriod);
             mov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod, MovMethod.Exponential);
             mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
             rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);
@@ -114,7 +114,7 @@ namespace Kalitte.Trading.Algos
 
 
             if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("ma59cross", Symbol, this, mov, mov2));
-            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("macd59cross", Symbol, this, macd, macd.MacdTrigger));
+            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("macd59cross", Symbol, this, macd, macd.MacdTrigger) { Split = 0.15M, Periods = 3 });
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
             if (this.ProfitQuantity > 0) this.signals.Add(new TakeProfitSignal("takeprofit", Symbol, this, this.ProfitPuan, this.ProfitQuantity));
             if (this.LossQuantity > 0) this.signals.Add(new StopLossSignal("stoploss", Symbol, this, this.LossPuan, this.LossQuantity));
@@ -146,7 +146,7 @@ namespace Kalitte.Trading.Algos
 
             var seconds = (end - start).TotalSeconds;
 
-            for(var i = 0; i < seconds; i++)
+            for (var i = 0; i < seconds; i++)
             {
                 var t = start.AddSeconds(i);
                 //            var result = this.ManageProfitLoss(price, date);
@@ -190,27 +190,27 @@ namespace Kalitte.Trading.Algos
         {
             var assembly = typeof(MaProfit).Assembly.GetName();
             Log($"Inited with {assembly.FullName}");
-            LoadRealPositions(this.Symbol);            
+            LoadRealPositions(this.Symbol);
             signals.ForEach(p => p.Start());
             if (!BackTestMode)
             {
                 orderTimer.Elapsed += OnOrderTimerEvent;
                 orderTimer.Enabled = true;
-            }            
+            }
         }
 
         private void OnOrderTimerEvent(Object source, ElapsedEventArgs e)
         {
-            if (BackTestMode) return;
-            orderTimer.Enabled = false;
-            try
-            {
-                Decide();
-            }
-            finally
-            {
-                orderTimer.Enabled = true;
-            }
+            //if (BackTestMode) return;
+            //orderTimer.Enabled = false;
+            //try
+            //{
+            //    Decide();
+            //}
+            //finally
+            //{
+            //    orderTimer.Enabled = true;
+            //}
         }
 
         private void SignalReceieved(Signal signal, SignalEventArgs data)
@@ -219,6 +219,7 @@ namespace Kalitte.Trading.Algos
             {
                 if (data.Result.finalResult.HasValue) Log($"Signal received from {signal.Name} as {data.Result.finalResult }", LogLevel.Debug);
                 signalResults[signal.Name] = data.Result;
+                Decide();
             }
         }
 
@@ -227,9 +228,11 @@ namespace Kalitte.Trading.Algos
         {
             lock (signalResults)
             {
-                var result = signalResults.Where(p => p.Value.finalResult.HasValue).FirstOrDefault().Value;
-                if (result != null)
+                var results = signalResults.Where(p => p.Value.finalResult.HasValue);
+                foreach (var kv in results)
                 {
+                    var result = kv.Value;
+
                     Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
                     operationWait.WaitOne();
                     orderWait.WaitOne();
@@ -246,7 +249,7 @@ namespace Kalitte.Trading.Algos
                             {
                                 Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
                                 sendOrder(Symbol, profitSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.TakeProfit);
-                            } 
+                            }
                         }
                         else if (result.Signal is StopLossSignal)
                         {
@@ -266,7 +269,7 @@ namespace Kalitte.Trading.Algos
                     {
                         operationWait.Set();
                     }
-                }               
+                }
             }
         }
 
@@ -317,7 +320,7 @@ namespace Kalitte.Trading.Algos
 
         }
 
-       
+
         protected ExchangeOrder sendOrder(string symbol, decimal quantity, OrderSide side, string comment = "", decimal lprice = 0, ChartIcon icon = ChartIcon.None)
         {
             Log($"Order received: {symbol} {quantity} {side} {comment}", LogLevel.Debug);
@@ -357,8 +360,9 @@ namespace Kalitte.Trading.Algos
             foreach (var signal in signals)
             {
                 var result = signal.Check(barDataCurrentValues.LastUpdate.DTime);
-                SignalReceieved(signal, new SignalEventArgs() { Result = result });
+                signalResults[signal.Name] = result ;                
             }
+            Thread.Sleep(100);
             Decide();
         }
 

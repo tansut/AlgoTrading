@@ -81,16 +81,10 @@ namespace Kalitte.Trading
         public virtual SignalResultX Check(DateTime? t = null)
         {
             var result = CheckInternal(t);
+            if (CheckCount == 0) Algo.Log($"{this.Name} inited successfully.");
             CheckCount++;
+            LastSignal = result.finalResult != LastSignal? result.finalResult: LastSignal ;
             return result;
-
-            //var saveLast = LastSignal;
-            //LastSignal = result.finalResult;
-            //
-            //if (saveLast != result.finalResult)
-            //{                                
-            //    return new SignalResultX(this) {  finalResult = result.finalResult };
-            //} else return new SignalResultX(this) { finalResult = null };
         }
 
         public virtual void Start()

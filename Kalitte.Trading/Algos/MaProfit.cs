@@ -232,14 +232,13 @@ namespace Kalitte.Trading.Algos
                 foreach (var kv in results)
                 {
                     var result = kv.Value;
-
-                    Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
+                    //Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
                     operationWait.WaitOne();
                     orderWait.WaitOne();
                     operationWait.Reset();
                     try
                     {
-                        Log($"Decided signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
+                        Log($"Processing signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
                         if (result.Signal is TakeProfitSignal)
                         {
                             var profitSignal = (TakeProfitSignal)(result.Signal);

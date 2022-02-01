@@ -82,7 +82,7 @@ namespace Kalitte.Trading
             if (lastSignals.Count >= Periods)
             {                
                 var avg = lastSignals.Average();
-                //Algo.Log($"Average: {avg} slip: {Split}");
+                Algo.Log($"Average: {avg} slip: {Split}");
                 if (avg >= Split) finalResult = OrderSide.Buy;
                 else if (avg <= -Split) finalResult = OrderSide.Sell;
             }

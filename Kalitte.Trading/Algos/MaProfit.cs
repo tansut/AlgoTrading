@@ -33,7 +33,7 @@ namespace Kalitte.Trading.Algos
     {
         private ManualResetEvent orderWait = new ManualResetEvent(true);
         private ManualResetEvent operationWait = new ManualResetEvent(true);
-        private ManualResetEvent backtestWait = new ManualResetEvent(false);
+        private ManualResetEvent backtestWait = new ManualResetEvent(true);
 
 
         //[SymbolParameter("F_XU0300222")]
@@ -125,7 +125,7 @@ namespace Kalitte.Trading.Algos
 
             WorkWithPermanentSignal(true);
             SendOrderSequential(false);
-            orderTimer = new System.Timers.Timer(3000);
+            orderTimer = new System.Timers.Timer(500);
             if ((ProfitQuantity > 0 || LossQuantity > 0) && !BackTestMode)
             {
                 AddSymbolMarketData(Symbol);
@@ -136,22 +136,45 @@ namespace Kalitte.Trading.Algos
 
 
 
-
-
-
-        public void startBackTest()
+        public void simulateTestPeriod(object barDataCurrentValuesx)
         {
-            var start = new DateTime(2022, 01, 28, 9, 30, 0);
-            var end = new DateTime(2022, 01, 28, 18, 0, 0);
+            BarDataCurrentValues barDataCurrentValues = (BarDataCurrentValues)barDataCurrentValuesx;
+            var t = barDataCurrentValues.LastUpdate.DTime;
+            var periodsToBack = GetSymbolPeriodSeconds(SymbolPeriod);
 
-            var seconds = (end - start).TotalSeconds;
-
-            for (var i = 0; i < seconds; i++)
+            var start = t - TimeSpan.FromSeconds(periodsToBack - 1);
+            Log($"Backtest starting for bar: {t}, start: {start}  seconds back: {periodsToBack}", LogLevel.Debug);
+            for (var i = 0; i < periodsToBack; i++)
             {
-                var t = start.AddSeconds(i);
-                //            var result = this.ManageProfitLoss(price, date);
-                //            if (result.HasValue) break;
+                var date = start.AddSeconds(i);
+                foreach (var signal in signals)
+                {
+                    var t1 = date;
+                    Task.Run(() =>
+                    {
+                        var result = signal.Check(t1);
+                        Log($"used t: {t1}");
+                        SignalReceieved(signal, new SignalEventArgs() { Result = result });
+                    }).Wait();
+                }
+                Decide();
             }
+
+
+
+
+
+            //var start = new DateTime(2022, 01, 28, 9, 30, 0);
+            //var end = new DateTime(2022, 01, 28, 18, 0, 0);
+
+            //var seconds = (end - start).TotalSeconds;
+
+            //for (var i = 0; i < seconds; i++)
+            //{
+            //    var t = start.AddSeconds(i);
+            //    //            var result = this.ManageProfitLoss(price, date);
+            //    //            if (result.HasValue) break;
+            //}
 
 
 
@@ -181,8 +204,6 @@ namespace Kalitte.Trading.Algos
             //    SignalReceieved(signal, new SignalEventArgs() { Result = result });
             //}
             //Decide();
-
-            backtestWait.Set();
         }
 
 
@@ -196,7 +217,7 @@ namespace Kalitte.Trading.Algos
             {
                 orderTimer.Elapsed += OnOrderTimerEvent;
                 orderTimer.Enabled = true;
-            }
+            } 
         }
 
         private void OnOrderTimerEvent(Object source, ElapsedEventArgs e)
@@ -223,13 +244,26 @@ namespace Kalitte.Trading.Algos
                 SignalReceieved(signal, new SignalEventArgs() { Result = result });
             }
             Decide();
+
+            ////backtestWait.WaitOne();
+            ////backtestWait.Reset();
+            //var t = new Thread(new ParameterizedThreadStart(simulateTestPeriod));
+            //t.Start();
+            //t.Join();
+            ////simulateTestPeriod(barDataCurrentValues);
+            ////backtestWait.Set();
+
+
         }
 
         private Boolean waitForOperationAndOrders(string message)
         {
+            Log($"Operations/orders waiting: { message}", LogLevel.Debug);
+            
             var result1 = operationWait.WaitOne(10000);
             var result2 = orderWait.WaitOne(10000);
-            if (!result1) Log($"Operation couldnot be completed: {message}");
+            if (!result1) Log($"operation couldnot be completed: {message}", LogLevel.Warning);
+            if (!result2) Log($"order couldnot be completed: {message}", LogLevel.Warning);
             return result1 && result2;
         }
 
@@ -255,7 +289,7 @@ namespace Kalitte.Trading.Algos
                 operationWait.Reset();
                 try
                 {
-                    Log($"Processing signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
+                    //Log($"Processing signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
                     if (result.Signal is TakeProfitSignal)
                     {
                         var profitSignal = (TakeProfitSignal)(result.Signal);

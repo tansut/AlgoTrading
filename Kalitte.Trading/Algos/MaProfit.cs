@@ -201,74 +201,91 @@ namespace Kalitte.Trading.Algos
 
         private void OnOrderTimerEvent(Object source, ElapsedEventArgs e)
         {
-            //if (BackTestMode) return;
-            //orderTimer.Enabled = false;
-            //try
-            //{
-            //    Decide();
-            //}
-            //finally
-            //{
-            //    orderTimer.Enabled = true;
-            //}
+            if (BackTestMode) return;
+            orderTimer.Enabled = false;
+            try
+            {
+                Decide();
+            }
+            finally
+            {
+                orderTimer.Enabled = true;
+            }
+        }
+
+        public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
+        {
+            if (!this.BackTestMode) return;
+
+            foreach (var signal in signals)
+            {
+                var result = signal.Check(barDataCurrentValues.LastUpdate.DTime);
+                SignalReceieved(signal, new SignalEventArgs() { Result = result });
+            }
+            Decide();
+        }
+
+        private Boolean waitForOperationAndOrders(string message)
+        {
+            var result1 = operationWait.WaitOne(10000);
+            var result2 = orderWait.WaitOne(10000);
+            if (!result1) Log($"Operation couldnot be completed: {message}");
+            return result1 && result2;
         }
 
         private void SignalReceieved(Signal signal, SignalEventArgs data)
         {
-            lock (signalResults)
-            {
-                if (data.Result.finalResult.HasValue) Log($"Signal received from {signal.Name} as {data.Result.finalResult }", LogLevel.Debug);
-                signalResults[signal.Name] = data.Result;
-                Decide();
-            }
+
+            if (data.Result.finalResult.HasValue) Log($"Signal received from {signal.Name} as {data.Result.finalResult }", LogLevel.Debug);
+            signalResults[signal.Name] = data.Result;
         }
 
 
         private void Decide()
         {
-            lock (signalResults)
+            var results = signalResults.Where(p => p.Value.finalResult.HasValue).ToList();
+            List<SignalResultX> validOrders = new List<SignalResultX>();
+            if (results.Any()) validOrders.Add(results[0].Value);
+            foreach (var validOrder in validOrders)
             {
-                var results = signalResults.Where(p => p.Value.finalResult.HasValue);
-                foreach (var kv in results)
+                 var result = validOrder;
+                //Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
+                var waitOthers = waitForOperationAndOrders("Decide");
+                if (!waitOthers) break;
+                operationWait.Reset();
+                try
                 {
-                    var result = kv.Value;
-                    //Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
-                    operationWait.WaitOne();
-                    orderWait.WaitOne();
-                    operationWait.Reset();
-                    try
+                    Log($"Processing signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
+                    if (result.Signal is TakeProfitSignal)
                     {
-                        Log($"Processing signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
-                        if (result.Signal is TakeProfitSignal)
+                        var profitSignal = (TakeProfitSignal)(result.Signal);
+                        var profitResult = (ProfitLossResult)result;
+
+                        if (UserPortfolioList.GetPortfolio(Symbol).Quantity == this.OrderQuantity)
                         {
-                            var profitSignal = (TakeProfitSignal)(result.Signal);
-                            var profitResult = (ProfitLossResult)result;
-
-                            if (UserPortfolioList.GetPortfolio(Symbol).Quantity == this.OrderQuantity)
-                            {
-                                Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
-                                sendOrder(Symbol, profitSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.TakeProfit);
-                            }
+                            Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
+                            sendOrder(Symbol, profitSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.TakeProfit);
                         }
-                        else if (result.Signal is StopLossSignal)
-                        {
-                            var lossSignal = (StopLossSignal)(result.Signal);
-                            var profitResult = (ProfitLossResult)result;
-
-                            if (UserPortfolioList.GetPortfolio(Symbol).Quantity == this.OrderQuantity)
-                            {
-                                Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
-                                sendOrder(Symbol, lossSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.StopLoss);
-                            }
-                        }
-                        else CreateOrders(result);
-
                     }
-                    finally
+                    else if (result.Signal is StopLossSignal)
                     {
-                        operationWait.Set();
+                        var lossSignal = (StopLossSignal)(result.Signal);
+                        var profitResult = (ProfitLossResult)result;
+
+                        if (UserPortfolioList.GetPortfolio(Symbol).Quantity == this.OrderQuantity)
+                        {
+                            Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
+                            sendOrder(Symbol, lossSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.StopLoss);
+                        }
                     }
+                    else CreateOrders(result);
+
                 }
+                finally
+                {
+                    operationWait.Set();
+                }
+
             }
         }
 
@@ -352,18 +369,7 @@ namespace Kalitte.Trading.Algos
             return new DateTime((dt.Ticks + d.Ticks - 1) / d.Ticks * d.Ticks, dt.Kind);
         }
 
-        public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
-        {
-            if (!this.BackTestMode) return;
 
-            foreach (var signal in signals)
-            {
-                var result = signal.Check(barDataCurrentValues.LastUpdate.DTime);
-                signalResults[signal.Name] = result ;                
-            }
-            Thread.Sleep(100);
-            Decide();
-        }
 
 
         public void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
@@ -381,7 +387,8 @@ namespace Kalitte.Trading.Algos
         {
             if (order.OrdStatus.Obj == OrdStatus.Filled)
             {
-                //Log($"fa: {order.FilledAmount} fq: {order.FilledQty} price: {order.Price} lastx: {order.LastPx}");
+                Log($"OrderUpdate: pos: {this.positionRequest} status: {order.OrdStatus.Obj} orderid: {order.CliOrdID} fa: {order.FilledAmount} fq: {order.FilledQty} price: {order.Price} lastx: {order.LastPx}", LogLevel.Debug);
+
                 if (this.positionRequest != null && this.positionRequest.Id == order.CliOrdID)
                 {
                     if (BackTestMode)

@@ -47,18 +47,20 @@ namespace Kalitte.Trading
     {
         protected System.Timers.Timer _timer = null;
         public string Name { get; set; }
-        public Kalitte.Trading.Algos.AlgoBase Owner { get; set; }
+        public Kalitte.Trading.Algos.AlgoBase Algo { get; set; }
         public bool Enabled { get; set; }
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
+        public string Symbol { get; private set; }
 
         public event SignalEventHandler OnSignal;
 
-        public Signal(string name, Kalitte.Trading.Algos.AlgoBase owner, bool enabled)
+        public Signal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner)
         {
             Name = name;
-            Owner = owner;
-            Enabled = enabled;
+            Symbol = symbol;
+            Algo = owner;
+            Enabled = true;
             TimerEnabled = false;
             Simulation = false;
 

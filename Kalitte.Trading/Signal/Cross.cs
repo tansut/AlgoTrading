@@ -31,11 +31,10 @@ namespace Kalitte.Trading
         private OrderSide? firstSignal = null;
         private decimal split = 1M;
 
-        public CrossSignal(string name, Kalitte.Trading.Algos.AlgoBase owner, bool enabled, IIndicator i1, IIndicator i2) : base(name, owner, enabled)
+        public CrossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
         {
             this.i1 = i1;
             this.i2 = i2;
-            this.Enabled = enabled;
         }
 
 
@@ -43,8 +42,8 @@ namespace Kalitte.Trading
         {
             OrderSide? result = null;
 
-            if (Owner.CrossAboveX(i1, i2, t)) result = OrderSide.Buy;
-            else if (Owner.CrossBelowX(i1, i2, t)) result = OrderSide.Sell;
+            if (Algo.CrossAboveX(i1, i2, t)) result = OrderSide.Buy;
+            else if (Algo.CrossBelowX(i1, i2, t)) result = OrderSide.Sell;
 
             if (Simulation) return new SignalResultX(this) { finalResult = result };
 
@@ -53,7 +52,7 @@ namespace Kalitte.Trading
                 firstSignal = result;
                 if (result.HasValue)
                 {
-                    Owner.Log($"Set first signal to {result}");
+                    Algo.Log($"Set first signal to {result}");
                     result = null;
                 }
             }
@@ -62,12 +61,12 @@ namespace Kalitte.Trading
                 var dif = Math.Abs(i1.CurrentValue - i2.CurrentValue);
                 if (dif >= split)
                 {
-                    Owner.Log($"{result} confirmed with diff {dif}");
+                    Algo.Log($"{result} confirmed with diff {dif}");
                     firstSignal = null;
                 }
                 else
                 {
-                    Owner.Log($"{result} NOT confirmed with diff {dif}");
+                    Algo.Log($"{result} NOT confirmed with diff {dif}");
                     result = null;
                 }
             }

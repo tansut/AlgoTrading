@@ -96,26 +96,12 @@ namespace Kalitte.Trading.Algos
         RSI rsi;
         MACD macd;
 
-        public string logDir = @"c:\kalitte\log";
-        private MarketDataFileLogger fileLogger;
 
 
-        [Parameter(false)]
-        public bool BackTestMode = false;
 
         int virtualOrderCounter = 0;
-
-        decimal takeProfitTotal = 0;
-        decimal stopLossTotal = 0;
-
-
-
-
-        PortfolioList portfolios = new PortfolioList();
         ExchangeOrder positionRequest = null;
         System.Timers.Timer orderTimer;
-
-
 
 
         public override void OnInit()
@@ -127,9 +113,11 @@ namespace Kalitte.Trading.Algos
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
 
 
-            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("MA59Cross", this, !SimulateOrderSignal && MovPeriod > 0, mov, mov2));
-            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("MACD59Cross", this, !SimulateOrderSignal && MACDLongPeriod > 0, macd, macd.MacdTrigger));
-            if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("FlipFlop", this, SimulateOrderSignal, OrderSide.Buy));
+            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("ma59cross", Symbol, this, mov, mov2));
+            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("macd59cross", Symbol, this, macd, macd.MacdTrigger));
+            if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
+            if (this.ProfitQuantity > 0) this.signals.Add(new TakeProfitSignal("takeprofit", Symbol, this, this.ProfitPuan, this.ProfitQuantity));
+            if (this.LossQuantity > 0) this.signals.Add(new StopLossSignal("stoploss", Symbol, this, this.LossPuan, this.LossQuantity));
 
             signals.ForEach(p => p.TimerEnabled = !BackTestMode);
             signals.ForEach(p => p.Simulation = BackTestMode);
@@ -141,46 +129,12 @@ namespace Kalitte.Trading.Algos
             if ((ProfitQuantity > 0 || LossQuantity > 0) && !BackTestMode)
             {
                 AddSymbolMarketData(Symbol);
-                SetTimerInterval(1);
+                //SetTimerInterval(1);
             }
-            this.fileLogger = new MarketDataFileLogger(Symbol, logDir, "price");
+            this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
         }
 
 
-
-        public decimal GetMarketPrice(DateTime? t = null)
-        {
-            if (BackTestMode) return fileLogger.GetMarketData(t.HasValue ? t.Value : DateTime.Now);
-            var price = this.GetMarketData(Symbol, SymbolUpdateField.Last);
-            return price;
-        }
-
-        public override void OnRealPositionUpdate(AlgoTraderPosition position)
-        {
-
-            //if (position.Symbol == Symbol)
-            //{
-            //	lock (ordrLock)
-            //	{
-            //		portfolios.UpdateFromTrade(position);
-            //		Log("Portfolio Updated");
-            //		Log(portfolios.Print());
-            //		Log(portfolios.Print());
-            //	}
-            //}
-
-
-            //Log($"sym: {position.Symbol} side:{position.Side} total:{position.TotalPosition} amount:{position.Amount} cost:{position.AvgCost} avail:{position.QtyAvailable} net:{position.QtyNet}");
-
-        }
-
-        public void LoadRealPositions()
-        {
-            var positions = BackTestMode ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
-            portfolios.LoadRealPositions(positions, p => p.Symbol == this.Symbol);
-            Log($"- PORTFOLIO -");
-            Log($"{portfolios.Print()}");
-        }
 
 
 
@@ -236,7 +190,7 @@ namespace Kalitte.Trading.Algos
         {
             var assembly = typeof(MaProfit).Assembly.GetName();
             Log($"Inited with {assembly.FullName}");
-            LoadRealPositions();            
+            LoadRealPositions(this.Symbol);            
             signals.ForEach(p => p.Start());
             if (!BackTestMode)
             {
@@ -273,24 +227,46 @@ namespace Kalitte.Trading.Algos
         {
             lock (signalResults)
             {
-                Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
                 var result = signalResults.Where(p => p.Value.finalResult.HasValue).FirstOrDefault().Value;
                 if (result != null)
                 {
+                    Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
                     operationWait.WaitOne();
                     orderWait.WaitOne();
                     operationWait.Reset();
                     try
                     {
                         Log($"Decided signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
-                        CreateOrders(result);
+                        if (result.Signal is TakeProfitSignal)
+                        {
+                            var profitSignal = (TakeProfitSignal)(result.Signal);
+                            var profitResult = (ProfitLossResult)result;
+
+                            if (UserPortfolioList.GetPortfolio(Symbol).Quantity == this.OrderQuantity)
+                            {
+                                Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
+                                sendOrder(Symbol, profitSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.TakeProfit);
+                            } 
+                        }
+                        else if (result.Signal is StopLossSignal)
+                        {
+                            var lossSignal = (StopLossSignal)(result.Signal);
+                            var profitResult = (ProfitLossResult)result;
+
+                            if (UserPortfolioList.GetPortfolio(Symbol).Quantity == this.OrderQuantity)
+                            {
+                                Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
+                                sendOrder(Symbol, lossSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.StopLoss);
+                            }
+                        }
+                        else CreateOrders(result);
+
                     }
                     finally
                     {
                         operationWait.Set();
                     }
-                }
-                else Log("Bot decided", LogLevel.Debug);
+                }               
             }
         }
 
@@ -298,7 +274,7 @@ namespace Kalitte.Trading.Algos
         {
             decimal doubleMultiplier = 1.0M;
             OrderSide? side = null;
-            var portfolio = this.portfolios.GetPortfolio(Symbol);
+            var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
 
             if (signalResult.finalResult == OrderSide.Buy && portfolio.IsLong) return;
             if (signalResult.finalResult == OrderSide.Sell && portfolio.IsShort) return;
@@ -357,88 +333,13 @@ namespace Kalitte.Trading.Algos
 
         
 
-        public OrderSide? ManageProfitLoss(decimal? marketPrice = null, DateTime? t = null)
-        {
-            //if (!this.ensureWaitingPositions())
-            //{
-            //    Log($"waiting orders: {this.positionRequest.Id}");
-            //    return null;
-            //}
-            operationWait.WaitOne();
-            orderWait.WaitOne();
-            operationWait.Reset();
-            OrderSide? result = null;
-            try
-            {
-                var portfolio = portfolios.GetPortfolio(Symbol);
-
-                if (!portfolio.IsEmpty)
-                {
-                    var price = marketPrice.HasValue ? marketPrice.Value : GetMarketPrice(t);
-                    var pl = price - portfolio.AvgCost;
-
-                    if (price == 0)
-                    {
-                        Log($"ProfitLoss price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
-                    }
-                    else if ((this.ProfitQuantity > 0) && (portfolio.Side == OrderSide.Buy) && (pl >= this.ProfitPuan) && (portfolio.Quantity == this.OrderQuantity))
-                    {
-                        takeProfitTotal += Math.Abs(pl);
-                        Log($"TakeProfit: t:{t ?? DateTime.Now} PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
-                        sendOrder(Symbol, ProfitQuantity, OrderSide.Sell, $"take profit order, PL: {pl}, totalTakeProfit: {takeProfitTotal}", price, ChartIcon.TakeProfit);
-                        result = OrderSide.Sell;
-                    }
-                    else if ((this.ProfitQuantity > 0) && (portfolio.Side == OrderSide.Sell) && (-pl >= this.ProfitPuan) && (portfolio.Quantity == this.OrderQuantity))
-                    {
-                        takeProfitTotal += Math.Abs(pl);
-                        Log($"TakeProfit: t:{t ?? DateTime.Now} PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
-                        sendOrder(Symbol, ProfitQuantity, OrderSide.Buy, $"take profit order, PL: {-pl}, totalTakeProfit: {takeProfitTotal}", price, ChartIcon.TakeProfit);
-                        result = OrderSide.Buy;
-                    }
-                    else if ((this.LossQuantity > 0) && (portfolio.Side == OrderSide.Buy) && (pl <= -this.LossPuan) && (portfolio.Quantity == this.OrderQuantity))
-                    {
-                        stopLossTotal += Math.Abs(pl);
-                        Log($"Stoploss: t:{t ?? DateTime.Now} PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
-                        sendOrder(Symbol, LossQuantity, OrderSide.Sell, $"stop loss order, PL: {pl}, stopLossTotal: {stopLossTotal}", price, ChartIcon.StopLoss);
-                        result = OrderSide.Sell;
-                    }
-                    else if ((this.LossQuantity > 0) && (portfolio.Side == OrderSide.Sell) && (pl >= this.LossPuan) && (portfolio.Quantity == this.OrderQuantity))
-                    {
-                        stopLossTotal += Math.Abs(pl);
-                        Log($"Stoploss: t:{t ?? DateTime.Now} PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
-                        sendOrder(Symbol, LossQuantity, OrderSide.Buy, $"stop loss order, PL: {pl}, stopLossTotal: {stopLossTotal}", price, ChartIcon.StopLoss);
-                        result = OrderSide.Buy;
-                    }
-                }
-            }
-            finally
-            {
-                operationWait.Set();
-            }
-
-
-
-            return result;
-
-        }
-
-        public override void OnTimer()
-        {
-            ManageProfitLoss();
-        }
-
 
 
         protected ExchangeOrder sendOrder(string symbol, decimal quantity, OrderSide side, string comment = "", decimal lprice = 0, ChartIcon icon = ChartIcon.None)
         {
-            //if (!this.ensureWaitingPositions())
-            //{
-            //    Log("Bekleyen pozisyon varken yeni pozisyon gönderilemez");
-            //    return null;
-            //}
             Log($"Order received: {symbol} {quantity} {side} {comment}", LogLevel.Debug);
             orderWait.Reset();
-            var price = lprice > 0 ? lprice : GetMarketPrice();
+            var price = lprice > 0 ? lprice : GetMarketPrice(this.Symbol);
             string orderid;
             decimal limitPrice = Math.Round((price + price * 0.02M * (side == OrderSide.Sell ? -1 : 1)) * 4, MidpointRounding.ToEven) / 4;
 
@@ -472,29 +373,29 @@ namespace Kalitte.Trading.Algos
 
 
 
-            var portfolio = portfolios.GetPortfolio(Symbol);
-            if (ProfitQuantity > 0 && !portfolio.IsEmpty)
-            {
-                var t = barDataCurrentValues.LastUpdate.DTime;
-                var periodsToBack = GetSymbolPeriodSeconds(SymbolPeriod);
+            //var portfolio = UserPortfolioList.GetPortfolio(Symbol);
+            //if (ProfitQuantity > 0 && !portfolio.IsEmpty)
+            //{
+            //    var t = barDataCurrentValues.LastUpdate.DTime;
+            //    var periodsToBack = GetSymbolPeriodSeconds(SymbolPeriod);
 
-                var start = t - TimeSpan.FromSeconds(periodsToBack - 1);
-                Log($"Backtest starting to check take profit. Bar: {t}, start: {start}  seconds back: {periodsToBack}", LogLevel.Debug);
-                for (var i = 0; i < periodsToBack; i++)
-                {
-                    var date = start.AddSeconds(i);
-                    var price = GetMarketPrice(date);
-                    if (price != 0)
-                    {
-                        var result = this.ManageProfitLoss(price, date);
-                        if (result.HasValue) break;
-                    }
-                }
-            }
+            //    var start = t - TimeSpan.FromSeconds(periodsToBack - 1);
+            //    Log($"Backtest starting to check take profit. Bar: {t}, start: {start}  seconds back: {periodsToBack}", LogLevel.Debug);
+            //    for (var i = 0; i < periodsToBack; i++)
+            //    {
+            //        var date = start.AddSeconds(i);
+            //        var price = GetMarketPrice(this.Symbol, date);
+            //        if (price != 0)
+            //        {
+            //            var result = this.ManageProfitLoss(price, date);
+            //            if (result.HasValue) break;
+            //        }
+            //    }
+            //}
 
             foreach (var signal in signals)
             {
-                var result = signal.Check();
+                var result = signal.Check(barDataCurrentValues.LastUpdate.DTime);
                 SignalReceieved(signal, new SignalEventArgs() { Result = result });
             }
             Decide();
@@ -505,7 +406,7 @@ namespace Kalitte.Trading.Algos
         {
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
-            var portfolio = this.portfolios.Add(this.positionRequest);
+            var portfolio = this.UserPortfolioList.Add(this.positionRequest);
             Log($"Completed order: {this.positionRequest.ToString()}");
             Log($"Portfolio: {portfolio.ToString()}");
             this.positionRequest = null;
@@ -537,7 +438,7 @@ namespace Kalitte.Trading.Algos
         {
             orderTimer.Stop();
             signals.ForEach(p => p.Stop());
-            Log($"Portfolio ended: {portfolios.Print()}");
+            Log($"Portfolio ended: {UserPortfolioList.Print()}");
         }
     }
 

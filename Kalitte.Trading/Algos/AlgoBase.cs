@@ -25,9 +25,22 @@ namespace Kalitte.Trading.Algos
 {
     public class AlgoBase : MatriksAlgo
     {
-        private static Dictionary<SymbolPeriod, int> symbolPeriodCache = new Dictionary<SymbolPeriod, int>();
+
         [Parameter(1)]
         public int LoggingLevel { get; set; }
+
+        [Parameter(false)]
+        public bool BackTestMode = false;
+
+        public string LogDir = @"c:\kalitte\log";
+        public MarketDataFileLogger PriceLogger;
+
+
+        public PortfolioList UserPortfolioList = new PortfolioList();
+
+        private static Dictionary<SymbolPeriod, int> symbolPeriodCache = new Dictionary<SymbolPeriod, int>();
+
+        
         public void Log(string text, LogLevel level = LogLevel.Info)
         {
             if ((int)level >= this.LoggingLevel) Debug(text);
@@ -58,9 +71,6 @@ namespace Kalitte.Trading.Algos
             return result;
         }
 
-        decimal i1val = 0.0M;
-
-
         public virtual bool CrossAboveX(IIndicator i1, IIndicator i2, DateTime? t = null)
         {
             return this.CrossAbove(i1, i2);
@@ -69,6 +79,21 @@ namespace Kalitte.Trading.Algos
         public virtual bool CrossBelowX(IIndicator i1, IIndicator i2, DateTime? t = null)
         {
             return this.CrossBelow(i1, i2);
+        }
+
+        public void LoadRealPositions(string symbol)
+        {
+            var positions = BackTestMode ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
+            UserPortfolioList.LoadRealPositions(positions, p => p.Symbol == symbol);
+            Log($"- PORTFOLIO -");
+            Log($"{UserPortfolioList.Print()}");
+        }
+
+        public decimal GetMarketPrice(string symbol, DateTime? t = null)
+        {
+            if (BackTestMode) return PriceLogger.GetMarketData(t.HasValue ? t.Value : DateTime.Now);
+            var price = this.GetMarketData(symbol, SymbolUpdateField.Last);
+            return price;
         }
 
     }

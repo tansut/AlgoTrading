@@ -87,4 +87,8 @@
     </Reference>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="C:\Users\tansu\source\repos\borsabot\Merge\bin\Debug\net472\merge.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading" />
+  </Target>
+
 </Project>

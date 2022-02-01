@@ -23,10 +23,27 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
-    public enum LogLevel
+    public class FlipFlopSignal : Signal
     {
-        Debug = 0,
-        Info = 1,
-        Warning = 2
+        public OrderSide Side { get; set; }
+
+        public FlipFlopSignal(string name, Kalitte.Trading.Algos.AlgoBase owner, bool enabled, OrderSide side = OrderSide.Buy) : base(name, owner, enabled)
+        {
+            this.Side = side;
+        }
+
+
+        public override SignalResultX Check(DateTime? t = null)
+        {
+            var result = this.Side;
+            this.Side = result == OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy;
+            return new SignalResultX(this) { finalResult = result };
+        }
+
+
+
+
     }
+
+
 }

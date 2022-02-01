@@ -21,12 +21,34 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kalitte.Trading
+
+namespace Matriks.Lean.Algotrader
 {
-    public enum LogLevel
+    public class MaAlg : Kalitte.Trading.Algos.MaProfit
     {
-        Debug = 0,
-        Info = 1,
-        Warning = 2
+
+    }
+
+    public class backtest : Kalitte.Trading.Algos.MaProfit
+    {
+        public override void OnInit()
+        {
+            this.BackTestMode = true;
+            base.OnInit();
+        }
+    }
+
+    public class testalgo : Kalitte.Trading.Algos.MaProfit
+    {
+        public override void OnInit()
+        {
+
+            base.OnInit();
+        }
+    }
+
+    public class log : Kalitte.Trading.Algos.PriceLogger
+    {
+
     }
 }

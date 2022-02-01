@@ -106,7 +106,7 @@ namespace Kalitte.Trading.Algos
 
         public override void OnInit()
         {
-            AddSymbol(Symbol, SymbolPeriod);
+            AddSymbol(Symbol, BackTestMode ? SymbolPeriod.Min: SymbolPeriod);
             mov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod, MovMethod.Exponential);
             mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
             rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);

@@ -20,6 +20,7 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Skender.Stock.Indicators;
 
 namespace Kalitte.Trading
 {
@@ -48,8 +49,8 @@ namespace Kalitte.Trading
         //private List<decimal> lastSignals = new List<decimal>();
         //private OrderSide? initialPeriodSignal = null;
 
-        private List<decimal> i1List = new List<decimal>();
-        private List<decimal> i2List = new List<decimal>();
+        private List<Quote> i1List = new List<Quote>();
+        private List<Quote> i2List = new List<Quote>();
         private List<decimal> priceList = new List<decimal>();
 
 
@@ -114,11 +115,22 @@ namespace Kalitte.Trading
 
         //}
 
-        private void Reset()
+        public override void Start()
+        {
+            Reset();
+            base.Start();
+        }
+
+        private void clearLists()
         {
             i1List.Clear();
             i2List.Clear();
             priceList.Clear();
+        }
+
+        private void Reset()
+        {
+            clearLists();
             LastPeriodSignal = null;
             evalState = SignalConfirmStatus.None;
         }
@@ -132,7 +144,7 @@ namespace Kalitte.Trading
 
         private bool verifyPeriodSignal(OrderSide? received, DateTime? t = null)
         {
-            Thread.Sleep(3000);
+            Thread.Sleep(500);
             if (getPeriodSignal(t) != received) return false;
             return true;
         }
@@ -165,12 +177,11 @@ namespace Kalitte.Trading
                     {
                         Algo.Log($"Received empty period signal but will use last verified signal {LastPeriodSignal} ", LogLevel.Warning);
                     }
-
                 }
                 else
                 {
-                    Reset();
                     Algo.Log($"Period signal changed from {LastPeriodSignal} to {periodSignal}", LogLevel.Debug);
+                    Reset();                   
                     LastPeriodSignal = periodSignal;
                     evalState = periodSignal.HasValue ? SignalConfirmStatus.Verifying : evalState;
                 }
@@ -193,7 +204,6 @@ namespace Kalitte.Trading
                         if (finalResult != periodSignal)
                         {
                             Algo.Log($"Tried to verify {periodSignal} but ended with {finalResult}. Resetting.", LogLevel.Info);
-                            finalResult = null;
                             this.Reset();
                         } else
                         {

@@ -46,14 +46,15 @@ namespace Kalitte.Trading
     public abstract class Signal
     {
         protected System.Timers.Timer _timer = null;
+        private static object _locker = new object();
         public string Name { get; set; }
         public Kalitte.Trading.Algos.AlgoBase Algo { get; set; }
         public bool Enabled { get; set; }
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
-        public OrderSide? LastSignal { get; protected set; }
-        public int CheckCount { get; private set; }
+        public OrderSide? LastSignalResult { get; protected set; }
+        //public int CheckCount { get; private set; }
 
         private ManualResetEvent checkLock = new ManualResetEvent(true);
 
@@ -67,43 +68,73 @@ namespace Kalitte.Trading
             Enabled = true;
             TimerEnabled = false;
             Simulation = false;
-            LastSignal = null;
-            CheckCount = 0;
-
+            LastSignalResult = null;
+            //CheckCount = 0;
         }
 
         protected virtual void onTick(Object source, ElapsedEventArgs e)
         {
-            var result = this.Check();
-            if (result != null) raiseSignal(new SignalEventArgs() { Result = result });
+            var hasLock = false;
+            var restartTimer = false;
+            SignalResultX result = null;
+            try
+            {
+                Monitor.TryEnter(_locker, ref hasLock);
+                if (!hasLock)
+                {
+                    return;
+                }
+                if (_timer != null && _timer.Enabled)
+                {
+                    restartTimer = true;
+                }
+                result = this.Check();                
+            }
+            finally
+            {
+                if (hasLock)
+                {
+                    Monitor.Exit(_locker);
+                    if (restartTimer) _timer.Start();
+                }
+            }
+            raiseSignal(new SignalEventArgs() { Result = result });
         }
 
         protected abstract SignalResultX CheckInternal(DateTime? t = null);
 
         public virtual SignalResultX Check(DateTime? t = null)
         {
-            checkLock.WaitOne();
-            checkLock.Reset();
-            var restartTimer = false;
-            if (_timer != null && _timer.Enabled)
-            {
-                restartTimer = true;
-                _timer.Stop();
-            }
-            SignalResultX result;
-            
-            try
-            {
-                result = CheckInternal(t);
-                if (CheckCount == 0) Algo.Log($"{this.Name} inited successfully.");
-                CheckCount++;
-                LastSignal = result.finalResult != LastSignal ? result.finalResult : LastSignal;
-
-            } finally {                
-                if (restartTimer) _timer.Start();
-                checkLock.Set();
-            }
+            var result = CheckInternal(t);
+            //if (CheckCount == 0) Algo.Log($"{this.Name} inited successfully.");
+            //CheckCount++;
+            LastSignalResult = result.finalResult;
             return result;
+
+            //checkLock.WaitOne();
+            //checkLock.Reset();
+            //var restartTimer = false;
+            //if (_timer != null && _timer.Enabled)
+            //{
+            //    restartTimer = true;
+            //    _timer.Stop();
+            //}
+            //SignalResultX result;
+
+            //try
+            //{
+            //    result = CheckInternal(t);
+            //    if (CheckCount == 0) Algo.Log($"{this.Name} inited successfully.");
+            //    CheckCount++;
+            //    LastSignal = result.finalResult != LastSignal ? result.finalResult : LastSignal;
+
+            //}
+            //finally
+            //{
+            //    if (restartTimer) _timer.Start();
+            //    checkLock.Set();
+            //}
+            //return result;
         }
 
         public virtual void Start()
@@ -127,7 +158,7 @@ namespace Kalitte.Trading
 
 
         protected virtual void raiseSignal(SignalEventArgs data)
-        {            
+        {
             if (this.OnSignal != null) OnSignal(this, data);
             //if (data.Result.finalResult.HasValue) LastSignal = data.Result;
         }

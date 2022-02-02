@@ -55,6 +55,8 @@ namespace Kalitte.Trading
         public OrderSide? LastSignal { get; protected set; }
         public int CheckCount { get; private set; }
 
+        private ManualResetEvent checkLock = new ManualResetEvent(true);
+
         public event SignalEventHandler OnSignal;
 
         public Signal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner)
@@ -80,10 +82,27 @@ namespace Kalitte.Trading
 
         public virtual SignalResultX Check(DateTime? t = null)
         {
-            var result = CheckInternal(t);
-            if (CheckCount == 0) Algo.Log($"{this.Name} inited successfully.");
-            CheckCount++;
-            LastSignal = result.finalResult != LastSignal? result.finalResult: LastSignal ;
+            checkLock.WaitOne();
+            checkLock.Reset();
+            var restartTimer = false;
+            if (_timer != null && _timer.Enabled)
+            {
+                restartTimer = true;
+                _timer.Stop();
+            }
+            SignalResultX result;
+            
+            try
+            {
+                result = CheckInternal(t);
+                if (CheckCount == 0) Algo.Log($"{this.Name} inited successfully.");
+                CheckCount++;
+                LastSignal = result.finalResult != LastSignal ? result.finalResult : LastSignal;
+
+            } finally {                
+                if (restartTimer) _timer.Start();
+                checkLock.Set();
+            }
             return result;
         }
 

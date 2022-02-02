@@ -113,8 +113,8 @@ namespace Kalitte.Trading.Algos
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
 
 
-            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("ma59cross", Symbol, this, mov, mov2));
-            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("macd59cross", Symbol, this, macd, macd.MacdTrigger) { Split = 0.15M, Periods = 3 });
+            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("ma59cross", Symbol, this, mov, mov2) {  AvgChange = 0.25M, Periods = 5});
+            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("macd59cross", Symbol, this, macd, macd.MacdTrigger) { AvgChange = 0.15M, Periods = 3 });
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
             if (this.ProfitQuantity > 0) this.signals.Add(new TakeProfitSignal("takeprofit", Symbol, this, this.ProfitPuan, this.ProfitQuantity));
             if (this.LossQuantity > 0) this.signals.Add(new StopLossSignal("stoploss", Symbol, this, this.LossPuan, this.LossQuantity));
@@ -258,7 +258,7 @@ namespace Kalitte.Trading.Algos
 
         private Boolean waitForOperationAndOrders(string message)
         {
-            Log($"Operations/orders waiting: { message}", LogLevel.Debug);
+            //Log($"Operations/orders waiting: { message}", LogLevel.Debug);
             
             var result1 = operationWait.WaitOne(10000);
             var result2 = orderWait.WaitOne(10000);
@@ -269,9 +269,15 @@ namespace Kalitte.Trading.Algos
 
         private void SignalReceieved(Signal signal, SignalEventArgs data)
         {
-
-            if (data.Result.finalResult.HasValue) Log($"Signal received from {signal.Name} as {data.Result.finalResult }", LogLevel.Debug);
-            signalResults[signal.Name] = data.Result;
+            lock(signalResults)
+            {
+                var oldVal = signalResults.ContainsKey(signal.Name) ? signalResults[signal.Name].finalResult : null;
+                if (oldVal != data.Result.finalResult)
+                {
+                    Log($"Signal from {signal.Name} changed from {oldVal} -> {data.Result.finalResult }", LogLevel.Debug);
+                }
+                signalResults[signal.Name] = data.Result;
+            }
         }
 
 

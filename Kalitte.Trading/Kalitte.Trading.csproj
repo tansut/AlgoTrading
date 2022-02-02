@@ -85,6 +85,9 @@
     <Reference Include="Matriks.Wpf.Trader">
       <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Trader.dll</HintPath>
     </Reference>
+    <Reference Include="Skender.Stock.Indicators">
+      <HintPath>..\third.party\Skender.Stock.Indicators.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

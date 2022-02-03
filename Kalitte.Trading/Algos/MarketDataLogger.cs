@@ -83,6 +83,8 @@ namespace Kalitte.Trading.Algos
             var t = DateTime.Now;
             var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
             var t2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
+            
+            
             if (t >= t1 && t <= t2)
             {
                 var price = GetMarketData(Symbol, SymbolUpdateField.Last);

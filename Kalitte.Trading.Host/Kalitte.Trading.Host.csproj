@@ -11,4 +11,10 @@
     <ProjectReference Include="..\Kalitte.Trading\Kalitte.Trading.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Skender.Stock.Indicators">
+      <HintPath>..\third.party\Skender.Stock.Indicators.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

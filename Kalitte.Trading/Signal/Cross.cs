@@ -20,7 +20,7 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Skender.Stock.Indicators;
+
 
 namespace Kalitte.Trading
 {
@@ -49,9 +49,9 @@ namespace Kalitte.Trading
         //private List<decimal> lastSignals = new List<decimal>();
         //private OrderSide? initialPeriodSignal = null;
 
-        private List<Quote> i1List = new List<Quote>();
-        private List<Quote> i2List = new List<Quote>();
-        private List<decimal> priceList = new List<decimal>();
+        private TopQue i1List; 
+        private TopQue i2List; 
+        private TopQue priceList; 
 
 
         public CrossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
@@ -123,9 +123,9 @@ namespace Kalitte.Trading
 
         private void clearLists()
         {
-            i1List.Clear();
-            i2List.Clear();
-            priceList.Clear();
+            i1List = new TopQue(Periods);
+            i2List = new TopQue(Periods);
+            priceList = new TopQue(Periods);            
         }
 
         private void Reset()
@@ -173,15 +173,16 @@ namespace Kalitte.Trading
                     {
                         Algo.Log($"Received empty period signal, reverifying previous signal {LastPeriodSignal}.", LogLevel.Warning);
                         evalState = SignalConfirmStatus.Verifying;
-                    } else
+                    }
+                    else
                     {
-                        Algo.Log($"Received empty period signal but will use last verified signal {LastPeriodSignal} ", LogLevel.Warning);
+                        //Algo.Log($"Received empty period signal but will use last verified signal {LastPeriodSignal} ", LogLevel.Debug);
                     }
                 }
                 else
                 {
                     Algo.Log($"Period signal changed from {LastPeriodSignal} to {periodSignal}", LogLevel.Debug);
-                    Reset();                   
+                    Reset();
                     LastPeriodSignal = periodSignal;
                     evalState = periodSignal.HasValue ? SignalConfirmStatus.Verifying : evalState;
                 }
@@ -189,34 +190,36 @@ namespace Kalitte.Trading
 
             if (evalState == SignalConfirmStatus.Verifying)
             {
-                updateList(i1List, i1.CurrentValue);
-                updateList(i2List, i2.CurrentValue);
-                updateList(priceList, Algo.GetMarketPrice(Symbol, t));
+                i1List.Push(i1.CurrentValue);
+                i2List.Push(i2.CurrentValue);
+                //ateList(priceList, Algo.GetMarketPrice(Symbol, t));
                 decimal avgDif = i1List.Average() - i2List.Average();
+                decimal avgEmaDif = i1List.ExponentialMovingAverage - i2List.ExponentialMovingAverage;
 
                 if (i1List.Count >= Periods)
                 {
-                    if (avgDif > AvgChange) finalResult = OrderSide.Buy;
-                    else if (avgDif < -AvgChange) finalResult = OrderSide.Sell;
+                    if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
+                    else if (avgEmaDif < -AvgChange) finalResult = OrderSide.Sell;
 
                     if (finalResult.HasValue)
                     {
                         if (finalResult != periodSignal)
                         {
-                            Algo.Log($"Tried to verify {periodSignal} but ended with {finalResult}. Resetting.", LogLevel.Info);
+                            Algo.Log($"[{this.Name}]: Tried to verify {periodSignal} but ended with {finalResult}. Resetting.", LogLevel.Info);
                             this.Reset();
-                        } else
+                        }
+                        else
                         {
-                            Algo.Log($"{periodSignal} verified with {avgDif}", LogLevel.Debug);
+                            Algo.Log($"[{this.Name}]: {periodSignal} verified with {avgDif} {avgEmaDif} {AvgChange}", LogLevel.Debug);
                             evalState = SignalConfirmStatus.Verified;
                         }
                     }
                     else
                     {
-                        Algo.Log($"Still trying to verify {periodSignal} signal. Avg: {avgDif}");
+                        Algo.Log($"[{this.Name}]: Still trying to verify {periodSignal} signal. Avg: {avgDif} {avgEmaDif} {AvgChange}");
                     }
                 }
-                else Algo.Log($"Collecting data to start verifying {periodSignal} signal. Avg: {avgDif}");
+                else Algo.Log($"[{this.Name}]: Collecting data to start verifying {periodSignal} signal. Avg: {avgDif} {avgEmaDif} {AvgChange}");
             }
 
             return new SignalResultX(this) { finalResult = (evalState == SignalConfirmStatus.Verified ? periodSignal : null) };

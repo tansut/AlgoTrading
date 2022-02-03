@@ -113,8 +113,8 @@ namespace Kalitte.Trading.Algos
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
 
 
-            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("ma59cross", Symbol, this, mov, mov2) {  AvgChange = 0.25M, Periods = 5});
-            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("macd59cross", Symbol, this, macd, macd.MacdTrigger) { AvgChange = 0.15M, Periods = 3 });
+            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("ma59cross", Symbol, this, mov, mov2) {  AvgChange = 0.1M, Periods = 8});
+            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("macd59cross", Symbol, this, macd, macd.MacdTrigger) { AvgChange = 0.025M, Periods = 4 });
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
             if (this.ProfitQuantity > 0) this.signals.Add(new TakeProfitSignal("takeprofit", Symbol, this, this.ProfitPuan, this.ProfitQuantity));
             if (this.LossQuantity > 0) this.signals.Add(new StopLossSignal("stoploss", Symbol, this, this.LossPuan, this.LossQuantity));

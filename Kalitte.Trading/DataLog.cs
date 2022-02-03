@@ -25,6 +25,7 @@ namespace Kalitte.Trading
 {
     public abstract class MarketDataLogger : IDisposable
     {
+        public char Seperator = '\t';
         public string Symbol
         {
             get; private set;
@@ -74,15 +75,41 @@ namespace Kalitte.Trading
 
         public override void LogMarketData(DateTime t, decimal[] price)
         {
-            string append = $"{t.ToString("mm-ss")}\t{string.Join("\t", price)}\n";
+            string append = $"{t.ToString("mm-ss")}{Seperator}{string.Join(Convert.ToString(Seperator), price)}\n";
             string file = GetFileName(t);
             if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
             File.AppendAllText(file, append);
         }
 
-        public override decimal[] GetMarketDataList(DateTime t)
+        public List<decimal[]> GetContentValues(string file)
         {
-            var file = GetFileName(t);
+            
+            var content = new List< decimal[]>();
+            if (File.Exists(file))
+            {
+                var fileContent = File.ReadAllLines(file);
+                foreach (var line in fileContent)
+                {
+                    var parts = new List<string>(line.Split(Seperator));
+                    try
+                    {
+                        var key = parts[0];
+                        parts.RemoveAt(0);
+                        content.Add(parts.Select(p => decimal.Parse(p)).ToArray());
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+            
+            return content;
+        }
+
+        public SortedList<string, decimal[]> GetContent(string file)
+        {
+           
             var cacheContains = cache.ContainsKey(file);
             var content = cacheContains ? cache[file] : new SortedList<string, decimal[]>();
             if (!content.Any() && File.Exists(file))
@@ -90,7 +117,7 @@ namespace Kalitte.Trading
                 var fileContent = File.ReadAllLines(file);
                 foreach (var line in fileContent)
                 {
-                    var parts = new List<string>(line.Split('\t'));
+                    var parts = new List<string>(line.Split(Seperator));
                     try
                     {
                         var key = parts[0];
@@ -104,6 +131,14 @@ namespace Kalitte.Trading
                 }
             }
             if (!cacheContains) cache[file] = content;
+            return content;
+        }
+
+
+        public override decimal[] GetMarketDataList(DateTime t)
+        {
+            var file = GetFileName(t);
+            var content = GetContent(file);
             decimal[] result;
             content.TryGetValue(t.ToString("mm-ss"), out result);
             return result;

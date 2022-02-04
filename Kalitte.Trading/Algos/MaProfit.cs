@@ -120,9 +120,14 @@ namespace Kalitte.Trading.Algos
             if (this.ProfitQuantity > 0) this.signals.Add(new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity));
             //if (this.LossQuantity > 0) this.signals.Add(new StopLossSignal("stoploss", Symbol, this, this.LossPuan, this.LossQuantity));
 
-            signals.ForEach(p => p.TimerEnabled = !BackTestMode);
-            signals.ForEach(p => p.Simulation = BackTestMode);
-            signals.ForEach(p => p.OnSignal += SignalReceieved);
+            signals.ForEach(p =>
+            {
+                p.TimerEnabled = !BackTestMode;
+                p.Simulation = BackTestMode;
+                p.OnSignal += SignalReceieved;
+            });
+            
+            
 
             WorkWithPermanentSignal(true);
             SendOrderSequential(false);
@@ -451,7 +456,7 @@ namespace Kalitte.Trading.Algos
 
         protected void sendOrder(string symbol, decimal quantity, OrderSide side, string comment = "", decimal lprice = 0, ChartIcon icon = ChartIcon.None)
         {
-            Log($"Order received: {symbol} {quantity} {side} {comment}", LogLevel.Debug);
+            //Log($"Order received: {symbol} {quantity} {side} {comment}", LogLevel.Debug);
             orderWait.Reset();
             var price = lprice > 0 ? lprice : GetMarketPrice(this.Symbol);
             string orderid;

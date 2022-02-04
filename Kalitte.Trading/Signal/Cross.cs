@@ -49,9 +49,9 @@ namespace Kalitte.Trading
         //private List<decimal> lastSignals = new List<decimal>();
         //private OrderSide? initialPeriodSignal = null;
 
-        private TopQue i1List; 
-        private TopQue i2List; 
-        private TopQue priceList; 
+        private TopQue i1List;
+        private TopQue i2List;
+        private TopQue priceList;
 
 
         public CrossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
@@ -125,7 +125,7 @@ namespace Kalitte.Trading
         {
             i1List = new TopQue(Periods);
             i2List = new TopQue(Periods);
-            priceList = new TopQue(Periods);            
+            priceList = new TopQue(Periods);
         }
 
         private void Reset()
@@ -158,7 +158,7 @@ namespace Kalitte.Trading
 
 
             periodSignal = getPeriodSignal(t);
-           
+
 
             //if (Simulation)
             //{
@@ -191,12 +191,12 @@ namespace Kalitte.Trading
                 }
             }
 
-            
+
 
             if (evalState == SignalConfirmStatus.Verifying)
             {
                 var repeat = 0;
-                while(evalState == SignalConfirmStatus.Verifying)
+                while (evalState == SignalConfirmStatus.Verifying && repeat <= Periods)
                 {
                     i1List.Push(i1.CurrentValue);
                     i2List.Push(i2.CurrentValue);
@@ -204,6 +204,7 @@ namespace Kalitte.Trading
                     if (i1List.Count >= Periods)
                     {
                         decimal avgEmaDif = i1List.ExponentialMovingAverage - i2List.ExponentialMovingAverage;
+
                         if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
                         else if (avgEmaDif < -AvgChange) finalResult = OrderSide.Sell;
 

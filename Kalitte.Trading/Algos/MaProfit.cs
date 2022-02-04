@@ -107,6 +107,7 @@ namespace Kalitte.Trading.Algos
         public override void OnInit()
         {
             AddSymbol(Symbol, BackTestMode ? SymbolPeriod.Min : SymbolPeriod);
+            //AddSymbol(Symbol,  SymbolPeriod);
             mov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod, MovMethod.Exponential);
             mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
             rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);
@@ -116,8 +117,8 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("ma59cross", Symbol, this, mov, mov2) {  AvgChange = 0.1M, Periods = 8});
             if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("macd59cross", Symbol, this, macd, macd.MacdTrigger) { AvgChange = 0.025M, Periods = 4 });
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
-            if (this.ProfitQuantity > 0) this.signals.Add(new TakeProfitSignal("takeprofit", Symbol, this, this.ProfitPuan, this.ProfitQuantity));
-            if (this.LossQuantity > 0) this.signals.Add(new StopLossSignal("stoploss", Symbol, this, this.LossPuan, this.LossQuantity));
+            if (this.ProfitQuantity > 0) this.signals.Add(new TakeProfitOrLossSignal("takeprofit", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity));
+            //if (this.LossQuantity > 0) this.signals.Add(new StopLossSignal("stoploss", Symbol, this, this.LossPuan, this.LossQuantity));
 
             signals.ForEach(p => p.TimerEnabled = !BackTestMode);
             signals.ForEach(p => p.Simulation = BackTestMode);
@@ -136,75 +137,75 @@ namespace Kalitte.Trading.Algos
 
 
 
-        public void simulateTestPeriod(object barDataCurrentValuesx)
-        {
-            BarDataCurrentValues barDataCurrentValues = (BarDataCurrentValues)barDataCurrentValuesx;
-            var t = barDataCurrentValues.LastUpdate.DTime;
-            var periodsToBack = GetSymbolPeriodSeconds(SymbolPeriod);
+        //public void simulateTestPeriod(object barDataCurrentValuesx)
+        //{
+        //    BarDataCurrentValues barDataCurrentValues = (BarDataCurrentValues)barDataCurrentValuesx;
+        //    var t = barDataCurrentValues.LastUpdate.DTime;
+        //    var periodsToBack = GetSymbolPeriodSeconds(SymbolPeriod);
 
-            var start = t - TimeSpan.FromSeconds(periodsToBack - 1);
-            Log($"Backtest starting for bar: {t}, start: {start}  seconds back: {periodsToBack}", LogLevel.Debug);
-            for (var i = 0; i < periodsToBack; i++)
-            {
-                var date = start.AddSeconds(i);
-                foreach (var signal in signals)
-                {
-                    var t1 = date;
-                    Task.Run(() =>
-                    {
-                        var result = signal.Check(t1);
-                        Log($"used t: {t1}");
-                        SignalReceieved(signal, new SignalEventArgs() { Result = result });
-                    }).Wait();
-                }
-                Decide();
-            }
-
-
+        //    var start = t - TimeSpan.FromSeconds(periodsToBack - 1);
+        //    Log($"Backtest starting for bar: {t}, start: {start}  seconds back: {periodsToBack}", LogLevel.Debug);
+        //    for (var i = 0; i < periodsToBack; i++)
+        //    {
+        //        var date = start.AddSeconds(i);
+        //        foreach (var signal in signals)
+        //        {
+        //            var t1 = date;
+        //            Task.Run(() =>
+        //            {
+        //                var result = signal.Check(t1);
+        //                Log($"used t: {t1}");
+        //                SignalReceieved(signal, new SignalEventArgs() { Result = result });
+        //            }).Wait();
+        //        }
+        //        Decide();
+        //    }
 
 
 
-            //var start = new DateTime(2022, 01, 28, 9, 30, 0);
-            //var end = new DateTime(2022, 01, 28, 18, 0, 0);
-
-            //var seconds = (end - start).TotalSeconds;
-
-            //for (var i = 0; i < seconds; i++)
-            //{
-            //    var t = start.AddSeconds(i);
-            //    //            var result = this.ManageProfitLoss(price, date);
-            //    //            if (result.HasValue) break;
-            //}
 
 
+        //    //var start = new DateTime(2022, 01, 28, 9, 30, 0);
+        //    //var end = new DateTime(2022, 01, 28, 18, 0, 0);
 
-            //var portfolio = portfolios.GetPortfolio(Symbol);
-            //if (ProfitQuantity > 0 && !portfolio.IsEmpty)
-            //{
-            //    var t = barDataCurrentValues.LastUpdate.DTime;
-            //    var periodsToBack = GetSymbolPeriodSeconds(SymbolPeriod);
+        //    //var seconds = (end - start).TotalSeconds;
 
-            //    var start = t - TimeSpan.FromSeconds(periodsToBack - 1);
-            //    Log($"Backtest starting to check take profit. Bar: {t}, start: {start}  seconds back: {periodsToBack}", LogLevel.Debug);
-            //    for (var i = 0; i < periodsToBack; i++)
-            //    {
-            //        var date = start.AddSeconds(i);
-            //        var price = GetMarketPrice(date);
-            //        if (price != 0)
-            //        {                        
-            //            var result = this.ManageProfitLoss(price, date);
-            //            if (result.HasValue) break;
-            //        }
-            //    }
-            //}
+        //    //for (var i = 0; i < seconds; i++)
+        //    //{
+        //    //    var t = start.AddSeconds(i);
+        //    //    //            var result = this.ManageProfitLoss(price, date);
+        //    //    //            if (result.HasValue) break;
+        //    //}
 
-            //foreach (var signal in signals)
-            //{
-            //    var result = signal.Check();
-            //    SignalReceieved(signal, new SignalEventArgs() { Result = result });
-            //}
-            //Decide();
-        }
+
+
+        //    //var portfolio = portfolios.GetPortfolio(Symbol);
+        //    //if (ProfitQuantity > 0 && !portfolio.IsEmpty)
+        //    //{
+        //    //    var t = barDataCurrentValues.LastUpdate.DTime;
+        //    //    var periodsToBack = GetSymbolPeriodSeconds(SymbolPeriod);
+
+        //    //    var start = t - TimeSpan.FromSeconds(periodsToBack - 1);
+        //    //    Log($"Backtest starting to check take profit. Bar: {t}, start: {start}  seconds back: {periodsToBack}", LogLevel.Debug);
+        //    //    for (var i = 0; i < periodsToBack; i++)
+        //    //    {
+        //    //        var date = start.AddSeconds(i);
+        //    //        var price = GetMarketPrice(date);
+        //    //        if (price != 0)
+        //    //        {                        
+        //    //            var result = this.ManageProfitLoss(price, date);
+        //    //            if (result.HasValue) break;
+        //    //        }
+        //    //    }
+        //    //}
+
+        //    //foreach (var signal in signals)
+        //    //{
+        //    //    var result = signal.Check();
+        //    //    SignalReceieved(signal, new SignalEventArgs() { Result = result });
+        //    //}
+        //    //Decide();
+        //}
 
 
         public override void OnInitCompleted()
@@ -222,28 +223,49 @@ namespace Kalitte.Trading.Algos
 
         private void OnOrderTimerEvent(Object source, ElapsedEventArgs e)
         {
-            if (BackTestMode) return;
-            orderTimer.Enabled = false;
-            try
-            {
-                Decide();
-            }
-            finally
-            {
-                orderTimer.Enabled = true;
-            }
+            //if (BackTestMode) return;
+            //orderTimer.Enabled = false;
+            //try
+            //{
+            //    Decide();
+            //}
+            //finally
+            //{
+            //    orderTimer.Enabled = true;
+            //}
         }
 
         public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
         {
             if (!this.BackTestMode) return;
+            if (!this.BackTestMode) return;
 
+      
             foreach (var signal in signals)
             {
-                var result = signal.Check(barDataCurrentValues.LastUpdate.DTime);
-                SignalReceieved(signal, new SignalEventArgs() { Result = result });
+                var t = barDataCurrentValues.LastUpdate.DTime;
+
+                var task = Task.Factory.StartNew(() =>
+                {
+                    var result = signal.Check(t);
+                    var waitOthers = waitForOperationAndOrders("Backtest");
+                    if (!waitOthers)
+                    {
+                        Log($"Wait timeout", LogLevel.Warning);
+                    }
+                });
+
+                task.Wait();
+
+
+
+     
+                //Log($"test started. {result.Signal.Name} fired {result.finalResult}");
+                //SignalReceieved(signal, new SignalEventArgs() { Result = result });
+
+                // Decide();
             }
-            Decide();
+            //Decide();
 
             ////backtestWait.WaitOne();
             ////backtestWait.Reset();
@@ -269,65 +291,115 @@ namespace Kalitte.Trading.Algos
 
         private void SignalReceieved(Signal signal, SignalEventArgs data)
         {
-            lock(signalResults)
+            lock(signalResults)                
             {
                 var oldVal = signalResults.ContainsKey(signal.Name) ? signalResults[signal.Name].finalResult : null;
                 if (oldVal != data.Result.finalResult)
                 {
                     Log($"Signal from {signal.Name} changed from {oldVal} -> {data.Result.finalResult }", LogLevel.Debug);
+                    if (data.Result.finalResult.HasValue) Decide(signal, data);
                 }
                 signalResults[signal.Name] = data.Result;
             }
         }
 
-
-        private void Decide()
+        private void Decide(Signal signal, SignalEventArgs data)
         {
-            var results = signalResults.Where(p => p.Value.finalResult.HasValue).ToList();
-            List<SignalResultX> validOrders = new List<SignalResultX>();
-            if (results.Any()) validOrders.Add(results[0].Value);
-            foreach (var validOrder in validOrders)
+            var result = data.Result;
+            //Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
+            var waitOthers = waitForOperationAndOrders("Decide");
+            if (!waitOthers) return;
+            operationWait.Reset();
+            try
             {
-                 var result = validOrder;
-                //Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
-                var waitOthers = waitForOperationAndOrders("Decide");
-                if (!waitOthers) break;
-                operationWait.Reset();
-                try
+                //Log($"Processing signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
+                if (result.Signal is TakeProfitOrLossSignal)
                 {
-                    //Log($"Processing signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
-                    if (result.Signal is TakeProfitSignal)
+                    var tpSignal = (TakeProfitOrLossSignal)(result.Signal);
+                    var signalResult = (ProfitLossResult)result;
+                    var pq = UserPortfolioList.GetPortfolio(Symbol).Quantity;
+
+                    if (pq == this.OrderQuantity)
                     {
-                        var profitSignal = (TakeProfitSignal)(result.Signal);
-                        var profitResult = (ProfitLossResult)result;
-
-                        if (UserPortfolioList.GetPortfolio(Symbol).Quantity == this.OrderQuantity)
-                        {
-                            Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
-                            sendOrder(Symbol, profitSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.TakeProfit);
-                        }
+                        Log($"{result.Signal.Name} received: PL: {signalResult.PL}, MarketPrice: {signalResult.MarketPrice}, Average Cost: {signalResult.PortfolioCost}", LogLevel.Debug);
+                        sendOrder(Symbol, signalResult.Direction == ProfitOrLoss.Profit ? tpSignal.ProfitQuantity : tpSignal.LossQuantity, signalResult.finalResult.Value, $"[{result.Signal.Name}], PL: {signalResult.PL}", signalResult.MarketPrice, signalResult.Direction == ProfitOrLoss.Profit ? ChartIcon.TakeProfit : ChartIcon.StopLoss);
                     }
-                    else if (result.Signal is StopLossSignal)
-                    {
-                        var lossSignal = (StopLossSignal)(result.Signal);
-                        var profitResult = (ProfitLossResult)result;
-
-                        if (UserPortfolioList.GetPortfolio(Symbol).Quantity == this.OrderQuantity)
-                        {
-                            Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
-                            sendOrder(Symbol, lossSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.StopLoss);
-                        }
-                    }
-                    else CreateOrders(result);
-
+                    else Log($"TakeProfitLoss received but quantity doesbot match. Portfolio: {pq} oq: {this.OrderQuantity}");
                 }
-                finally
-                {
-                    operationWait.Set();
-                }
+                else CreateOrders(result);
 
             }
+            finally
+            {
+                operationWait.Set();
+            }
+
         }
+
+
+        //private void Decide()
+        //{
+        //    lock(signalResults)
+        //    {
+        //        var results = signalResults.Where(p => p.Value.finalResult.HasValue).ToList();
+        //        List<SignalResultX> validOrders = new List<SignalResultX>();
+        //        if (results.Count>0) {
+        //            validOrders.Add(results[0].Value);
+        //            Log($"Will process signal {results[0].Key} out of {results.Count}", LogLevel.Debug);
+        //        } else
+        //        {
+        //            //Log($"no valid signal result out of {results.Count}");
+
+        //        }
+
+        //        foreach (var validOrder in validOrders)
+        //        {
+        //            var result = validOrder;
+        //            //Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
+        //            var waitOthers = waitForOperationAndOrders("Decide");
+        //            if (!waitOthers) break;
+        //            operationWait.Reset();
+        //            try
+        //            {
+        //                //Log($"Processing signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
+        //                if (result.Signal is TakeProfitOrLossSignal)
+        //                {
+        //                    var signal = (TakeProfitOrLossSignal)(result.Signal);
+        //                    var signalResult = (ProfitLossResult)result;
+        //                    var pq = UserPortfolioList.GetPortfolio(Symbol).Quantity;
+
+        //                    if (pq == this.OrderQuantity)
+        //                    {
+        //                        Log($"{result.Signal.Name} received: PL: {signalResult.PL}, MarketPrice: {signalResult.MarketPrice}, Average Cost: {signalResult.PortfolioCost}", LogLevel.Debug);
+        //                        sendOrder(Symbol, signalResult.Direction == ProfitOrLoss.Profit ? signal.ProfitQuantity: signal.LossQuantity, signalResult.finalResult.Value, $"[{result.Signal.Name}], PL: {signalResult.PL}", signalResult.MarketPrice, signalResult.Direction == ProfitOrLoss.Profit ? ChartIcon.TakeProfit: ChartIcon.StopLoss);
+        //                    }
+        //                    else Log($"TakeProfitLoss received but quantity doesbot match. Portfolio: {pq} oq: {this.OrderQuantity}");
+        //                }
+        //                //else if (result.Signal is StopLossSignal)
+        //                //{
+        //                //    var lossSignal = (StopLossSignal)(result.Signal);
+        //                //    var profitResult = (ProfitLossResult)result;
+        //                //    var pq = UserPortfolioList.GetPortfolio(Symbol).Quantity;
+
+        //                //    if (pq == this.OrderQuantity)
+        //                //    {
+        //                //        Log($"{result.Signal.Name} received: PL: {profitResult.PL}, MarketPrice: {profitResult.MarketPrice}, Average Cost: {profitResult.PortfolioCost}", LogLevel.Debug);
+        //                //        sendOrder(Symbol, lossSignal.Quantity, profitResult.finalResult.Value, $"[{result.Signal.Name}], PL: {profitResult.PL}", profitResult.MarketPrice, ChartIcon.StopLoss);
+        //                //    }
+        //                //    else Log($"Stoploss received but quantity doesbot match. Portfolio: {pq} oq: {this.OrderQuantity}");
+        //                //}
+        //                else CreateOrders(result);
+
+        //            }
+        //            finally
+        //            {
+        //                operationWait.Set();
+        //            }
+
+        //        }
+        //    }
+
+        //}
 
         public void CreateOrders(SignalResultX signalResult)
         {

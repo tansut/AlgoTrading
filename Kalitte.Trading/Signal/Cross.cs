@@ -156,12 +156,16 @@ namespace Kalitte.Trading
             OrderSide? periodSignal = null;
             OrderSide? finalResult = null;
 
+
+
+            periodSignal = getPeriodSignal(t);
+           
+
             if (Simulation)
             {
                 return new SignalResultX(this) { finalResult = periodSignal };
             }
 
-            periodSignal = getPeriodSignal(t);
             if (!verifyPeriodSignal(periodSignal, t)) return null;
 
             if (periodSignal != LastPeriodSignal)

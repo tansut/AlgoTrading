@@ -32,7 +32,7 @@ namespace Kalitte.Trading
 
     public interface SignalManager
     {
-        public void Log(string text, LogLevel level = LogLevel.Info);
+        void Log(string text, LogLevel level = LogLevel.Info);
         bool CrossAboveX(IIndicator i1, IIndicator i2, DateTime t);
         bool CrossBelowX(IIndicator i1, IIndicator i2, DateTime t);
     }

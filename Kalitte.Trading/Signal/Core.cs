@@ -98,7 +98,7 @@ namespace Kalitte.Trading
                     if (restartTimer) _timer.Start();
                 }
             }
-            raiseSignal(new SignalEventArgs() { Result = result });
+            
         }
 
         protected abstract SignalResultX CheckInternal(DateTime? t = null);
@@ -108,6 +108,7 @@ namespace Kalitte.Trading
             var result = CheckInternal(t);
             //if (CheckCount == 0) Algo.Log($"{this.Name} inited successfully.");
             //CheckCount++;
+            raiseSignal(new SignalEventArgs() { Result = result });
             LastSignalResult = result.finalResult;
             return result;
 

@@ -12,6 +12,8 @@ using Matriks.Trader.Core.TraderModels;
 using Matriks.Lean.Algotrader.AlgoBase;
 using Matriks.Lean.Algotrader.Models;
 using Matriks.Lean.Algotrader.Trading;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Matriks.Lean.Algotrader
 {
@@ -32,17 +34,15 @@ namespace Matriks.Lean.Algotrader
 		[Parameter(1)]
 		public decimal SellOrderQuantity;
 
-		[Parameter(9)]
-		public int MomPeriod;
 
-		[Parameter(9)]
-		public int EMAPeriod;
+		 
 
 		// indikator tanımları.
 
-		MOM mom;
-
-		EMA ema;
+		MOV mov;
+		MOV mov2;
+		RSI rsi;
+		MACD macd;
 
 		/// <summary>
 		/// Strateji ilk çalıştırıldığında bu fonksiyon tetiklenir. Tüm sembole kayit işlemleri,
@@ -53,8 +53,10 @@ namespace Matriks.Lean.Algotrader
 			AddSymbol(Symbol, SymbolPeriod);
 
 
-			mom = MOMIndicator(Symbol, SymbolPeriod, OHLCType.Close, MomPeriod);
-			ema = EMAIndicator(mom, EMAPeriod);
+			mov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, 9, MovMethod.Exponential);
+			mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, 5, MovMethod.Exponential);
+			rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);
+			macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, 9, 5, 3);
 
 			// Algoritmanın kalıcı veya geçici sinyal ile çalışıp çalışmayacağını belirleyen fonksiyondur.
 			// true geçerseniz algoritma sadece yeni bar açılışlarında çalışır, bu fonksiyonu çağırmazsanız veya false geçerseniz her işlem olduğunda algoritma tetiklenir.
@@ -78,6 +80,7 @@ namespace Matriks.Lean.Algotrader
 		/// </summary>
 		public override void OnInitCompleted()
 		{
+			
 
 		}
 
@@ -103,23 +106,33 @@ namespace Matriks.Lean.Algotrader
 		/// Eklenen sembollerin bardata'ları ve indikatorler güncellendikçe bu fonksiyon tetiklenir. 
 		/// </summary>
 		/// <param name="barData">Bardata ve hesaplanan gerçekleşen işleme ait detaylar</param>
+		/// 
+
+		private void saveBardataValue(BarDataValue bd, List<string> list)
+        {
+			list.Add($"t: {bd.DTime} o:{bd.Open} h:{bd.High} l:{bd.Low} c:{bd.Close} wc:{bd.WClose} dif:{bd.Diff} dif%:{bd.DiffPercent} vol:{bd.Volume}");
+			list.Add($"t: {bd.DTime} rsi: {rsi.CurrentValue} ma5: {mov.CurrentValue} ma9: {mov2.CurrentValue} macd: {macd.CurrentValue} {macd.MacdTrigger.CurrentValue}");
+			list.Add($"t: {bd.DTime} macb: {CrossBelow(mov, mov2)} maca: {CrossAbove(mov, mov2)} macdcb: {CrossBelow(macd, macd.MacdTrigger)} macdcb: {CrossAbove(macd, macd.MacdTrigger)}");
+		}
 		public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
 		{
+			//File.AppendAllLines(@"c:\kalitte\log\0203period.txt", )
+			
+			var list = new List<string>();
 			foreach(var bd in barDataCurrentValues.BarDataValues)
+            {				
+				saveBardataValue(bd, list);
+			}
+
+			list.Add("--CURRENT-");
+			saveBardataValue(barDataCurrentValues.LastUpdate, list);
+			
+			foreach(var line in list)
             {
-				
-				Debug($"o:{bd.Open} h:{bd.High} l:{bd.Low} c:{bd.Close} wc:{bd.WClose} dif:{bd.Diff} dif%:{bd.DiffPercent} vol:{bd.Volume}");
+				Debug(line);
             }
-			if (CrossAbove(mom, ema))
-			{
-				SendMarketOrder(Symbol, BuyOrderQuantity, OrderSide.Buy);
-				Debug("Alış Emri Gönderildi");
-			}
-			else if (CrossBelow(mom, ema))
-			{
-				SendMarketOrder(Symbol, SellOrderQuantity, OrderSide.Sell);
-				Debug("Satış Emri Gönderildi");
-			}
+			File.AppendAllLines(@"c:\kalitte\log\0203period10min.txt", list);
+
 		}
 
 		/// <summary>

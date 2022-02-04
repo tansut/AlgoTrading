@@ -51,4 +51,9 @@ namespace Matriks.Lean.Algotrader
     {
 
     }
+
+    public class bardatalogger : Kalitte.Trading.Algos.BarDataLogger
+    {
+
+    }
 }

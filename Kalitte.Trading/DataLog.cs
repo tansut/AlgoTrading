@@ -58,7 +58,7 @@ namespace Kalitte.Trading
         {
             get; set;
         }
-
+        public bool SaveDaily = false;
         protected string usedDir;
         protected Dictionary<string, SortedList<string, decimal[]>> cache = new Dictionary<string, SortedList<string, decimal[]>>();
         public FileLogger(string symbol, string baseDir, string subdir) : base(symbol)
@@ -70,12 +70,15 @@ namespace Kalitte.Trading
 
         public string GetFileName(DateTime t)
         {
-            return Path.Combine(usedDir, t.ToString("yyyy-MM-dd"), t.ToString("HH")) + ".txt";
+            if (SaveDaily)
+
+                return Path.Combine(usedDir, t.ToString("yyyy-MM-dd") + ".txt");
+            else return Path.Combine(usedDir, t.ToString("yyyy-MM-dd"), t.ToString("HH")) + ".txt";
         }
 
         public override void LogMarketData(DateTime t, decimal[] price)
         {
-            string append = $"{t.ToString("mm-ss")}{Seperator}{string.Join(Convert.ToString(Seperator), price)}\n";
+            string append = $"{t.ToString("yyyy.MM.dd HH:mm:ss")}{Seperator}{string.Join(Convert.ToString(Seperator), price)}\n";
             string file = GetFileName(t);
             if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
             File.AppendAllText(file, append);
@@ -140,7 +143,8 @@ namespace Kalitte.Trading
             var file = GetFileName(t);
             var content = GetContent(file);
             decimal[] result;
-            content.TryGetValue(t.ToString("mm-ss"), out result);
+            var f1 = content.TryGetValue(t.ToString("yyyy.MM.dd HH:mm:sss"), out result);
+            if (!f1) content.TryGetValue(t.ToString("mm-ss"), out result);
             return result;
         }
     }

@@ -12,7 +12,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kalitte.Trading", "Kalitte.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kalitte.Trading.Host", "Kalitte.Trading.Host\Kalitte.Trading.Host.csproj", "{6D5D1163-AA27-4030-8B39-DCFE5EB05C45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Merge", "Merge\Merge.csproj", "{FF172370-BB8F-4196-B6C6-1EA9EF3DC618}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Merge", "Merge\Merge.csproj", "{FF172370-BB8F-4196-B6C6-1EA9EF3DC618}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kalitte.Trading.Server", "Kalitte.Trading.Server\Kalitte.Trading.Server.csproj", "{FFC12AA9-CFE6-4594-8B0A-B1AE5E1E8343}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{FF172370-BB8F-4196-B6C6-1EA9EF3DC618}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF172370-BB8F-4196-B6C6-1EA9EF3DC618}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF172370-BB8F-4196-B6C6-1EA9EF3DC618}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFC12AA9-CFE6-4594-8B0A-B1AE5E1E8343}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFC12AA9-CFE6-4594-8B0A-B1AE5E1E8343}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFC12AA9-CFE6-4594-8B0A-B1AE5E1E8343}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFC12AA9-CFE6-4594-8B0A-B1AE5E1E8343}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

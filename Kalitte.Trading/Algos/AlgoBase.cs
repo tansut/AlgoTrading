@@ -49,9 +49,13 @@ namespace Kalitte.Trading.Algos
                 Debug(text);
                 if (BackTestMode)
                 {
-                    var file = Path.Combine(LogDir, $"algologs{(BackTestMode ? 'B' : 'L')}", $" {DateTime.Now.ToString("MM-dd-HH")}.txt");
-                    if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
-                    File.AppendAllText(file, $"{level} {DateTime.Now.ToString()}: {text}" + Environment.NewLine);
+                    lock(LogDir)
+                    {
+                        var file = Path.Combine(LogDir, $"algologs2{(BackTestMode ? 'B' : 'L')}", $" {DateTime.Now.ToString("MM-dd-HH")}.txt");
+                        if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
+                        File.AppendAllText(file, $"{level} {DateTime.Now.ToString()}: {text}" + Environment.NewLine);
+                    }
+
                 }
             }
         }

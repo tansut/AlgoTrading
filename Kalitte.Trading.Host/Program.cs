@@ -3,11 +3,67 @@ using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNet.SignalR.Client;
+using System.Threading.Tasks;
+using Microsoft.AspNet.SignalR.Client.Transports;
 
 public class Program
 {
+    static HubConnection connection;
+
+
     public static void Main()
     {
+
+
+
+        connection = new HubConnection("https://localhost:44392");
+        
+            connection.Headers.Add("headername", "headervalue");
+            IHubProxy stockTickerHubProxy = connection.CreateHubProxy("pricefeed");
+            stockTickerHubProxy.On<string, decimal>("feed", (symbol, price) =>
+            {
+                Console.WriteLine("message: " + symbol + "-" + price);
+            });
+        connection.Start(new LongPollingTransport()).Wait();
+
+            Console.WriteLine("connect done");
+
+            Console.ReadLine();
+
+        stockTickerHubProxy.Invoke("feed", "fff", 12, DateTime.Now);
+
+        
+
+            Console.ReadLine();
+
+            // connection.Send("denee123").Wait();
+
+
+        
+
+
+
+
+
+
+
+        //connection. <string, string>("ReceiveMessage", (user, message) =>
+        //{
+        //    Console.WriteLine(user + message);
+
+        //});
+
+        //try
+        //{
+        //     connection.Start().Wait();
+        //}
+        //catch (Exception ex)
+        //{
+        //    Console.WriteLine(ex.Message);
+        //}
+
+        Console.ReadLine();
 
 
         var s = new List<string>("5,4,6,8,12,14,16,18,20".Split(',')).Select(x => decimal.Parse(x)).ToArray();
@@ -63,7 +119,7 @@ public class Program
             q1.Add(content[i][3]);
         }
 
-        for (var i = 0; i < 100 ; i++)
+        for (var i = 0; i < 100; i++)
         {
             Console.WriteLine($"{i} {content[i][3]} {q1.CalcEma(5)[i]} {q1.CalcEma(9)[i]}");
         }
@@ -100,6 +156,11 @@ public class Program
         //var val2 = logger.GetMarketDataList(t);
         //Console.WriteLine(val.ToString());
         //Console.WriteLine(val2);
+    }
+
+    private static void Connection_Closed()
+    {
+        throw new NotImplementedException();
     }
 }
 

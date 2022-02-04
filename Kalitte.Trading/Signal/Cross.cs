@@ -157,14 +157,13 @@ namespace Kalitte.Trading
             OrderSide? finalResult = null;
 
 
-
             periodSignal = getPeriodSignal(t);
            
 
-            if (Simulation)
-            {
-                return new SignalResultX(this) { finalResult = periodSignal };
-            }
+            //if (Simulation)
+            //{
+            //    return new SignalResultX(this) { finalResult = periodSignal };
+            //}
 
             if (!verifyPeriodSignal(periodSignal, t)) return null;
 
@@ -192,69 +191,50 @@ namespace Kalitte.Trading
                 }
             }
 
+            
+
             if (evalState == SignalConfirmStatus.Verifying)
             {
-                i1List.Push(i1.CurrentValue);
-                i2List.Push(i2.CurrentValue);
-                //ateList(priceList, Algo.GetMarketPrice(Symbol, t));
-                decimal avgDif = i1List.Average() - i2List.Average();
-                decimal avgEmaDif = i1List.ExponentialMovingAverage - i2List.ExponentialMovingAverage;
-
-                if (i1List.Count >= Periods)
+                var repeat = 0;
+                while(evalState == SignalConfirmStatus.Verifying)
                 {
-                    if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
-                    else if (avgEmaDif < -AvgChange) finalResult = OrderSide.Sell;
+                    i1List.Push(i1.CurrentValue);
+                    i2List.Push(i2.CurrentValue);
 
-                    if (finalResult.HasValue)
+                    decimal avgDif = i1List.Average() - i2List.Average();
+                    decimal avgEmaDif = i1List.ExponentialMovingAverage - i2List.ExponentialMovingAverage;
+
+                    if (i1List.Count >= Periods)
                     {
-                        if (finalResult != periodSignal)
+                        if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
+                        else if (avgEmaDif < -AvgChange) finalResult = OrderSide.Sell;
+
+                        if (finalResult.HasValue)
                         {
-                            Algo.Log($"[{this.Name}]: Tried to verify {periodSignal} but ended with {finalResult}. Resetting.", LogLevel.Info);
-                            this.Reset();
+                            if (finalResult != periodSignal)
+                            {
+                                Algo.Log($"[{this.Name}]: Tried to verify {periodSignal} but ended with {finalResult}. Resetting.", LogLevel.Info);
+                                this.Reset();
+                            }
+                            else
+                            {
+                                Algo.Log($"[{this.Name}]: {periodSignal} verified with {avgDif} {avgEmaDif} {AvgChange}", LogLevel.Debug);
+                                evalState = SignalConfirmStatus.Verified;
+                            }
                         }
                         else
                         {
-                            Algo.Log($"[{this.Name}]: {periodSignal} verified with {avgDif} {avgEmaDif} {AvgChange}", LogLevel.Debug);
-                            evalState = SignalConfirmStatus.Verified;
+                            Algo.Log($"[{this.Name}]: Still trying to verify {periodSignal} signal. Avg: {avgDif} {avgEmaDif} {AvgChange}");
                         }
                     }
-                    else
-                    {
-                        Algo.Log($"[{this.Name}]: Still trying to verify {periodSignal} signal. Avg: {avgDif} {avgEmaDif} {AvgChange}");
-                    }
+                    else Algo.Log($"[{this.Name}]: Collecting data to start verifying {periodSignal} signal. Avg: {avgDif} {avgEmaDif} {AvgChange}");
+                    repeat++;
+                    Algo.Log($"while {repeat} state: {evalState}");
+                    Thread.Sleep(1000);
                 }
-                else Algo.Log($"[{this.Name}]: Collecting data to start verifying {periodSignal} signal. Avg: {avgDif} {avgEmaDif} {AvgChange}");
             }
 
             return new SignalResultX(this) { finalResult = (evalState == SignalConfirmStatus.Verified ? periodSignal : null) };
-
-
-            //periodSignal = OrderSide.Sell;
-            //Algo.Log($"cacl initial period {initialPeriodSignal}", LogLevel.Debug);
-
-            //if (!initialPeriodSignal.HasValue && periodSignal.HasValue)
-            //{
-            //    initialPeriodSignal = periodSignal;
-            //    Algo.Log($"Setting initial period signal to {initialPeriodSignal}", LogLevel.Debug);
-            //}
-
-            //if (CheckCount == 0 && !initialPeriodSignal.HasValue)
-            //{
-            //    Algo.Log($"No initial signal for {Name}. Suspended until a valid initial signal", LogLevel.Warning);
-            //}
-
-            //if (!initialPeriodSignal.HasValue) return new SignalResultX(this) { finalResult = null };
-
-            //if (i1.CurrentValue > i2.CurrentValue) currentSignal = OrderSide.Buy;
-            //else if (i1.CurrentValue < i2.CurrentValue) currentSignal = OrderSide.Sell;
-
-
-
-            //var dif = i1.CurrentValue - i2.CurrentValue;
-            //Algo.Log($"{i1.CurrentValue} - {i2.CurrentValue}", LogLevel.Debug);
-
-
-
 
         }
 

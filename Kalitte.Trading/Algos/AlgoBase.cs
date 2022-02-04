@@ -39,11 +39,9 @@ namespace Kalitte.Trading.Algos
         public PortfolioList UserPortfolioList = new PortfolioList();
 
         private static Dictionary<SymbolPeriod, int> symbolPeriodCache = new Dictionary<SymbolPeriod, int>();
-
         
         public void Log(string text, LogLevel level = LogLevel.Info)
         {            
-
             if ((int)level >= this.LoggingLevel)
             {
                 Debug(text);
@@ -55,7 +53,6 @@ namespace Kalitte.Trading.Algos
                         if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
                         File.AppendAllText(file, $"{level} {DateTime.Now.ToString()}: {text}" + Environment.NewLine);
                     }
-
                 }
             }
         }
@@ -101,6 +98,7 @@ namespace Kalitte.Trading.Algos
             UserPortfolioList.LoadRealPositions(positions, p => p.Symbol == symbol);
             Log($"- PORTFOLIO -");
             Log($"{UserPortfolioList.Print()}");
+            Log($"- END PORTFOLIO -");
         }
 
         public decimal GetMarketPrice(string symbol, DateTime? t = null)

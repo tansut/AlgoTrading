@@ -256,7 +256,7 @@ namespace Kalitte.Trading.Algos
                 });
 
                 task.Wait();
-
+                Thread.Sleep(100);
 
 
      
@@ -291,15 +291,19 @@ namespace Kalitte.Trading.Algos
 
         private void SignalReceieved(Signal signal, SignalEventArgs data)
         {
-            lock(signalResults)                
+            var waitOthers = waitForOperationAndOrders("SignalReceieved");
+            lock (signalResults)                
             {
-                var oldVal = signalResults.ContainsKey(signal.Name) ? signalResults[signal.Name].finalResult : null;
-                if (oldVal != data.Result.finalResult)
-                {
-                    Log($"Signal from {signal.Name} changed from {oldVal} -> {data.Result.finalResult }", LogLevel.Debug);
-                    if (data.Result.finalResult.HasValue) Decide(signal, data);
-                }
+                SignalResultX existing;
+                OrderSide? oldFinalResult = null;
+                if (signalResults.TryGetValue(signal.Name, out existing))
+                    oldFinalResult = existing.finalResult;
                 signalResults[signal.Name] = data.Result;
+                if (oldFinalResult != data.Result.finalResult)
+                {
+                    Log($"Signal from {signal.Name} changed from {oldFinalResult} -> {data.Result.finalResult }", LogLevel.Debug);
+                    if (data.Result.finalResult.HasValue) Decide(signal, data);
+                }                
             }
         }
 

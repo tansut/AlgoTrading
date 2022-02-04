@@ -201,11 +201,9 @@ namespace Kalitte.Trading
                     i1List.Push(i1.CurrentValue);
                     i2List.Push(i2.CurrentValue);
 
-                    decimal avgDif = i1List.Average() - i2List.Average();
-                    decimal avgEmaDif = i1List.ExponentialMovingAverage - i2List.ExponentialMovingAverage;
-
                     if (i1List.Count >= Periods)
                     {
+                        decimal avgEmaDif = i1List.ExponentialMovingAverage - i2List.ExponentialMovingAverage;
                         if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
                         else if (avgEmaDif < -AvgChange) finalResult = OrderSide.Sell;
 
@@ -213,24 +211,24 @@ namespace Kalitte.Trading
                         {
                             if (finalResult != periodSignal)
                             {
-                                Algo.Log($"[{this.Name}]: Tried to verify {periodSignal} but ended with {finalResult}. Resetting.", LogLevel.Info);
+                                Algo.Log($"[{this.Name}]: Tried to verify {periodSignal} but ended with {finalResult}. Resetting.", LogLevel.Warning);
                                 this.Reset();
                             }
                             else
                             {
-                                Algo.Log($"[{this.Name}]: {periodSignal} verified with {avgDif} {avgEmaDif} {AvgChange}", LogLevel.Debug);
+                                Algo.Log($"[{this.Name}]: {periodSignal} verified with {avgEmaDif} EMA dif against {AvgChange}", LogLevel.Debug);
                                 evalState = SignalConfirmStatus.Verified;
                             }
                         }
                         else
                         {
-                            Algo.Log($"[{this.Name}]: Still trying to verify {periodSignal} signal. Avg: {avgDif} {avgEmaDif} {AvgChange}");
+                            Algo.Log($"[{this.Name}]: Still trying to verify {periodSignal} signal with {avgEmaDif} EMA dif against {AvgChange}", LogLevel.Debug);
                         }
                     }
-                    else Algo.Log($"[{this.Name}]: Collecting data to start verifying {periodSignal} signal. Avg: {avgDif} {avgEmaDif} {AvgChange}");
+                    else Algo.Log($"[{this.Name}]: Collecting data to start verifying {periodSignal} signal against {AvgChange}", LogLevel.Debug);
                     repeat++;
-                    Algo.Log($"while {repeat} state: {evalState}");
-                    Thread.Sleep(1000);
+                    Algo.Log($"CrossSignal state is {evalState} aftrer {repeat} repeations.", LogLevel.Debug);
+                    if (evalState == SignalConfirmStatus.Verified) Thread.Sleep(1000);
                 }
             }
 

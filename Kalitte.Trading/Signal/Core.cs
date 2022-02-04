@@ -105,37 +105,17 @@ namespace Kalitte.Trading
 
         public virtual SignalResultX Check(DateTime? t = null)
         {
-            var result = CheckInternal(t);
-            //if (CheckCount == 0) Algo.Log($"{this.Name} inited successfully.");
-            //CheckCount++;
-            raiseSignal(new SignalEventArgs() { Result = result });
-            LastSignalResult = result.finalResult;
-            return result;
-
-            //checkLock.WaitOne();
-            //checkLock.Reset();
-            //var restartTimer = false;
-            //if (_timer != null && _timer.Enabled)
-            //{
-            //    restartTimer = true;
-            //    _timer.Stop();
-            //}
-            //SignalResultX result;
-
-            //try
-            //{
-            //    result = CheckInternal(t);
-            //    if (CheckCount == 0) Algo.Log($"{this.Name} inited successfully.");
-            //    CheckCount++;
-            //    LastSignal = result.finalResult != LastSignal ? result.finalResult : LastSignal;
-
-            //}
-            //finally
-            //{
-            //    if (restartTimer) _timer.Start();
-            //    checkLock.Set();
-            //}
-            //return result;
+            try
+            {
+                var result = CheckInternal(t);
+                raiseSignal(new SignalEventArgs() { Result = result });
+                LastSignalResult = result.finalResult;
+                return result;
+            } catch (Exception ex)
+            {
+                Algo.Log($"Signal {this.Name} got exception. {ex.Message}", LogLevel.Error);
+                return new SignalResultX(this) {  finalResult = null };
+            }
         }
 
         public virtual void Start()

@@ -216,8 +216,8 @@ namespace Kalitte.Trading.Algos
             signals.ForEach(p => p.Start());
             if (!BackTestMode)
             {
-                orderTimer.Elapsed += OnOrderTimerEvent;
-                orderTimer.Enabled = true;
+                //orderTimer.Elapsed += OnOrderTimerEvent;
+                //orderTimer.Enabled = true;
             } 
         }
 
@@ -238,18 +238,12 @@ namespace Kalitte.Trading.Algos
         public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
         {
             if (!this.BackTestMode) return;
-            if (!this.BackTestMode) return;
-
       
             foreach (var signal in signals)
             {
                 var t = barDataCurrentValues.LastUpdate.DTime;
                 var result = signal.Check(t);
                 var waitOthers = waitForOperationAndOrders("Backtest");
-                if (!waitOthers)
-                {
-                    Log($"Wait timeout", LogLevel.Warning);
-                }
                 //Thread.Sleep(100);
 
 
@@ -312,10 +306,10 @@ namespace Kalitte.Trading.Algos
 
             if (pq == this.OrderQuantity)
             {
-                Log($"{result.Signal.Name} received: PL: {result.PL}, MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Debug);
-                sendOrder(Symbol, result.Direction == ProfitOrLoss.Profit ? signal.ProfitQuantity : signal.LossQuantity, result.finalResult.Value, $"[{result.Signal.Name}], PL: {result.PL}", result.MarketPrice, result.Direction == ProfitOrLoss.Profit ? ChartIcon.TakeProfit : ChartIcon.StopLoss);
+                Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Debug);
+                sendOrder(Symbol, result.Direction == ProfitOrLoss.Profit ? signal.ProfitQuantity : signal.LossQuantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result.MarketPrice, result.Direction == ProfitOrLoss.Profit ? ChartIcon.TakeProfit : ChartIcon.StopLoss);
             }
-            else Log($"TakeProfitLoss received but quantity doesnot match. Portfolio: {pq} oq: {this.OrderQuantity}");
+            else Log($"[{result.Signal.Name}:{result.Direction}] received but quantity doesnot match. Portfolio: {pq} oq: {this.OrderQuantity}", LogLevel.Debug);
         }
 
         private void Decide(Signal signal, SignalEventArgs data)

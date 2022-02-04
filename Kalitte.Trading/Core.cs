@@ -27,7 +27,8 @@ namespace Kalitte.Trading
     {
         Debug = 0,
         Info = 1,
-        Warning = 2
+        Warning = 2,
+        Error = 4
     }
 
     public interface SignalManager
@@ -146,57 +147,38 @@ namespace Kalitte.Trading
 
         public List<decimal> CalcEma(int lookbackPeriods) 
         {
-
             List<decimal> emaArray = new List<decimal>();
             double k = 2D / (lookbackPeriods + 1);
-            //double? lastEma = 0;
-
             int initPeriods = Math.Min(lookbackPeriods, this.Count);
-
             double lastEma = 0;
 
             for (int i = 0; i < initPeriods; i++)
             {
-                lastEma += Convert.ToDouble(this[i]);
+                lastEma += (double)this[i];
             }
 
             lastEma /= lookbackPeriods;
 
-
-            double result = 0;
+            decimal result = 0;
 
             for (var i = 0; i < this.Count; i++)
             {
                 int index = i + 1;
 
-
                 if (index > lookbackPeriods)
                 {
                     double ema = lastEma + (k * ((double)this[i] - lastEma));
-                    result = Convert.ToDouble(ema);
+                    result = (decimal)ema;
                     lastEma = ema;
                 }
                 else if (index == lookbackPeriods)
                 {
-                    result = Convert.ToDouble(lastEma);
+                    result = (decimal)lastEma;
                 }
 
-                emaArray.Add(Convert.ToDecimal(result));
+                emaArray.Add(result);
             }
 
-
-            //var k = 2M / (lookbackPeriods + 1);
-            //// first item is just the same as the first item in the input
-
-            //List<decimal> emaArray = new List<decimal>();
-            //emaArray.Add(this[0]);
-
-            ////emaArray = [mArray[0]];
-            //// for the rest of the items, they are computed with the previous one
-            //for (var i = 1; i < this.Count; i++)
-            //{
-            //    emaArray.Add(this[i] * k + emaArray[i - 1] * (1 - k));
-            //}
             return emaArray;
         }
 
@@ -205,7 +187,14 @@ namespace Kalitte.Trading
 
             get
             {
-                return this.CalcEma((this.Count/2)).Last();
+                try
+                {
+                    return this.CalcEma((this.Count / 2)).Last();
+                } catch(Exception ex)
+                {
+                    throw new Exception("Error in list:" + string.Join(",", this.Select(p => p.ToString())), ex);
+                }
+                
                 //return this.DefaultIfEmpty()
                 //             .Aggregate((ema, nextQuote) => alpha * nextQuote + (1 - alpha) * ema);
             }

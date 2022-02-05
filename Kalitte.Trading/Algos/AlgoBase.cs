@@ -44,7 +44,7 @@ namespace Kalitte.Trading.Algos
 
         public AlgoBase()
         {
-            this.InstanceName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (new Random().Next(10000));
+            this.InstanceName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (new Random().Next(1000000));
         }
 
         public void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null)
@@ -52,15 +52,13 @@ namespace Kalitte.Trading.Algos
             if ((int)level >= this.LoggingLevel)
             {
                 Debug(text);
-                if (true)
+                var file = Path.Combine(LogDir, $"algologs2{(BackTestMode ? 'B' : 'L')}", $" {InstanceName}.txt");
+                if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
+                string opTime = t.HasValue ? t.Value.ToString("yyyy.MM.dd HH:mm:sss") + "*" : "current";
+
+                lock (typeof(AlgoBase))
                 {
-
-
-                    var file = Path.Combine(LogDir, $"algologs2{(BackTestMode ? 'B' : 'L')}", $" {InstanceName}.txt");
-                    if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
-                    string opTime = t.HasValue ? t.Value.ToString("yyyy.MM.dd HH:mm:sss") + "*" : "current";
                     File.AppendAllText(file, $"[{level}:{DateTime.Now.ToString("yyyy.MM.dd HH:mm:sss")}({opTime})]: {text}" + Environment.NewLine);
-
                 }
             }
         }

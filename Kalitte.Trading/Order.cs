@@ -32,6 +32,7 @@ namespace Kalitte.Trading
         public decimal UnitPrice;
         public decimal Quantity;
         public string Comment;
+        public DateTime Time;
         public decimal FilledUnitPrice
         {
             get; set;
@@ -50,7 +51,7 @@ namespace Kalitte.Trading
             }
         }
 
-        public ExchangeOrder(string symbol, string id, OrderSide side, decimal quantity, decimal unitPrice, string comment = "")
+        public ExchangeOrder(string symbol, string id, OrderSide side, decimal quantity, decimal unitPrice, string comment = "", DateTime? t=null)
         {
             this.Symbol = symbol;
             this.Id = id;
@@ -59,6 +60,7 @@ namespace Kalitte.Trading
             this.UnitPrice = unitPrice;
             this.Comment = comment;
             this.FilledUnitPrice = 0;
+            this.Time = t ?? DateTime.Now;
         }
 
         public string SideStr

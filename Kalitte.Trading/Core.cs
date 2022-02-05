@@ -189,7 +189,7 @@ namespace Kalitte.Trading
             {
                 try
                 {
-                    return this.CalcEma((this.Count / 2)).Last();
+                    return this.CalcEma((this.Count)).Last();
                 } catch(Exception ex)
                 {
                     throw new Exception("Error in list:" + string.Join(",", this.Select(p => p.ToString())), ex);

@@ -80,7 +80,7 @@ namespace Kalitte.Trading
 
                 if (price == 0 || avgCost == 0)
                 {
-                    Algo.Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
+                    Algo.Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug, t);
                 }
                 else if (ProfitQuantity > 0 && portfolio.Side == OrderSide.Buy && pl >= this.ProfitPriceChange)
                 {
@@ -112,55 +112,6 @@ namespace Kalitte.Trading
 
     }
 
-    //public class StopLossSignal : Signal
-    //{
-    //    public decimal PriceChange { get; set; }
-    //    public decimal Quantity { get; set; }
-
-    //    public StopLossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, decimal priceChange, decimal quantity) : base(name, symbol, owner)
-    //    {
-    //        PriceChange = priceChange;
-    //        Quantity = quantity;
-    //    }
-
-
-    //    protected override SignalResultX CheckInternal(DateTime? t = null)
-    //    {
-
-    //        OrderSide? result = null;
-    //        decimal price = 0M;
-    //        decimal pl = 0M;
-    //        decimal avgCost = 0M;
-
-    //        var portfolio = Algo.UserPortfolioList.GetPortfolio(this.Symbol);
-
-    //        if (!portfolio.IsEmpty)
-    //        {
-    //            price = Algo.GetMarketPrice(Symbol, t);
-    //            avgCost = portfolio.AvgCost;
-    //            pl = price - avgCost;
-
-    //            if (price == 0 || avgCost == 0)
-    //            {
-    //                Algo.Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
-    //            }
-    //            else if (portfolio.Side == OrderSide.Buy && pl <= -this.PriceChange)
-    //            {
-    //                result = OrderSide.Sell;
-    //            }
-    //            else if (portfolio.Side == OrderSide.Sell && pl >= this.PriceChange)
-    //            {
-    //                result = OrderSide.Buy;
-    //            }
-    //            //else Algo.Log($"No cation stoploss: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
-    //        }
-
-    //        return new ProfitLossResult(this) { PL = pl, MarketPrice = price, PortfolioCost = avgCost, finalResult = result };
-
-
-    //    }
-
-    //}
 
 
 }

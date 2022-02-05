@@ -27,10 +27,16 @@ namespace Kalitte.Trading
     {
         public OrderSide? finalResult = null;
         public Signal Signal { get; set; }
+        public DateTime SignalTime { get; set; }
 
-        public SignalResultX(Signal signal)
+        public SignalResultX(Signal signal): this(signal, DateTime.Now)
+        {
+        }
+
+        public SignalResultX(Signal signal, DateTime signalTime)
         {
             this.Signal = signal;
+            this.SignalTime = signalTime;
         }
     }
 
@@ -108,6 +114,7 @@ namespace Kalitte.Trading
             try
             {
                 var result = CheckInternal(t);
+                result.SignalTime = t ?? DateTime.Now;
                 raiseSignal(new SignalEventArgs() { Result = result });
                 LastSignalResult = result.finalResult;
                 return result;

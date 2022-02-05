@@ -35,24 +35,32 @@ namespace Kalitte.Trading.Algos
         public string LogDir = @"c:\kalitte\log";
         public MarketDataFileLogger PriceLogger;
 
+        public string InstanceName { get; set; }
+
 
         public PortfolioList UserPortfolioList = new PortfolioList();
 
         private static Dictionary<SymbolPeriod, int> symbolPeriodCache = new Dictionary<SymbolPeriod, int>();
-        
-        public void Log(string text, LogLevel level = LogLevel.Info)
-        {            
+
+        public AlgoBase()
+        {
+            this.InstanceName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (new Random().Next(10000));
+        }
+
+        public void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null)
+        {
             if ((int)level >= this.LoggingLevel)
             {
                 Debug(text);
-                if (BackTestMode)
+                if (true)
                 {
-                    lock(LogDir)
-                    {
-                        var file = Path.Combine(LogDir, $"algologs2{(BackTestMode ? 'B' : 'L')}", $" {DateTime.Now.ToString("MM-dd-HH")}.txt");
-                        if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
-                        File.AppendAllText(file, $"{level} {DateTime.Now.ToString()}: {text}" + Environment.NewLine);
-                    }
+
+
+                    var file = Path.Combine(LogDir, $"algologs2{(BackTestMode ? 'B' : 'L')}", $" {InstanceName}.txt");
+                    if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
+                    string opTime = t.HasValue ? t.Value.ToString("yyyy.MM.dd HH:mm:sss") + "*" : "current";
+                    File.AppendAllText(file, $"[{level}:{DateTime.Now.ToString("yyyy.MM.dd HH:mm:sss")}({opTime})]: {text}" + Environment.NewLine);
+
                 }
             }
         }
@@ -97,7 +105,8 @@ namespace Kalitte.Trading.Algos
             var positions = BackTestMode ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
             UserPortfolioList.LoadRealPositions(positions, p => p.Symbol == symbol);
             Log($"- PORTFOLIO -");
-            Log($"{UserPortfolioList.Print()}");
+            if (UserPortfolioList.Count > 0) Log($"{UserPortfolioList.Print()}");
+            else Log("!! Portfolio is empty !!");
             Log($"- END PORTFOLIO -");
         }
 

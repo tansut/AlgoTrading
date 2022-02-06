@@ -101,7 +101,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return (AvgCost * Quantity).ToCurrency();
+                return (AvgCost * Quantity);
             }
         }
 
@@ -115,7 +115,7 @@ namespace Kalitte.Trading
             this.Symbol = symbol;
             this.Side = side;
             this.Quantity = quantity;
-            this.AvgCost = unitPrice.ToCurrency();
+            this.AvgCost = unitPrice;
         }
 
         public PortfolioItem(string symbol) : this(symbol, OrderSide.Buy, 0, 0)
@@ -135,7 +135,7 @@ namespace Kalitte.Trading
             else
                 if (this.Side == position.Side)
             {
-                this.AvgCost = ((this.Total + position.Total) / (this.Quantity + position.FilledQuantity)).ToCurrency();
+                this.AvgCost = ((this.Total + position.Total) / (this.Quantity + position.FilledQuantity));
                 this.Quantity += position.FilledQuantity;
 
             }
@@ -150,7 +150,7 @@ namespace Kalitte.Trading
                 {
                     var delta = position.FilledQuantity;
                     var direction = this.Side == OrderSide.Buy ? 1 : -1;
-                    var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost)).ToCurrency();
+                    var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost));
                     PL += profit;
                     this.Quantity -= position.FilledQuantity;
                     if (this.Quantity == 0)
@@ -162,7 +162,7 @@ namespace Kalitte.Trading
                 {
                     var delta = this.Quantity;
                     var direction = this.Side == OrderSide.Buy ? 1 : -1;
-                    var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost)).ToCurrency();
+                    var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost));
                     PL += profit;
                     this.Side = position.Side;
                     this.Quantity = position.FilledQuantity - this.Quantity;
@@ -190,7 +190,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return this.Sum(p => p.Value.PL).ToCurrency();
+                return this.Sum(p => p.Value.PL);
             }
         }
 

@@ -254,7 +254,7 @@ namespace Kalitte.Trading.Algos
             foreach (var signal in signals)
             {
                 var t = barDataCurrentValues.LastUpdate.DTime;
-                //Log($"Checking signal {signal.Name} for {t}", LogLevel.Debug, t);
+                Log($"Checking signal {signal.Name} for {t}", LogLevel.Debug, t);
                 var result = signal.Check(t);
                 var waitOthers = waitForOperationAndOrders("Backtest");
                 //break;
@@ -524,7 +524,7 @@ namespace Kalitte.Trading.Algos
                     {
                         if (positionRequest.UnitPrice > 0)
                         {
-                            var gain = ((order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? 1 : -1) * positionRequest.Quantity).ToCurrency();
+                            var gain = ((order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? 1 : -1) * positionRequest.Quantity);
                             simulationPriceDif += gain;
                             Log($"Collected market price is {positionRequest.UnitPrice}, backtest market price: {order.Price} [{gain}]", LogLevel.Warning, positionRequest.Time);
                             //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
@@ -544,7 +544,7 @@ namespace Kalitte.Trading.Algos
             var portfolio = UserPortfolioList.Print();
             if (BackTestMode && portfolio.Length > 0)
             {
-                portfolio.Append($"Market price difference: [{ simulationPriceDif.ToCurrency()}] Expected PL: [{simulationPriceDif+UserPortfolioList.PL}]");
+                portfolio.Append($"Market price difference: [{ simulationPriceDif}] Expected PL: [{simulationPriceDif+UserPortfolioList.PL}]");
             }
             return "-- RECENT PORTFOLIO --" + Environment.NewLine + portfolio.ToString() + Environment.NewLine + "-- END PORTFOLIO --" ;
         }

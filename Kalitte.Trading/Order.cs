@@ -56,7 +56,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return (FilledUnitPrice * FilledQuantity).ToCurrency();
+                return (FilledUnitPrice * FilledQuantity);
             }
         }
 
@@ -66,7 +66,7 @@ namespace Kalitte.Trading
             this.Id = id;
             this.Side = side;
             this.Quantity = quantity;
-            this.UnitPrice = unitPrice.ToCurrency();
+            this.UnitPrice = unitPrice;
             this.Comment = comment;
             this.FilledUnitPrice = 0M;
             this.Time = t ?? DateTime.Now;

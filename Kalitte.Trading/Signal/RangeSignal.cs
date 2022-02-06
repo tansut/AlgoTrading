@@ -23,29 +23,79 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
+    public enum RangeStatus
+    {
+        BelowMin,
+        InRange,
+        AboveHigh
+    }
+
+    public class RangeSignalResult : SignalResultX
+    {
+        public RangeStatus? Status { get; set; }
+
+        public RangeSignalResult(Signal signal, RangeStatus? status) : base(signal)
+        {
+            this.Status = status;
+        }
+    }
+
     public class RangeSignal : Signal
     {
         public decimal? Min { get; set; }
         public decimal? Max { get; set; }
+        public int Periods { get; set; } = 3;
         public IIndicator Indicator { get; set; }
+        Bars bars;
 
         public RangeSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator indicator,
             decimal? min, decimal? max) : base(name, symbol, owner)
         {
+            Indicator = indicator;
             Min = min;
             Max = Max;
+        }
+
+        public override void Start()
+        {
+            bars = new Bars(Periods);
+            base.Start();
+            Algo.Log($"{this.Name} started with {Min}-{Max} range, period: {Periods}.");
+
+        }
+
+        protected override void Colllect()
+        {
+            bars.Push(new Quote(Indicator.CurrentValue));
         }
 
 
         protected override SignalResultX CheckInternal(DateTime? t = null)
         {
             OrderSide? result = null;
+            RangeStatus? status = null;
 
-            //if (!Max.HasValue && Min.HasValue) result = Indicator.CurrentValue > Min.Value ? OrderSide;
+            Colllect();            
 
+            var data = bars.CloseList;
 
+            if (bars.Count >= Periods)
+            {
+                var ema = bars.Ema().Last();
+                if (Min.HasValue && ema < Min.Value)
+                {
+                    result = OrderSide.Buy;
+                    status = RangeStatus.BelowMin;
+                }
+                else if (Max.HasValue && ema > Max.Value)
+                {
+                    result = OrderSide.Sell;
+                    status = RangeStatus.AboveHigh;
+                }
+                //Algo.Log($"{this.Name} Ema: {ema} Status: {status} Result: {result}", LogLevel.Debug, t);
+            }
 
-            return new SignalResultX(this) { finalResult = result };
+            return new RangeSignalResult(this, status) { finalResult = result };
         }
 
     }

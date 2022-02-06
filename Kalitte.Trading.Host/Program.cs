@@ -16,11 +16,14 @@ public class Program
 
         var bars = new Bars(5);
         bars.Push(new Quote(DateTime.Now, 12));
-        bars.Push(new Quote(DateTime.Now, 15));
-        //bars.Push(new Quote(DateTime.Now, 20));
-        //bars.Push(new Quote(DateTime.Now, 30));
-        //bars.Push(new Quote(DateTime.Now, 16));
+        //bars.Push(new Quote(DateTime.Now, 15));
+        ////bars.Push(new Quote(DateTime.Now, 20));
+        ////bars.Push(new Quote(DateTime.Now, 30));
+        ////bars.Push(new Quote(DateTime.Now, 16));
+        ///
 
+
+        Console.WriteLine(bars.Ema().Last());
         Console.WriteLine(bars.Cross(6));
         Console.WriteLine(bars.Cross(12));
         Console.WriteLine(bars.Cross(13));

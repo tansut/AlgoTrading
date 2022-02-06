@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Compile Remove="MAProfit.cs" />
+    <Compile Remove="Signal\SignalTask.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -38,6 +38,11 @@ namespace Kalitte.Trading
             this.Date = date;
             this.Close = close;
         }
+
+        public Quote(decimal close): this(DateTime.Now, close)
+        {
+
+        }
     }
 
     public class Bars

@@ -24,40 +24,19 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
-    //public enum SignalConfirmStatus
-    //{
-    //    None,
-    //    Verifying,
-    //    Verified
-    //}
 
     public class CrossSignal : Signal
     {
-        //private volatile SignalConfirmStatus evalState = SignalConfirmStatus.None;
         private OrderSide? LastPeriodSignal = null;
         public IIndicator i1 = null;
         public IIndicator i2 = null;
 
         Task<OrderSide?> signalVerificationTask = null;
         CancellationTokenSource tokenSource2;
-        CancellationToken ct;
-
-        //private OrderSide? firstSignal = null;
 
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
         private Bars bars;
-        //public decimal Moment = 0.3M;
-        //public decimal PriceSplit = 0.3M;
-
-
-        //private List<decimal> lastSignals = new List<decimal>();
-        //private OrderSide? initialPeriodSignal = null;
-
-        //private TopQue i1List;
-        //private TopQue i2List;
-        //private TopQue priceList;
-
         bool useMyCross = true;
 
 
@@ -66,8 +45,6 @@ namespace Kalitte.Trading
             this.i1 = i1;
             this.i2 = i2;
         }
-
-
 
         public override void Start()
         {
@@ -84,6 +61,11 @@ namespace Kalitte.Trading
         }
 
 
+        protected override void Colllect()
+        {
+            bars.Push(new Quote(i1.CurrentValue - i2.CurrentValue));
+        }
+
 
         public void CancelVerificationTask()
         {
@@ -92,7 +74,7 @@ namespace Kalitte.Trading
                 tokenSource2.Cancel();
                 try
                 {
-                    signalVerificationTask.Wait();
+                    signalVerificationTask.Wait(tokenSource2.Token);
 
                 }
                 catch (OperationCanceledException)
@@ -100,7 +82,7 @@ namespace Kalitte.Trading
 
                 }
                 finally
-                {                    
+                {
                     signalVerificationTask = null;
                     tokenSource2.Dispose();
                     tokenSource2 = null;
@@ -114,6 +96,8 @@ namespace Kalitte.Trading
             tokenSource2 = new CancellationTokenSource();
             Algo.Log($"[{this.Name}] creating verifiation task for {periodSignal}", LogLevel.Debug, t);
 
+            
+
             signalVerificationTask = new Task<OrderSide?>(() =>
             {
                 tokenSource2.Token.ThrowIfCancellationRequested();
@@ -121,19 +105,17 @@ namespace Kalitte.Trading
 
                 var difList = new Bars(Periods);
 
-                while (difList.Count < Periods)
+                while (!tokenSource2.Token.IsCancellationRequested && difList.Count < Periods)
                 {
-                    difList.Push(new Quote(DateTime.Now, i1.CurrentValue-i2.CurrentValue));
-                                        
+
+
+                    difList.Push(new Quote(DateTime.Now, i1.CurrentValue - i2.CurrentValue));
+
                     decimal avgEmaDif = difList.Ema().Last();
 
                     Algo.Log($"[{this.Name}]: Collecting {difList.Count}. data [{avgEmaDif}] to start verifying {periodSignal} signal against {AvgChange}", LogLevel.Debug, t);
 
-                    if (ct.IsCancellationRequested)
-                    {
-                        ct.ThrowIfCancellationRequested();
-                    }
-                    
+
                     if (difList.Count == Periods)
                     {
                         if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
@@ -157,8 +139,8 @@ namespace Kalitte.Trading
                             Algo.Log($"[{this.Name}]: Still trying to verify {periodSignal} signal with {avgEmaDif} EMA dif against {AvgChange}", LogLevel.Debug, t);
                         }
                     }
-                    
-                    Thread.Sleep(Simulation ? 0:1000);
+
+                    Thread.Sleep(Simulation ? 0 : 1000);
                 }
 
                 return finalResult;
@@ -169,12 +151,12 @@ namespace Kalitte.Trading
 
         private bool CrossAbove(DateTime? t)
         {
-            return useMyCross ? bars.Cross(0) > 0: Algo.CrossAboveX(i1, i2, t);
+            return useMyCross ? bars.Cross(0) > 0 : Algo.CrossAboveX(i1, i2, t);
         }
 
         private bool CrossBelow(DateTime? t)
         {
-            return useMyCross ? bars.Cross(0) < 0: Algo.CrossBelowX(i1, i2, t);
+            return useMyCross ? bars.Cross(0) < 0 : Algo.CrossBelowX(i1, i2, t);
 
         }
 
@@ -196,11 +178,12 @@ namespace Kalitte.Trading
 
         protected SignalResultX CalculateSignal(DateTime? t = null)
         {
-            OrderSide? periodSignal = null;
-            periodSignal = getPeriodSignal(t);
-            var verifySignal = false;
+            Colllect();
 
-            bars.Push(new Quote(DateTime.Now, i1.CurrentValue - i2.CurrentValue));
+            OrderSide? periodSignal = null;            
+            periodSignal = getPeriodSignal(t);
+            
+            var verifySignal = false;
 
             if (!Simulation && !verifyPeriodSignal(periodSignal, t)) return null;
 
@@ -219,9 +202,9 @@ namespace Kalitte.Trading
                 else
                 {
                     Algo.Log($"Period signal changed from {LastPeriodSignal} to {periodSignal}", LogLevel.Debug, t);
-                    if (signalVerificationTask != null) CancelVerificationTask();                    
+                    if (signalVerificationTask != null) CancelVerificationTask();
                     LastPeriodSignal = periodSignal;
-                    if (periodSignal.HasValue) verifySignal = true;                    
+                    if (periodSignal.HasValue) verifySignal = true;
                 }
             }
 
@@ -230,15 +213,12 @@ namespace Kalitte.Trading
             if (Simulation && signalVerificationTask != null && !signalVerificationTask.IsCompleted) signalVerificationTask.Wait();
 
             return new SignalResultX(this) { finalResult = (signalVerificationTask != null && signalVerificationTask.IsCompleted ? signalVerificationTask.Result : null) };
-
         }
 
         protected override SignalResultX CheckInternal(DateTime? t = null)
         {
-            var current = CalculateSignal(t);
-            //if (current.finalResult == LastSignal) return new SignalResultX(this) { finalResult = null };
+            var current = CalculateSignal(t);            
             return current;
         }
     }
-
 }

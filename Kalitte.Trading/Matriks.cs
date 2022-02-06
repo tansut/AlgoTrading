@@ -33,7 +33,7 @@ namespace Matriks.Lean.Algotrader
     {
         public override void OnInit()
         {
-            this.BackTestMode = true;
+            //this.Simulation = true;
             base.OnInit();
         }
     }

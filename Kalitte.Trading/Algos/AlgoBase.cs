@@ -30,7 +30,7 @@ namespace Kalitte.Trading.Algos
         public int LoggingLevel { get; set; }
 
         [Parameter(false)]
-        public bool BackTestMode = false;
+        public bool Simulation = false;
 
         public string LogDir = @"c:\kalitte\log";
         public MarketDataFileLogger PriceLogger;
@@ -49,7 +49,7 @@ namespace Kalitte.Trading.Algos
 
         public string LogFile {
             get {
-                return Path.Combine(LogDir, $"algologs2{(BackTestMode ? 'B' : 'L')}", $" {InstanceName}.txt");
+                return Path.Combine(LogDir, $"algologs2{(Simulation ? 'B' : 'L')}", $" {InstanceName}.txt");
             }
         }
 
@@ -106,7 +106,7 @@ namespace Kalitte.Trading.Algos
 
         public void LoadRealPositions(string symbol)
         {
-            var positions = BackTestMode ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
+            var positions = Simulation ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
             UserPortfolioList.LoadRealPositions(positions, p => p.Symbol == symbol);
             Log($"- PORTFOLIO -");
             if (UserPortfolioList.Count > 0) Log($"{UserPortfolioList.Print()}");
@@ -116,7 +116,7 @@ namespace Kalitte.Trading.Algos
 
         public decimal GetMarketPrice(string symbol, DateTime? t = null)
         {
-            if (BackTestMode) return PriceLogger.GetMarketData(t.HasValue ? t.Value : DateTime.Now);
+            if (Simulation) return PriceLogger.GetMarketData(t.HasValue ? t.Value : DateTime.Now);
             var price = this.GetMarketData(symbol, SymbolUpdateField.Last);
             return price;
         }

@@ -60,7 +60,11 @@ namespace Kalitte.Trading
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
         public OrderSide? LastSignalResult { get; protected set; }
-        //public int CheckCount { get; private set; }
+        protected volatile bool isRunning = false;
+
+        protected Task collectorTask = null;
+        protected CancellationTokenSource collectorTaskTokenSource;
+
 
         private ManualResetEvent checkLock = new ManualResetEvent(true);
 
@@ -125,8 +129,27 @@ namespace Kalitte.Trading
             }
         }
 
+        protected virtual void Colllect()
+        {
+            
+        }
+        
         public virtual void Start()
         {
+            this.isRunning = true;
+
+            collectorTaskTokenSource = new CancellationTokenSource();
+            collectorTask = new Task(() =>
+            {
+                collectorTaskTokenSource.Token.ThrowIfCancellationRequested();                
+                while (!collectorTaskTokenSource.Token.IsCancellationRequested)
+                {                    
+                    //Algo.Log($"{this.Name }task doing {Simulation}");
+                    //if (!Simulation) Colllect();
+                    Thread.Sleep(1000);
+                }
+            });            
+            collectorTask.Start();
             if (Enabled && TimerEnabled)
             {
                 _timer = new System.Timers.Timer(1000);
@@ -142,6 +165,27 @@ namespace Kalitte.Trading
                 _timer.Stop();
                 _timer.Dispose();
             }
+            this.isRunning = false;
+            try
+            {
+                collectorTaskTokenSource.Cancel();
+                try
+                {
+                    collectorTask.Wait(collectorTaskTokenSource.Token);
+                }
+                catch (OperationCanceledException)
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Algo.Log($"Error stop task {this.Name}. {ex.Message}");
+            }
+
+            Algo.Log($"{this.Name} stopped.");
+
+
         }
 
 

@@ -23,6 +23,15 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
+
+    public static class Extensions
+    {
+        public static decimal ToCurrency(this decimal d)
+        {
+            return Math.Round(d, 2, MidpointRounding.AwayFromZero);
+        }
+    }
+
     public enum LogLevel
     {
         Debug = 0,

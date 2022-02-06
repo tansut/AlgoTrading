@@ -42,6 +42,8 @@ namespace Kalitte.Trading
 
         }
 
+        public decimal CommissionPaid { get; set; } = 0M;
+
         public string Symbol
         {
             get; private set;
@@ -99,13 +101,13 @@ namespace Kalitte.Trading
         {
             get
             {
-                return AvgCost * Quantity;
+                return (AvgCost * Quantity).ToCurrency();
             }
         }
 
         public override string ToString()
         {
-            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL}";
+            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL} Commission: {CommissionPaid}";
         }
 
         public PortfolioItem(string symbol, OrderSide side, decimal quantity, decimal unitPrice)
@@ -113,8 +115,9 @@ namespace Kalitte.Trading
             this.Symbol = symbol;
             this.Side = side;
             this.Quantity = quantity;
-            this.AvgCost = unitPrice;
+            this.AvgCost = unitPrice.ToCurrency();
         }
+
         public PortfolioItem(string symbol) : this(symbol, OrderSide.Buy, 0, 0)
         {
 
@@ -122,6 +125,7 @@ namespace Kalitte.Trading
 
         public void OrderCompleted(ExchangeOrder position)
         {
+            this.CommissionPaid += position.CommissionPaid;
             if (this.IsEmpty)
             {
                 this.Side = position.Side;
@@ -131,7 +135,7 @@ namespace Kalitte.Trading
             else
                 if (this.Side == position.Side)
             {
-                this.AvgCost = (this.Total + position.Total) / (this.Quantity + position.FilledQuantity);
+                this.AvgCost = ((this.Total + position.Total) / (this.Quantity + position.FilledQuantity)).ToCurrency();
                 this.Quantity += position.FilledQuantity;
 
             }
@@ -146,7 +150,7 @@ namespace Kalitte.Trading
                 {
                     var delta = position.FilledQuantity;
                     var direction = this.Side == OrderSide.Buy ? 1 : -1;
-                    var profit = delta * direction * (position.FilledUnitPrice - this.AvgCost);
+                    var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost)).ToCurrency();
                     PL += profit;
                     this.Quantity -= position.FilledQuantity;
                     if (this.Quantity == 0)
@@ -158,7 +162,7 @@ namespace Kalitte.Trading
                 {
                     var delta = this.Quantity;
                     var direction = this.Side == OrderSide.Buy ? 1 : -1;
-                    var profit = delta * direction * (position.FilledUnitPrice - this.AvgCost);
+                    var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost)).ToCurrency();
                     PL += profit;
                     this.Side = position.Side;
                     this.Quantity = position.FilledQuantity - this.Quantity;
@@ -179,6 +183,15 @@ namespace Kalitte.Trading
         public PortfolioList()
         {
 
+        }
+
+
+        public decimal PL
+        {
+            get
+            {
+                return this.Sum(p => p.Value.PL).ToCurrency();
+            }
         }
 
 

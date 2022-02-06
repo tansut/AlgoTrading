@@ -20,9 +20,7 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-
-
-
+using System.Diagnostics;
 
 namespace Kalitte.Trading.Algos
 {
@@ -508,8 +506,8 @@ namespace Kalitte.Trading.Algos
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-            Log($"Completed order: {this.positionRequest.ToString()}", LogLevel.Info, positionRequest.Time);
-            Log($"Portfolio: {portfolio.ToString()} [{simulationPriceDif}]", LogLevel.Info, positionRequest.Time);
+            Log($"Completed order: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Info, positionRequest.Time);
+            
             this.positionRequest = null;
             orderWait.Set();
         }
@@ -526,12 +524,12 @@ namespace Kalitte.Trading.Algos
                     {
                         if (positionRequest.UnitPrice > 0)
                         {
-                            var gain = (order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? 1 : -1) * positionRequest.Quantity;
+                            var gain = ((order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? 1 : -1) * positionRequest.Quantity).ToCurrency();
                             simulationPriceDif += gain;
-                            Log($"Will use this {positionRequest.UnitPrice} instead of backtest market price: {order.Price} [{gain}]", LogLevel.Debug, positionRequest.Time);
-                            this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
+                            Log($"Collected market price is {positionRequest.UnitPrice}, backtest market price: {order.Price} [{gain}]", LogLevel.Warning, positionRequest.Time);
+                            //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
                         }
-                        else this.FillCurrentOrder(order.Price, this.positionRequest.Quantity);
+                        this.FillCurrentOrder(order.Price, this.positionRequest.Quantity);
                     }
                     else
                     {
@@ -541,13 +539,22 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-
+        public string printPortfolio()
+        {
+            var portfolio = UserPortfolioList.Print();
+            if (BackTestMode && portfolio.Length > 0)
+            {
+                portfolio.Append($"Market price difference: [{ simulationPriceDif.ToCurrency()}] Expected PL: [{simulationPriceDif+UserPortfolioList.PL}]");
+            }
+            return "-- RECENT PORTFOLIO --" + Environment.NewLine + portfolio.ToString() + Environment.NewLine + "-- END PORTFOLIO --" ;
+        }
 
         public override void OnStopped()
         {
             orderTimer.Stop();
             signals.ForEach(p => p.Stop());
-            Log($"Portfolio ended: {UserPortfolioList.Print()}");
+            Log($"Completed Algo.\n {printPortfolio()}");
+            if (BackTestMode) Process.Start(LogFile);
         }
     }
 

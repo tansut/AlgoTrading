@@ -47,12 +47,18 @@ namespace Kalitte.Trading.Algos
             this.InstanceName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (new Random().Next(1000000));
         }
 
+        public string LogFile {
+            get {
+                return Path.Combine(LogDir, $"algologs2{(BackTestMode ? 'B' : 'L')}", $" {InstanceName}.txt");
+            }
+        }
+
         public void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null)
         {
             if ((int)level >= this.LoggingLevel)
             {
                 Debug(text);
-                var file = Path.Combine(LogDir, $"algologs2{(BackTestMode ? 'B' : 'L')}", $" {InstanceName}.txt");
+                var file = LogFile;
                 if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
                 string opTime = t.HasValue ? t.Value.ToString("yyyy.MM.dd HH:mm:sss") + "*" : "current";
 

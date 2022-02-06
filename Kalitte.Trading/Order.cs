@@ -33,6 +33,7 @@ namespace Kalitte.Trading
         public decimal Quantity;
         public string Comment;
         public DateTime Time;
+        public decimal ComissionRate = 0.0003M;
         public decimal FilledUnitPrice
         {
             get; set;
@@ -42,24 +43,32 @@ namespace Kalitte.Trading
             get; set;
         }
 
+        public decimal CommissionPaid
+        {
+            get
+            {
+                return (Total * ComissionRate).ToCurrency();
+            }
+        }
+
 
         public decimal Total
         {
             get
             {
-                return FilledUnitPrice * FilledQuantity;
+                return (FilledUnitPrice * FilledQuantity).ToCurrency();
             }
         }
 
-        public ExchangeOrder(string symbol, string id, OrderSide side, decimal quantity, decimal unitPrice, string comment = "", DateTime? t=null)
+        public ExchangeOrder(string symbol, string id, OrderSide side, decimal quantity, decimal unitPrice, string comment = "", DateTime? t = null)
         {
             this.Symbol = symbol;
             this.Id = id;
             this.Side = side;
             this.Quantity = quantity;
-            this.UnitPrice = unitPrice;
+            this.UnitPrice = unitPrice.ToCurrency();
             this.Comment = comment;
-            this.FilledUnitPrice = 0;
+            this.FilledUnitPrice = 0M;
             this.Time = t ?? DateTime.Now;
         }
 
@@ -73,12 +82,13 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{this.Symbol}:{this.SideStr}/{this.Quantity}:{this.FilledQuantity}/{this.UnitPrice}:{this.FilledUnitPrice} {this.Comment}";
+            return $"{this.Symbol}:{this.SideStr}/{this.Quantity}:{this.FilledQuantity}/{this.UnitPrice}:{this.FilledUnitPrice} {this.Comment} Commission: {CommissionPaid}";
         }
 
         public ExchangeOrder Clone()
         {
             var clone = new ExchangeOrder(this.Symbol, "", this.Side, this.Quantity, this.UnitPrice);
+            clone.ComissionRate = this.ComissionRate;
             clone.FilledUnitPrice = this.FilledUnitPrice;
             clone.FilledQuantity = this.FilledQuantity;
             return clone;

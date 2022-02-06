@@ -254,7 +254,7 @@ namespace Kalitte.Trading.Algos
             foreach (var signal in signals)
             {
                 var t = barDataCurrentValues.LastUpdate.DTime;
-                Log($"Checking signal {signal.Name} for {t}", LogLevel.Debug, t);
+                //Log($"Checking signal {signal.Name} for {t}", LogLevel.Debug, t);
                 var result = signal.Check(t);
                 var waitOthers = waitForOperationAndOrders("Backtest");
                 //break;
@@ -284,7 +284,7 @@ namespace Kalitte.Trading.Algos
         {
             //Log($"Operations/orders waiting: { message}", LogLevel.Debug);
 
-            var wait = BackTestMode ? 10 : 1000;
+            var wait = BackTestMode ? 0 : 100;
             
             var result1 = operationWait.WaitOne(wait);
             var result2 = orderWait.WaitOne(wait);
@@ -524,7 +524,7 @@ namespace Kalitte.Trading.Algos
                     {
                         if (positionRequest.UnitPrice > 0)
                         {
-                            var gain = ((order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? 1 : -1) * positionRequest.Quantity);
+                            var gain = ((order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? -1 : 1) * positionRequest.Quantity);
                             simulationPriceDif += gain;
                             Log($"Collected market price is {positionRequest.UnitPrice}, backtest market price: {order.Price} [{gain}]", LogLevel.Warning, positionRequest.Time);
                             //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);

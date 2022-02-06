@@ -46,6 +46,7 @@ namespace Kalitte.Trading
 
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
+        private Bars bars;
         //public decimal Moment = 0.3M;
         //public decimal PriceSplit = 0.3M;
 
@@ -53,11 +54,11 @@ namespace Kalitte.Trading
         //private List<decimal> lastSignals = new List<decimal>();
         //private OrderSide? initialPeriodSignal = null;
 
-        private TopQue i1List;
-        private TopQue i2List;
-        private TopQue priceList;
+        //private TopQue i1List;
+        //private TopQue i2List;
+        //private TopQue priceList;
 
-
+        bool useMyCross = true;
 
 
         public CrossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
@@ -66,31 +67,23 @@ namespace Kalitte.Trading
             this.i2 = i2;
         }
 
-        private void updateList(List<decimal> l, decimal v)
-        {
-            l.Add(v);
-            if (l.Count > Periods) l.RemoveAt(0);
-        }
-
-        private decimal deriv(List<decimal> list)
-        {
-            decimal dif = (list.Last() - list.First()) / Periods;
-            return dif;
-        }
 
 
         public override void Start()
         {
-            LastPeriodSignal = null;            
+            LastPeriodSignal = null;
+            bars = new Bars(Periods);
             base.Start();
+            Algo.Log($"{this.Name} started with {i1.GetType().Name}/{i2.GetType().Name} period: {Periods} avgChange: {AvgChange}");
         }
 
-        private void clearLists()
+        public override void Stop()
         {
-            //i1List = new TopQue(Periods);
-            //i2List = new TopQue(Periods);
-            priceList = new TopQue(Periods);
+            if (signalVerificationTask != null) CancelVerificationTask();
+            base.Stop();
         }
+
+
 
         public void CancelVerificationTask()
         {
@@ -126,24 +119,22 @@ namespace Kalitte.Trading
                 tokenSource2.Token.ThrowIfCancellationRequested();
                 OrderSide? finalResult = null;
 
-                i1List = new TopQue(Periods);
-                i2List = new TopQue(Periods);
+                var difList = new Bars(Periods);
 
-                while (i1List.Count < Periods)
-                {                    
-                    i1List.Push(i1.CurrentValue);
-                    i2List.Push(i2.CurrentValue);
-                    
-                    decimal avgEmaDif = i1List.ExponentialMovingAverage - i2List.ExponentialMovingAverage;
+                while (difList.Count < Periods)
+                {
+                    difList.Push(new Quote(DateTime.Now, i1.CurrentValue-i2.CurrentValue));
+                                        
+                    decimal avgEmaDif = difList.Ema().Last();
 
-                    Algo.Log($"[{this.Name}]: Collecting {i1List.Count}. data [{avgEmaDif}] to start verifying {periodSignal} signal against {AvgChange}", LogLevel.Debug, t);
+                    Algo.Log($"[{this.Name}]: Collecting {difList.Count}. data [{avgEmaDif}] to start verifying {periodSignal} signal against {AvgChange}", LogLevel.Debug, t);
 
                     if (ct.IsCancellationRequested)
                     {
                         ct.ThrowIfCancellationRequested();
                     }
                     
-                    if (i1List.Count == Periods)
+                    if (difList.Count == Periods)
                     {
                         if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
                         else if (avgEmaDif < -AvgChange) finalResult = OrderSide.Sell;
@@ -176,17 +167,27 @@ namespace Kalitte.Trading
             signalVerificationTask.Start();
         }
 
+        private bool CrossAbove(DateTime? t)
+        {
+            return useMyCross ? bars.Cross(0) > 0: Algo.CrossAboveX(i1, i2, t);
+        }
 
+        private bool CrossBelow(DateTime? t)
+        {
+            return useMyCross ? bars.Cross(0) < 0: Algo.CrossBelowX(i1, i2, t);
+
+        }
 
         private OrderSide? getPeriodSignal(DateTime? t = null)
         {
-            if (Algo.CrossAboveX(i1, i2, t)) return OrderSide.Buy;
-            else if (Algo.CrossBelowX(i1, i2, t)) return OrderSide.Sell;
+            if (CrossAbove(t)) return OrderSide.Buy;
+            else if (CrossBelow(t)) return OrderSide.Sell;
             return null;
         }
 
         private bool verifyPeriodSignal(OrderSide? received, DateTime? t = null)
         {
+            if (useMyCross) return true;
             Thread.Sleep(250);
             if (getPeriodSignal(t) != received) return false;
             return true;
@@ -198,6 +199,8 @@ namespace Kalitte.Trading
             OrderSide? periodSignal = null;
             periodSignal = getPeriodSignal(t);
             var verifySignal = false;
+
+            bars.Push(new Quote(DateTime.Now, i1.CurrentValue - i2.CurrentValue));
 
             if (!Simulation && !verifyPeriodSignal(periodSignal, t)) return null;
 

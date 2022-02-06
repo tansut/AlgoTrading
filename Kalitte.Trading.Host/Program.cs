@@ -1,5 +1,4 @@
 ﻿using Kalitte.Trading;
-using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,67 +14,84 @@ public class Program
     public static void Main()
     {
 
+        var bars = new Bars(5);
+        bars.Push(new Quote(DateTime.Now, 12));
+        bars.Push(new Quote(DateTime.Now, 15));
+        //bars.Push(new Quote(DateTime.Now, 20));
+        //bars.Push(new Quote(DateTime.Now, 30));
+        //bars.Push(new Quote(DateTime.Now, 16));
 
+        Console.WriteLine(bars.Cross(6));
+        Console.WriteLine(bars.Cross(12));
+        Console.WriteLine(bars.Cross(13));
+        Console.WriteLine(bars.Cross(20));
+        Console.WriteLine(bars.Cross(50));
 
-        connection = new HubConnection("https://localhost:44392");
-        
-            connection.Headers.Add("headername", "headervalue");
-            IHubProxy stockTickerHubProxy = connection.CreateHubProxy("pricefeed");
-            stockTickerHubProxy.On<string, decimal>("feed", (symbol, price) =>
-            {
-                Console.WriteLine("message: " + symbol + "-" + price);
-            });
-        connection.Start(new LongPollingTransport()).Wait();
-
-            Console.WriteLine("connect done");
-
-            Console.ReadLine();
-
-        stockTickerHubProxy.Invoke("feed", "fff", 12, DateTime.Now);
-
-        
-
-            Console.ReadLine();
-
-            // connection.Send("denee123").Wait();
-
-
-        
-
-
-
-
-
-
-
-        //connection. <string, string>("ReceiveMessage", (user, message) =>
-        //{
-        //    Console.WriteLine(user + message);
-
-        //});
-
-        //try
-        //{
-        //     connection.Start().Wait();
-        //}
-        //catch (Exception ex)
-        //{
-        //    Console.WriteLine(ex.Message);
-        //}
 
         Console.ReadLine();
+
+        return;
+
+        //connection = new HubConnection("https://localhost:44392");
+        
+        //    connection.Headers.Add("headername", "headervalue");
+        //    IHubProxy stockTickerHubProxy = connection.CreateHubProxy("pricefeed");
+        //    stockTickerHubProxy.On<string, decimal>("feed", (symbol, price) =>
+        //    {
+        //        Console.WriteLine("message: " + symbol + "-" + price);
+        //    });
+        //connection.Start(new LongPollingTransport()).Wait();
+
+        //    Console.WriteLine("connect done");
+
+        //    Console.ReadLine();
+
+        //stockTickerHubProxy.Invoke("feed", "fff", 12, DateTime.Now);
+
+        
+
+        //    Console.ReadLine();
+
+        //    // connection.Send("denee123").Wait();
+
+
+        
+
+
+
+
+
+
+
+        ////connection. <string, string>("ReceiveMessage", (user, message) =>
+        ////{
+        ////    Console.WriteLine(user + message);
+
+        ////});
+
+        ////try
+        ////{
+        ////     connection.Start().Wait();
+        ////}
+        ////catch (Exception ex)
+        ////{
+        ////    Console.WriteLine(ex.Message);
+        ////}
+
+        //Console.ReadLine();
 
 
         var s = new List<string>("5,4,6,8,12,14,16,18,20".Split(',')).Select(x => decimal.Parse(x)).ToArray();
 
         TopQue q = new TopQue(s.Length);
-
+        Bars qbar = new Bars(s.Length);
 
         List<Quote> quotes = new List<Quote>();
         foreach (var n in s)
         {
-            quotes.Add(new Quote() { Close = n, Date = DateTime.Now });
+            //quotes.Add(new Quote() { Close = n, Date = DateTime.Now });
             q.Push(n);
+            qbar.Push(new Quote() { Close = n, Date = DateTime.Now });
         };
 
         for (var i = 1; i < s.Length + 1; i++)
@@ -86,13 +102,14 @@ public class Program
             Console.WriteLine("me");
 
             Console.WriteLine(q.CalcEma(i).Last());
+            Console.WriteLine(qbar.Ema(i).Last());
 
 
         }
 
 
         Console.WriteLine(s.Length);
-        Console.WriteLine(q.Average());
+        //Console.WriteLine(q.Average());
         Console.WriteLine(q.ExponentialMovingAverage);
 
         //Console.ReadLine();

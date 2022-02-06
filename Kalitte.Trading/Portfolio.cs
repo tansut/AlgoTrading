@@ -107,7 +107,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL} Commission: {CommissionPaid}";
+            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL} Commission: {CommissionPaid} NetPL: {PL-CommissionPaid}";
         }
 
         public PortfolioItem(string symbol, OrderSide side, decimal quantity, decimal unitPrice)
@@ -195,6 +195,17 @@ namespace Kalitte.Trading
         }
 
 
+        public decimal Comission
+        {
+            get
+            {
+                return this.Sum(p => p.Value.CommissionPaid);
+            }
+        }
+
+        
+
+        
 
 
         public PortfolioItem Add(ExchangeOrder position)

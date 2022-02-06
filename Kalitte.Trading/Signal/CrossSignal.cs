@@ -51,7 +51,7 @@ namespace Kalitte.Trading
             LastPeriodSignal = null;
             bars = new Bars(Periods);
             base.Start();
-            Algo.Log($"{this.Name} started with {i1.GetType().Name}/{i2.GetType().Name} period: {Periods} avgChange: {AvgChange}");
+            Algo.Log($"{this.Name} started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}");
         }
 
         public override void Stop()

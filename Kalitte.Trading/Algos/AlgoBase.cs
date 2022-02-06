@@ -26,7 +26,7 @@ namespace Kalitte.Trading.Algos
     public class AlgoBase : MatriksAlgo
     {
 
-        [Parameter(1)]
+        [Parameter(0)]
         public int LoggingLevel { get; set; }
 
         [Parameter(false)]

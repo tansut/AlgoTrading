@@ -41,7 +41,11 @@ namespace Kalitte.Trading
         }
 
 
-
+        public override void Start()
+        {
+            base.Start();
+            Algo.Log($"{this.Name} started with.");
+        }
 
     }
 

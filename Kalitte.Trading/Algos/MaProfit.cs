@@ -65,7 +65,7 @@ namespace Kalitte.Trading.Algos
         [Parameter(1)]
         public decimal ProfitQuantity = 1;
 
-        [Parameter(1)]
+        [Parameter(0)]
         public decimal LossQuantity = 0;
 
         [Parameter(9)]
@@ -80,11 +80,13 @@ namespace Kalitte.Trading.Algos
         [Parameter(0)]
         public int RsiShort = 0;
 
+        [Parameter(5)]
+        public int MACDShortPeriod = 5;
+
         [Parameter(0)]
         public int MACDLongPeriod = 0;
 
-        [Parameter(5)]
-        public int MACDShortPeriod = 5;
+
 
         [Parameter(3)]
         public int MACDTrigger = 3;
@@ -386,14 +388,16 @@ namespace Kalitte.Trading.Algos
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-            Log($"Completed order: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Info, positionRequest.Time);
-            
+            Log($"Completed order: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Info, positionRequest.Time);            
             this.positionRequest = null;
             orderWait.Set();
         }
 
+
+
         public override void OnOrderUpdate(IOrder order)
         {
+            Log($"OrderUpdate: status: {order.OrdStatus.Obj} orderid: {order.CliOrdID} fa: {order.FilledAmount}"); 
             if (order.OrdStatus.Obj == OrdStatus.Filled)
             {
                 //if (!BackTestMode) Log($"OrderUpdate: pos: {this.positionRequest} status: {order.OrdStatus.Obj} orderid: {order.CliOrdID} fa: {order.FilledAmount} fq: {order.FilledQty} price: {order.Price} lastx: {order.LastPx}", LogLevel.Debug, this.positionRequest != null ? this.positionRequest.Time: DateTime.Now);
@@ -404,7 +408,7 @@ namespace Kalitte.Trading.Algos
                     {
                         if (positionRequest.UnitPrice > 0)
                         {
-                            var gain = ((order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? -1 : 1) * positionRequest.Quantity);
+                            var gain = ((order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? 1 : -1) * positionRequest.Quantity);
                             simulationPriceDif += gain;
                             Log($"Collected market price is {positionRequest.UnitPrice}, backtest market price: {order.Price} [{gain}]", LogLevel.Warning, positionRequest.Time);
                             //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
@@ -416,7 +420,20 @@ namespace Kalitte.Trading.Algos
                         this.FillCurrentOrder((order.FilledAmount / order.FilledQty) / 10M, order.FilledQty);
                     }
                 }
+            } else if (order.OrdStatus.Obj == OrdStatus.Rejected || order.OrdStatus.Obj == OrdStatus.Canceled)
+            {
+                if (this.positionRequest != null && this.positionRequest.Id == order.CliOrdID)
+                {
+                    CancelCurrentOrder(order);
+                }                    
             }
+        }
+
+        private void CancelCurrentOrder(IOrder order)
+        {
+            Log($"Order rejected/cancelled [{order.OrdStatus.Obj}]", LogLevel.Warning, this.positionRequest.Time);
+            this.positionRequest = null;
+            orderWait.Set();
         }
 
         public string printPortfolio()
@@ -424,7 +441,7 @@ namespace Kalitte.Trading.Algos
             var portfolio = UserPortfolioList.Print();
             if (Simulation && portfolio.Length > 0)
             {
-                portfolio.Append($"Market price difference: [{ simulationPriceDif}] Expected PL: [{simulationPriceDif+UserPortfolioList.PL}]");
+                portfolio.Append($"Market price difference: [{ simulationPriceDif}] Expected: [PL: {simulationPriceDif+UserPortfolioList.PL} NetPL: {simulationPriceDif + UserPortfolioList.PL-UserPortfolioList.Comission}]");
             }
             return "-- RECENT PORTFOLIO --" + Environment.NewLine + portfolio.ToString() + Environment.NewLine + "-- END PORTFOLIO --" ;
         }

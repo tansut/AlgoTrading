@@ -124,7 +124,7 @@ namespace Kalitte.Trading
                 return result;
             } catch (Exception ex)
             {
-                Algo.Log($"Signal {this.Name} got exception. {ex.Message}", LogLevel.Error);
+                Algo.Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
                 return new SignalResultX(this) {  finalResult = null };
             }
         }

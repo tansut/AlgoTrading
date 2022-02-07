@@ -31,18 +31,25 @@ namespace Kalitte.Trading
         public IIndicator i1 = null;
         public IIndicator i2 = null;
 
+
+        public Kalitte.Trading.Indicators.IndicatorBase i1k;
+        public Kalitte.Trading.Indicators.IndicatorBase i2k;
+
+
         Task<OrderSide?> signalVerificationTask = null;
+
         CancellationTokenSource tokenSource2;
 
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
         private Bars bars;
-        bool useMyCross = true;
+        //bool useMyCross = false;
+        bool useMyIndicators = true;
 
         private decimal lastCrossValue = 0;
         private decimal lastEma = 0;
 
-        
+
 
         public CrossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
         {
@@ -67,7 +74,11 @@ namespace Kalitte.Trading
 
         protected override void Colllect()
         {
-            bars.Push(new Quote(i1.CurrentValue - i2.CurrentValue));
+
+
+
+
+
             //var list = string.Join(",", bars.List.Select(p => p.Close.ToString()));
             //Algo.Log($"{list}", LogLevel.Debug);
         }
@@ -96,101 +107,133 @@ namespace Kalitte.Trading
             }
         }
 
-        public void StartVerificationTask(OrderSide periodSignal, DateTime? t)
-        {
+        //public void StartVerificationTask(OrderSide periodSignal, DateTime? t)
+        //{
 
-            tokenSource2 = new CancellationTokenSource();
-            Algo.Log($"[{this.Name}] creating verifiation task for {periodSignal}", LogLevel.Debug, t);
-
-            
-
-            signalVerificationTask = new Task<OrderSide?>(() =>
-            {
-                tokenSource2.Token.ThrowIfCancellationRequested();
-                OrderSide? finalResult = null;
-
-                var difList = new Bars(Periods);
-
-                while (!tokenSource2.Token.IsCancellationRequested && difList.Count < Periods)
-                {
+        //    tokenSource2 = new CancellationTokenSource();
+        //    Algo.Log($"[{this.Name}] creating verifiation task for {periodSignal}", LogLevel.Debug, t);
 
 
-                    difList.Push(new Quote(DateTime.Now, i1.CurrentValue - i2.CurrentValue));
 
-                    decimal avgEmaDif = difList.Ema().Last();
+        //    signalVerificationTask = new Task<OrderSide?>(() =>
+        //    {
+        //        tokenSource2.Token.ThrowIfCancellationRequested();
+        //        OrderSide? finalResult = null;
 
-                    Algo.Log($"[{this.Name}/{Thread.CurrentThread.ManagedThreadId}]: Collecting {difList.Count}. data [{avgEmaDif}] to start verifying {periodSignal} signal against {AvgChange}", LogLevel.Debug, t);
+        //        var difList = new Bars(Periods);
+
+        //        while (!tokenSource2.Token.IsCancellationRequested && difList.Count < Periods)
+        //        {
 
 
-                    if (difList.Count == Periods)
-                    {
-                        if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
-                        else if (avgEmaDif < -AvgChange) finalResult = OrderSide.Sell;
+        //            difList.Push(new Quote(DateTime.Now, i1.CurrentValue - i2.CurrentValue));
 
-                        if (finalResult.HasValue)
-                        {
-                            if (finalResult != periodSignal)
-                            {
-                                Algo.Log($"[{this.Name}/{Thread.CurrentThread.ManagedThreadId}]: Tried to verify {periodSignal} but ended with {finalResult}. Resetting.", LogLevel.Warning, t);
-                                finalResult = null;
-                                LastVerifiedSignal = null;
-                            }
-                            else
-                            {
-                                Algo.Log($"[{this.Name}/{Thread.CurrentThread.ManagedThreadId}]: {periodSignal} verified with {avgEmaDif} EMA dif against {AvgChange}", LogLevel.Debug, t);
-                            }
-                        }
-                        else
-                        {
-                            Algo.Log($"[{this.Name}{Thread.CurrentThread.ManagedThreadId}]: Still trying to verify {periodSignal} signal with {avgEmaDif} EMA dif against {AvgChange}", LogLevel.Debug, t);
-                        }
-                    }
+        //            decimal avgEmaDif = difList.Ema().Last();
 
-                    Thread.Sleep(Simulation ? 0 : 1000);
-                }
+        //            Algo.Log($"[{this.Name}/{Thread.CurrentThread.ManagedThreadId}]: Collecting {difList.Count}. data [{avgEmaDif}] to start verifying {periodSignal} signal against {AvgChange}", LogLevel.Debug, t);
 
-                return finalResult;
-            });
 
-            signalVerificationTask.Start();
-        }
+        //            if (difList.Count == Periods)
+        //            {
+        //                if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
+        //                else if (avgEmaDif < -AvgChange) finalResult = OrderSide.Sell;
 
-        private bool CrossAbove(DateTime? t)
-        {
-            return useMyCross ? bars.Cross(0) > 0 : Algo.CrossAboveX(i1, i2, t);
-        }
+        //                if (finalResult.HasValue)
+        //                {
+        //                    if (finalResult != periodSignal)
+        //                    {
+        //                        Algo.Log($"[{this.Name}/{Thread.CurrentThread.ManagedThreadId}]: Tried to verify {periodSignal} but ended with {finalResult}. Resetting.", LogLevel.Warning, t);
+        //                        finalResult = null;
+        //                        LastVerifiedSignal = null;
+        //                    }
+        //                    else
+        //                    {
+        //                        Algo.Log($"[{this.Name}/{Thread.CurrentThread.ManagedThreadId}]: {periodSignal} verified with {avgEmaDif} EMA dif against {AvgChange}", LogLevel.Debug, t);
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    Algo.Log($"[{this.Name}{Thread.CurrentThread.ManagedThreadId}]: Still trying to verify {periodSignal} signal with {avgEmaDif} EMA dif against {AvgChange}", LogLevel.Debug, t);
+        //                }
+        //            }
 
-        private bool CrossBelow(DateTime? t)
-        {
-            return useMyCross ? bars.Cross(0) < 0 : Algo.CrossBelowX(i1, i2, t);
+        //            Thread.Sleep(Simulation ? 0 : 1000);
+        //        }
 
-        }
+        //        return finalResult;
+        //    });
 
-        private OrderSide? getPeriodSignal(DateTime? t = null)
-        {
-            if (CrossAbove(t)) return OrderSide.Buy;
-            else if (CrossBelow(t)) return OrderSide.Sell;
-            return null;
-        }
+        //    signalVerificationTask.Start();
+        //}
 
-        private bool verifyPeriodSignal(OrderSide? received, DateTime? t = null)
-        {
-            if (useMyCross) return true;
-            Thread.Sleep(250);
-            if (getPeriodSignal(t) != received) return false;
-            return true;
-        }
+        //private bool CrossAbove(DateTime? t)
+        //{
+        //    return useMyCross ? bars.Cross(0) > 0 : Algo.CrossAboveX(i1, i2, t);
+        //}
+
+        //private bool CrossBelow(DateTime? t)
+        //{
+        //    return useMyCross ? bars.Cross(0) < 0 : Algo.CrossBelowX(i1, i2, t);
+
+        //}
+
+        //private OrderSide? getPeriodSignal(DateTime? t = null)
+        //{
+        //    if (CrossAbove(t)) return OrderSide.Buy;
+        //    else if (CrossBelow(t)) return OrderSide.Sell;
+        //    return null;
+        //}
+
+        //private bool verifyPeriodSignal(OrderSide? received, DateTime? t = null)
+        //{
+        //    if (useMyCross) return true;
+        //    Thread.Sleep(250);
+        //    if (getPeriodSignal(t) != received) return false;
+        //    return true;
+        //}
 
 
         protected SignalResultX CalculateSignal(DateTime? t = null)
         {
-            Colllect();
-
-            var cross = bars.Cross(0);
-            var ema = bars.Ema().Last();
-            
 
             OrderSide? finalResult = null;
+
+
+
+            //Colllect();
+
+
+
+            var mp = Algo.GetMarketPrice(Symbol, t);
+
+            if (mp > 0)
+            {
+
+                var val = useMyIndicators ? i1k.LastValue(mp) - i2k.LastValue(mp) : i1.CurrentValue - i2.CurrentValue;
+                bars.Push(new Quote(val));
+
+                Algo.Log($"i1k: {i1k.LastValue(mp)} i1:{i1.CurrentValue} mp: {mp}");
+                Algo.Log($"i2k: {i2k.LastValue(mp)} i2:{i2.CurrentValue} mp: {mp}");
+
+                var cross = bars.Cross(0);
+                var ema = bars.Ema().Last();
+
+
+                if (lastEma < 0 && ema > AvgChange) finalResult = OrderSide.Buy;
+                else if (lastEma > 0 && ema < -AvgChange) finalResult = OrderSide.Sell;
+
+                if (lastEma == 0) lastEma = ema;
+
+                lastEma = finalResult.HasValue ? 0 : lastEma;
+
+                Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
+
+                //Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
+            }
+            else Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} no market price for {t}");
+
+
+
 
             //if (lastCrossValue == 0 && cross !=  0) lastCrossValue = cross;
 
@@ -200,14 +243,11 @@ namespace Kalitte.Trading
 
             //lastCrossValue = finalResult.HasValue ? 0 : lastCrossValue;
 
-            if (lastEma == 0) lastEma = ema;
 
-            Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
+
+            //Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
             //var changedDirection = lastEma * 
-            if (lastEma < 0 && ema > AvgChange) finalResult = OrderSide.Buy;
-            else if (lastEma > 0 && ema < -AvgChange) finalResult = OrderSide.Sell;
 
-            lastEma = finalResult.HasValue ? 0 : lastEma;
 
 
 
@@ -217,49 +257,11 @@ namespace Kalitte.Trading
             };
 
 
-            //if (avgEmaDif > AvgChange) finalResult = OrderSide.Buy;
-            //else if (avgEmaDif < -AvgChange) finalResult = OrderSide.Sell;
-
-
-
-                //OrderSide? periodSignal = null;            
-                //periodSignal = getPeriodSignal(t);
-
-                //var verifySignal = false;
-
-                //if (!Simulation && !verifyPeriodSignal(periodSignal, t)) return null;
-
-                //if (periodSignal != LastPeriodSignal)
-                //{
-                //    if (LastPeriodSignal.HasValue && !periodSignal.HasValue)
-                //    {
-                //        periodSignal = LastPeriodSignal.Value;
-                //        if (signalVerificationTask == null || !signalVerificationTask.Result.HasValue)
-                //        {
-                //            Algo.Log($"Received empty period signal, reverifying previous signal {LastPeriodSignal}.", LogLevel.Warning, t);
-                //            if (signalVerificationTask != null) CancelVerificationTask();
-                //            verifySignal = true;
-                //        }
-                //    }
-                //    else
-                //    {
-                //        Algo.Log($"Period signal changed from {LastPeriodSignal} to {periodSignal}", LogLevel.Debug, t);
-                //        if (signalVerificationTask != null) CancelVerificationTask();
-                //        LastPeriodSignal = periodSignal;
-                //        if (periodSignal.HasValue) verifySignal = true;
-                //    }
-                //}
-
-                //if (verifySignal && signalVerificationTask == null) StartVerificationTask(periodSignal.Value, t);
-
-                //if (Simulation && signalVerificationTask != null && !signalVerificationTask.IsCompleted) signalVerificationTask.Wait();
-
-                //return new SignalResultX(this) { finalResult = (signalVerificationTask != null && signalVerificationTask.IsCompleted ? signalVerificationTask.Result : null) };
-            }
+        }
 
         protected override SignalResultX CheckInternal(DateTime? t = null)
         {
-            var current = CalculateSignal(t);            
+            var current = CalculateSignal(t);
             return current;
         }
     }

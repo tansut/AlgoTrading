@@ -116,10 +116,13 @@ namespace Kalitte.Trading.Algos
 
         public decimal GetMarketPrice(string symbol, DateTime? t = null)
         {
-            if (Simulation) return PriceLogger.GetMarketData(t.HasValue ? t.Value : DateTime.Now);
+            if (Simulation) return PriceLogger.GetMarketData(t.HasValue ? t.Value : DateTime.Now) ?? 0;
             var price = this.GetMarketData(symbol, SymbolUpdateField.Last);
             return price;
         }
+
+
+
 
     }
 

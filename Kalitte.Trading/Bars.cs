@@ -39,7 +39,7 @@ namespace Kalitte.Trading
             this.Close = close;
         }
 
-        public Quote(decimal close): this(DateTime.Now, close)
+        public Quote(decimal close) : this(DateTime.Now, close)
         {
 
         }
@@ -48,18 +48,21 @@ namespace Kalitte.Trading
     public class Bars
     {
         private Queue<IQuote> data;
-        public int Size { get; private set; }
+        public int Size { get; private set; } = 0;
         private int timeOut = -1;
 
-        private double alpha = 0.2;
 
         private ReaderWriterLock rwl = new ReaderWriterLock();
 
-        public Bars(int size)
+        public Bars(int size = 0)
         {
             Size = size;
-            alpha = 2D / (size + 1);
             data = new Queue<IQuote>(size);
+        }
+
+        public Bars(IEnumerable<Quote> init)
+        {        
+            data = new Queue<IQuote>(init);
         }
 
         public IQuote[] List
@@ -76,7 +79,6 @@ namespace Kalitte.Trading
                 {
                     rwl.ReleaseReaderLock();
                 }
-
             }
         }
 
@@ -124,15 +126,24 @@ namespace Kalitte.Trading
             rwl.AcquireWriterLock(timeOut);
             try
             {
-                if (data.Count == Size)
-                        data.Dequeue();
+                if (Size > 0 && data.Count == Size)
+                    data.Dequeue();
                 data.Enqueue(quote);
             }
             finally
             {
-                
+
                 rwl.ReleaseWriterLock();
             }
+        }
+
+       
+
+        public decimal EmaNext(decimal price, decimal lastEma, int lookbackPeriods)
+        {
+            double k = 2D / (lookbackPeriods + 1);
+            double ema = (double)lastEma + (k * ((double)price - (double)lastEma));
+            return (decimal)ema;
         }
 
         public List<decimal> Ema(int lookbackPeriods = 0)
@@ -140,11 +151,11 @@ namespace Kalitte.Trading
             List<decimal> emaArray = new List<decimal>();
             double k = 2D / (lookbackPeriods + 1);
             var data = CloseList;
-            
+
             if (lookbackPeriods <= 0) lookbackPeriods = data.Length;
 
             int initPeriods = Math.Min(lookbackPeriods, data.Length);
-            
+
             double lastEma = 0;
 
             for (int i = 0; i < initPeriods; i++)
@@ -162,9 +173,9 @@ namespace Kalitte.Trading
 
                 if (index > lookbackPeriods)
                 {
-                    double ema = lastEma + (k * ((double)data[i] - lastEma));
-                    result = (decimal)ema;
-                    lastEma = ema;
+                    result = EmaNext(data[i], (decimal)lastEma, lookbackPeriods); // + (k * ((double)data[i] - lastEma));
+                    //result = (decimal)ema;
+                    lastEma = (double)result;
                 }
                 else if (index == lookbackPeriods)
                 {
@@ -178,17 +189,19 @@ namespace Kalitte.Trading
         }
 
 
+
+
         public decimal Cross(decimal baseVal)
         {
             var list = CloseList;
             var i = list.Length;
 
-            while(--i >= 1)
+            while (--i >= 1)
             {
                 decimal cdif = list[i] - baseVal;
-                decimal pdif = list[i-1] - baseVal;
+                decimal pdif = list[i - 1] - baseVal;
                 if (cdif > 0 && pdif < 0) return cdif;
-                else if (cdif < 0 && pdif > 0) return cdif;                
+                else if (cdif < 0 && pdif > 0) return cdif;
             }
             return 0;
         }

@@ -20,6 +20,7 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace Kalitte.Trading
 {
@@ -44,10 +45,10 @@ namespace Kalitte.Trading
             this.LogMarketData(t, new decimal[] { price });
         }
         public abstract void LogMarketData(DateTime t, decimal[] price);
-        public virtual decimal GetMarketData(DateTime t)
+        public virtual decimal? GetMarketData(DateTime t)
         {
             var res = this.GetMarketDataList(t);
-            return (res != null && res.Length > 0) ? res[0] : 0;
+            return (res != null && res.Length > 0) ? res[0] : default(decimal?);
         }
         public abstract decimal[] GetMarketDataList(DateTime t);
     }
@@ -151,6 +152,44 @@ namespace Kalitte.Trading
 
     public class MarketDataFileLogger : FileLogger
     {
+
+        public Bars GetContentAsQuote(DateTime t)
+        {
+            var file = GetFileName(t);
+            var content = GetContent(file);
+            var result = new Bars();
+
+            //Open = line.Value[0],
+            //        High = line.Value[1],
+            //        Low = line.Value[2],
+            //        Close = line.Value[3],
+            //        //WClose = line.Value[4],
+            //        //Quantity = line.Value[5],
+            //        Volume = line.Value[5],
+
+            foreach (var line in content)
+            {
+                var q = new Quote()
+                {
+                    Date = DateTime.Parse(line.Key, CultureInfo.InvariantCulture),
+                    Open = line.Value[0],
+                    High = line.Value[1],
+                    Low = line.Value[2],
+                    Close = line.Value[3],
+                    //WClose = line.Value[4],
+                    //Quantity = line.Value[5],
+                    Volume = line.Value[5],
+                    //Ema5 = line.Value[9],
+                    //Ema9 = line.Value[10],
+                    //Rsi = line.Value[11],
+                    //Macd59 = line.Value[12],
+                    //Macd59t = line.Value[13]
+                };
+                result.Push(q);
+            }
+            return result;
+        }
+
 
 
         public MarketDataFileLogger(string symbol, string baseDir, string type) : base(symbol, baseDir, type)

@@ -39,7 +39,7 @@ namespace Kalitte.Trading.Algos
 
 
         public string logDir = @"c:\kalitte\log";
-        private MarketDataFileLogger logger;
+        //private MarketDataFileLogger logger;
         //private MarketDataFileLogger rsiLogger;
         //private MarketDataFileLogger ma59Logger;
         //private MarketDataFileLogger macd953Logger;
@@ -69,23 +69,35 @@ namespace Kalitte.Trading.Algos
 
         public override void OnInitCompleted()
         {
-            //var fbd = GetBarData(Symbol, SymbolPeriod);
 
-            //Log($"barData.BarDataIndexer.BarCount: {fbd.BarDataIndexer.BarCount}");
-            //for(var i = 0; i < fbd.BarDataIndexer.LastBarIndex; i++)
-            //{
-            //    //var bar = barData.
-            //    Debug($" {fbd.BarDataIndexer[i].ToString()}  o:{fbd.Open[i]} h:{fbd.High[i]} l:{fbd.Low[i]} c:{fbd.Close[i]} wc:{fbd.WClose[i]} dif:{fbd.Diff[i]} dif%:{fbd.DiffPercent[i]} vol:{fbd.Volume[i]}");
+            List<ISymbolBarData> barDataList = new List<ISymbolBarData>();
+            try
+            {
+                foreach (var sp in periodList)
+                {
+                    var fbd = GetBarData(Symbol, sp);
+                    for (var i = 0; i < fbd.BarDataIndexer.LastBarIndex; i++)
+                    {
+                        var bdidx = periodList.FindIndex(p => p == fbd.PeriodInfo.ToSymbolPeriod());
+                        var logger = loggerList[bdidx];
+                        if (!logger.GetMarketData(fbd.BarDataIndexer[i]).HasValue)
+                            LogBardata(fbd, i);
 
-            //}
+                        //Debug($"{i} {fbd.BarDataIndexer[i].ToString()}  o:{fbd.Open[i]} h:{fbd.High[i]} l:{fbd.Low[i]} c:{fbd.Close[i]} wc:{fbd.WClose[i]} dif:{fbd.Diff[i]} dif%:{fbd.DiffPercent[i]} vol:{fbd.Volume[i]}");
 
 
-            
+                    }
+                }
+            } catch(Exception ex)
+            {
+                Debug($"{ex.Message}");
+            }
         }
+
+
 
         public override void OnInit()
         {
-            //AddSymbol(Symbol, SymbolPeriod);
             AddSymbolMarketData(Symbol);
             SetTimerInterval(1);
             WorkWithPermanentSignal(true);
@@ -95,7 +107,7 @@ namespace Kalitte.Trading.Algos
                 AddSymbol(Symbol, sp);
                 var logger = new MarketDataFileLogger(Symbol, logDir, "" + sp.ToString());
                 logger.SaveDaily = true;
-                //loggerList.Add();
+                loggerList.Add(logger);
             }
 
             mov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod, MovMethod.Exponential);
@@ -105,35 +117,40 @@ namespace Kalitte.Trading.Algos
             volume = VolumeIndicator(Symbol, SymbolPeriod);
 
 
-            //this.logger = new MarketDataFileLogger(Symbol, logDir, "" + SymbolPeriod.ToString());
-            //logger.SaveDaily = true;
+        }
+
+        void LogBardata(ISymbolBarData bd, int i)
+        {
+            var bdidx = periodList.FindIndex(p => p == bd.PeriodInfo.ToSymbolPeriod());
+            loggerList[bdidx].LogMarketData(bd.BarDataIndexer[i], new decimal[] { 
+                bd.Open[i], 
+                bd.High[i], 
+                bd.Low[i], 
+                bd.Close[i], 
+                bd.WClose[i], 
+                bd.Volume[i], 
+                bd.Diff[i], 
+                bd.DiffPercent[i], 
+                mov.CurrentValue, 
+                mov2.CurrentValue, 
+                rsi.CurrentValue, 
+                macd.CurrentValue, 
+                macd.MacdTrigger.CurrentValue });
+
+
         }
 
         public override void OnDataUpdate(BarDataEventArgs barDataEventArgs)
         {
             try
             {
-                List<int> idList = new List<int>();
-                List<ISymbolBarData> barDataList = new List<ISymbolBarData>();
-
-                foreach (var sp in periodList)
-                {
-                    idList.Add(GetSymbolId(Symbol));
-                    barDataList.Add(GetBarData(Symbol, sp));
-                }
-
+               
                 var bdidx = periodList.FindIndex(p => p == barDataEventArgs.PeriodInfo.ToSymbolPeriod());
-                if (bdidx<0)
-                {
-                    Log($"Idx error {barDataEventArgs.PeriodInfo.ToSymbolPeriod()}");
-                }
-                else
-                {
-                    var bd = barDataList[bdidx];
-                    var logger = loggerList[bdidx];
-                    var i = barDataEventArgs.BarDataIndex - 1;
-                    logger.LogMarketData(bd.BarDataIndexer[i], new decimal[] { bd.Open[i], bd.High[i], bd.Low[i], bd.Close[i], bd.WClose[i], bd.Volume[i], bd.Diff[i], bd.DiffPercent[i], mov.CurrentValue, mov2.CurrentValue, rsi.CurrentValue, macd.CurrentValue, macd.MacdTrigger.CurrentValue });
-                }
+
+                var bd = GetBarData(Symbol, periodList[bdidx]);
+                var logger = loggerList[bdidx];
+                var i = bd.BarDataIndexer.LastBarIndex;
+                LogBardata(bd, i);
 
             } catch(Exception ex)
             {

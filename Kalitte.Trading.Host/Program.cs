@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.AspNet.SignalR.Client;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client.Transports;
+using Kalitte.Trading.Indicators;
 
 public class Program
 {
@@ -13,8 +14,32 @@ public class Program
 
     public static void Main()
     {
+        var mdp = new MarketDataFileLogger("F_XU0300222", @"c:\kalitte\log", "Min10");
+        mdp.SaveDaily = true;
+        var bars = mdp.GetContentAsQuote(DateTime.Now);
+        var ema5 = new Ema(bars, 5);
+        var ema9 = new Ema(bars, 9);
 
-        var bars = new Bars(5);
+
+        var em5list = bars.Ema(5);// string.Join(",", bars.Ema(5).Select(p => p.ToString()));
+        var em9list = bars.Ema(9);// string.Join(",", bars.Ema(9).Select(p => p.ToString()));
+
+
+        for (var i = 0; i < ema5.Bars.List.Length; i++)
+        {
+            Console.WriteLine($"{ ema5.Bars.List[i].Date} { ema5.Bars.List[i].Close} {em5list[i]}");
+        }
+
+        Console.WriteLine(ema5.LastValue(2500));
+
+
+
+        Console.WriteLine($"{ em5list }");
+        Console.WriteLine($"{ em5list }");
+
+        Console.ReadLine();
+
+        bars = new Bars(5);
         bars.Push(new Quote(DateTime.Now, 12));
         bars.Push(new Quote(DateTime.Now, 15));
         bars.Push(new Quote(DateTime.Now, 20));

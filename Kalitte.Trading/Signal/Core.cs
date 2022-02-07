@@ -188,6 +188,8 @@ namespace Kalitte.Trading
 
         }
 
+        
+
 
         protected virtual void raiseSignal(SignalEventArgs data)
         {

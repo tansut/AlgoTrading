@@ -16,11 +16,18 @@ public class Program
 
         var bars = new Bars(5);
         bars.Push(new Quote(DateTime.Now, 12));
-        //bars.Push(new Quote(DateTime.Now, 15));
-        ////bars.Push(new Quote(DateTime.Now, 20));
-        ////bars.Push(new Quote(DateTime.Now, 30));
-        ////bars.Push(new Quote(DateTime.Now, 16));
-        ///
+        bars.Push(new Quote(DateTime.Now, 15));
+        bars.Push(new Quote(DateTime.Now, 20));
+        bars.Push(new Quote(DateTime.Now, 30));
+        bars.Push(new Quote(DateTime.Now, 16));
+
+
+        var list = string.Join(",", bars.List.Select(p => p.Close.ToString()));
+        Console.WriteLine(list);
+        //bars.Push(new Quote(85));
+
+         list = string.Join(",", bars.List.Select(p => p.Close.ToString()));
+        Console.WriteLine(list);
 
 
         Console.WriteLine(bars.Ema().Last());

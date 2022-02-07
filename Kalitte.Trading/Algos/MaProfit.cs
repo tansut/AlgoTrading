@@ -43,8 +43,8 @@ namespace Kalitte.Trading.Algos
         [Parameter(2)]
         public decimal OrderQuantity = 2M;
 
-        [Parameter(5)]
-        public int MovPeriod = 5;
+        [Parameter(0)]
+        public int MovPeriod = 0;
 
         [Parameter(9)]
         public int MovPeriod2 = 9;
@@ -83,8 +83,8 @@ namespace Kalitte.Trading.Algos
         [Parameter(5)]
         public int MACDShortPeriod = 5;
 
-        [Parameter(0)]
-        public int MACDLongPeriod = 0;
+        [Parameter(9)]
+        public int MACDLongPeriod = 9;
 
 
 
@@ -120,11 +120,11 @@ namespace Kalitte.Trading.Algos
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
 
 
-            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("cross:ma59", Symbol, this, mov, mov2) {  AvgChange = 0.1M, Periods = 5});
-            if (!SimulateOrderSignal && MACDLongPeriod > 0) this.signals.Add(new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { AvgChange = 0.025M, Periods = 4 });
+            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("cross:ma59", Symbol, this, mov, mov2) {  AvgChange = 0.1M, Periods = 8});
+            if (!SimulateOrderSignal && MACDShortPeriod > 0) this.signals.Add(new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { AvgChange = 0.025M, Periods = 48 });
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
-            if (this.ProfitQuantity > 0 || this.LossQuantity > 0) this.signals.Add(new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity));
-            if (RsiLong > 0 || RsiShort > 0) this.signals.Add(new RangeSignal("rsi", Symbol, this, rsi, RsiShort == 0 ? new decimal?() : RsiShort, RsiLong == 0 ? new decimal() : RsiLong) { Periods = 1});
+            if (!SimulateOrderSignal && this.ProfitQuantity > 0 || this.LossQuantity > 0) this.signals.Add(new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity));
+            if (!SimulateOrderSignal && RsiLong > 0 || RsiShort > 0) this.signals.Add(new RangeSignal("rsi", Symbol, this, rsi, RsiShort == 0 ? new decimal?() : RsiShort, RsiLong == 0 ? new decimal() : RsiLong) { Periods = 1});
             
             signals.ForEach(p =>
             {
@@ -255,7 +255,7 @@ namespace Kalitte.Trading.Algos
 
             if (marketPrice == 0)
             {
-                Log($"{signal.Name} couldnot be executed since market price is zero");
+                Log($"{signal.Name} couldnot be executed since market price is zero",LogLevel.Debug, result.SignalTime);
             }
 
             if (!portfolio.IsEmpty)
@@ -263,12 +263,12 @@ namespace Kalitte.Trading.Algos
                 Log($"[{result.Signal.Name}:{result.Status}] received.", LogLevel.Debug, result.SignalTime);
                 if (portfolio.Side == OrderSide.Sell && result.Status == RangeStatus.BelowMin && portfolio.AvgCost > marketPrice)
                 {
-                    Log($"{signal.Name} simulate position close,  buy.  Rsi: {signal.Indicator.CurrentValue}, Market price: {signal.Indicator.CurrentValue} {marketPrice}, {portfolio.ToString()}");
+                    Log($"{signal.Name} simulate position close,  buy.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
                     //sendOrder(Symbol, portfolio.Quantity, OrderSide.Buy, $"[{result.Signal.Name}:{result.Status}]", 0, ChartIcon.PositionClose, result.SignalTime);
                 }
                 else if (portfolio.Side == OrderSide.Buy && result.Status == RangeStatus.AboveHigh && portfolio.AvgCost < marketPrice)
                 {
-                    Log($"{signal.Name} simulate position close,  sell.  Rsi: {signal.Indicator.CurrentValue}, Market price: {signal.Indicator.CurrentValue} {marketPrice}, {portfolio.ToString()}");
+                    Log($"{signal.Name} simulate position close,  sell.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
                     //sendOrder(Symbol, portfolio.Quantity, OrderSide.Sell, $"[{result.Signal.Name}:{result.Status}]", 0, ChartIcon.PositionClose, result.SignalTime);
                 }
                 else Log($"{signal.Name} ignored. Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}");
@@ -367,10 +367,10 @@ namespace Kalitte.Trading.Algos
             {
                 orderid = Simulation ? this.SendMarketOrder(symbol, quantity, side, icon) :
                 this.SendLimitOrder(symbol, quantity, side, limitPrice, icon, DateTime.Now.Hour >= 19);
-                this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
-                Log($"Order created, waiting to complete: {this.positionRequest.ToString()}", LogLevel.Info, t);
-                if (this.UseVirtualOrders || this.AutoCompleteOrders) FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);
-            }            
+            }
+            this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
+            Log($"Order created, waiting to complete. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info, t);
+            if (this.UseVirtualOrders || this.AutoCompleteOrders) FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);
         }
 
 
@@ -414,6 +414,9 @@ namespace Kalitte.Trading.Algos
                             //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
                         }
                         this.FillCurrentOrder(order.Price, this.positionRequest.Quantity);
+                    } else if (UseVirtualOrders)
+                    {
+                        this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
                     }
                     else
                     {

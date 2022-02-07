@@ -188,6 +188,7 @@ namespace Kalitte.Trading
 
             var cross = bars.Cross(0);
             var ema = bars.Ema().Last();
+            
 
             OrderSide? finalResult = null;
 
@@ -201,7 +202,7 @@ namespace Kalitte.Trading
 
             if (lastEma == 0) lastEma = ema;
 
-            Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
+            Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
             //var changedDirection = lastEma * 
             if (lastEma < 0 && ema > AvgChange) finalResult = OrderSide.Buy;
             else if (lastEma > 0 && ema < -AvgChange) finalResult = OrderSide.Sell;

@@ -77,7 +77,8 @@ namespace Kalitte.Trading
 
             Colllect();            
 
-            var data = bars.CloseList;
+            //var data = bars.CloseList;
+            //var cross = bars.Cross(0);
 
             if (bars.Count >= Periods)
             {

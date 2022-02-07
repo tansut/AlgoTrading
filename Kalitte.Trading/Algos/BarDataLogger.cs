@@ -50,7 +50,12 @@ namespace Kalitte.Trading.Algos
         MACD macd;
         VOLUME volume;
 
-        
+        List<SymbolPeriod> periodList = new List<SymbolPeriod>(new SymbolPeriod[] { SymbolPeriod.Min, SymbolPeriod.Min5, SymbolPeriod.Min10, SymbolPeriod.Min15,
+            SymbolPeriod.Min20, SymbolPeriod.Min30, SymbolPeriod.Min60, SymbolPeriod.Min120, SymbolPeriod.Min180, SymbolPeriod.Min240
+        });
+
+        List<IIndicator> indicatorList = new List<IIndicator>();
+        List<MarketDataFileLogger> loggerList = new List<MarketDataFileLogger>();
 
         int MovPeriod = 5;
         int MovPeriod2 = 9;
@@ -61,12 +66,37 @@ namespace Kalitte.Trading.Algos
         int MACDTrigger = 3;
 
 
+
+        public override void OnInitCompleted()
+        {
+            //var fbd = GetBarData(Symbol, SymbolPeriod);
+
+            //Log($"barData.BarDataIndexer.BarCount: {fbd.BarDataIndexer.BarCount}");
+            //for(var i = 0; i < fbd.BarDataIndexer.LastBarIndex; i++)
+            //{
+            //    //var bar = barData.
+            //    Debug($" {fbd.BarDataIndexer[i].ToString()}  o:{fbd.Open[i]} h:{fbd.High[i]} l:{fbd.Low[i]} c:{fbd.Close[i]} wc:{fbd.WClose[i]} dif:{fbd.Diff[i]} dif%:{fbd.DiffPercent[i]} vol:{fbd.Volume[i]}");
+
+            //}
+
+
+            
+        }
+
         public override void OnInit()
         {
-            AddSymbol(Symbol, SymbolPeriod);
+            //AddSymbol(Symbol, SymbolPeriod);
             AddSymbolMarketData(Symbol);
             SetTimerInterval(1);
             WorkWithPermanentSignal(true);
+
+            foreach (var sp in periodList)
+            {
+                AddSymbol(Symbol, sp);
+                var logger = new MarketDataFileLogger(Symbol, logDir, "" + sp.ToString());
+                logger.SaveDaily = true;
+                //loggerList.Add();
+            }
 
             mov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod, MovMethod.Exponential);
             mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
@@ -74,48 +104,43 @@ namespace Kalitte.Trading.Algos
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
             volume = VolumeIndicator(Symbol, SymbolPeriod);
 
-            this.logger = new MarketDataFileLogger(Symbol, logDir, "" + SymbolPeriod.ToString());
-            logger.SaveDaily = true;
+
+            //this.logger = new MarketDataFileLogger(Symbol, logDir, "" + SymbolPeriod.ToString());
+            //logger.SaveDaily = true;
         }
 
         public override void OnDataUpdate(BarDataEventArgs barDataEventArgs)
         {
-            var fbd = GetBarData(Symbol, SymbolPeriod);
+            try
+            {
+                List<int> idList = new List<int>();
+                List<ISymbolBarData> barDataList = new List<ISymbolBarData>();
 
-            Debug($"--1t:  o:{fbd.Open} h:{fbd.High} l:{fbd.Low} c:{fbd.Close} wc:{fbd.WClose} dif:{fbd.Diff} dif%:{fbd.DiffPercent} vol:{fbd.Volume}");
+                foreach (var sp in periodList)
+                {
+                    idList.Add(GetSymbolId(Symbol));
+                    barDataList.Add(GetBarData(Symbol, sp));
+                }
 
-            var fbd2 = barDataEventArgs.BarData;
+                var bdidx = periodList.FindIndex(p => p == barDataEventArgs.PeriodInfo.ToSymbolPeriod());
+                if (bdidx<0)
+                {
+                    Log($"Idx error {barDataEventArgs.PeriodInfo.ToSymbolPeriod()}");
+                }
+                else
+                {
+                    var bd = barDataList[bdidx];
+                    var logger = loggerList[bdidx];
+                    var i = barDataEventArgs.BarDataIndex - 1;
+                    logger.LogMarketData(bd.BarDataIndexer[i], new decimal[] { bd.Open[i], bd.High[i], bd.Low[i], bd.Close[i], bd.WClose[i], bd.Volume[i], bd.Diff[i], bd.DiffPercent[i], mov.CurrentValue, mov2.CurrentValue, rsi.CurrentValue, macd.CurrentValue, macd.MacdTrigger.CurrentValue });
+                }
 
-            Debug($"--2t: {fbd2.Dtime} bt: {fbd2.BarType}   o:{fbd2.Open} h:{fbd2.High} l:{fbd2.Low} c:{fbd2.Close} wc:{fbd2.WClose} dif:{fbd.Diff} dif%:{fbd.DiffPercent} vol:{fbd.Volume}");
-
+            } catch(Exception ex)
+            {
+                Log($"{ex.Message} / {ex.StackTrace}");
+            }
+           
         }
-
-        public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
-        {
-            var bd = barDataCurrentValues.LastUpdate;
-            
-
-            //logger.LogMarketData(bd.DTime, new decimal[] { bd.Open, bd.High, bd.Low, bd.Close, bd.WClose, bd.LastQuantity, bd.Volume, bd.Diff, bd.DiffPercent, mov.CurrentValue, mov2.CurrentValue, rsi.CurrentValue, macd.CurrentValue, macd.MacdTrigger.CurrentValue });
-
-            var fbd = GetBarData(Symbol, SymbolPeriod);
-
-            Debug($"*1t:   o:{fbd.Open} h:{fbd.High} l:{fbd.Low} c:{fbd.Close} wc:{fbd.WClose} dif:{fbd.Diff} dif%:{fbd.DiffPercent} vol:{fbd.Volume}");
-
-
-
-
-            //list.Add($"t: {bd.DTime} o:{bd.Open} h:{bd.High} l:{bd.Low} c:{bd.Close} wc:{bd.WClose} dif:{bd.Diff} dif%:{bd.DiffPercent} vol:{bd.Volume}");
-            //list.Add($"t: {bd.DTime} rsi: {rsi.CurrentValue} ma5: {mov.CurrentValue} ma9: {mov2.CurrentValue} macd: {macd.CurrentValue} {macd.MacdTrigger.CurrentValue}");
-            //list.Add($"t: {bd.DTime} macb: {CrossBelow(mov, mov2)} maca: {CrossAbove(mov, mov2)} macdcb: {CrossBelow(macd, macd.MacdTrigger)} macdcb: {CrossAbove(macd, macd.MacdTrigger)}");
-
-
-            //priceLogger.LogMarketData(DateTime.Now, new decimal[] { price, volume.CurrentValue });
-            //rsiLogger.LogMarketData(DateTime.Now, new decimal[] { price, rsi.CurrentValue });
-            //ma59Logger.LogMarketData(DateTime.Now, new decimal[] { price, mov.CurrentValue, mov2.CurrentValue, CrossBelow(mov, mov2) ? 1 : 0, CrossAbove(mov, mov2) ? 1 : 0 });
-            //macd953Logger.LogMarketData(DateTime.Now, new decimal[] { price, macd.CurrentValue, macd.MacdTrigger.CurrentValue, CrossBelow(macd, macd.MacdTrigger) ? 1 : 0, CrossAbove(macd, macd.MacdTrigger) ? 1 : 0 });
-
-        }
-
     }
 
 }

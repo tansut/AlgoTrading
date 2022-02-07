@@ -121,7 +121,7 @@ namespace Kalitte.Trading.Algos
 
 
             if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(new CrossSignal("cross:ma59", Symbol, this, mov, mov2) {  AvgChange = 0.1M, Periods = 8});
-            if (!SimulateOrderSignal && MACDShortPeriod > 0) this.signals.Add(new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { AvgChange = 0.025M, Periods = 48 });
+            if (!SimulateOrderSignal && MACDShortPeriod > 0) this.signals.Add(new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { AvgChange = 0.020M, Periods = 8 });
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
             if (!SimulateOrderSignal && this.ProfitQuantity > 0 || this.LossQuantity > 0) this.signals.Add(new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity));
             if (!SimulateOrderSignal && RsiLong > 0 || RsiShort > 0) this.signals.Add(new RangeSignal("rsi", Symbol, this, rsi, RsiShort == 0 ? new decimal?() : RsiShort, RsiLong == 0 ? new decimal() : RsiLong) { Periods = 1});

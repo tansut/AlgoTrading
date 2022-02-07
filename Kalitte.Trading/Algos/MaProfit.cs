@@ -150,7 +150,9 @@ namespace Kalitte.Trading.Algos
         public override void OnInitCompleted()
         {
             var assembly = typeof(MaProfit).Assembly.GetName();
-            Log($"Inited instance {InstanceName} using assemly {assembly.FullName}");
+            var ma = mov.Period > 0 ? $"Ma[{MovPeriod}/{MovPeriod2}]":"";
+            var macd = MACDShortPeriod > 0 ? $"Macd[{MACDShortPeriod}/{MACDLongPeriod}]":"";
+            Log($"Inited instance {InstanceName} [{this.Symbol}, {ma} {macd}] using assemly {assembly.FullName}");
             LoadRealPositions(this.Symbol);
             signals.ForEach(p => p.Start());
             if (!Simulation)

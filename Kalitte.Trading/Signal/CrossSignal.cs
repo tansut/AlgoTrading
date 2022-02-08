@@ -27,15 +27,12 @@ namespace Kalitte.Trading
 
     public class CrossSignal : Signal
     {
-        private OrderSide? LastVerifiedSignal = null;
         public IIndicator i1 = null;
         public IIndicator i2 = null;
 
 
         public Kalitte.Trading.Indicators.IndicatorBase i1k;
         public Kalitte.Trading.Indicators.IndicatorBase i2k;
-
-
         Task<OrderSide?> signalVerificationTask = null;
 
         CancellationTokenSource tokenSource2;
@@ -43,10 +40,8 @@ namespace Kalitte.Trading
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
         private Bars bars;
-        //bool useMyCross = false;
         bool useMyIndicators = true;
 
-        private decimal lastCrossValue = 0;
         private decimal lastEma = 0;
 
 
@@ -59,7 +54,6 @@ namespace Kalitte.Trading
 
         public override void Start()
         {
-            LastVerifiedSignal = null;
             bars = new Bars(Periods);
             base.Start();
             Algo.Log($"{this.Name} started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}");
@@ -208,12 +202,17 @@ namespace Kalitte.Trading
 
             if (mp > 0)
             {
-
+                
                 var val = useMyIndicators ? i1k.LastValue(mp) - i2k.LastValue(mp) : i1.CurrentValue - i2.CurrentValue;
-                bars.Push(new Quote(val));
 
-                Algo.Log($"i1k: {i1k.LastValue(mp)} i1:{i1.CurrentValue} mp: {mp}");
-                Algo.Log($"i2k: {i2k.LastValue(mp)} i2:{i2.CurrentValue} mp: {mp}");
+                bars.Push(new Quote(val));
+                if (useMyIndicators)
+                {
+                    Algo.Log($"i1k: {i1k.LastValue(mp)} i1:{i1.CurrentValue} mp: {mp}", LogLevel.Debug, t);
+                    Algo.Log($"i2k: {i2k.LastValue(mp)} i2:{i2.CurrentValue} mp: {mp}", LogLevel.Debug, t);
+                }
+
+
 
                 var cross = bars.Cross(0);
                 var ema = bars.Ema().Last();
@@ -230,7 +229,7 @@ namespace Kalitte.Trading
 
                 //Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
             }
-            else Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} no market price for {t}");
+            else Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} no market price for {t}", LogLevel.Debug, t);
 
 
 

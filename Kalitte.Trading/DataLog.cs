@@ -60,6 +60,7 @@ namespace Kalitte.Trading
             get; set;
         }
         public bool SaveDaily = false;
+        public string FileName { get; set; }
         protected string usedDir;
         protected Dictionary<string, SortedList<string, decimal[]>> cache = new Dictionary<string, SortedList<string, decimal[]>>();
         public FileLogger(string symbol, string baseDir, string subdir) : base(symbol)
@@ -71,8 +72,8 @@ namespace Kalitte.Trading
 
         public string GetFileName(DateTime t)
         {
+            if (!string.IsNullOrEmpty(FileName)) return Path.Combine(usedDir, FileName);
             if (SaveDaily)
-
                 return Path.Combine(usedDir, t.ToString("yyyy-MM-dd") + ".txt");
             else return Path.Combine(usedDir, t.ToString("yyyy-MM-dd"), t.ToString("HH")) + ".txt";
         }
@@ -169,9 +170,11 @@ namespace Kalitte.Trading
 
             foreach (var line in content)
             {
+                var date = DateTime.Parse(line.Key, CultureInfo.InvariantCulture);                
+                if (date.AddSeconds(0.1) > t) return result;
                 var q = new Quote()
                 {
-                    Date = DateTime.Parse(line.Key, CultureInfo.InvariantCulture),
+                    Date = date,
                     Open = line.Value[0],
                     High = line.Value[1],
                     Low = line.Value[2],

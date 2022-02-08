@@ -107,6 +107,7 @@ namespace Kalitte.Trading.Algos
                 AddSymbol(Symbol, sp);
                 var logger = new MarketDataFileLogger(Symbol, logDir, "" + sp.ToString());
                 logger.SaveDaily = true;
+                logger.FileName = "all.txt";
                 loggerList.Add(logger);
             }
 

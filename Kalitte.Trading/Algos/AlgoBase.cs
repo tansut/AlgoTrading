@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Algos
 {
-    public class AlgoBase : MatriksAlgo
+    public class AlgoBase : MatriksAlgo, IDisposable
     {
 
         [Parameter(0)]
@@ -37,6 +37,8 @@ namespace Kalitte.Trading.Algos
 
         public string InstanceName { get; set; }
 
+        private FileStream logStream;
+
 
         public PortfolioList UserPortfolioList = new PortfolioList();
 
@@ -44,7 +46,10 @@ namespace Kalitte.Trading.Algos
 
         public AlgoBase()
         {
-            this.InstanceName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (new Random().Next(1000000));
+            if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
+            this.InstanceName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (new Random().Next(100000000));
+            //logStream = new FileStream(LogFile, FileMode.Create, FileAccess.Write, FileShare.Read, 4096);
+            
         }
 
         public string LogFile {
@@ -59,14 +64,20 @@ namespace Kalitte.Trading.Algos
             {
                 Debug(text);
                 var file = LogFile;
-                if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
+                
                 string opTime = t.HasValue ? t.Value.ToString("yyyy.MM.dd HH:mm:sss") + "*" : "current";
-
-                lock (typeof(AlgoBase))
-                {
-                    File.AppendAllText(file, $"[{level}:{DateTime.Now.ToString("yyyy.MM.dd HH:mm:sss")}({opTime})]: {text}" + Environment.NewLine);
-                }
+                var content = $"[{level}:{DateTime.Now.ToString("yyyy.MM.dd HH:mm:sss")}({opTime})]: {text}" + Environment.NewLine;
+                //var bytes = Encoding.UTF8.GetBytes(content);
+                //logStream.Write(bytes, 0, bytes.Length);
+                File.AppendAllText(file, content + Environment.NewLine);
+                
             }
+        }
+
+        public override void Dispose()
+        {
+            //logStream.Dispose();
+            base.Dispose();
         }
 
         static AlgoBase()
@@ -114,7 +125,7 @@ namespace Kalitte.Trading.Algos
             Log($"- END PORTFOLIO -");
         }
 
-        public decimal GetMarketPrice(string symbol, DateTime? t = null)
+        public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)
         {
             if (Simulation) return PriceLogger.GetMarketData(t.HasValue ? t.Value : DateTime.Now) ?? 0;
             var price = this.GetMarketData(symbol, SymbolUpdateField.Last);

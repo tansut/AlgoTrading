@@ -17,6 +17,14 @@ namespace Kalitte.Trading.Indicators
             this.Periods = periods;
         }
 
+        public override List<decimal> Values
+        {
+            get
+            {
+                return Bars.Ema(Periods);
+            }
+        }
+
         public override decimal LastValue(decimal newValue)
         {
             return Bars.EmaNext(newValue, Bars.Ema(Periods).Last(), Periods);

@@ -16,6 +16,8 @@ namespace Kalitte.Trading.Indicators
 
         public Ema Trigger { get; set; }
 
+        public override List<decimal> Values => throw new NotImplementedException();
+
         public Macd(Bars bars, int shortp, int longp, int signal) : base(bars)
         {
             this.Short = shortp;

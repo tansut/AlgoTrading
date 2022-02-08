@@ -23,6 +23,19 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
+    public enum OHLC
+    {
+        Open = 0,
+        High = 1,
+        Low = 2,
+        Close = 3,
+        Volume = 4,
+        WClose = 5,
+        Diff = 6,
+        DiffPercent = 7,
+        Undivided = 8,
+        Other = 9
+    }
 
     public static class Extensions
     {

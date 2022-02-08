@@ -160,13 +160,6 @@ namespace Kalitte.Trading
             var content = GetContent(file);
             var result = new Bars();
 
-            //Open = line.Value[0],
-            //        High = line.Value[1],
-            //        Low = line.Value[2],
-            //        Close = line.Value[3],
-            //        //WClose = line.Value[4],
-            //        //Quantity = line.Value[5],
-            //        Volume = line.Value[5],
 
             foreach (var line in content)
             {

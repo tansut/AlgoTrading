@@ -50,7 +50,11 @@ namespace Kalitte.Trading
         private Queue<IQuote> data;
         public int Size { get; private set; } = 0;
         private int timeOut = -1;
+        public OHLC Ohlc { get; set; } = OHLC.Close;
 
+        public int DefaultLookback { get; set; }
+
+        //List<decimal> EmaResults = new List<decimal>();
 
         private ReaderWriterLock rwl = new ReaderWriterLock();
 
@@ -82,7 +86,8 @@ namespace Kalitte.Trading
             }
         }
 
-        public decimal[] CloseList
+
+        public decimal[] Values
         {
             get
             {
@@ -90,7 +95,17 @@ namespace Kalitte.Trading
                 rwl.AcquireReaderLock(timeOut);
                 try
                 {
-                    return data.Select(p => p.Close).ToArray();
+                    return data.Select(p => { switch (Ohlc)
+                        {
+                            case OHLC.Close: return p.Close;
+                                case OHLC.Volume: return p.Volume;
+                                case OHLC.Open: return p.Open;
+                                case OHLC.High: return p.High;
+                                case OHLC.Low: return p.Low;
+                                default : return 0;
+
+                        } }).ToArray();
+                    
                 }
                 finally
                 {
@@ -127,8 +142,13 @@ namespace Kalitte.Trading
             try
             {
                 if (Size > 0 && data.Count == Size)
+                {
                     data.Dequeue();
+                    //EmaResults.RemoveAt(0);
+                }
                 data.Enqueue(quote);
+                //var current = data.Dequeue();
+                //EmaResults.Add(EmaNext(quote.Close, 0, DefaultLookback));
             }
             finally
             {
@@ -137,7 +157,22 @@ namespace Kalitte.Trading
             }
         }
 
-       
+        public void Clear()
+        {
+            rwl.AcquireWriterLock(timeOut);
+            try
+            {
+                data.Clear();
+                //EmaResults.Clear();
+            }
+            finally
+            {
+
+                rwl.ReleaseWriterLock();
+            }
+        }
+
+
 
         public decimal EmaNext(decimal price, decimal lastEma, int lookbackPeriods)
         {
@@ -150,7 +185,7 @@ namespace Kalitte.Trading
         {
             List<decimal> emaArray = new List<decimal>();
             double k = 2D / (lookbackPeriods + 1);
-            var data = CloseList;
+            var data = Values;
 
             if (lookbackPeriods <= 0) lookbackPeriods = data.Length;
 
@@ -185,6 +220,8 @@ namespace Kalitte.Trading
                 emaArray.Add(result);
             }
 
+            //EmaResults = emaArray;
+
             return emaArray;
         }
 
@@ -193,7 +230,7 @@ namespace Kalitte.Trading
 
         public decimal Cross(decimal baseVal)
         {
-            var list = CloseList;
+            var list = Values;
             var i = list.Length;
 
             while (--i >= 1)

@@ -26,6 +26,10 @@ namespace Kalitte.Trading.Indicators
             Bars = bars;
         }
 
+        public abstract List<decimal> Values
+        {
+            get;
+        }
         public abstract decimal LastValue(decimal newValue);
     }
 }

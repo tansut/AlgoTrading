@@ -144,18 +144,18 @@ namespace Kalitte.Trading
         {
             this.isRunning = true;
 
-            collectorTaskTokenSource = new CancellationTokenSource();
-            collectorTask = new Task(() =>
-            {
-                collectorTaskTokenSource.Token.ThrowIfCancellationRequested();                
-                while (!collectorTaskTokenSource.Token.IsCancellationRequested)
-                {                    
-                    //Log($"{this.Name }task doing {Simulation}");
-                    //if (!Simulation) Colllect();
-                    Thread.Sleep(1000);
-                }
-            });            
-            collectorTask.Start();
+            //collectorTaskTokenSource = new CancellationTokenSource();
+            //collectorTask = new Task(() =>
+            //{
+            //    collectorTaskTokenSource.Token.ThrowIfCancellationRequested();                
+            //    while (!collectorTaskTokenSource.Token.IsCancellationRequested)
+            //    {                    
+            //        //Log($"{this.Name }task doing {Simulation}");
+            //        //if (!Simulation) Colllect();
+            //        Thread.Sleep(1000);
+            //    }
+            //});            
+            //collectorTask.Start();
             if (Enabled && TimerEnabled)
             {
                 _timer = new System.Timers.Timer(1000);
@@ -172,22 +172,22 @@ namespace Kalitte.Trading
                 _timer.Dispose();
             }
             this.isRunning = false;
-            try
-            {
-                collectorTaskTokenSource.Cancel();
-                try
-                {
-                    collectorTask.Wait(collectorTaskTokenSource.Token);
-                }
-                catch (OperationCanceledException)
-                {
+            //try
+            //{
+            //    collectorTaskTokenSource.Cancel();
+            //    try
+            //    {
+            //        collectorTask.Wait(collectorTaskTokenSource.Token);
+            //    }
+            //    catch (OperationCanceledException)
+            //    {
 
-                }
-            }
-            catch (Exception ex)
-            {
-                Log($"Error stopping task {this.Name}. {ex.Message}", LogLevel.Error);
-            }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log($"Error stopping task {this.Name}. {ex.Message}", LogLevel.Error);
+            //}
 
             Log($"Stopped.", LogLevel.Debug);
 

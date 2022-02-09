@@ -17,7 +17,7 @@ public class Program
 
         var b1 = new Bars(5);
 
-        var e5 = new Ema(b1, 5);
+        
 
         b1.Push(new Quote(0.5448457542630377619258446M));
         b1.Push(new Quote(0.5448457542630377619258446M));
@@ -25,7 +25,7 @@ public class Program
         b1.Push(new Quote(0.5448457542630377619258446M));
         b1.Push(new Quote(0.5448457542630377619258446M));
 
-        var res = b1.Ema(4);
+        //var res = macd.Ema(4);
 
         
 
@@ -43,6 +43,7 @@ public class Program
 
         var ema5 = new Ema(bars, 5);
         var ema9 = new Ema(bars, 9);
+        var macd = new Macd(bars, 5, 9, 3);
 
 
         var em5list = bars.Ema(5);// string.Join(",", bars.Ema(5).Select(p => p.ToString()));
@@ -51,8 +52,9 @@ public class Program
         for (var i = 0; i < newBars.Count; i++)
         {
             bars.Push(newBars.List[i]);
-            Console.WriteLine($"EMA5: { ema5.InputBars.List.Last().Date}  {ema5.ResultBars.List.Last().Close}");
-            Console.WriteLine($"EMA9: { ema9.InputBars.List.Last().Date}  {ema9.ResultBars.List.Last().Close}");
+            Console.WriteLine($"EMA5: { ema5.InputBars.Last.Date}  {ema5.ResultBars.Last.Close}");
+            Console.WriteLine($"EMA9: { ema9.InputBars.Last.Date}  {ema9.ResultBars.Last.Close}");
+            Console.WriteLine($"MACD: { macd.InputBars.Last.Date}  {macd.ResultBars.Last.Close}");
         }
 
 

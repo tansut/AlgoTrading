@@ -62,10 +62,7 @@ namespace Kalitte.Trading
             Log($"Started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}", LogLevel.Info);
         }
 
-        public override void Stop()
-        {
-            base.Stop();
-        }
+
 
 
         protected override void Colllect()
@@ -94,25 +91,34 @@ namespace Kalitte.Trading
             var ldif = Math.Round(l1 - l2, 5);
             var idif = Math.Round(i1Val - i2Val, 5);
 
-            if (Math.Abs(ldif - idif) > 0.2M && !Simulation)
-            {
-                Log("-- Too much indicator difference between us and matrix --", LogLevel.Debug, t);
+            //if (Math.Abs(ldif - idif) > 0.2M)
+            //{
+            //Log("-- Too much indicator difference between us and matrix --", LogLevel.Debug, t);
+                Log($"Bardata: {i1k.InputBars.Latest}", LogLevel.Debug, t);
                 Log($"Currents: my1: {l1}  i1: {i1Val} my2: {l2} l2: {i2Val}", LogLevel.Debug, t);
                 Log($"Difs: mp:{mp}  ldif: {ldif} idif: {idif} diff: {ldif - idif}", LogLevel.Debug, t);
-            }
+            //}
             
             if (differenceBars.Count >= Periods)
             {                
                 var cross = differenceBars.Cross(0);
                 var ema = differenceBars.Ema(Periods).Last();
 
-                if (lastEma < 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
-                else if (lastEma > 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
+                if (lastCross == 0 && cross != 0) lastCross = cross;
 
-                if (finalResult.HasValue)
-                {
-                    Log($"Status: cross: {cross}, lastEma: {lastEma}, ema: {ema.Ema} split: {AvgChange}", LogLevel.Debug, t);
-                }
+                Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
+                if (lastCross > 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
+                else if (lastCross < 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
+
+                lastCross = finalResult.HasValue ? 0 : lastCross;
+
+                //if (lastEma < 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
+                //else if (lastEma > 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
+
+                //if (finalResult.HasValue)
+                //{
+                Log($"Status: cross: {cross}, lastEma: {lastEma}, ema: {ema.Ema} split: {AvgChange}", LogLevel.Debug, t);
+                //}
 
                 if (lastEma == 0) lastEma = ema.Ema.Value;
 
@@ -124,13 +130,13 @@ namespace Kalitte.Trading
                 finalResult = finalResult
             };
 
-            //if (lastCrossValue == 0 && cross !=  0) lastCrossValue = cross;
+            //if (lastCross == 0 && cross !=  0) lastCrossValue = cross;
 
             //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
-            //if (lastCrossValue > 0 && ema > AvgChange) finalResult = OrderSide.Buy;
-            //else if (lastCrossValue < 0 && ema < -AvgChange) finalResult = OrderSide.Sell;
+            //if (lastCross > 0 && ema > AvgChange) finalResult = OrderSide.Buy;
+            //else if (lastCross < 0 && ema < -AvgChange) finalResult = OrderSide.Sell;
 
-            //lastCrossValue = finalResult.HasValue ? 0 : lastCrossValue;
+            //lastCross = finalResult.HasValue ? 0 : lastCross;
 
 
 

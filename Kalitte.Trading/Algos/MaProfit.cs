@@ -133,9 +133,42 @@ namespace Kalitte.Trading.Algos
         bool boolsSignalsStarted = false;
         decimal lastPrice = 0;
 
+        public void InitMySignals(DateTime t)
+        {
+            var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
+            mdp.FileName = "all.txt";
+            mdp.SaveDaily = true;
+            bars = mdp.GetContentAsQuote(t);
+            Log($"Bars initialized. Last bar is: {bars.Last}", LogLevel.Debug, t);
+
+            var ma = signals.Where(p => p.Name == "cross:ma59").FirstOrDefault() as CrossSignal;
+            if (ma != null)
+            {
+                var movema5 = new Ema(bars, MovPeriod);
+                var mov2ema9 = new Ema(bars, MovPeriod2);
+                ma.i1k = movema5;
+                ma.i2k = mov2ema9;
+            }
 
 
-        public void InitSignals(DateTime t)
+            var macds = signals.Where(p => p.Name == "cross:macd593").FirstOrDefault() as CrossSignal;
+
+            if (macds != null)
+            {
+
+                var macdi = new Macd(bars, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
+
+                macds.i1k = macdi;
+                macds.i2k = macdi.Trigger;
+            }
+
+
+
+
+
+        }
+
+        public void InitSignals()
         {
             mov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod, MovMethod.Exponential);
             mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
@@ -143,37 +176,32 @@ namespace Kalitte.Trading.Algos
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
 
 
-            var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
-            mdp.FileName = "all.txt";
-            mdp.SaveDaily = true;
 
-            bars = mdp.GetContentAsQuote(t);
+            
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-                var movema5 = new Ema(bars, MovPeriod);
-                var mov2ema9 = new Ema(bars, MovPeriod2);
+
 
                 var ma = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { AvgChange = MaAvgChange, Periods = MaPeriods };
 
-                ma.i1k = movema5;
-                ma.i2k = mov2ema9;
+
 
                 this.signals.Add(ma);
             }
-            
+
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                var macdi = new Macd(bars, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
+
 
 
                 var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { AvgChange = MacdAvgChange, Periods = MacdPeriods };
 
-                //macds.i1k = macdi;
-                //macds.i2k = macdi.Trigger;
+
+
                 this.signals.Add(macds);
             }
-            
+
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
             if (!SimulateOrderSignal && this.ProfitQuantity > 0 || this.LossQuantity > 0) this.signals.Add(new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity));
             if (!SimulateOrderSignal && RsiLong > 0 || RsiShort > 0) this.signals.Add(new RangeSignal("rsi", Symbol, this, rsi, RsiShort == 0 ? new decimal?() : RsiShort, RsiLong == 0 ? new decimal() : RsiLong) { Periods = 1 });
@@ -198,7 +226,8 @@ namespace Kalitte.Trading.Algos
             }
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
 
-            InitSignals(DateTime.Now);
+            InitSignals();
+            if (!Simulation) InitMySignals(DateTime.Now);
         }
 
         public void CompleteInit()
@@ -225,24 +254,14 @@ namespace Kalitte.Trading.Algos
             {
                 var bd = barDataCurrentValues.LastUpdate;
                 var time = barDataCurrentValues.LastUpdate.DTime;
-                
+
                 lock (this)
                 {
                     //if (simulationCount > 10) return;                                       
-                    var ma = (CrossSignal)signals.First(p => p.Name == "cross:ma59");
-                    
+
                     if (!boolsSignalsStarted)
                     {
-                        var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
-                        mdp.FileName = "all.txt";
-                        mdp.SaveDaily = true;
-
-                        var newBars = mdp.GetContentAsQuote(time);
-                        bars.Clear();
-                        foreach (var b in newBars.List) bars.Push(b);
-
-                        Log($"Bars initialized. Last bar is: {bars.List.Last()}", LogLevel.Debug, time);
-
+                        InitMySignals(time);
                         CompleteInit();
                     }
 
@@ -280,7 +299,7 @@ namespace Kalitte.Trading.Algos
                 {
                     var newQuote = new Quote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
                     bars.Push(newQuote);
-                    Log($"Pushed new quote: {newQuote.ToString()}", LogLevel.Debug, bd.BarDataIndexer[last]);                    
+                    Log($"Pushed new quote: {newQuote.ToString()}", LogLevel.Debug, bd.BarDataIndexer[last]);
                 }
                 catch (Exception ex)
                 {

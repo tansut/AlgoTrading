@@ -62,7 +62,7 @@ namespace Kalitte.Trading
         public override void Start()
         {
             base.Start();
-            Log($"Started: profit:{ProfitQuantity}/{ProfitPriceChange} loss: {LossQuantity}/{LossPriceChange}.", LogLevel.Debug);
+            Log($"Started: profit:{ProfitQuantity}/{ProfitPriceChange} loss: {LossQuantity}/{LossPriceChange}.", LogLevel.Info);
         }
 
 
@@ -83,7 +83,6 @@ namespace Kalitte.Trading
                 avgCost = portfolio.AvgCost;
                 pl = price - avgCost;
                
-
                 if (price == 0 || avgCost == 0)
                 {
                     Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Warning, t);

@@ -17,13 +17,14 @@ namespace Kalitte.Trading.Indicators
         {
             this.Periods = periods;
             bars.BarEvent += BarChanged;
-            ResultBars = InputBars.Count < Periods ? new Bars(): createResult();
+            ResultBars = new Bars();
+            if (InputBars.Count >= Periods)  createResult();
         }
 
 
         private Bars createResult()
         {
-            ResultBars = new Bars();
+            ResultBars.Clear();
             var result = InputBars.Ema(Periods);
             result.ForEach(r => ResultBars.Push(new Quote() { Date = r.Date, Close = r.Ema ?? 0 }));
             return ResultBars;
@@ -41,7 +42,7 @@ namespace Kalitte.Trading.Indicators
         {
             if (e.Action == BarActions.Cleared)
             {
-                ResultBars = new Bars();
+                ResultBars.Clear();
 
             } else if (HasResult)
             {
@@ -56,10 +57,10 @@ namespace Kalitte.Trading.Indicators
 
                 else if (e.Action == BarActions.BarRemoved)
                 {
-                    ResultBars = createResult();
+                    createResult();
                 }
             }
-            else ResultBars = createResult();
+            else createResult();
         }
 
         //public override List<decimal> Values

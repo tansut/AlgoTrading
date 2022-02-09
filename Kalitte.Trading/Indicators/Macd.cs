@@ -14,6 +14,9 @@ namespace Kalitte.Trading.Indicators
         public int Long { get; set; }
         public int Signal { get; set; }
 
+  
+        public Ema EMa1 { get; set; }
+        public Ema EMa2 { get; set; }
         public Ema Trigger { get; set; }
 
 
@@ -22,12 +25,62 @@ namespace Kalitte.Trading.Indicators
             this.Short = shortp;
             this.Long = longp;
             this.Signal = signal;
-            this.Trigger = new Ema(InputBars, signal);
+            this.EMa1 = new Ema(InputBars, shortp);
+            this.EMa2 = new Ema(InputBars, longp);
+            
+            ResultBars = new Bars();
+            if (InputBars.Count >= longp) createResult();
+            this.InputBars.BarEvent += InputBars_BarEvent;
+
+
+
+            this.Trigger = new Ema(ResultBars, signal);
+        }
+
+        private Bars createResult()
+        {
+            ResultBars.Clear();
+            for (var i = 0; i < EMa1.ResultBars.Count; i++)
+            {
+                var data1 = EMa1.ResultBars.List;
+                var data2 = EMa2.ResultBars.List;
+                ResultBars.Push(new Quote(data1[i].Date, data1[i].Close - data2[i].Close));
+            }
+
+            return ResultBars;
+        }
+
+        private void InputBars_BarEvent(object sender, BarEvent e)
+        {
+            if (e.Action == BarActions.Cleared)
+            {
+                ResultBars.Clear();
+
+            }
+            else if (HasResult)
+            {
+                if (e.Action == BarActions.BarCreated && EMa2.HasResult)
+                {
+                    ResultBars.Push(new Quote()
+                    {
+                        Date = EMa1.ResultBars.Latest.Date,
+                        Close = (EMa1.ResultBars.Latest.Close - EMa2.ResultBars.Latest.Close)
+                    });
+                }
+
+                else if (e.Action == BarActions.BarRemoved)
+                {
+                    createResult();
+                }
+            }
+            else createResult();
         }
 
         public override decimal NextValue(decimal newVal)
         {
-            throw new NotImplementedException();
+            var em1 = EMa1.NextValue(newVal);
+            var em2 = EMa2.NextValue(newVal);
+            return em1 - em2;
         }
 
 

@@ -99,7 +99,7 @@ namespace Kalitte.Trading
     public class Bars
     {
         public event EventHandler<BarEvent> BarEvent;
-        private Queue<IQuote> data;
+        private List<IQuote> data;
         public int Size { get; private set; } = 0;
         private int timeOut = -1;
         public CandlePart Ohlc { get; set; } = CandlePart.Close;
@@ -113,12 +113,12 @@ namespace Kalitte.Trading
         public Bars(int size = 0)
         {
             Size = size;
-            data = new Queue<IQuote>(size);
+            data = new List<IQuote>(size);
         }
 
         public Bars(IEnumerable<Quote> init)
         {
-            data = new Queue<IQuote>(init);
+            data = new List<IQuote>(init);
         }
 
          List<BasicD> ConvertToBasic()    
@@ -163,6 +163,23 @@ namespace Kalitte.Trading
                 try
                 {
                     return data.ToArray();
+                }
+                finally
+                {
+                    rwl.ReleaseReaderLock();
+                }
+            }
+        }
+
+        public IQuote Last
+        {
+            get
+            {
+
+                rwl.AcquireReaderLock(timeOut);
+                try
+                {
+                    return data[data.Count-1];
                 }
                 finally
                 {
@@ -247,10 +264,11 @@ namespace Kalitte.Trading
             {
                 if (Size > 0 && data.Count == Size)
                 {
-                    var item = data.Dequeue();
+                    var item = data[0];
+                    data.RemoveAt(0);
                     if (BarEvent != null) BarEvent(this, new Trading.BarEvent() { Action = BarActions.BarRemoved, Item = item });
                 }
-                data.Enqueue(quote);
+                data.Add(quote);
                 if (BarEvent != null) BarEvent(this, new Trading.BarEvent() { Action = BarActions.BarCreated, Item = quote });
 
             }

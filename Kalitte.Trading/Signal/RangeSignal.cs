@@ -60,8 +60,7 @@ namespace Kalitte.Trading
         {
             bars = new Bars(Periods);
             base.Start();
-            Algo.Log($"{this.Name} started with {Min}-{Max} range, period: {Periods}.");
-
+            Algo.Log($"Started with {Min}-{Max} range, period: {Periods}.", LogLevel.Info);
         }
 
         protected override void Colllect()

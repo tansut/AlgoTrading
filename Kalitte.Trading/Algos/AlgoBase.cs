@@ -62,11 +62,12 @@ namespace Kalitte.Trading.Algos
         {
             if ((int)level >= this.LoggingLevel)
             {
-                Debug(text);
+                string opTime = t.HasValue ? t.Value.ToString("yyyy.MM.dd HH:mm:sss") + "*" : DateTime.Now.ToString("yyyy.MM.dd HH:mm:sss");
+                var content = $"[{level}:{opTime}]: {text}" + Environment.NewLine;
+
+                Debug(content);
                 var file = LogFile;
                 
-                string opTime = t.HasValue ? t.Value.ToString("yyyy.MM.dd HH:mm:sss") + "*" : "current";
-                var content = $"[{level}:{DateTime.Now.ToString("yyyy.MM.dd HH:mm:sss")}({opTime})]: {text}" + Environment.NewLine;
                 //var bytes = Encoding.UTF8.GetBytes(content);
                 //logStream.Write(bytes, 0, bytes.Length);
                 File.AppendAllText(file, content + Environment.NewLine);
@@ -127,9 +128,25 @@ namespace Kalitte.Trading.Algos
 
         public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)
         {
-            if (Simulation) return PriceLogger.GetMarketData(t.HasValue ? t.Value : DateTime.Now) ?? 0;
-            var price = this.GetMarketData(symbol, SymbolUpdateField.Last);
-            return price;
+            if (Simulation)
+            {
+                var price = PriceLogger.GetMarketData(t.Value) ?? 0;
+                if (price ==0)
+                {
+                    int toBack = 0, toForward = 0;
+                    while (toBack-- > -5)
+                    {
+                        toForward++;
+                        price = PriceLogger.GetMarketData(t.Value.AddSeconds(toBack)) ?? 0;
+                        if (price > 0) return price;
+                        price = PriceLogger.GetMarketData(t.Value.AddSeconds(toForward)) ?? 0;
+                        if (price > 0) return price;
+
+                    }
+                }
+                return price;
+            } else return this.GetMarketData(symbol, SymbolUpdateField.Last);
+            
         }
 
     }

@@ -29,7 +29,7 @@ namespace Kalitte.Trading.Indicators
             InputBars = bars;
         }
 
-        public abstract Quote CreateNewResultBar(IQuote newBar);
+        public abstract decimal NextValue(decimal newVal);
 
         //public abstract List<decimal> Values
         //{

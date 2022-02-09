@@ -59,7 +59,7 @@ namespace Kalitte.Trading
             differenceBars = new Bars(Periods);
             priceBars = new Bars(2);
             base.Start();
-            Algo.Log($"{this.Name} started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}");
+            Log($"Started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}", LogLevel.Info);
         }
 
         public override void Stop()
@@ -76,78 +76,57 @@ namespace Kalitte.Trading
         protected SignalResultX CalculateSignal(DateTime? t = null)
         {
             OrderSide? finalResult = null;
-            var mp = Algo.GetMarketPrice(Symbol, t); // düşün  mp 0 gelirse
+            var mp = Algo.GetMarketPrice(Symbol, t); 
 
             if (mp == 0)
             {
                 mp = i1k.InputBars.Latest.Close;
-                Algo.Log($"Used last close bar price { mp }", LogLevel.Warning, t);
+                Log($"Used last close bar price { mp } since market price is unavailable.", LogLevel.Warning, t);
             }
             decimal i1Val = i1.CurrentValue, i2Val = i2.CurrentValue;
-            Algo.Log($"bar last: {(i1k.HasResult ? i1k.ResultBars.List.Last().Close : 0)}");
 
-            var l1 = i1k.CreateNewResultBar(new Quote(mp));
-            var l2 = i2k.CreateNewResultBar(new Quote(mp));
+            var l1 = i1k.NextValue(mp);
+            var l2 = i2k.NextValue(mp);            
 
-            var emaTest= (decimal)i1k.InputBars.EmaNext((double)mp, (double)i1k.InputBars.List.Last().Close, 5);
-
-            Algo.Log($"l1: {l1.Close} l2: {l2.Close} test: emates: {emaTest} mp: {(double)mp} lastema: {((double)i1k.InputBars.List.Last().Close)}");
-
-            //differenceBars.Push(new Quote(i1Val-i2Val));
-            var newResultBar = new Quote(t ?? DateTime.Now, l1.Close - l2.Close);
-            Algo.Log($"added new item {newResultBar}");
+            var newResultBar = new Quote(t ?? DateTime.Now, l1 - l2);
             differenceBars.Push(newResultBar);
-            if (mp > 0) priceBars.Push(new Quote(t ?? DateTime.Now, mp));
 
+            var ldif = Math.Round(l1 - l2, 5);
+            var idif = Math.Round(i1Val - i2Val, 5);
 
-            if (differenceBars.Count >= Periods && priceBars.Count >= 2)
+            if (Math.Abs(ldif - idif) > 0.2M && !Simulation)
             {
-                //var mpEma = priceBars.Ema(2).Last().Ema.Value;
-
-
-                Algo.Log($"l1: {l1.Close}  i1: {l2.Close} i2: {i2Val} l2: {i1Val}");
-
-                var ldif = Math.Round(l1.Close - l2.Close, 5);
-                var idif = Math.Round(i1Val - i2Val, 5);
-
-
-                Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} mp:{mp} t: {t} ldif: {ldif} idif: {idif} diff: {ldif - idif}", LogLevel.Error, t);
-
+                Log("-- Too much indicator difference between us and matrix --", LogLevel.Debug, t);
+                Log($"Currents: my1: {l1}  i1: {i1Val} my2: {l2} l2: {i2Val}", LogLevel.Debug, t);
+                Log($"Difs: mp:{mp}  ldif: {ldif} idif: {idif} diff: {ldif - idif}", LogLevel.Debug, t);
+            }
+            
+            if (differenceBars.Count >= Periods)
+            {                
                 var cross = differenceBars.Cross(0);
                 var ema = differenceBars.Ema(Periods).Last();
-
-                Algo.Log($" cross: {cross}, lastEma: {lastEma}, ema: {ema.Ema} split: {AvgChange}", LogLevel.Debug, t);
-
 
                 if (lastEma < 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
                 else if (lastEma > 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
 
+                if (finalResult.HasValue)
+                {
+                    Log($"Status: cross: {cross}, lastEma: {lastEma}, ema: {ema.Ema} split: {AvgChange}", LogLevel.Debug, t);
+                }
+
                 if (lastEma == 0) lastEma = ema.Ema.Value;
 
                 lastEma = finalResult.HasValue ? 0 : lastEma;
-
-            }
-            else Algo.Log($"Collected {differenceBars.Count} data ...");
-
-
-
-
-
+            }           
 
             return new SignalResultX(this)
             {
                 finalResult = finalResult
             };
 
-
-
-
-
-
-
             //if (lastCrossValue == 0 && cross !=  0) lastCrossValue = cross;
 
-            //Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
+            //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
             //if (lastCrossValue > 0 && ema > AvgChange) finalResult = OrderSide.Buy;
             //else if (lastCrossValue < 0 && ema < -AvgChange) finalResult = OrderSide.Sell;
 
@@ -155,7 +134,7 @@ namespace Kalitte.Trading
 
 
 
-            //Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
+            //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
             //var changedDirection = lastEma * 
 
 
@@ -177,7 +156,7 @@ namespace Kalitte.Trading
 
         //    if (mp == 0 && useLastPriceIfMissing)
         //    {
-        //        Algo.Log($"No price was found, used last price {lastMarketPrice}", LogLevel.Warning, t);
+        //        Log($"No price was found, used last price {lastMarketPrice}", LogLevel.Warning, t);
         //        mp = lastMarketPrice;
         //    }
         //    else lastMarketPrice = mp;
@@ -193,8 +172,8 @@ namespace Kalitte.Trading
         //        bars.Push(new Quote(val));
         //        if (useMyIndicators)
         //        {
-        //            Algo.Log($"i1k: {i1k.LastValue(mp)} i1:{i1.CurrentValue} mp: {mp}", LogLevel.Debug, t);
-        //            Algo.Log($"i2k: {i2k.LastValue(mp)} i2:{i2.CurrentValue} mp: {mp}", LogLevel.Debug, t);
+        //            Log($"i1k: {i1k.LastValue(mp)} i1:{i1.CurrentValue} mp: {mp}", LogLevel.Debug, t);
+        //            Log($"i2k: {i2k.LastValue(mp)} i2:{i2.CurrentValue} mp: {mp}", LogLevel.Debug, t);
         //        }
 
         //        var cross = bars.Cross(0);
@@ -208,18 +187,18 @@ namespace Kalitte.Trading
 
         //        lastEma = finalResult.HasValue ? 0 : lastEma;
 
-        //        Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
+        //        Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
 
-        //        //Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
+        //        //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
         //    }
-        //    else Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} no market price for {t}", LogLevel.Debug, t);
+        //    else Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} no market price for {t}", LogLevel.Debug, t);
 
 
 
 
         //    //if (lastCrossValue == 0 && cross !=  0) lastCrossValue = cross;
 
-        //    //Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
+        //    //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
         //    //if (lastCrossValue > 0 && ema > AvgChange) finalResult = OrderSide.Buy;
         //    //else if (lastCrossValue < 0 && ema < -AvgChange) finalResult = OrderSide.Sell;
 
@@ -227,7 +206,7 @@ namespace Kalitte.Trading
 
 
 
-        //    //Algo.Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
+        //    //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
         //    //var changedDirection = lastEma * 
 
 

@@ -25,10 +25,12 @@ namespace Kalitte.Trading.Indicators
             this.Trigger = new Ema(InputBars, signal);
         }
 
-        public override Quote CreateNewResultBar(IQuote newBar)
+        public override decimal NextValue(decimal newVal)
         {
             throw new NotImplementedException();
         }
+
+
 
         //public override decimal LastValue(decimal newValue)
         //{

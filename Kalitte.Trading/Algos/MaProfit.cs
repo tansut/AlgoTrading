@@ -217,34 +217,15 @@ namespace Kalitte.Trading.Algos
             if (!Simulation) CompleteInit();
         }
 
-        //public override void OnDataUpdate(BarDataEventArgs barDataEventArgs)
-        //{
-        //    var bd = barDataEventArgs.BarData;
-        //    //var bd = GetBarData(Symbol, SymbolPeriod);
-        //    //var last = bd.BarDataIndexer.LastBarIndex;
-        //    try
-        //    {
-        //        var newQuote = new Quote() { Date = bd.Dtime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-        //        bars.Push(newQuote);
-        //        Log($"Pushed from 2 new quote {newQuote.ToString()}", LogLevel.Debug);                
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log($"data update: {ex.Message}", LogLevel.Error, bd.Dtime);
-        //    }
-        //}
-
 
         public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
         {
 
             if (Simulation)
             {
-
                 var bd = barDataCurrentValues.LastUpdate;
                 var time = barDataCurrentValues.LastUpdate.DTime;
-
-                //if (simulationCount++ == 0) return;
+                
                 lock (this)
                 {
                     //if (simulationCount > 10) return;                                       
@@ -260,43 +241,15 @@ namespace Kalitte.Trading.Algos
                         bars.Clear();
                         foreach (var b in newBars.List) bars.Push(b);
 
+                        Log($"Bars initialized. Last bar is: {bars.List.Last()}", LogLevel.Debug, time);
+
                         CompleteInit();
                     }
 
-                    //var mp = GetMarketPrice(Symbol, time);
+                    var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
+                    bars.Push(newQuote);
 
-                    //if (mp == 0) mp = lastPrice;
-                    //else lastPrice = mp;
-
-                    try
-                    {
-                        var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                        bars.Push(newQuote);
-                        Log($"Pushed: { newQuote }");
-
-                        //Log($"parameter says time: {barDataCurrentValues.LastUpdate.DTime} isnew: {barDataCurrentValues.LastUpdate.IsNewBar} o:{barDataCurrentValues.LastUpdate.Open} h: {barDataCurrentValues.LastUpdate.High} l: {barDataCurrentValues.LastUpdate.Low} c:{barDataCurrentValues.LastUpdate.Close}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Log($"data update: {ex.Message}", LogLevel.Error, barDataCurrentValues.LastUpdate.DTime);
-                    }
-
-
-                    Log($"BAR-LAST: {bars.List.Last().Date}", LogLevel.Debug, time);
-                    Log($"EMA5-BAR: {bars.Ema(5).Last().Ema}", LogLevel.Debug, time);
-                    Log($"EMA9-BAR: {bars.Ema(9).Last().Ema}", LogLevel.Debug, time);
-                    Log($"MOV5BAR:{mov.Value[mov.LastBarIndex].Last().Value}", LogLevel.Debug, time);
-                    Log($"MOV9BAR:{mov2.Value[mov.LastBarIndex].Last().Value}", LogLevel.Debug, time);
-
-
-                    //Log($"MP: {mp}", LogLevel.Debug, time);
-                    //Log($"EMA5-current: {ma.i1k.LastValue(mp)}", LogLevel.Debug, time);
-                    //Log($"EMA9-current: {ma.i2k.LastValue(mp)}", LogLevel.Debug, time);
-                    //Log($"MOV5-current: {mov.CurrentValue}", LogLevel.Debug, time);
-                    //Log($"MOV9-current: {mov2.CurrentValue}", LogLevel.Debug, time);
-
-
-
+                    Log($"Current test bar: {bars.List.Last()}", LogLevel.Debug, time);
 
                     //foreach (var signal in signals)
                     //{
@@ -305,8 +258,6 @@ namespace Kalitte.Trading.Algos
                     //    var waitOthers = waitForOperationAndOrders("Backtest");
                     //}
 
-                    //if (simulationCount++ == 0) return;
-
                     var seconds = 60 * 10;
 
                     for (var i = 0; i < seconds; i++)
@@ -314,17 +265,12 @@ namespace Kalitte.Trading.Algos
                         var t = time.AddSeconds(i);
                         foreach (var signal in signals)
                         {
-                            //Log($"Checking signal {signal.Name} for {t}", LogLevel.Debug, t);
                             var result = signal.Check(t);
                             var waitOthers = waitForOperationAndOrders("Backtest");
                         }
                     }
-
-
                     simulationCount++;
-
                 }
-
             }
             else
             {
@@ -334,30 +280,19 @@ namespace Kalitte.Trading.Algos
                 {
                     var newQuote = new Quote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
                     bars.Push(newQuote);
-                    Log($"Pushed new quote {newQuote.ToString()}", LogLevel.Debug);
-                    //Log($"parameter says time: {barDataCurrentValues.LastUpdate.DTime} o:{barDataCurrentValues.LastUpdate.Open} h: {barDataCurrentValues.LastUpdate.High} l: {barDataCurrentValues.LastUpdate.Low} c:{barDataCurrentValues.LastUpdate.Close}");
+                    Log($"Pushed new quote: {newQuote.ToString()}", LogLevel.Debug, bd.BarDataIndexer[last]);                    
                 }
                 catch (Exception ex)
                 {
                     Log($"data update: {ex.Message}", LogLevel.Error, barDataCurrentValues.LastUpdate.DTime);
                 }
             }
-
         }
 
-        //public override decimal GetMarketPrice(string symbol, DateTime? t = null)
-        //{
-        //    if (Simulation && simulationCount == 0)
-        //    {
-        //        return bars.List.Last().Close;
-        //    }
-        //    return base.GetMarketPrice(symbol, t);
-        //}
+
 
         private Boolean waitForOperationAndOrders(string message)
         {
-            //Log($"Operations/orders waiting: { message}", LogLevel.Debug);
-
             var wait = Simulation ? 0 : 100;
             var result1 = operationWait.WaitOne(wait);
             var result2 = orderWait.WaitOne(wait);
@@ -532,7 +467,9 @@ namespace Kalitte.Trading.Algos
                 orderid = Simulation ? this.SendMarketOrder(symbol, quantity, side, icon) :
                 this.SendLimitOrder(symbol, quantity, side, limitPrice, icon, DateTime.Now.Hour >= 19);
             }
-            this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
+            var order = this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
+            order.Sent = t ?? DateTime.Now;
+
             Log($"Order created, waiting to complete. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info, t);
             if (this.UseVirtualOrders || this.AutoCompleteOrders) FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);
         }
@@ -552,7 +489,7 @@ namespace Kalitte.Trading.Algos
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-            Log($"Completed order: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Info, positionRequest.Time);
+            Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Info, positionRequest.Resulted);
             this.positionRequest = null;
             orderWait.Set();
         }
@@ -568,13 +505,14 @@ namespace Kalitte.Trading.Algos
 
                 if (this.positionRequest != null && this.positionRequest.Id == order.CliOrdID)
                 {
+                    this.positionRequest.Resulted = order.TradeDate;
                     if (Simulation)
                     {
-                        if (positionRequest.UnitPrice > 0)
+                        if (positionRequest.UnitPrice > 0 && positionRequest.UnitPrice != order.Price)
                         {
                             var gain = ((order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? 1 : -1) * positionRequest.Quantity);
                             simulationPriceDif += gain;
-                            Log($"Collected market price is {positionRequest.UnitPrice}, backtest market price: {order.Price} [{gain}]", LogLevel.Warning, positionRequest.Time);
+                            Log($"Filled price difference: Potential: {positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, positionRequest.Resulted);
                             //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
                         }
                         this.FillCurrentOrder(order.Price, this.positionRequest.Quantity);
@@ -600,7 +538,7 @@ namespace Kalitte.Trading.Algos
 
         private void CancelCurrentOrder(IOrder order)
         {
-            Log($"Order rejected/cancelled [{order.OrdStatus.Obj}]", LogLevel.Warning, this.positionRequest.Time);
+            Log($"Order rejected/cancelled [{order.OrdStatus.Obj}]", LogLevel.Warning, this.positionRequest.Created);
             this.positionRequest = null;
             orderWait.Set();
         }

@@ -82,6 +82,12 @@ namespace Kalitte.Trading
             //CheckCount = 0;
         }
 
+
+        public void Log(string message, LogLevel level, DateTime? t = null)
+        {
+            Algo.Log($"{this.Name}[{Thread.CurrentThread.ManagedThreadId}]: {message}", level, t);
+        }
+
         protected virtual void onTick(Object source, ElapsedEventArgs e)
         {
             var hasLock = false;
@@ -124,7 +130,7 @@ namespace Kalitte.Trading
                 return result;
             } catch (Exception ex)
             {
-                Algo.Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
+                Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
                 return new SignalResultX(this) {  finalResult = null };
             }
         }
@@ -144,7 +150,7 @@ namespace Kalitte.Trading
                 collectorTaskTokenSource.Token.ThrowIfCancellationRequested();                
                 while (!collectorTaskTokenSource.Token.IsCancellationRequested)
                 {                    
-                    //Algo.Log($"{this.Name }task doing {Simulation}");
+                    //Log($"{this.Name }task doing {Simulation}");
                     //if (!Simulation) Colllect();
                     Thread.Sleep(1000);
                 }
@@ -180,10 +186,10 @@ namespace Kalitte.Trading
             }
             catch (Exception ex)
             {
-                Algo.Log($"Error stop task {this.Name}. {ex.Message}");
+                Log($"Error stopping task {this.Name}. {ex.Message}", LogLevel.Error);
             }
 
-            Algo.Log($"{this.Name} stopped.");
+            Log($"Stopped.", LogLevel.Debug);
 
 
         }

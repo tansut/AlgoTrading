@@ -29,13 +29,12 @@ namespace Kalitte.Trading.Indicators
             return ResultBars;
         }
 
-        
 
-        public override Quote CreateNewResultBar(IQuote newBar)
-        {            
+        public override decimal NextValue(decimal newVal)
+        {
             var lastEma = (double)(ResultBars.List.Last().Close);
-            var ema = (decimal)InputBars.EmaNext((double)newBar.Close, lastEma, Periods);
-            return new Quote() { Date = newBar.Date, Close = ema };
+            var ema = (decimal)InputBars.EmaNext((double)newVal, lastEma, Periods);
+            return ema;
         }
 
         private void BarChanged(object sender, BarEvent e)

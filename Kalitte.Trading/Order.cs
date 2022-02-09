@@ -26,13 +26,15 @@ namespace Kalitte.Trading
 
     public class ExchangeOrder
     {
+        public DateTime Created { get; set; } 
+        public DateTime Sent { get; set; }
+        public DateTime Resulted { get; set; }
         public string Symbol;
         public string Id;
         public OrderSide Side;
         public decimal UnitPrice;
         public decimal Quantity;
         public string Comment;
-        public DateTime Time;
         public decimal ComissionRate = 0.0003M;
         public decimal FilledUnitPrice
         {
@@ -69,7 +71,7 @@ namespace Kalitte.Trading
             this.UnitPrice = unitPrice;
             this.Comment = comment;
             this.FilledUnitPrice = 0M;
-            this.Time = t ?? DateTime.Now;
+            this.Created = t ?? DateTime.Now;
         }
 
         public string SideStr

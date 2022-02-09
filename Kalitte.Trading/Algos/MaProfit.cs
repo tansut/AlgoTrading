@@ -38,7 +38,7 @@ namespace Kalitte.Trading.Algos
         //[SymbolParameter("F_XU0300222")]
         public string Symbol = "F_XU0300222";
 
-        //[Parameter(SymbolPeriod.Min10)]
+        [Parameter(SymbolPeriod.Min10)]
         public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
 
         [Parameter(2)]
@@ -63,8 +63,8 @@ namespace Kalitte.Trading.Algos
         public bool DoublePositions = true;
 
 
-        //[Parameter(false)]
-        public bool UseVirtualOrders = false;
+        [Parameter(true)]
+        public bool UseVirtualOrders = true;
 
         //[Parameter(false)]
         public bool AutoCompleteOrders = false;
@@ -96,11 +96,11 @@ namespace Kalitte.Trading.Algos
         [Parameter(9)]
         public int MACDLongPeriod = 9;
 
-        [Parameter(0.02)]
-        public decimal MacdAvgChange = 0.020M;
+        [Parameter(0.5)]
+        public decimal MacdAvgChange = 0.5M;
 
-        [Parameter(8)]
-        public int MacdPeriods = 8;
+        [Parameter(6)]
+        public int MacdPeriods = 6;
 
         [Parameter(3)]
         public int MACDTrigger = 3;
@@ -148,25 +148,32 @@ namespace Kalitte.Trading.Algos
             mdp.SaveDaily = true;
 
             bars = mdp.GetContentAsQuote(t);
-            var ema5 = new Ema(bars, MovPeriod);
-            var ema9 = new Ema(bars, MovPeriod2);
 
-            var macdi = new Macd(bars, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
+            if (MovPeriod > 0 && !SimulateOrderSignal)
+            {
+                var movema5 = new Ema(bars, MovPeriod);
+                var mov2ema9 = new Ema(bars, MovPeriod2);
 
-            var ma = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { AvgChange = MaAvgChange, Periods = MaPeriods };
+                var ma = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { AvgChange = MaAvgChange, Periods = MaPeriods };
 
-            ma.i1k = ema5;
-            ma.i2k = ema9;
+                ma.i1k = movema5;
+                ma.i2k = mov2ema9;
+
+                this.signals.Add(ma);
+            }
+            
+            if (MACDShortPeriod > 0 && !SimulateOrderSignal)
+            {
+                var macdi = new Macd(bars, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
 
 
+                var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { AvgChange = MacdAvgChange, Periods = MacdPeriods };
 
-            var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { AvgChange = MacdAvgChange, Periods = MacdPeriods };
-
-            macds.i1k = macdi;
-            macds.i2k = macdi.Trigger;
-
-            if (!SimulateOrderSignal && MovPeriod > 0) this.signals.Add(ma);
-            if (!SimulateOrderSignal && MACDShortPeriod > 0) this.signals.Add(macds);
+                //macds.i1k = macdi;
+                //macds.i2k = macdi.Trigger;
+                this.signals.Add(macds);
+            }
+            
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
             if (!SimulateOrderSignal && this.ProfitQuantity > 0 || this.LossQuantity > 0) this.signals.Add(new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity));
             if (!SimulateOrderSignal && RsiLong > 0 || RsiShort > 0) this.signals.Add(new RangeSignal("rsi", Symbol, this, rsi, RsiShort == 0 ? new decimal?() : RsiShort, RsiLong == 0 ? new decimal() : RsiLong) { Periods = 1 });
@@ -210,30 +217,48 @@ namespace Kalitte.Trading.Algos
             if (!Simulation) CompleteInit();
         }
 
+        //public override void OnDataUpdate(BarDataEventArgs barDataEventArgs)
+        //{
+        //    var bd = barDataEventArgs.BarData;
+        //    //var bd = GetBarData(Symbol, SymbolPeriod);
+        //    //var last = bd.BarDataIndexer.LastBarIndex;
+        //    try
+        //    {
+        //        var newQuote = new Quote() { Date = bd.Dtime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
+        //        bars.Push(newQuote);
+        //        Log($"Pushed from 2 new quote {newQuote.ToString()}", LogLevel.Debug);                
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log($"data update: {ex.Message}", LogLevel.Error, bd.Dtime);
+        //    }
+        //}
+
 
         public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
         {
 
             if (Simulation)
             {
+
+                var bd = barDataCurrentValues.LastUpdate;
+                var time = barDataCurrentValues.LastUpdate.DTime;
+
                 //if (simulationCount++ == 0) return;
                 lock (this)
                 {
-                    //if (simulationCount > 25) return;
-                    var time = barDataCurrentValues.LastUpdate.DTime;
-                    var bd = barDataCurrentValues.LastUpdate;
-
-                    //var ma = (CrossSignal)signals.First(p => p.Name == "cross:ma59");
+                    //if (simulationCount > 10) return;                                       
+                    var ma = (CrossSignal)signals.First(p => p.Name == "cross:ma59");
                     
                     if (!boolsSignalsStarted)
                     {
-                        //var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
-                        //mdp.FileName = "all.txt";
-                        //mdp.SaveDaily = true;
+                        var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
+                        mdp.FileName = "all.txt";
+                        mdp.SaveDaily = true;
 
-                        //var newBars = mdp.GetContentAsQuote(time);
-                        //bars.Clear();
-                        //foreach (var b in newBars.List) bars.Push(b);
+                        var newBars = mdp.GetContentAsQuote(time);
+                        bars.Clear();
+                        foreach (var b in newBars.List) bars.Push(b);
 
                         CompleteInit();
                     }
@@ -243,14 +268,25 @@ namespace Kalitte.Trading.Algos
                     //if (mp == 0) mp = lastPrice;
                     //else lastPrice = mp;
 
+                    try
+                    {
+                        var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
+                        bars.Push(newQuote);
+                        Log($"Pushed: { newQuote }");
+
+                        //Log($"parameter says time: {barDataCurrentValues.LastUpdate.DTime} isnew: {barDataCurrentValues.LastUpdate.IsNewBar} o:{barDataCurrentValues.LastUpdate.Open} h: {barDataCurrentValues.LastUpdate.High} l: {barDataCurrentValues.LastUpdate.Low} c:{barDataCurrentValues.LastUpdate.Close}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log($"data update: {ex.Message}", LogLevel.Error, barDataCurrentValues.LastUpdate.DTime);
+                    }
 
 
-
-                    //Log($"BAR-LAST: {bars.List.Last().Date}", LogLevel.Debug, time);
-                    //Log($"EMA5-BAR: {bars.Ema(5).Last()}", LogLevel.Debug, time);
-                    //Log($"EMA9-BAR: {bars.Ema(9).Last()}", LogLevel.Debug, time);
-                    //Log($"MOV5BAR:{mov.Value[mov.LastBarIndex].Last().Value}", LogLevel.Debug, time);
-                    //Log($"MOV9BAR:{mov2.Value[mov.LastBarIndex].Last().Value}", LogLevel.Debug, time);
+                    Log($"BAR-LAST: {bars.List.Last().Date}", LogLevel.Debug, time);
+                    Log($"EMA5-BAR: {bars.Ema(5).Last().Ema}", LogLevel.Debug, time);
+                    Log($"EMA9-BAR: {bars.Ema(9).Last().Ema}", LogLevel.Debug, time);
+                    Log($"MOV5BAR:{mov.Value[mov.LastBarIndex].Last().Value}", LogLevel.Debug, time);
+                    Log($"MOV9BAR:{mov2.Value[mov.LastBarIndex].Last().Value}", LogLevel.Debug, time);
 
 
                     //Log($"MP: {mp}", LogLevel.Debug, time);
@@ -284,21 +320,8 @@ namespace Kalitte.Trading.Algos
                         }
                     }
 
-                    //if (simulationCount != 1)
-                    //{
-                    //    var newBar = new Quote() { Date = time, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                    //    bars.Push(newBar);
-                    //    Log($"Pushed new bar. {bd.DTime} {bd.Open} {bd.High} {bd.Low} {bd.Close} {bd.Open}");
-                    //}
 
                     simulationCount++;
-
-                    //var bdclose = GetBarData(Symbol, SymbolPeriod);
-                    //var last = bdclose.BarDataIndexer.LastBarIndex;
-                    //bars.Push(new Quote() { Date = bdclose.BarDataIndexer[last], 
-                    //    High = bdclose.High[last], Close = bdclose.Close[last], 
-                    //    Low = bdclose.Low[last], Open = bdclose.Open[last], 
-                    //    Volume = bdclose.Volume[last] });
 
                 }
 
@@ -309,7 +332,10 @@ namespace Kalitte.Trading.Algos
                 var last = bd.BarDataIndexer.LastBarIndex;
                 try
                 {
-                    bars.Push(new Quote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] });
+                    var newQuote = new Quote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
+                    bars.Push(newQuote);
+                    Log($"Pushed new quote {newQuote.ToString()}", LogLevel.Debug);
+                    //Log($"parameter says time: {barDataCurrentValues.LastUpdate.DTime} o:{barDataCurrentValues.LastUpdate.Open} h: {barDataCurrentValues.LastUpdate.High} l: {barDataCurrentValues.LastUpdate.Low} c:{barDataCurrentValues.LastUpdate.Close}");
                 }
                 catch (Exception ex)
                 {

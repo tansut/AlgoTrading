@@ -11,23 +11,69 @@ namespace Kalitte.Trading.Indicators
     public class Ema : IndicatorBase
     {
         public int Periods { get; set; }
+        
 
         public Ema(Bars bars, int periods) : base(bars)
         {
             this.Periods = periods;
+            bars.BarEvent += BarChanged;
+            ResultBars = InputBars.Count < Periods ? new Bars(): createResult();
         }
 
-        public override List<decimal> Values
+
+        private Bars createResult()
         {
-            get
+            ResultBars = new Bars();
+            var result = InputBars.Ema(Periods);
+            result.ForEach(r => ResultBars.Push(new Quote() { Date = r.Date, Close = r.Ema ?? 0 }));
+            return ResultBars;
+        }
+
+        
+
+        public override Quote CreateNewResultBar(IQuote newBar)
+        {            
+            var lastEma = (double)(ResultBars.List.Last().Close);
+            var ema = (decimal)InputBars.EmaNext((double)newBar.Close, lastEma, Periods);
+            return new Quote() { Date = newBar.Date, Close = ema };
+        }
+
+        private void BarChanged(object sender, BarEvent e)
+        {
+            if (e.Action == BarActions.Cleared)
             {
-                return Bars.Ema(Periods);
+                ResultBars = new Bars();
+
+            } else if (HasResult)
+            {
+                if (e.Action == BarActions.BarCreated)
+                {
+                    var ema = new EmaResult() { Date = e.Item.Date };
+                    var close = (double)(e.Item.Close);
+                    var lastEma = (double)(ResultBars.List.Last().Close);
+                    ema.Ema = (decimal)InputBars.EmaNext(close, lastEma, Periods);
+                    ResultBars.Push(new Quote() { Date = ema.Date, Close = ema.Ema ?? 0 });
+                }
+
+                else if (e.Action == BarActions.BarRemoved)
+                {
+                    ResultBars = createResult();
+                }
             }
+            else ResultBars = createResult();
         }
 
-        public override decimal LastValue(decimal newValue)
-        {
-            return Bars.EmaNext(newValue, Bars.Ema(Periods).Last(), Periods);
-        }
+        //public override List<decimal> Values
+        //{
+        //    get
+        //    {
+        //        return Bars.Ema(Periods);
+        //    }
+        //}
+
+        //public override decimal LastValue(decimal newValue)
+        //{
+        //    return Bars.EmaNext(newValue, Bars.Ema(Periods).Last(), Periods);
+        //}
     }
 }

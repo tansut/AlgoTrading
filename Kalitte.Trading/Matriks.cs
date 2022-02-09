@@ -29,6 +29,11 @@ namespace Matriks.Lean.Algotrader
 
     }
 
+    public class MaAlg2 : Kalitte.Trading.Algos.MaProfit
+    {
+
+    }
+
     public class backtest : Kalitte.Trading.Algos.MaProfit
     {
         public override void OnInit()

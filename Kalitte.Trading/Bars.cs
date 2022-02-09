@@ -28,6 +28,11 @@ namespace Kalitte.Trading
         public decimal Close { get; set; }
         public decimal Volume { get; set; }
 
+        public override string ToString()
+        {
+            return $"d: {Date}, o:{Open}, h: {High}, l: {Low}, c: {Close}";
+        }
+
         public Quote()
         {
 
@@ -45,12 +50,59 @@ namespace Kalitte.Trading
         }
     }
 
+    public enum BarActions
+    {
+        BarCreated = 1,
+        BarRemoved = 2,
+        Cleared = 4
+    }
+
+    public class BarEvent
+    {
+        public BarActions Action { get; set; }
+        public IQuote Item { get; set; }
+    }
+
+    public enum CandlePart
+    {
+        Open,
+        High,
+        Low,
+        Close,
+        Volume,
+        HL2
+    }
+
+    public interface IResult
+    {
+        DateTime Date { get; }
+    }
+
+    public class EmaResult : ResultBase
+    {
+        public decimal? Ema { get; set; }
+    }
+
+    [Serializable]
+    public abstract class ResultBase : IResult
+    {
+        public DateTime Date { get; set; }
+    }
+
+    [Serializable]
+    internal class BasicD
+    {
+        internal DateTime Date { get; set; }
+        internal double Value { get; set; }
+    }
+
     public class Bars
     {
+        public event EventHandler<BarEvent> BarEvent;
         private Queue<IQuote> data;
         public int Size { get; private set; } = 0;
         private int timeOut = -1;
-        public OHLC Ohlc { get; set; } = OHLC.Close;
+        public CandlePart Ohlc { get; set; } = CandlePart.Close;
 
         public int DefaultLookback { get; set; }
 
@@ -65,8 +117,41 @@ namespace Kalitte.Trading
         }
 
         public Bars(IEnumerable<Quote> init)
-        {        
+        {
             data = new Queue<IQuote>(init);
+        }
+
+         List<BasicD> ConvertToBasic()    
+        {
+            var res = new List<BasicD>();
+            try
+            {
+                rwl.AcquireReaderLock(timeOut);
+                
+
+                foreach (var item in this.data)
+                {
+                    decimal val = 0;
+                    switch (Ohlc)
+                    {
+                        case CandlePart.Close: val = item.Close; break;
+                        case CandlePart.Volume: val = item.Volume; break;
+                        case CandlePart.Open: val = item.Open; break;
+                        case CandlePart.High: val = item.High;break;
+                        case CandlePart.Low: val = item.Low;break;
+
+                    }
+
+                    res.Add(new BasicD() { Date = item.Date, Value = (double)val });
+                }
+            } finally
+            {
+                rwl.ReleaseReaderLock();
+            }
+            
+
+
+            return res.OrderBy(x => x.Date).ToList();
         }
 
         public IQuote[] List
@@ -86,6 +171,23 @@ namespace Kalitte.Trading
             }
         }
 
+        public IQuote Latest
+        {
+            get
+            {
+
+                rwl.AcquireReaderLock(timeOut);
+                try
+                {
+                    return data.Last();
+                }
+                finally
+                {
+                    rwl.ReleaseReaderLock();
+                }
+            }
+        }
+
 
         public decimal[] Values
         {
@@ -95,17 +197,20 @@ namespace Kalitte.Trading
                 rwl.AcquireReaderLock(timeOut);
                 try
                 {
-                    return data.Select(p => { switch (Ohlc)
+                    return data.Select(p =>
+                    {
+                        switch (Ohlc)
                         {
-                            case OHLC.Close: return p.Close;
-                                case OHLC.Volume: return p.Volume;
-                                case OHLC.Open: return p.Open;
-                                case OHLC.High: return p.High;
-                                case OHLC.Low: return p.Low;
-                                default : return 0;
+                            case CandlePart.Close: return p.Close;
+                            case CandlePart.Volume: return p.Volume;
+                            case CandlePart.Open: return p.Open;
+                            case CandlePart.High: return p.High;
+                            case CandlePart.Low: return p.Low;                                
+                            default: return 0;
 
-                        } }).ToArray();
-                    
+                        }
+                    }).ToArray();
+
                 }
                 finally
                 {
@@ -119,7 +224,6 @@ namespace Kalitte.Trading
         {
             get
             {
-
                 rwl.AcquireReaderLock(timeOut);
                 try
                 {
@@ -143,12 +247,12 @@ namespace Kalitte.Trading
             {
                 if (Size > 0 && data.Count == Size)
                 {
-                    data.Dequeue();
-                    //EmaResults.RemoveAt(0);
+                    var item = data.Dequeue();
+                    if (BarEvent != null) BarEvent(this, new Trading.BarEvent() { Action = BarActions.BarRemoved, Item = item });
                 }
                 data.Enqueue(quote);
-                //var current = data.Dequeue();
-                //EmaResults.Add(EmaNext(quote.Close, 0, DefaultLookback));
+                if (BarEvent != null) BarEvent(this, new Trading.BarEvent() { Action = BarActions.BarCreated, Item = quote });
+
             }
             finally
             {
@@ -163,7 +267,7 @@ namespace Kalitte.Trading
             try
             {
                 data.Clear();
-                //EmaResults.Clear();
+                if (BarEvent != null) BarEvent(this, new Trading.BarEvent() { Action = BarActions.Cleared, Item = null });
             }
             finally
             {
@@ -174,74 +278,127 @@ namespace Kalitte.Trading
 
 
 
-        public decimal EmaNext(decimal price, decimal lastEma, int lookbackPeriods)
+        public double EmaNext(double price, double lastEma, int lookbackPeriods)
         {
             double k = 2D / (lookbackPeriods + 1);
-            double ema = (double)lastEma + (k * ((double)price - (double)lastEma));
-            return (decimal)ema;
+            double ema = lastEma + (k * (price - lastEma));
+            return ema;
         }
 
-        public List<decimal> Ema(int lookbackPeriods = 0)
-        {
-            List<decimal> emaArray = new List<decimal>();
-            double k = 2D / (lookbackPeriods + 1);
-            var data = Values;
 
-            if (lookbackPeriods <= 0) lookbackPeriods = data.Length;
 
-            int initPeriods = Math.Min(lookbackPeriods, data.Length);
 
-            double lastEma = 0;
+
+
+        public List<EmaResult> Ema(int lookbackPeriods)
+        {            
+            int length = this.Count;
+            var results = new List<EmaResult>(length);
+            List<BasicD> bdList = ConvertToBasic();
+
+            double k = 2d / (lookbackPeriods + 1);
+            double? lastEma = 0;
+            int initPeriods = Math.Min(lookbackPeriods, length);
 
             for (int i = 0; i < initPeriods; i++)
             {
-                lastEma += (double)data[i];
+                lastEma += bdList[i].Value;
             }
 
             lastEma /= lookbackPeriods;
 
-            decimal result = 0;
-
-            for (var i = 0; i < data.Length; i++)
+            // roll through quotes
+            for (int i = 0; i < length; i++)
             {
+                BasicD h = bdList[i];
                 int index = i + 1;
+
+                EmaResult result = new EmaResult()
+                {
+                    Date = h.Date
+                };
 
                 if (index > lookbackPeriods)
                 {
-                    result = EmaNext(data[i], (decimal)lastEma, lookbackPeriods); // + (k * ((double)data[i] - lastEma));
-                    //result = (decimal)ema;
-                    lastEma = (double)result;
+                    double? ema = EmaNext(h.Value, lastEma.Value, lookbackPeriods);// lastEma + (k * (h.Value - lastEma));
+                    result.Ema = (decimal?)ema;
+                    lastEma = ema;
                 }
                 else if (index == lookbackPeriods)
                 {
-                    result = (decimal)lastEma;
+                    result.Ema = (decimal?)lastEma;
                 }
 
-                emaArray.Add(result);
+                results.Add(result);
             }
+
+            return results;
+
+
+            //var emaArray = new List<EmaResult>();
+            //double k = 2D / (lookbackPeriods + 1);
+            //var data = Values;
+
+            //if (lookbackPeriods <= 0) lookbackPeriods = data.Length;
+
+            //int initPeriods = Math.Min(lookbackPeriods, data.Length);
+
+            //double? lastEma = 0;
+
+            //for (int i = 0; i < initPeriods; i++)
+            //{
+            //    lastEma += (double)data[i];
+            //}
+
+            //lastEma /= lookbackPeriods;
+
+            //decimal? result = null;
+
+            //for (var i = 0; i < data.Length; i++)
+            //{
+            //    int index = i + 1;
+
+            //    var result = new EmaResult()
+            //    {
+            //        Date = h.Date
+            //    };
+
+            //    if (index > lookbackPeriods)
+            //    {
+            //        result = EmaNext(data[i], (decimal)lastEma, lookbackPeriods); // + (k * ((double)data[i] - lastEma));
+            //        //result = (decimal)ema;
+            //        lastEma = (double)result;
+            //    }
+            //    else if (index == lookbackPeriods)
+            //    {
+            //        result = (decimal)lastEma;
+            //    }
+
+            //    emaArray.Add(result);
+        }
 
             //EmaResults = emaArray;
 
-            return emaArray;
-        }
+            //return emaArray;
+        //}
 
 
 
 
-        public decimal Cross(decimal baseVal)
+    public decimal Cross(decimal baseVal)
+    {
+        var list = Values;
+        var i = list.Length;
+
+        while (--i >= 1)
         {
-            var list = Values;
-            var i = list.Length;
-
-            while (--i >= 1)
-            {
-                decimal cdif = list[i] - baseVal;
-                decimal pdif = list[i - 1] - baseVal;
-                if (cdif > 0 && pdif < 0) return cdif;
-                else if (cdif < 0 && pdif > 0) return cdif;
-            }
-            return 0;
+            decimal cdif = list[i] - baseVal;
+            decimal pdif = list[i - 1] - baseVal;
+            if (cdif > 0 && pdif < 0) return cdif;
+            else if (cdif < 0 && pdif > 0) return cdif;
         }
-
+        return 0;
     }
+
+}
 }

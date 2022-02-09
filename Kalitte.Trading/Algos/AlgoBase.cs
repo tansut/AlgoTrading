@@ -47,7 +47,7 @@ namespace Kalitte.Trading.Algos
         public AlgoBase()
         {
             if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
-            this.InstanceName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (new Random().Next(100000000));
+            this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (new Random().Next(100000000));
             //logStream = new FileStream(LogFile, FileMode.Create, FileAccess.Write, FileShare.Read, 4096);
             
         }
@@ -131,9 +131,6 @@ namespace Kalitte.Trading.Algos
             var price = this.GetMarketData(symbol, SymbolUpdateField.Last);
             return price;
         }
-
-
-
 
     }
 

@@ -14,9 +14,33 @@ public class Program
 
     public static void Main()
     {
+
+        var b1 = new Bars(5);
+
+        var e5 = new Ema(b1, 5);
+
+        b1.Push(new Quote(0.5448457542630377619258446M));
+        b1.Push(new Quote(0.5448457542630377619258446M));
+        b1.Push(new Quote(0.5448457542630377619258446M));
+        b1.Push(new Quote(0.5448457542630377619258446M));
+        b1.Push(new Quote(0.5448457542630377619258446M));
+
+        var res = b1.Ema(4);
+
+        
+
+
         var mdp = new MarketDataFileLogger("F_XU0300222", @"c:\kalitte\log", "Min10");
         mdp.SaveDaily = true;
+        mdp.FileName = "history.txt";
         var bars = mdp.GetContentAsQuote(DateTime.Now);
+
+        var mdp2 = new MarketDataFileLogger("F_XU0300222", @"c:\kalitte\log", "Min10");
+        mdp2.SaveDaily = true;
+        mdp2.FileName = "new.txt";
+
+        var newBars = mdp2.GetContentAsQuote(DateTime.Now);
+
         var ema5 = new Ema(bars, 5);
         var ema9 = new Ema(bars, 9);
 
@@ -24,13 +48,21 @@ public class Program
         var em5list = bars.Ema(5);// string.Join(",", bars.Ema(5).Select(p => p.ToString()));
         var em9list = bars.Ema(9);// string.Join(",", bars.Ema(9).Select(p => p.ToString()));
 
-
-        for (var i = 0; i < ema5.Bars.List.Length; i++)
+        for (var i = 0; i < newBars.Count; i++)
         {
-            Console.WriteLine($"{ ema5.Bars.List[i].Date} { ema5.Bars.List[i].Close} {em5list[i]}");
+            bars.Push(newBars.List[i]);
+            Console.WriteLine($"EMA5: { ema5.InputBars.List.Last().Date}  {ema5.ResultBars.List.Last().Close}");
+            Console.WriteLine($"EMA9: { ema9.InputBars.List.Last().Date}  {ema9.ResultBars.List.Last().Close}");
         }
 
-        Console.WriteLine(ema5.LastValue(2500));
+
+        //for (var i = 0; i < ema5.Bars.List.Length; i++)
+        //{
+        //    Console.WriteLine($"EMA5: { ema5.Bars.List[i].Date}  {em5list[i].Ema}");
+        //    Console.WriteLine($"EMA9: { ema9.Bars.List[i].Date}  {em9list[i].Ema}");
+        //}
+
+        //Console.WriteLine(ema5.LastValue(2500));
 
 
 
@@ -55,7 +87,7 @@ public class Program
         Console.WriteLine(list);
 
 
-        Console.WriteLine(bars.Ema().Last());
+        Console.WriteLine(bars.Ema(9).Last());
         Console.WriteLine(bars.Cross(6));
         Console.WriteLine(bars.Cross(12));
         Console.WriteLine(bars.Cross(13));

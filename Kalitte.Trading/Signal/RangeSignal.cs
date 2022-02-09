@@ -82,13 +82,13 @@ namespace Kalitte.Trading
 
             if (bars.Count >= Periods)
             {
-                var ema = bars.Ema().Last();
-                if (Min.HasValue && ema < Min.Value)
+                var ema = bars.Ema(Periods - 1).Last();
+                if (Min.HasValue && ema.Ema.Value < Min.Value)
                 {
                     result = OrderSide.Buy;
                     status = RangeStatus.BelowMin;
                 }
-                else if (Max.HasValue && ema > Max.Value)
+                else if (Max.HasValue && ema.Ema.Value > Max.Value)
                 {
                     result = OrderSide.Sell;
                     status = RangeStatus.AboveHigh;

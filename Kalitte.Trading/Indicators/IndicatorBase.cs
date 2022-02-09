@@ -18,18 +18,23 @@ namespace Kalitte.Trading.Indicators
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
 
-        public Bars Bars { get; }
+        public Bars InputBars { get; }
+        public Bars ResultBars { get; set; } = null;
+
+        public bool HasResult => ResultBars.Count > 0 && ResultBars.List.Last().Close > 0;
 
         public IndicatorBase(Bars bars)
         {
             //this.Algo = Algo;
-            Bars = bars;
+            InputBars = bars;
         }
 
-        public abstract List<decimal> Values
-        {
-            get;
-        }
-        public abstract decimal LastValue(decimal newValue);
+        public abstract Quote CreateNewResultBar(IQuote newBar);
+
+        //public abstract List<decimal> Values
+        //{
+        //    get;
+        //}
+        //public abstract decimal LastValue(decimal newValue);
     }
 }

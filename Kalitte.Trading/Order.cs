@@ -35,11 +35,12 @@ namespace Kalitte.Trading
         public decimal UnitPrice;
         public decimal Quantity;
         public string Comment;
-        public decimal ComissionRate = 0.0003M;
+        public decimal ComissionRate = 0.00015M;
         public decimal FilledUnitPrice
         {
             get; set;
         }
+
         public decimal FilledQuantity
         {
             get; set;

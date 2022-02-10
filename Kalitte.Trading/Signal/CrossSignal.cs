@@ -20,7 +20,7 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Kalitte.Trading.Indicators;
 
 namespace Kalitte.Trading
 {
@@ -31,13 +31,13 @@ namespace Kalitte.Trading
         public IIndicator i2 = null;
 
 
-        public Kalitte.Trading.Indicators.IndicatorBase i1k;
-        public Kalitte.Trading.Indicators.IndicatorBase i2k;
+        public ITradingIndicator i1k;
+        public ITradingIndicator i2k;
 
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
-        private Bars differenceBars;
-        private Bars priceBars;
+        private PriceBars differenceBars;
+        private PriceBars priceBars;
 
         bool useMyIndicators = false;
         bool useLastPriceIfMissing = true;
@@ -56,8 +56,8 @@ namespace Kalitte.Trading
 
         public override void Start()
         {
-            differenceBars = new Bars(Periods);
-            priceBars = new Bars(2);
+            differenceBars = new PriceBars(Periods);
+            priceBars = new PriceBars(2);
             base.Start();
             Log($"Started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}", LogLevel.Info);
         }
@@ -77,7 +77,7 @@ namespace Kalitte.Trading
 
             if (mp == 0)
             {
-                mp = i1k.InputBars.Latest.Close;
+                mp = i1k.InputBars.Last.Close;
                 Log($"Used last close bar price { mp } since market price is unavailable.", LogLevel.Warning, t);
             }
             decimal i1Val = i1.CurrentValue, i2Val = i2.CurrentValue;
@@ -94,7 +94,7 @@ namespace Kalitte.Trading
             //if (Math.Abs(ldif - idif) > 0.2M)
             //{
             //Log("-- Too much indicator difference between us and matrix --", LogLevel.Debug, t);
-                Log($"Bardata: {i1k.InputBars.Latest}", LogLevel.Debug, t);
+                Log($"Bardata: {i1k.InputBars.Last}", LogLevel.Debug, t);
                 Log($"Currents: my1: {l1}  i1: {i1Val} my2: {l2} l2: {i2Val}", LogLevel.Debug, t);
                 Log($"Difs: mp:{mp}  ldif: {ldif} idif: {idif} diff: {ldif - idif}", LogLevel.Debug, t);
             //}
@@ -106,7 +106,7 @@ namespace Kalitte.Trading
 
                 if (lastCross == 0 && cross != 0) lastCross = cross;
 
-                Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
+                
                 if (lastCross > 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
                 else if (lastCross < 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
 

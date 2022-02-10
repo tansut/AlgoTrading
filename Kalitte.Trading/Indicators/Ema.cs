@@ -8,54 +8,57 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Indicators
 {
-    public class Ema : IndicatorBase
+
+
+
+    public class Ema : TradingIndicator<EmaResult>
     {
         public int Periods { get; set; }
         
 
-        public Ema(Bars bars, int periods) : base(bars)
+        public Ema(PriceBars bars, int periods) : base(bars)
         {
             this.Periods = periods;
-            bars.BarEvent += BarChanged;
-            ResultBars = new Bars();
+            bars.ListEvent += BarChanged;            
             if (InputBars.Count >= Periods)  createResult();
         }
 
+        public bool HasResult => Results.Count > 0 && Results.Last.Ema.HasValue;
 
-        private Bars createResult()
+
+        private void createResult()
         {
-            ResultBars.Clear();
+            Results.Clear();
             var result = InputBars.Ema(Periods);
-            result.ForEach(r => ResultBars.Push(new Quote() { Date = r.Date, Close = r.Ema ?? 0 }));
-            return ResultBars;
+            result.ForEach(r => Results.Push(new EmaResult() {  Date = r.Date, Ema = r.Ema}));
         }
 
 
         public override decimal NextValue(decimal newVal)
         {
-            var lastEma = (double)(ResultBars.List.Last().Close);
+            var lastEma = (double)(Results.Last.Ema);
             var ema = (decimal)InputBars.EmaNext((double)newVal, lastEma, Periods);
             return ema;
         }
 
-        private void BarChanged(object sender, BarEvent e)
+        private void BarChanged(object sender, ListEventArgs<IQuote> e)
         {
-            if (e.Action == BarActions.Cleared)
+            if (e.Action == ListAction.Cleared)
             {
-                ResultBars.Clear();
+                Results.Clear();
 
             } else if (HasResult)
             {
-                if (e.Action == BarActions.BarCreated)
+                if (e.Action == ListAction.ItemAdded)
                 {
                     var ema = new EmaResult() { Date = e.Item.Date };
                     var close = (double)(e.Item.Close);
-                    var lastEma = (double)(ResultBars.List.Last().Close);
+                    var lastEma = (double)(Results.Last.Ema);
                     ema.Ema = (decimal)InputBars.EmaNext(close, lastEma, Periods);
-                    ResultBars.Push(new Quote() { Date = ema.Date, Close = ema.Ema ?? 0 });
+                    Results.Push(new EmaResult() { Date = ema.Date, Ema = ema.Ema });
                 }
 
-                else if (e.Action == BarActions.BarRemoved)
+                else if (e.Action == ListAction.ItemRemoved)
                 {
                     createResult();
                 }

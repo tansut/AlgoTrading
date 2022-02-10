@@ -154,11 +154,11 @@ namespace Kalitte.Trading
     public class MarketDataFileLogger : FileLogger
     {
 
-        public Bars GetContentAsQuote(DateTime t)
+        public PriceBars GetContentAsQuote(DateTime t)
         {
             var file = GetFileName(t);
             var content = GetContent(file);
-            var result = new Bars();
+            var result = new PriceBars();
 
 
             foreach (var line in content)

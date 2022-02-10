@@ -51,10 +51,10 @@ namespace Kalitte.Trading.Algos
         public int MovPeriod2 = 9;
 
 
-        [Parameter(0.2)]
+        [Parameter(0.25)]
         public decimal MaAvgChange = 0.1M;
 
-        [Parameter(8)]
+        [Parameter(30)]
         public int MaPeriods = 8;
 
 
@@ -78,10 +78,10 @@ namespace Kalitte.Trading.Algos
         [Parameter(0)]
         public decimal LossQuantity = 0;
 
-        //[Parameter(9)]
+        [Parameter(9)]
         public decimal ProfitPuan = 9;
 
-        //[Parameter(9)]
+        [Parameter(9)]
         public decimal LossPuan = 9;
 
         //[Parameter(0)]
@@ -105,10 +105,10 @@ namespace Kalitte.Trading.Algos
         [Parameter(3)]
         public int MACDTrigger = 3;
 
-        //[Parameter(false)]
+        [Parameter(false)]
         public bool AlwaysGetProfit = false;
 
-        //[Parameter(false)]
+        [Parameter(false)]
         public bool AlwaysStopLoss = false;
 
         MOV mov;
@@ -119,7 +119,7 @@ namespace Kalitte.Trading.Algos
         //Ema ema5;
         //Ema ema9;
 
-        Bars bars = null;
+        PriceBars bars = null;
 
         decimal simulationPriceDif = 0;
 
@@ -265,10 +265,6 @@ namespace Kalitte.Trading.Algos
                         CompleteInit();
                     }
 
-                    var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                    bars.Push(newQuote);
-
-                    Log($"Current test bar: {bars.List.Last()}", LogLevel.Debug, time);
 
                     //foreach (var signal in signals)
                     //{
@@ -290,6 +286,10 @@ namespace Kalitte.Trading.Algos
                     }
                     simulationCount++;
                 }
+                var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
+                bars.Push(newQuote);
+                Log($"Pushed new bar, current bar is: {bars.Last}", LogLevel.Debug, time);
+
             }
             else
             {
@@ -576,7 +576,7 @@ namespace Kalitte.Trading.Algos
         {
             //orderTimer.Stop();
             signals.ForEach(p => p.Stop());
-            Log($"Completed Algo.\n {printPortfolio()}");
+            Log($"Completed Algo.\n {printPortfolio()}",  LogLevel.Info);
             if (Simulation) Process.Start(LogFile);
         }
     }

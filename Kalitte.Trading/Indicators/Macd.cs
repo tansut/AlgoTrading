@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Indicators
 {
-    public class Macd : IndicatorBase
+    public class Macd : TradingIndicator<MacdResult>
     {
         public int Short { get; set; }
         public int Long { get; set; }
@@ -20,55 +20,53 @@ namespace Kalitte.Trading.Indicators
         public Ema Trigger { get; set; }
 
 
-        public Macd(Bars bars, int shortp, int longp, int signal) : base(bars)
+        public Macd(PriceBars bars, int shortp, int longp, int signal) : base(bars)
         {
             this.Short = shortp;
             this.Long = longp;
             this.Signal = signal;
             this.EMa1 = new Ema(InputBars, shortp);
-            this.EMa2 = new Ema(InputBars, longp);
-            
-            ResultBars = new Bars();
+            this.EMa2 = new Ema(InputBars, longp);                       
             if (InputBars.Count >= longp) createResult();
-            this.InputBars.BarEvent += InputBars_BarEvent;
-
-
-
-            this.Trigger = new Ema(ResultBars, signal);
+            this.InputBars.ListEvent += InputBars_BarEvent;
+            //this.Trigger = new Ema(Results, signal);
         }
 
-        private Bars createResult()
+        private void createResult()
         {
-            ResultBars.Clear();
-            for (var i = 0; i < EMa1.ResultBars.Count; i++)
+            Results.Clear();
+            for (var i = 0; i < EMa1.Results.Count; i++)
             {
-                var data1 = EMa1.ResultBars.List;
-                var data2 = EMa2.ResultBars.List;
-                ResultBars.Push(new Quote(data1[i].Date, data1[i].Close - data2[i].Close));
+                var data1 = EMa1.Results.List;
+                var data2 = EMa2.Results.List;
+                Results.Push(new MacdResult() { 
+                    Date = data1[i].Date, 
+                    FastEma = data1[i].Ema, SlowEma = data2[i].Ema, Macd = data1[i].Ema.HasValue && data2[i].Ema.HasValue ? data1[i].Ema - data2[i].Ema: null  });
             }
 
-            return ResultBars;
         }
 
-        private void InputBars_BarEvent(object sender, BarEvent e)
-        {
-            if (e.Action == BarActions.Cleared)
-            {
-                ResultBars.Clear();
+        public bool HasResult => Results.Count > 0 && Results.Last.FastEma.HasValue && Results.Last.SlowEma.HasValue;
 
+
+        private void InputBars_BarEvent(object sender, ListEventArgs<IQuote> e)
+        {
+            if (e.Action == ListAction.Cleared)
+            {
+                Results.Clear();
             }
             else if (HasResult)
             {
-                if (e.Action == BarActions.BarCreated && EMa2.HasResult)
+                if (e.Action == ListAction.ItemAdded && EMa2.HasResult)
                 {
-                    ResultBars.Push(new Quote()
+                    Results.Push(new MacdResult()
                     {
-                        Date = EMa1.ResultBars.Latest.Date,
-                        Close = (EMa1.ResultBars.Latest.Close - EMa2.ResultBars.Latest.Close)
+                        Date = EMa1.Results.Last.Date,
+                        Macd = EMa1.Results.Last.Ema - EMa2.Results.Last.Ema
                     });
                 }
 
-                else if (e.Action == BarActions.BarRemoved)
+                else if (e.Action == ListAction.ItemRemoved)
                 {
                     createResult();
                 }
@@ -82,23 +80,5 @@ namespace Kalitte.Trading.Indicators
             var em2 = EMa2.NextValue(newVal);
             return em1 - em2;
         }
-
-
-
-        //public override decimal LastValue(decimal newValue)
-        //{
-        //    lock(this)
-        //    {
-        //        var em1 = Bars.Ema(Short);
-        //        var em2 = Bars.Ema(Long);
-        //        var difs = new Bars();
-        //        var data = Bars.List;
-        //        for (int i = 0; i < em1.Count; i++) difs.Push(new Quote(data[i].Date, em1[i] - em2[i]));
-        //        return Bars.EmaNext(newValue, difs.Ema(Long).Last(), Long);
-        //        //return difs.Ema(Signal)
-
-        //    }
-        //    //return Bars.EmaNext(newValue, Bars.Ema(Periods).Last(), Periods);
-        //}
     }
 }

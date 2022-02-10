@@ -7,7 +7,14 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Indicators
 {
-    public abstract class IndicatorBase
+
+    public interface ITradingIndicator
+    {
+        PriceBars InputBars { get; }
+        abstract decimal NextValue(decimal newVal);
+    }
+
+    public abstract class TradingIndicator<R>: ITradingIndicator where R: ResultBase
     {
         protected System.Timers.Timer _timer = null;
         private static object _locker = new object();
@@ -18,23 +25,18 @@ namespace Kalitte.Trading.Indicators
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
 
-        public Bars InputBars { get; }
-        public Bars ResultBars { get; set; } = null;
+        public PriceBars InputBars { get; }
+        public FinanceList<R> Results { get; set; } = null;
 
-        public bool HasResult => ResultBars.Count > 0 && ResultBars.List.Last().Close > 0;
+        
 
-        public IndicatorBase(Bars bars)
+        public TradingIndicator(PriceBars bars, FinanceList<R> initialResults = null)
         {
             //this.Algo = Algo;
             InputBars = bars;
+            Results = initialResults == null ? new FinanceList<R>(0, null): initialResults;
         }
 
         public abstract decimal NextValue(decimal newVal);
-
-        //public abstract List<decimal> Values
-        //{
-        //    get;
-        //}
-        //public abstract decimal LastValue(decimal newValue);
     }
 }

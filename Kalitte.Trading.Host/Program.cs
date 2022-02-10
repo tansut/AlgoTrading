@@ -15,7 +15,7 @@ public class Program
     public static void Main()
     {
 
-        var b1 = new Bars(5);
+        var b1 = new PriceBars(5);
 
         
 
@@ -39,22 +39,43 @@ public class Program
         mdp2.SaveDaily = true;
         mdp2.FileName = "new.txt";
 
+        var mdp3 = new MarketDataFileLogger("F_XU0300222", @"c:\kalitte\log", "Min10");
+        mdp3.SaveDaily = true;
+        mdp3.FileName = "test.txt";
+
+        var mdp4 = new MarketDataFileLogger("F_XU0300222", @"c:\kalitte\log", "Min10");
+        mdp4.SaveDaily = true;
+        mdp4.FileName = "all.txt";
+
+        var testBars = mdp3.GetContentAsQuote(DateTime.Now);
         var newBars = mdp2.GetContentAsQuote(DateTime.Now);
+        var allBars = mdp4.GetContentAsQuote(DateTime.Now);
 
         var ema5 = new Ema(bars, 5);
-        var ema9 = new Ema(bars, 9);
+        //var ema9 = new Ema(bars, 9);
         var macd = new Macd(bars, 5, 9, 3);
 
 
-        var em5list = bars.Ema(5);// string.Join(",", bars.Ema(5).Select(p => p.ToString()));
-        var em9list = bars.Ema(9);// string.Join(",", bars.Ema(9).Select(p => p.ToString()));
+        //var em5list = bars.Ema(5);// string.Join(",", bars.Ema(5).Select(p => p.ToString()));
+        //var em9list = bars.Ema(9);// string.Join(",", bars.Ema(9).Select(p => p.ToString()));
+
+        var list = newBars.List;
 
         for (var i = 0; i < newBars.Count; i++)
         {
-            bars.Push(newBars.List[i]);
-            Console.WriteLine($"EMA5: { ema5.InputBars.Last.Date}  {ema5.ResultBars.Last.Close}");
-            Console.WriteLine($"EMA9: { ema9.InputBars.Last.Date}  {ema9.ResultBars.Last.Close}");
-            Console.WriteLine($"MACD: { macd.InputBars.Last.Date}  {macd.ResultBars.Last.Close}");
+            bars.Push(list[i]);
+            //var testd = testBars.Ema(5).Find(p => p.Date == ema5.InputBars.Last.Date);
+            //var alld = allBars.Ema(5).Find(p => p.Date == ema5.InputBars.Last.Date);
+           Console.WriteLine($"EMA5: { ema5.InputBars.Last.Date}  {ema5.Results.Last.Ema}");
+            //Console.WriteLine($"TestEMA5: { testd.Date}  {testd.Ema}");
+            //Console.WriteLine($"allema5: { alld.Date}  {alld.Ema}");
+            //Console.WriteLine($"RES: { testd.Ema != ema5.ResultBars.Last.Close}  ");
+            //Console.WriteLine($"RES2: { alld.Ema != ema5.ResultBars.Last.Close}  ");
+            //Console.WriteLine($"EMA9: { ema9.InputBars.Last.Date}  {ema9.ResultBars.Last.Close}");
+            //Console.WriteLine($"MACD: { macd.InputBars.Last.Date}  {macd.Results.Last.Macd}");
+            //Console.WriteLine($"MACD: { macd.InputBars.Last.Date}  {macd.Trigger.Results.Last.Ema}");
+
+            //Console.WriteLine($"MACDT: { macd.InputBars.Last.Date}  {macd.Trigger.ResultBars.Last.Close}");
         }
 
 
@@ -68,12 +89,12 @@ public class Program
 
 
 
-        Console.WriteLine($"{ em5list }");
-        Console.WriteLine($"{ em5list }");
+        //Console.WriteLine($"{ em5list }");
+        //Console.WriteLine($"{ em5list }");
 
         Console.ReadLine();
 
-        bars = new Bars(5);
+        bars = new PriceBars(5);
         bars.Push(new Quote(DateTime.Now, 12));
         bars.Push(new Quote(DateTime.Now, 15));
         bars.Push(new Quote(DateTime.Now, 20));
@@ -81,12 +102,12 @@ public class Program
         bars.Push(new Quote(DateTime.Now, 16));
 
 
-        var list = string.Join(",", bars.List.Select(p => p.Close.ToString()));
-        Console.WriteLine(list);
-        //bars.Push(new Quote(85));
+        //var list = string.Join(",", bars.List.Select(p => p.Close.ToString()));
+        //Console.WriteLine(list);
+        ////bars.Push(new Quote(85));
 
-         list = string.Join(",", bars.List.Select(p => p.Close.ToString()));
-        Console.WriteLine(list);
+        // list = string.Join(",", bars.List.Select(p => p.Close.ToString()));
+        //Console.WriteLine(list);
 
 
         Console.WriteLine(bars.Ema(9).Last());
@@ -153,7 +174,7 @@ public class Program
         var s = new List<string>("5,4,6,8,12,14,16,18,20".Split(',')).Select(x => decimal.Parse(x)).ToArray();
 
         TopQue q = new TopQue(s.Length);
-        Bars qbar = new Bars(s.Length);
+        PriceBars qbar = new PriceBars(s.Length);
 
         List<Quote> quotes = new List<Quote>();
         foreach (var n in s)

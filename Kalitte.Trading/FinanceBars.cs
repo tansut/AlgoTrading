@@ -1,4 +1,5 @@
 ﻿// algo
+using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,53 +10,10 @@ using System.Threading.Tasks;
 namespace Kalitte.Trading
 {
 
-    public interface IValue
-    {
-        public decimal? Value { get; set; }
-    }
 
 
-    public interface IQuote
-    {
-        DateTime Date { get; set; }
-        decimal Open { get; set; }
-        decimal High { get; set; }
-        decimal Low { get; set; }
-        decimal Close { get; set; }
-        decimal Volume { get; set; }
-    }
 
-    public class Quote : IQuote, IValue
-    {
-        public DateTime Date { get; set; }
-        public decimal Open { get; set; }
-        public decimal High { get; set; }
-        public decimal Low { get; set; }
-        public decimal Close { get; set; }
-        public decimal Volume { get; set; }
-        public decimal? Value { get => Close; set  { Close = value.Value; } }
 
-        public override string ToString()
-        {
-            return $"d: {Date}, o:{Open}, h: {High}, l: {Low}, c: {Close}";
-        }
-
-        public Quote()
-        {
-
-        }
-
-        public Quote(DateTime date, decimal close)
-        {
-            this.Date = date;
-            this.Close = close;
-        }
-
-        public Quote(decimal close) : this(DateTime.Now, close)
-        {
-
-        }
-    }
 
     public enum ListAction
     {
@@ -109,10 +67,10 @@ namespace Kalitte.Trading
     }
 
     [Serializable]
-    internal class BasicD
+    public class BasicD
     {
-        internal DateTime Date { get; set; }
-        internal double Value { get; set; }
+        public DateTime Date { get; set; }
+        public double Value { get; set; }
     }
 
     public class FinanceList<T>
@@ -245,17 +203,17 @@ namespace Kalitte.Trading
         }
     }
 
-    public class PriceBars : FinanceList<IQuote>
+    public class FinanceBars : FinanceList<IQuote>
     {
         public CandlePart Ohlc { get; set; } = CandlePart.Close;
         public int DefaultLookback { get; set; }
 
-        public PriceBars(int size): base(size)
+        public FinanceBars(int size): base(size)
         {
 
         }
 
-        public PriceBars() : this(0)
+        public FinanceBars() : this(0)
         {
 
         }
@@ -294,6 +252,8 @@ namespace Kalitte.Trading
 
             return res.OrderBy(x => x.Date).ToList();
         }
+
+       
 
 
         public decimal[] Values
@@ -338,6 +298,99 @@ namespace Kalitte.Trading
         }
 
 
+        //public double EmaNext2(double price, double lastEma, int lookbackPeriods)
+        //{
+        //    double k = 2D / (lookbackPeriods + 1);
+        //    double ema = lastEma + (k * (price - lastEma));
+        //    return ema;
+        //}
+
+        //public static List<EmaResult> Ema2(List<IValue> input, int lookbackPeriods)
+        //{
+        //    int length = input.Count;
+        //    var results = new List<EmaResult>(length);
+        //    List<BasicD> bdList = ConvertToBasic2(input);
+
+        //    double k = 2d / (lookbackPeriods + 1);
+        //    double? lastEma = 0;
+        //    int initPeriods = Math.Min(lookbackPeriods, length);
+
+        //    for (int i = 0; i < initPeriods; i++)
+        //    {
+        //        lastEma += bdList[i].Value;
+        //    }
+
+        //    lastEma /= lookbackPeriods;
+
+        //    // roll through quotes
+        //    for (int i = 0; i < length; i++)
+        //    {
+        //        BasicD h = bdList[i];
+        //        int index = i + 1;
+
+        //        EmaResult result = new EmaResult()
+        //        {
+        //            Date = h.Date
+        //        };
+
+        //        if (index > lookbackPeriods)
+        //        {
+        //            double? ema = EmaNext2(h.Value, lastEma.Value, lookbackPeriods);// lastEma + (k * (h.Value - lastEma));
+        //            result.Ema = (decimal?)ema;
+        //            lastEma = ema;
+        //        }
+        //        else if (index == lookbackPeriods)
+        //        {
+        //            result.va = (decimal?)lastEma;
+        //        }
+
+        //        results.Add(result);
+        //    }
+
+        //    return results;
+
+
+        //    //var emaArray = new List<EmaResult>();
+        //    //double k = 2D / (lookbackPeriods + 1);
+        //    //var data = Values;
+
+        //    //if (lookbackPeriods <= 0) lookbackPeriods = data.Length;
+
+        //    //int initPeriods = Math.Min(lookbackPeriods, data.Length);
+
+        //    //double? lastEma = 0;
+
+        //    //for (int i = 0; i < initPeriods; i++)
+        //    //{
+        //    //    lastEma += (double)data[i];
+        //    //}
+
+        //    //lastEma /= lookbackPeriods;
+
+        //    //decimal? result = null;
+
+        //    //for (var i = 0; i < data.Length; i++)
+        //    //{
+        //    //    int index = i + 1;
+
+        //    //    var result = new EmaResult()
+        //    //    {
+        //    //        Date = h.Date
+        //    //    };
+
+        //    //    if (index > lookbackPeriods)
+        //    //    {
+        //    //        result = EmaNext(data[i], (decimal)lastEma, lookbackPeriods); // + (k * ((double)data[i] - lastEma));
+        //    //        //result = (decimal)ema;
+        //    //        lastEma = (double)result;
+        //    //    }
+        //    //    else if (index == lookbackPeriods)
+        //    //    {
+        //    //        result = (decimal)lastEma;
+        //    //    }
+
+        //    //    emaArray.Add(result);
+        //}
 
 
 

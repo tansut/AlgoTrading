@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Skender.Stock.Indicators;
 
 namespace Kalitte.Trading.Indicators
 {
@@ -20,7 +21,7 @@ namespace Kalitte.Trading.Indicators
         public Ema Trigger { get; set; }
 
 
-        public Macd(PriceBars bars, int shortp, int longp, int signal) : base(bars)
+        public Macd(FinanceBars bars, int shortp, int longp, int signal) : base(bars)
         {
             this.Short = shortp;
             this.Long = longp;

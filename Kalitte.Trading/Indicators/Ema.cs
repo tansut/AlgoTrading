@@ -1,5 +1,6 @@
 ﻿// algo
 using Kalitte.Trading.Algos;
+using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,10 @@ namespace Kalitte.Trading.Indicators
         public int Periods { get; set; }
         
 
-        public Ema(PriceBars bars, int periods) : base(bars)
+        public Ema(FinanceBars bars, int periods) : base(bars)
         {
             this.Periods = periods;
+
             bars.ListEvent += BarChanged;            
             if (InputBars.Count >= Periods)  createResult();
         }

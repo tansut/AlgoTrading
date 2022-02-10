@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Kalitte.Trading.Indicators;
+using Skender.Stock.Indicators;
 
 namespace Kalitte.Trading.Algos
 {
@@ -119,7 +120,7 @@ namespace Kalitte.Trading.Algos
         //Ema ema5;
         //Ema ema9;
 
-        PriceBars bars = null;
+        FinanceBars bars = null;
 
         decimal simulationPriceDif = 0;
 
@@ -140,6 +141,15 @@ namespace Kalitte.Trading.Algos
             mdp.SaveDaily = true;
             bars = mdp.GetContentAsQuote(t);
             Log($"Bars initialized. Last bar is: {bars.Last}", LogLevel.Debug, t);
+            
+
+            // calculate 20-period SMA
+            IEnumerable<SmaResult> results = bars.List.GetSma(20);
+
+            foreach(var r in results)
+            {
+                Log($"{r.Date} {r.Sma}");
+            }
 
             var ma = signals.Where(p => p.Name == "cross:ma59").FirstOrDefault() as CrossSignal;
             if (ma != null)

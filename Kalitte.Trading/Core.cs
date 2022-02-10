@@ -75,6 +75,9 @@ namespace Kalitte.Trading
             var c1 = q1.First() < q2.First() && q1.Last() > q2.Last();
 
             return c1;
+
+
+
         }
 
         public bool CrossBelowX(TopQue q1, TopQue q2, decimal dif)

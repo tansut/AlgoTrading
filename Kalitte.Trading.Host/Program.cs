@@ -15,7 +15,7 @@ public class Program
     public static void Main()
     {
 
-        var b1 = new PriceBars(5);
+        var b1 = new FinanceBars(5);
 
         
 
@@ -94,7 +94,7 @@ public class Program
 
         Console.ReadLine();
 
-        bars = new PriceBars(5);
+        bars = new FinanceBars(5);
         bars.Push(new Quote(DateTime.Now, 12));
         bars.Push(new Quote(DateTime.Now, 15));
         bars.Push(new Quote(DateTime.Now, 20));
@@ -174,7 +174,7 @@ public class Program
         var s = new List<string>("5,4,6,8,12,14,16,18,20".Split(',')).Select(x => decimal.Parse(x)).ToArray();
 
         TopQue q = new TopQue(s.Length);
-        PriceBars qbar = new PriceBars(s.Length);
+        FinanceBars qbar = new FinanceBars(s.Length);
 
         List<Quote> quotes = new List<Quote>();
         foreach (var n in s)

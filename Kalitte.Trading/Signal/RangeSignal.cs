@@ -20,6 +20,7 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Skender.Stock.Indicators;
 
 namespace Kalitte.Trading
 {
@@ -46,7 +47,7 @@ namespace Kalitte.Trading
         public decimal? Max { get; set; }
         public int Periods { get; set; } = 3;
         public IIndicator Indicator { get; set; }
-        PriceBars bars;
+        FinanceBars bars;
 
         public RangeSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator indicator,
             decimal? min, decimal? max) : base(name, symbol, owner)
@@ -58,15 +59,12 @@ namespace Kalitte.Trading
 
         public override void Start()
         {
-            bars = new PriceBars(Periods);
+            bars = new FinanceBars(Periods);
             base.Start();
             Algo.Log($"Started with {Min}-{Max} range, period: {Periods}.", LogLevel.Info);
         }
 
-        protected override void Colllect()
-        {
-            bars.Push(new Quote(Indicator.CurrentValue));
-        }
+
 
 
         protected override SignalResultX CheckInternal(DateTime? t = null)

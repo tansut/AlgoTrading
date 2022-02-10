@@ -21,6 +21,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Globalization;
+using Skender.Stock.Indicators;
 
 namespace Kalitte.Trading
 {
@@ -154,11 +155,11 @@ namespace Kalitte.Trading
     public class MarketDataFileLogger : FileLogger
     {
 
-        public PriceBars GetContentAsQuote(DateTime t)
+        public FinanceBars GetContentAsQuote(DateTime t)
         {
             var file = GetFileName(t);
             var content = GetContent(file);
-            var result = new PriceBars();
+            var result = new FinanceBars();
 
 
             foreach (var line in content)

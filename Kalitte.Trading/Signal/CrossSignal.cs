@@ -21,6 +21,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Kalitte.Trading.Indicators;
+using Skender.Stock.Indicators;
+
+
 
 namespace Kalitte.Trading
 {
@@ -36,8 +39,8 @@ namespace Kalitte.Trading
 
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
-        private PriceBars differenceBars;
-        private PriceBars priceBars;
+        private FinanceBars differenceBars;
+        private FinanceBars priceBars;
 
         bool useMyIndicators = false;
         bool useLastPriceIfMissing = true;
@@ -56,8 +59,8 @@ namespace Kalitte.Trading
 
         public override void Start()
         {
-            differenceBars = new PriceBars(Periods);
-            priceBars = new PriceBars(2);
+            differenceBars = new FinanceBars(Periods);
+            priceBars = new FinanceBars(2);
             base.Start();
             Log($"Started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}", LogLevel.Info);
         }
@@ -72,6 +75,13 @@ namespace Kalitte.Trading
 
         protected SignalResultX CalculateSignal(DateTime? t = null)
         {
+
+       
+
+            // fetch historical quotes from your feed (your method)
+
+
+
             OrderSide? finalResult = null;
             var mp = Algo.GetMarketPrice(Symbol, t); 
 
@@ -85,7 +95,7 @@ namespace Kalitte.Trading
             var l1 = i1k.NextValue(mp);
             var l2 = i2k.NextValue(mp);            
 
-            var newResultBar = new Quote(t ?? DateTime.Now, l1 - l2);
+            var newResultBar = new Quote() {  Date = t ?? DateTime.Now, Close = l1 - l2 };
             differenceBars.Push(newResultBar);
 
             var ldif = Math.Round(l1 - l2, 5);

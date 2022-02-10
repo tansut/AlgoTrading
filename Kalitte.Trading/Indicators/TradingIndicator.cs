@@ -10,8 +10,8 @@ namespace Kalitte.Trading.Indicators
 
     public interface ITradingIndicator
     {
-        PriceBars InputBars { get; }
-        abstract decimal NextValue(decimal newVal);
+        FinanceBars InputBars { get; }
+        decimal NextValue(decimal newVal);
     }
 
     public abstract class TradingIndicator<R>: ITradingIndicator where R: ResultBase
@@ -25,12 +25,12 @@ namespace Kalitte.Trading.Indicators
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
 
-        public PriceBars InputBars { get; }
+        public FinanceBars InputBars { get; }
         public FinanceList<R> Results { get; set; } = null;
 
         
 
-        public TradingIndicator(PriceBars bars, FinanceList<R> initialResults = null)
+        public TradingIndicator(FinanceBars bars, FinanceList<R> initialResults = null)
         {
             //this.Algo = Algo;
             InputBars = bars;

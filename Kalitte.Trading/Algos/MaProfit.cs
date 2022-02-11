@@ -97,8 +97,8 @@ namespace Kalitte.Trading.Algos
         [Parameter(9)]
         public int MACDLongPeriod = 9;
 
-        [Parameter(0.5)]
-        public decimal MacdAvgChange = 0.5M;
+        [Parameter(0.05)]
+        public decimal MacdAvgChange = 0.05M;
 
         [Parameter(6)]
         public int MacdPeriods = 6;
@@ -140,16 +140,12 @@ namespace Kalitte.Trading.Algos
             mdp.FileName = "all.txt";
             mdp.SaveDaily = true;
             bars = mdp.GetContentAsQuote(t);
-            Log($"Bars initialized. Last bar is: {bars.Last}", LogLevel.Debug, t);
             
 
-            // calculate 20-period SMA
-            IEnumerable<SmaResult> results = bars.List.GetSma(20);
+            //bd.ForEach(x => bars.Push(x));
 
-            foreach(var r in results)
-            {
-                Log($"{r.Date} {r.Sma}");
-            }
+            Log($"Bars initialized. Last bar is: {bars.Last}", LogLevel.Debug, t);
+            
 
             var ma = signals.Where(p => p.Name == "cross:ma59").FirstOrDefault() as CrossSignal;
             if (ma != null)
@@ -267,7 +263,7 @@ namespace Kalitte.Trading.Algos
 
                 lock (this)
                 {
-                    //if (simulationCount > 10) return;                                       
+                    //if (simulationCount > 12) return;                                       
 
                     if (!boolsSignalsStarted)
                     {

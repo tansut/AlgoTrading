@@ -79,7 +79,7 @@ namespace Kalitte.Trading
 
             if (bars.Count >= Periods)
             {
-                var ema = bars.Ema(Periods - 1).Last();
+                var ema = bars.List.GetEma(Periods - 1).Last();
                 if (Min.HasValue && ema.Ema.Value < Min.Value)
                 {
                     result = OrderSide.Buy;

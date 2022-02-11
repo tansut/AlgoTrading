@@ -112,7 +112,7 @@ namespace Kalitte.Trading
             if (differenceBars.Count >= Periods)
             {                
                 var cross = differenceBars.Cross(0);
-                var ema = differenceBars.Ema(Periods).Last();
+                var ema = differenceBars.List.GetEma(Periods).Last();
 
                 if (lastCross == 0 && cross != 0) lastCross = cross;
 

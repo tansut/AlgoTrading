@@ -1,4 +1,5 @@
 ﻿// algo
+using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,12 @@ namespace Kalitte.Trading.Indicators
             Results = initialResults == null ? new FinanceList<R>(0, null): initialResults;
         }
 
+        public TradingIndicator()
+        {
+
+        }
+
+        public abstract R NextResult(IQuote quote);
         public abstract decimal NextValue(decimal newVal);
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNet.SignalR.Client;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client.Transports;
 using Kalitte.Trading.Indicators;
+using Skender.Stock.Indicators;
 
 public class Program
 {
@@ -17,15 +18,7 @@ public class Program
 
         var b1 = new FinanceBars(5);
 
-        
 
-        b1.Push(new Quote(0.5448457542630377619258446M));
-        b1.Push(new Quote(0.5448457542630377619258446M));
-        b1.Push(new Quote(0.5448457542630377619258446M));
-        b1.Push(new Quote(0.5448457542630377619258446M));
-        b1.Push(new Quote(0.5448457542630377619258446M));
-
-        //var res = macd.Ema(4);
 
         
 
@@ -53,7 +46,11 @@ public class Program
 
         var ema5 = new Ema(bars, 5);
         //var ema9 = new Ema(bars, 9);
-        var macd = new Macd(bars, 5, 9, 3);
+        var macd = new Macd(bars,  5,9, 3);
+
+        //var nextt = macd.Trigger.NextValue(2422);
+
+        //Console.WriteLine(nextt);
 
 
         //var em5list = bars.Ema(5);// string.Join(",", bars.Ema(5).Select(p => p.ToString()));
@@ -63,6 +60,12 @@ public class Program
 
         for (var i = 0; i < newBars.Count; i++)
         {
+            var nextt = macd.Trigger.NextValue(list[i].Close);
+            var nextm= macd.NextValue(list[i].Close);
+            Console.WriteLine(list[i].Date.ToString());
+            Console.WriteLine(list[i].Close.ToString());
+            Console.WriteLine(nextt);
+            Console.WriteLine(nextm);
             bars.Push(list[i]);
             //var testd = testBars.Ema(5).Find(p => p.Date == ema5.InputBars.Last.Date);
             //var alld = allBars.Ema(5).Find(p => p.Date == ema5.InputBars.Last.Date);
@@ -72,8 +75,8 @@ public class Program
             //Console.WriteLine($"RES: { testd.Ema != ema5.ResultBars.Last.Close}  ");
             //Console.WriteLine($"RES2: { alld.Ema != ema5.ResultBars.Last.Close}  ");
             //Console.WriteLine($"EMA9: { ema9.InputBars.Last.Date}  {ema9.ResultBars.Last.Close}");
-            //Console.WriteLine($"MACD: { macd.InputBars.Last.Date}  {macd.Results.Last.Macd}");
-            //Console.WriteLine($"MACD: { macd.InputBars.Last.Date}  {macd.Trigger.Results.Last.Ema}");
+            Console.WriteLine($"MACD: { macd.InputBars.Last.Date}  {macd.Results.Last.Macd}");
+            Console.WriteLine($"MACD: { macd.InputBars.Last.Date}  {macd.Trigger.Results.Last.Ema}");
 
             //Console.WriteLine($"MACDT: { macd.InputBars.Last.Date}  {macd.Trigger.ResultBars.Last.Close}");
         }
@@ -94,12 +97,7 @@ public class Program
 
         Console.ReadLine();
 
-        bars = new FinanceBars(5);
-        bars.Push(new Quote(DateTime.Now, 12));
-        bars.Push(new Quote(DateTime.Now, 15));
-        bars.Push(new Quote(DateTime.Now, 20));
-        bars.Push(new Quote(DateTime.Now, 30));
-        bars.Push(new Quote(DateTime.Now, 16));
+ 
 
 
         //var list = string.Join(",", bars.List.Select(p => p.Close.ToString()));
@@ -110,7 +108,7 @@ public class Program
         //Console.WriteLine(list);
 
 
-        Console.WriteLine(bars.Ema(9).Last());
+        Console.WriteLine(bars.List.GetEma(9).Last());
         Console.WriteLine(bars.Cross(6));
         Console.WriteLine(bars.Cross(12));
         Console.WriteLine(bars.Cross(13));
@@ -192,7 +190,7 @@ public class Program
             Console.WriteLine("me");
 
             Console.WriteLine(q.CalcEma(i).Last());
-            Console.WriteLine(qbar.Ema(i).Last());
+            Console.WriteLine(qbar.List.GetEma(i).Last());
 
 
         }

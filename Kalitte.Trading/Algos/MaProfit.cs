@@ -261,6 +261,9 @@ namespace Kalitte.Trading.Algos
                 var bd = barDataCurrentValues.LastUpdate;
                 var time = barDataCurrentValues.LastUpdate.DTime;
 
+ 
+
+
                 lock (this)
                 {
                     //if (simulationCount > 12) return;                                       
@@ -271,6 +274,9 @@ namespace Kalitte.Trading.Algos
                         CompleteInit();
                     }
 
+                    var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
+                    bars.Push(newQuote);
+                    Log($"Pushed new bar, current bar is: {bars.Last.Date}", LogLevel.Info, time);
 
                     //foreach (var signal in signals)
                     //{
@@ -291,10 +297,12 @@ namespace Kalitte.Trading.Algos
                         }
                     }
                     simulationCount++;
+
+
+
                 }
-                var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                bars.Push(newQuote);
-                Log($"Pushed new bar, current bar is: {bars.Last}", LogLevel.Debug, time);
+
+
 
             }
             else

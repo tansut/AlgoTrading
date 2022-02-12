@@ -1,5 +1,5 @@
 ﻿// algo
-using Kalitte.Trading.Algos;
+using Kalitte.Trading.Matrix;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,13 +56,13 @@ namespace Kalitte.Trading.Indicators
             {
                 startIndex--;
             }
-            ResultList.Clear();
+            createResult(); 
 
         }
 
         public IList<IQuote> LastBars
         {
-            get { return InputBars.LastItems(Periods); }
+            get { return InputBars.LastItems(Periods+1); }
         }
 
         public override decimal NextValue(decimal newVal)

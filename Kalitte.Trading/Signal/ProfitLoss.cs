@@ -49,7 +49,7 @@ namespace Kalitte.Trading
         public decimal LossPriceChange { get; set; }
         public decimal LossQuantity { get; set; }
 
-        public TakeProfitOrLossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, 
+        public TakeProfitOrLossSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner, 
             decimal profitPriceChange, decimal profitQuantity, decimal lossPriceChange, decimal lossQuantity) : base(name, symbol, owner)
         {
             ProfitPriceChange = profitPriceChange;

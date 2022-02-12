@@ -21,7 +21,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kalitte.Trading.Algos
+namespace Kalitte.Trading.Matrix
 {
     public class BarDataLogger : AlgoBase
     {

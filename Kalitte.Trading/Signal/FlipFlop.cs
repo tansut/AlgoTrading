@@ -27,7 +27,7 @@ namespace Kalitte.Trading
     {
         public OrderSide Side { get; set; }
 
-        public FlipFlopSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, OrderSide side = OrderSide.Buy) : base(name, symbol, owner)
+        public FlipFlopSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner, OrderSide side = OrderSide.Buy) : base(name, symbol, owner)
         {
             this.Side = side;
         }

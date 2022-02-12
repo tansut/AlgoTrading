@@ -40,7 +40,7 @@ namespace Kalitte.Trading
 
 
 
-        public CrossSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
+        public CrossSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
         {
             this.i1 = i1;
             this.i2 = i2;

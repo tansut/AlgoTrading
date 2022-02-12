@@ -44,7 +44,7 @@ namespace Kalitte.Trading
         protected System.Timers.Timer _timer = null;
         private static object _locker = new object();
         public string Name { get; set; }
-        public Kalitte.Trading.Algos.AlgoBase Algo { get; set; }
+        public Kalitte.Trading.Matrix.AlgoBase Algo { get; set; }
         public bool Enabled { get; set; }
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
@@ -60,7 +60,7 @@ namespace Kalitte.Trading
 
         public event SignalEventHandler OnSignal;
 
-        public Signal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner)
+        public Signal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner)
         {
             Name = name;
             Symbol = symbol;

@@ -1,5 +1,5 @@
 ﻿// algo
-using Kalitte.Trading.Algos;
+using Kalitte.Trading.Matrix;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,7 +94,7 @@ namespace Kalitte.Trading.Indicators
         {
             if (e.Action == ListAction.Cleared)
             {
-                startIndex = 0;                
+                startIndex = 0;
             }
 
             else if (e.Action == ListAction.ItemAdded)
@@ -106,7 +106,7 @@ namespace Kalitte.Trading.Indicators
             {
                 startIndex--;
             }
-            ResultList.Clear();
+           createResult();
 
         }
 

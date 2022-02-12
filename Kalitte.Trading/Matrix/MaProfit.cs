@@ -12,7 +12,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-namespace Kalitte.Trading.Algos
+namespace Kalitte.Trading.Matrix
 {
 
 
@@ -82,8 +82,8 @@ namespace Kalitte.Trading.Algos
         [Parameter(9)]
         public int Rsi = 9;
 
-        [Parameter(8)]
-        public int RsiAnalysisPeriod = 8;
+        [Parameter(30)]
+        public int RsiAnalysisPeriod = 30;
 
         [Parameter(0)]
         public int MACDShortPeriod = 0;
@@ -367,20 +367,21 @@ namespace Kalitte.Trading.Algos
             if (marketPrice == 0)
             {
                 Log($"{signal.Name} couldnot be executed since market price is zero", LogLevel.Warning, result.SignalTime);
+                return;
             }
 
             if (!portfolio.IsEmpty)
             {
-                Log($"[{result.Signal.Name}:{result.Status}] received.", LogLevel.Debug, result.SignalTime);
+                Log($"[{result.Signal.Name}:{result.Status} {result.Value}] received.", LogLevel.Debug, result.SignalTime);
                 if (portfolio.Side == OrderSide.Sell && result.Status == RangeStatus.BelowMin && portfolio.AvgCost > marketPrice)
                 {
-                    Log($"{signal.Name} simulate position close,  buy.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
-                    //sendOrder(Symbol, portfolio.Quantity, OrderSide.Buy, $"[{result.Signal.Name}:{result.Status}]", 0, ChartIcon.PositionClose, result.SignalTime);
+                    //Log($"{signal.Name} simulate position close,  buy.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
+                    sendOrder(Symbol, portfolio.Quantity, OrderSide.Buy, $"[{result.Signal.Name}:{result.Status}]", 0, ChartIcon.PositionClose, result.SignalTime);
                 }
                 else if (portfolio.Side == OrderSide.Buy && result.Status == RangeStatus.AboveHigh && portfolio.AvgCost < marketPrice)
                 {
-                    Log($"{signal.Name} simulate position close,  sell.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
-                    //sendOrder(Symbol, portfolio.Quantity, OrderSide.Sell, $"[{result.Signal.Name}:{result.Status}]", 0, ChartIcon.PositionClose, result.SignalTime);
+                    //Log($"{signal.Name} simulate position close,  sell.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
+                    sendOrder(Symbol, portfolio.Quantity, OrderSide.Sell, $"[{result.Signal.Name}:{result.Status}]", 0, ChartIcon.PositionClose, result.SignalTime);
                 }
                 else Log($"{signal.Name} ignored. Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}");
             }

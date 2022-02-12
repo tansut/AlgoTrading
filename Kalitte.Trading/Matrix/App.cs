@@ -24,24 +24,24 @@ using System.Threading.Tasks;
 
 namespace Matriks.Lean.Algotrader
 {
-    public class MaAlg : Kalitte.Trading.Algos.MaProfit
+    public class MaAlg : Kalitte.Trading.Matrix.MaProfit
     {
 
     }
 
-    public class MaAlg2 : Kalitte.Trading.Algos.MaProfit
+    public class MaAlg2 : Kalitte.Trading.Matrix.MaProfit
     {
 
     }
 
-    public class MaAlgMacd : Kalitte.Trading.Algos.MaProfit
+    public class MaAlgMacd : Kalitte.Trading.Matrix.MaProfit
     {
 
     }
 
     
 
-    public class backtest : Kalitte.Trading.Algos.MaProfit
+    public class backtest : Kalitte.Trading.Matrix.MaProfit
     {
         public override void OnInit()
         {
@@ -50,7 +50,7 @@ namespace Matriks.Lean.Algotrader
         }
     }
 
-    public class testalgo : Kalitte.Trading.Algos.MaProfit
+    public class testalgo : Kalitte.Trading.Matrix.MaProfit
     {
         public override void OnInit()
         {
@@ -59,12 +59,12 @@ namespace Matriks.Lean.Algotrader
         }
     }
 
-    public class log : Kalitte.Trading.Algos.PriceLogger
+    public class log : Kalitte.Trading.Matrix.PriceLogger
     {
 
     }
 
-    public class bardatalogger : Kalitte.Trading.Algos.BarDataLogger
+    public class bardatalogger : Kalitte.Trading.Matrix.BarDataLogger
     {
 
     }

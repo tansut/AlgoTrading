@@ -22,7 +22,7 @@ namespace Kalitte.Trading.Indicators
         protected System.Timers.Timer _timer = null;
         private static object _locker = new object();
         public string Name { get; set; }
-        public Kalitte.Trading.Algos.AlgoBase Algo { get; set; }
+        public Kalitte.Trading.Matrix.AlgoBase Algo { get; set; }
         public bool Enabled { get; set; }
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }

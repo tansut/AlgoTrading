@@ -1,5 +1,5 @@
 ﻿// algo
-using Kalitte.Trading.Algos;
+using Kalitte.Trading.Matrix;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;

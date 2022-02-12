@@ -65,7 +65,12 @@ namespace Kalitte.Trading
         {
             bars = new FinanceBars(AnalysisPeriod);
             base.Start();
-            Log($"started with {Min}-{Max} range, period: {AnalysisPeriod}.", LogLevel.Info);
+            
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()}: {Min}-{Max} range, period: {AnalysisPeriod}";
         }
 
         protected override SignalResultX CheckInternal(DateTime? t = null)

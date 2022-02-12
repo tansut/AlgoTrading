@@ -51,7 +51,7 @@ namespace Kalitte.Trading
             differenceBars = new FinanceBars(Periods);
             priceBars = new FinanceBars(2);
             base.Start();
-            Log($"Started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}", LogLevel.Info);
+            //Log($"Started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}", LogLevel.Info);
         }
 
 
@@ -60,6 +60,11 @@ namespace Kalitte.Trading
         protected override void Colllect()
         {
 
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {Periods} avgChange: {AvgChange}";
         }
 
         protected SignalResultX CalculateSignal(DateTime? t = null)

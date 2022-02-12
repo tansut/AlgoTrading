@@ -13,10 +13,12 @@ namespace Kalitte.Trading.Indicators
 
     public class Rsi : TradingIndicator<RsiResult>
     {
-        public int Periods { get; set; }
 
         int startIndex = 0;
-
+        public override string ToString()
+        {
+            return $"{base.ToString()}:({Periods})";
+        }
 
         public Rsi(FinanceBars bars, int periods) : base(bars)
         {

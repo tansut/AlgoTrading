@@ -218,7 +218,12 @@ namespace Kalitte.Trading.Matrix
 
         public void CompleteInit()
         {
+
             signals.ForEach(p => p.Start());
+            foreach (var signal in signals)
+            {
+                Log($"{signal}", LogLevel.Result);
+            }
             boolsSignalsStarted = true;
         }
 
@@ -226,8 +231,13 @@ namespace Kalitte.Trading.Matrix
         {
             var assembly = typeof(MaProfit).Assembly.GetName();
             var ma = MovPeriod > 0 ? $"Ma[{MovPeriod}/{MovPeriod2}]" : "";
-            var macd = MACDShortPeriod > 0 ? $"Macd[{MACDShortPeriod}/{MACDLongPeriod}]" : "";
-            Log($"Inited instance {InstanceName} [{this.Symbol}, {ma} {macd}] using assemly {assembly.FullName}", LogLevel.Result);
+            //var macd = MACDShortPeriod > 0 ? $"Macd[{MACDShortPeriod}/{MACDLongPeriod}]" : "";
+            //var macd = MACDShortPeriod > 0 ? $"Macd[{MACDShortPeriod}/{MACDLongPeriod}]" : "";
+            Log($"Inited instance {InstanceName} [{this.Symbol}] using assemly {assembly.FullName}", LogLevel.Result);
+
+
+
+
             LoadRealPositions(this.Symbol);
             if (!Simulation) CompleteInit();
         }

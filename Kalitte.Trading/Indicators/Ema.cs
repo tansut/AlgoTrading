@@ -13,8 +13,11 @@ namespace Kalitte.Trading.Indicators
 
     public class Ema : TradingIndicator<EmaResult>
     {
-        public int Periods { get; set; }
-        
+
+        public override string ToString()
+        {
+            return $"{base.ToString()}:({Periods})";
+        }
 
         public Ema(FinanceBars bars, int periods) : base(bars)
         {

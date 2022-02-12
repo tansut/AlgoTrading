@@ -15,7 +15,11 @@ namespace Kalitte.Trading.Indicators
         decimal NextValue(decimal newVal);
         decimal? CurrentValue { get; }
         List<decimal?> Results { get; }
-}
+        int Periods { get; set; }
+        string Symbol { get;  set; }
+
+
+    }
 
     public abstract class TradingIndicator<R>: ITradingIndicator where R: ResultBase
     {
@@ -26,10 +30,18 @@ namespace Kalitte.Trading.Indicators
         public bool Enabled { get; set; }
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
-        public string Symbol { get; private set; }
+        public string Symbol { get; set; }
 
         public FinanceBars InputBars { get; }
         public FinanceList<R> ResultList { get; set; } = null;
+
+        public int Periods { get; set; }
+
+        public override string ToString()
+        {
+            return $"{this.GetType().Name}[{this.Symbol}]";
+        }
+
 
         protected abstract decimal? ToValue(R result);
 

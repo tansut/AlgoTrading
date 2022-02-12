@@ -66,6 +66,12 @@ namespace Kalitte.Trading.Indicators
 
         public MacdTrigger Trigger { get; set; }
 
+        public override string ToString()
+        {
+            return $"{base.ToString()}:({Slow}, {Fast}, {Signal})";
+
+        }
+
 
         public Macd(FinanceBars bars, int fast, int slow, int signal) : base(bars)
         {

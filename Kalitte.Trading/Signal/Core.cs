@@ -60,6 +60,11 @@ namespace Kalitte.Trading
 
         public event SignalEventHandler OnSignal;
 
+        public override string ToString()
+        {
+            return $"{this.GetType().Name}[{this.Name}]";
+        }
+
         public Signal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner)
         {
             Name = name;

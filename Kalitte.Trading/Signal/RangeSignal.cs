@@ -64,8 +64,13 @@ namespace Kalitte.Trading
         public override void Start()
         {
             bars = new FinanceBars(AnalysisPeriod);
-            base.Start();
-            
+            base.Start();            
+        }
+
+        public override void Stop()
+        {
+            base.Stop();
+            bars.Clear();
         }
 
         public override string ToString()

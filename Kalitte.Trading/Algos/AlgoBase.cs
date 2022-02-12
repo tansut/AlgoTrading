@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Algos
 {
-    public class AlgoBase
+    public abstract class AlgoBase
     {
 
     }

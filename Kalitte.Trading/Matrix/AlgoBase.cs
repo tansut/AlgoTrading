@@ -37,7 +37,7 @@ namespace Kalitte.Trading.Matrix
 
         public string InstanceName { get; set; }
 
-        private FileStream logStream;
+        protected DateTime? TimeSet = null;
 
 
         public PortfolioList UserPortfolioList = new PortfolioList();
@@ -50,12 +50,25 @@ namespace Kalitte.Trading.Matrix
             if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
             this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));
             //logStream = new FileStream(LogFile, FileMode.Create, FileAccess.Write, FileShare.Read, 4096);
-            
+
         }
 
-        public string LogFile {
+        public DateTime AlgoTime
+        {
             get {
-                return Path.Combine(LogDir, $"algologs2{(Simulation ? 'B' : 'L')}", $" {InstanceName}.txt");
+                return TimeSet ?? DateTime.Now;
+            }
+            protected set
+            {
+                TimeSet = value;
+            }
+        }
+
+        public string LogFile
+        {
+            get
+            {
+                return Path.Combine(LogDir, $"algologs{(Simulation ? 'B' : 'L')}", $" {InstanceName}.txt");
             }
         }
 
@@ -63,16 +76,17 @@ namespace Kalitte.Trading.Matrix
         {
             if ((int)level >= this.LoggingLevel)
             {
+                t = t ?? AlgoTime;
                 string opTime = t.HasValue ? t.Value.ToString("yyyy.MM.dd HH:mm:sss") + "*" : DateTime.Now.ToString("yyyy.MM.dd HH:mm:sss");
                 var content = $"[{level}:{opTime}]: {text}" + Environment.NewLine;
 
                 Debug(content);
                 var file = LogFile;
-                
+
                 //var bytes = Encoding.UTF8.GetBytes(content);
                 //logStream.Write(bytes, 0, bytes.Length);
                 File.AppendAllText(file, content + Environment.NewLine);
-                
+
             }
         }
 
@@ -132,7 +146,7 @@ namespace Kalitte.Trading.Matrix
             if (Simulation)
             {
                 var price = PriceLogger.GetMarketData(t.Value) ?? 0;
-                if (price ==0)
+                if (price == 0)
                 {
                     int toBack = 0, toForward = 0;
                     while (toBack-- > -5)
@@ -146,8 +160,9 @@ namespace Kalitte.Trading.Matrix
                     }
                 }
                 return price;
-            } else return this.GetMarketData(symbol, SymbolUpdateField.Last);
-            
+            }
+            else return this.GetMarketData(symbol, SymbolUpdateField.Last);
+
         }
 
     }

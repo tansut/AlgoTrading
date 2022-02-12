@@ -9,6 +9,7 @@ using Matriks.Trader.Core.TraderModels;
 using Skender.Stock.Indicators;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -111,22 +112,65 @@ namespace Kalitte.Trading.Matrix
         RSI rsi;
         MACD macd;
 
-        //Ema ema5;
-        //Ema ema9;
+        System.Timers.Timer seansTimer;
 
         FinanceBars periodBars = null;
         //FinanceBars priceBars = null;
 
         decimal simulationPriceDif = 0;
+        int orderCounter = 0;
 
 
         int virtualOrderCounter = 0;
         ExchangeOrder positionRequest = null;
         int simulationCount = 0;
+        public StartableState SignalsState { get; private set; } = StartableState.Stopped;
         bool boolsSignalsStarted = false;
 
 
-        
+        public void StartSignals()
+        {
+            SignalsState = StartableState.StartInProgress;
+            try
+            {
+                foreach (var signal in signals)
+                {
+                    signal.Start();
+                    Log($"Started signal {signal}", LogLevel.Info);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"{ex.Message}", LogLevel.Error);
+            }
+
+            SignalsState = StartableState.Started; ;
+        }
+
+        public void StopSignals()
+        {
+            SignalsState = StartableState.StopInProgress;
+            try
+            {
+                foreach (var signal in signals)
+                {
+
+                    signal.Stop();
+                    Log($"Stopped signal {signal}", LogLevel.Info);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"{ex.Message}", LogLevel.Error);
+            }
+
+            SignalsState = StartableState.Stopped;
+
+
+        }
+
+
 
         public void InitMySignals(DateTime t)
         {
@@ -135,7 +179,7 @@ namespace Kalitte.Trading.Matrix
             mdp.SaveDaily = true;
             periodBars = mdp.GetContentAsQuote(t);
             Log($"Bars initialized. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
-           
+
 
             var ma = signals.Where(p => p.Name == "cross:ma59").FirstOrDefault() as CrossSignal;
             if (ma != null)
@@ -175,7 +219,7 @@ namespace Kalitte.Trading.Matrix
             mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
             rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
-            
+
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
@@ -195,12 +239,11 @@ namespace Kalitte.Trading.Matrix
 
             signals.ForEach(p =>
             {
-                
                 p.TimerEnabled = !Simulation;
                 p.Simulation = Simulation;
                 p.OnSignal += SignalReceieved;
             });
-        }//
+        }
 
         public override void OnInit()
         {
@@ -214,30 +257,66 @@ namespace Kalitte.Trading.Matrix
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
             InitSignals();
             if (!Simulation) InitMySignals(DateTime.Now);
+
+        }
+
+        private void SeansTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            var t = DateTime.Now;
+            var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
+            var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 30, 0);
+            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 30, 0);
+            var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
+
+            seansTimer.Enabled = false;
+            try
+            {
+                if (t >= t1 && t <= t2 || t >= t3 && t <= t4)
+                {
+                    if (SignalsState == StartableState.Stopped)
+                    {
+                        Log($"Time seems OK, starting signals ...");
+                        StartSignals();
+                    }
+                }
+                else
+                {
+                    if (SignalsState == StartableState.Started)
+                    {
+                        Log($"Time seems OK, stopping signals ...");
+                        StopSignals();
+                    }
+                }
+            } finally
+            {
+                seansTimer.Enabled = true;
+            }
+
         }
 
         public void CompleteInit()
         {
-
-            signals.ForEach(p => p.Start());
-            foreach (var signal in signals)
+            if (!Simulation)
             {
-                Log($"{signal}", LogLevel.Result);
+                Log($"Setting seans timer ...");
+                seansTimer = new System.Timers.Timer(1000);
+                seansTimer.Enabled = true;
+                seansTimer.Elapsed += SeansTimer_Elapsed;
             }
-            boolsSignalsStarted = true;
+            else StartSignals();
+
+        }
+
+        public override string ToString()
+        {
+            var assembly = typeof(MaProfit).Assembly.GetName();
+            return $"Instance {InstanceName} [{this.Symbol}/{SymbolPeriod}] using assembly {assembly.FullName}";
         }
 
         public override void OnInitCompleted()
         {
             var assembly = typeof(MaProfit).Assembly.GetName();
-            var ma = MovPeriod > 0 ? $"Ma[{MovPeriod}/{MovPeriod2}]" : "";
-            //var macd = MACDShortPeriod > 0 ? $"Macd[{MACDShortPeriod}/{MACDLongPeriod}]" : "";
-            //var macd = MACDShortPeriod > 0 ? $"Macd[{MACDShortPeriod}/{MACDLongPeriod}]" : "";
-            Log($"Inited instance {InstanceName} [{this.Symbol}] using assemly {assembly.FullName}", LogLevel.Result);
-
-
-
-
+            Log($"{this}", LogLevel.Info);
             LoadRealPositions(this.Symbol);
             if (!Simulation) CompleteInit();
         }
@@ -251,7 +330,7 @@ namespace Kalitte.Trading.Matrix
                 var bd = barDataCurrentValues.LastUpdate;
                 var time = barDataCurrentValues.LastUpdate.DTime;
 
- 
+
 
 
                 lock (this)
@@ -275,11 +354,11 @@ namespace Kalitte.Trading.Matrix
                     //    var waitOthers = waitForOperationAndOrders("Backtest");
                     //}
 
-                    var seconds = 60 * 10;
+                    var seconds = GetSymbolPeriodSeconds(SymbolPeriod);
 
                     for (var i = 0; i < seconds; i++)
                     {
-                        var t = time.AddSeconds(i);
+                        var t = AlgoTime = time.AddSeconds(i);
                         foreach (var signal in signals)
                         {
                             var result = signal.Check(t);
@@ -287,8 +366,6 @@ namespace Kalitte.Trading.Matrix
                         }
                     }
                     simulationCount++;
-
-
 
                 }
 
@@ -512,8 +589,9 @@ namespace Kalitte.Trading.Matrix
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-            Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Result, positionRequest.Resulted);
+            Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Order, positionRequest.Resulted);
             this.positionRequest = null;
+            orderCounter++;
             orderWait.Set();
         }
 
@@ -521,7 +599,7 @@ namespace Kalitte.Trading.Matrix
 
         public override void OnOrderUpdate(IOrder order)
         {
-            Log($"OrderUpdate: status: {order.OrdStatus.Obj} orderid: {order.CliOrdID} fa: {order.FilledAmount}");
+            Log($"OrderUpdate: status: {order.OrdStatus.Obj} orderid: {order.CliOrdID} fa: {order.FilledAmount}", LogLevel.Debug);
             if (order.OrdStatus.Obj == OrdStatus.Filled)
             {
                 //if (!BackTestMode) Log($"OrderUpdate: pos: {this.positionRequest} status: {order.OrdStatus.Obj} orderid: {order.CliOrdID} fa: {order.FilledAmount} fq: {order.FilledQty} price: {order.Price} lastx: {order.LastPx}", LogLevel.Debug, this.positionRequest != null ? this.positionRequest.Time: DateTime.Now);
@@ -535,7 +613,7 @@ namespace Kalitte.Trading.Matrix
                         {
                             var gain = ((order.Price - positionRequest.UnitPrice) * (positionRequest.Side == OrderSide.Buy ? 1 : -1) * positionRequest.Quantity);
                             simulationPriceDif += gain;
-                            Log($"Filled price difference: Potential: {positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, positionRequest.Resulted);
+                            Log($"Filled price difference for order {order.CliOrdID}: Potential: {positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, positionRequest.Resulted);
                             //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
                         }
                         this.FillCurrentOrder(order.Price, this.positionRequest.Quantity);
@@ -578,10 +656,19 @@ namespace Kalitte.Trading.Matrix
 
         public override void OnStopped()
         {
-            //orderTimer.Stop();
-            signals.ForEach(p => p.Stop());
-            Log($"Completed Algo.\n {printPortfolio()}",  LogLevel.Result);
-            if (Simulation) Process.Start(LogFile);
+            if (!Simulation)
+            {
+                seansTimer.Stop();
+                seansTimer.Dispose();
+            }
+            StopSignals();
+            Log($"Completed {this}", LogLevel.FinalResult);
+            signals.ForEach(p => Log($"{p}", LogLevel.FinalResult));
+            Log($"Market price difference total: {this.simulationPriceDif}", LogLevel.FinalResult);
+            Log($"Total orders filled:: {this.orderCounter}", LogLevel.FinalResult);
+            Log($"{printPortfolio()}", LogLevel.FinalResult);
+            if (Simulation && this.UserPortfolioList.GetPortfolio(Symbol).PL < 200) File.Delete(LogFile);
+            else if (Simulation) Process.Start(LogFile);
         }
     }
 

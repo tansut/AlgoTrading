@@ -50,7 +50,7 @@ namespace Kalitte.Trading
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
         public OrderSide? LastSignalResult { get; protected set; }
-        protected volatile bool isRunning = false;
+        public volatile bool IsRunning = false;
 
         protected Task collectorTask = null;
         protected CancellationTokenSource collectorTaskTokenSource;
@@ -80,7 +80,7 @@ namespace Kalitte.Trading
 
         public void Log(string message, LogLevel level, DateTime? t = null)
         {
-            Algo.Log($"{this.Name}[{Thread.CurrentThread.ManagedThreadId}]: {message}", level, t);
+            Algo.Log($"{this.Name}[{Thread.CurrentThread.ManagedThreadId}]: {message}", level, t ?? Algo.AlgoTime);
         }
 
         protected virtual void onTick(Object source, ElapsedEventArgs e)
@@ -116,6 +116,7 @@ namespace Kalitte.Trading
 
         public virtual SignalResultX Check(DateTime? t = null)
         {
+            checkLock.Reset();
             try
             {
                 var result = CheckInternal(t);
@@ -127,6 +128,9 @@ namespace Kalitte.Trading
             {
                 Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
                 return new SignalResultX(this) {  finalResult = null };
+            } finally
+            {
+                checkLock.Set();
             }
         }
 
@@ -137,7 +141,17 @@ namespace Kalitte.Trading
         
         public virtual void Start()
         {
-            this.isRunning = true;
+            if (!checkLock.WaitOne(30000))
+            {
+                Log("Timeout in starting signal", LogLevel.Error);
+            }
+            this.IsRunning = true;
+            if (Enabled && TimerEnabled)
+            {
+                _timer = new System.Timers.Timer(1000);
+                _timer.Elapsed += this.onTick;
+                _timer.Start();
+            }
 
             //collectorTaskTokenSource = new CancellationTokenSource();
             //collectorTask = new Task(() =>
@@ -151,12 +165,7 @@ namespace Kalitte.Trading
             //    }
             //});            
             //collectorTask.Start();
-            if (Enabled && TimerEnabled)
-            {
-                _timer = new System.Timers.Timer(1000);
-                _timer.Elapsed += this.onTick;
-                _timer.Start();
-            }
+
         }
 
         public virtual void Stop()
@@ -165,8 +174,13 @@ namespace Kalitte.Trading
             {
                 _timer.Stop();
                 _timer.Dispose();
+                _timer = null;
             }
-            this.isRunning = false;
+            this.IsRunning = false;
+            if (!checkLock.WaitOne(30000))
+            {
+                Log("Timeout in stopping signal", LogLevel.Error);
+            }
             //try
             //{
             //    collectorTaskTokenSource.Cancel();

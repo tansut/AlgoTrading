@@ -29,11 +29,7 @@ namespace Kalitte.Trading
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
         private FinanceBars differenceBars;
-        private FinanceBars priceBars;
 
-        bool useMyIndicators = false;
-        bool useLastPriceIfMissing = true;
-        decimal lastMarketPrice = 0;
 
         private decimal lastEma = 0;
         private decimal lastCross = 0;
@@ -49,11 +45,19 @@ namespace Kalitte.Trading
         public override void Start()
         {
             differenceBars = new FinanceBars(Periods);
-            priceBars = new FinanceBars(2);
-            base.Start();
-            //Log($"Started with {i1.GetType().Name}[{i1.Period}]/{i2.GetType().Name}[{i2.Period}] period: {Periods} avgChange: {AvgChange}", LogLevel.Info);
+            lastEma = 0;
+            lastCross = 0;
+            base.Start();            
         }
 
+        public override void Stop()
+        {
+            base.Stop();
+            lastEma = 0;
+            lastCross = 0;
+            differenceBars.Clear();
+            
+        }
 
 
 

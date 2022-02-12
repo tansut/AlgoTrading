@@ -23,6 +23,62 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
+
+    public class AlgoParameter<T> where T: IEquatable<T>
+    {
+        public string Name { get; set; }
+        public T Value { get; set; }
+        //public T DefaultValue { get; set; }
+
+        public AlgoParameter(string name, T value)
+        {
+            this.Name = name;
+            this.Value = value;
+            //this.DefaultValue = default(T);
+        }
+    }
+
+    public class StringParameter: AlgoParameter<string>
+    {
+        public StringParameter(string name, string value): base(name, value)
+        {
+
+        }
+    }
+
+    public class DecimalParameter : AlgoParameter<decimal>
+    {
+        public DecimalParameter(string name, decimal value) : base(name, value)
+        {
+
+        }
+    }
+
+    public class IntegerParameter : AlgoParameter<int>
+    {
+        public IntegerParameter(string name, int value) : base(name, value)
+        {
+
+        }
+    }
+
+    public class BoolParameter : AlgoParameter<bool>
+    {
+        public BoolParameter(string name, bool value) : base(name, value)
+        {
+
+        }
+    }
+
+    public enum StartableState
+    {
+        StartInProgress,
+        Started,
+        StopInProgress,
+        Stopped
+
+    }
+
     public enum OHLC
     {
         Open = 0,
@@ -50,10 +106,11 @@ namespace Kalitte.Trading
         Verbose = 0,
         Debug = 1,
         Info = 2,
-        Warning = 3,
-        Error = 4,
-        Result = 5,
-        Critical = 10
+        Warning = 3,        
+        Order = 4,
+        Error = 10,
+        FinalResult = 15,
+        Critical = 20
     }
 
     public interface ILogProvider

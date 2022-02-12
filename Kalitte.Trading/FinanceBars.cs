@@ -28,9 +28,14 @@ namespace Kalitte.Trading
     }
 
 
-    public class MyQuote: Quote, IValue
+    public class MyQuote : Quote, IValue
     {
         public decimal? Value { get => Close; set { Close = value.Value; } }
+
+        public override string ToString()
+        {
+            return $"d: {Date} o: {Open} h: {High} l: {Low} c:{Close}";
+        }
     }
 
 
@@ -54,14 +59,14 @@ namespace Kalitte.Trading
             items = createList();
         }
 
-        public FinanceList(): this(0)
+        public FinanceList() : this(0)
         {
 
         }
 
         public List<T> LastItems(int n)
         {
-            return items.Skip(Math.Max(0, Count- n)).ToList();
+            return items.Skip(Math.Max(0, Count - n)).ToList();
         }
 
 
@@ -91,6 +96,42 @@ namespace Kalitte.Trading
                 try
                 {
                     return new List<T>(items);
+                }
+                finally
+                {
+                    rwl.ReleaseReaderLock();
+                }
+            }
+        }
+
+        public T First
+        {
+            get
+            {
+
+                rwl.AcquireReaderLock(timeOut);
+                try
+                {
+                    return items[0];
+                }
+                finally
+                {
+                    rwl.ReleaseReaderLock();
+                }
+            }
+        }
+
+
+
+        public Tuple<T, T> FirstLast
+        {
+            get
+            {
+
+                rwl.AcquireReaderLock(timeOut);
+                try
+                {
+                    return new Tuple<T, T>(items[0], items[items.Count - 1]);
                 }
                 finally
                 {
@@ -190,9 +231,9 @@ namespace Kalitte.Trading
     public class FinanceBars : FinanceList<IQuote>
     {
         public CandlePart Ohlc { get; set; } = CandlePart.Close;
-        
 
-        public FinanceBars(int size): base(size)
+
+        public FinanceBars(int size) : base(size)
         {
 
         }

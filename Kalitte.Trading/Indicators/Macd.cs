@@ -22,17 +22,20 @@ namespace Kalitte.Trading.Indicators
 
         private void createResult()
         {
-            Results.Clear();
-            var result = Owner.Results.List.Select(p => new EmaResult() { Date = p.Date, Ema = p.Signal }).ToList();
-            result.ForEach(r => Results.Push(r));
+            ResultList.Clear();
+            var result = Owner.ResultList.List.Select(p => new EmaResult() { Date = p.Date, Ema = p.Signal }).ToList();
+            result.ForEach(r => ResultList.Push(r));
         }
 
-        public MacdTrigger(Macd owner): base(owner.InputBars)
+        public MacdTrigger(Macd owner) : base(owner.InputBars)
         {
             Owner = owner;
-            Results = new FinanceList<EmaResult>();
-            Owner.Results.ListEvent += Bars_ListEvent;
+            ResultList = new FinanceList<EmaResult>();
+            Owner.ResultList.ListEvent += Bars_ListEvent;
         }
+
+        
+
 
         private void Bars_ListEvent(object sender, ListEventArgs<MacdResult> e)
         {
@@ -43,6 +46,12 @@ namespace Kalitte.Trading.Indicators
         {
             var next = Owner.NextResult(quote);
             return new EmaResult() { Date = quote.Date, Ema = next.Signal };
+
+        }
+
+        protected override decimal? ToValue(EmaResult result)
+        {
+            return result.Ema;
 
         }
     }
@@ -62,7 +71,7 @@ namespace Kalitte.Trading.Indicators
         {
             this.Slow = slow;
             this.Fast = fast;
-            this.Signal = signal;               
+            this.Signal = signal;
             createResult();
             this.InputBars.ListEvent += InputBars_BarEvent;
             this.Trigger = new MacdTrigger(this);
@@ -71,50 +80,51 @@ namespace Kalitte.Trading.Indicators
 
         private void createResult()
         {
-            Results.Clear();
+            ResultList.Clear();
             var results = LastBars.GetMacd(this.Fast, this.Slow, this.Signal).ToList();
-            results.ForEach(r => Results.Push(r));
+            results.ForEach(r => ResultList.Push(r));
         }
 
 
 
-        public bool HasResult => Results.Count > 0 && Results.Last.FastEma.HasValue && Results.Last.SlowEma.HasValue;
+        //public bool HasResult => Results.Count > 0 && Results.Last.FastEma.HasValue && Results.Last.SlowEma.HasValue;
 
 
         private void InputBars_BarEvent(object sender, ListEventArgs<IQuote> e)
         {
             if (e.Action == ListAction.Cleared)
             {
-                startIndex = 0;
-                Results.Clear();
+                startIndex = 0;                
             }
-            else if (HasResult)
-            {
-                if (e.Action == ListAction.ItemAdded)
-                {
-                    startIndex++;
-                    createResult();
-                }
 
-                else if (e.Action == ListAction.ItemRemoved)
-                {
-                    startIndex--;
-                    createResult();
-                }
+            else if (e.Action == ListAction.ItemAdded)
+            {
+                startIndex++;
             }
-            else createResult();
+
+            else if (e.Action == ListAction.ItemRemoved)
+            {
+                startIndex--;
+            }
+            ResultList.Clear();
+
         }
 
         public IList<IQuote> LastBars
         {
-            get { return InputBars.LastItems(Signal+Slow+startIndex); }
+            get { return InputBars.LastItems(Signal + Slow + startIndex); }
         }
 
         public override decimal NextValue(decimal newVal)
         {
             return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Macd ?? 0;
-
         }
+
+        protected override decimal? ToValue(MacdResult result)
+        {
+            return result.Macd;
+        }
+
 
         public override MacdResult NextResult(IQuote quote)
         {

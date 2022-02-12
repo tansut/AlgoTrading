@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Algos
 {
-    public class AlgoBase : MatriksAlgo, IDisposable
+    public class AlgoBase : MatriksAlgo, IDisposable, ILogProvider
     {
 
         [Parameter(0)]
@@ -46,8 +46,9 @@ namespace Kalitte.Trading.Algos
 
         public AlgoBase()
         {
+            RandomGenerator random = new RandomGenerator();
             if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
-            this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (new Random().Next(100000000));
+            this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));
             //logStream = new FileStream(LogFile, FileMode.Create, FileAccess.Write, FileShare.Read, 4096);
             
         }

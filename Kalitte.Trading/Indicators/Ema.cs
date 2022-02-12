@@ -23,27 +23,34 @@ namespace Kalitte.Trading.Indicators
             createResult();
         }
 
-        public bool HasResult => Results.Count > 0 && Results.Last.Ema.HasValue;
+        public bool HasResult => ResultList.Count > 0 && ResultList.Last.Ema.HasValue;
 
+        
 
         private void createResult()
         {
-            Results.Clear();
+            ResultList.Clear();
             var result = InputBars.LastItems(Periods).GetEma(Periods).ToList();
-            result.ForEach(r => Results.Push(r));
+            result.ForEach(r => ResultList.Push(r));
         }
+
+        protected override decimal? ToValue(EmaResult result)
+        {
+            return result.Ema;
+        }
+
 
 
         public override decimal NextValue(decimal newVal)
         {
-            var lastEma = (double)(Results.Last.Ema);
+            var lastEma = (double)(ResultList.Last.Ema);
             var ema = (decimal)FinanceBars.EmaNext((double)newVal, lastEma, Periods);
             return ema;
         }
 
         public override EmaResult NextResult(IQuote quote)
         {
-            var lastEma = (double)(Results.Last.Ema);
+            var lastEma = (double)(ResultList.Last.Ema);
             var ema = (decimal)FinanceBars.EmaNext((double)quote.Close, lastEma, Periods);
             return new EmaResult() {  Date = quote.Date, Ema=ema };
         }
@@ -52,7 +59,7 @@ namespace Kalitte.Trading.Indicators
         {
             if (e.Action == ListAction.Cleared)
             {
-                Results.Clear();
+                ResultList.Clear();
 
             } else if (HasResult)
             {
@@ -67,9 +74,9 @@ namespace Kalitte.Trading.Indicators
                     //var lastResult = temp.GetEma(Periods);
                     var ema = new EmaResult() { Date = e.Item.Date };
                     var close = (double)(e.Item.Close);
-                    var lastEma = (double)(Results.Last.Ema);
+                    var lastEma = (double)(ResultList.Last.Ema);
                     ema.Ema = (decimal)FinanceBars.EmaNext(close, lastEma, Periods);
-                    Results.Push(new EmaResult() { Date = ema.Date, Ema = ema.Ema });
+                    ResultList.Push(new EmaResult() { Date = ema.Date, Ema = ema.Ema });
                     //Results.Push(lastResult.Last());
 
                 }

@@ -21,6 +21,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Skender.Stock.Indicators;
+using Kalitte.Trading.Indicators;
 
 namespace Kalitte.Trading
 {
@@ -45,8 +46,10 @@ namespace Kalitte.Trading
     {
         public decimal? Min { get; set; }
         public decimal? Max { get; set; }
-        public int Periods { get; set; } = 3;
+        public int AnalysisPeriod { get; set; } = 3;
         public IIndicator Indicator { get; set; }
+        public ITradingIndicator i1k;
+
         FinanceBars bars;
 
         public RangeSignal(string name, string symbol, Kalitte.Trading.Algos.AlgoBase owner, IIndicator indicator,
@@ -54,32 +57,29 @@ namespace Kalitte.Trading
         {
             Indicator = indicator;
             Min = min;
-            Max = Max;
+            Max = max;
         }
 
         public override void Start()
         {
-            bars = new FinanceBars(Periods);
+            bars = new FinanceBars(AnalysisPeriod);
             base.Start();
-            Algo.Log($"Started with {Min}-{Max} range, period: {Periods}.", LogLevel.Info);
+            Log($"started with {Min}-{Max} range, period: {AnalysisPeriod}.", LogLevel.Info);
         }
-
-
-
 
         protected override SignalResultX CheckInternal(DateTime? t = null)
         {
             OrderSide? result = null;
             RangeStatus? status = null;
 
-            Colllect();            
+            if (i1k.CurrentValue.HasValue)
+            {                
+                bars.Push(new MyQuote() { Date = DateTime.Now, Close = i1k.CurrentValue.Value });
+            }            
 
-            //var data = bars.CloseList;
-            //var cross = bars.Cross(0);
-
-            if (bars.Count >= Periods)
+            if (bars.Count >= AnalysisPeriod)
             {
-                var ema = bars.List.GetEma(Periods - 1).Last();
+                var ema = bars.List.GetEma(AnalysisPeriod).Last();
                 if (Min.HasValue && ema.Ema.Value < Min.Value)
                 {
                     result = OrderSide.Buy;

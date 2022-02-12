@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Kalitte.Trading.Tests\Kalitte.Trading.Tests.csproj" />
     <ProjectReference Include="..\Kalitte.Trading\Kalitte.Trading.csproj" />
   </ItemGroup>
 

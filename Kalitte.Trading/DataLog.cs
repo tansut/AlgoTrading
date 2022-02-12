@@ -166,7 +166,7 @@ namespace Kalitte.Trading
             {
                 var date = DateTime.Parse(line.Key, CultureInfo.InvariantCulture);                
                 if (date.AddSeconds(0.1) > t) return result;
-                var q = new Quote()
+                var q = new MyQuote()
                 {
                     Date = date,
                     Open = line.Value[0],

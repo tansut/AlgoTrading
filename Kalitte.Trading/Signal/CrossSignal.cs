@@ -2,18 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Matriks.Data.Symbol;
-using Matriks.Engines;
-using Matriks.Indicators;
-using Matriks.Symbols;
-using Matriks.AlgoTrader;
-using Matriks.Trader.Core;
-using Matriks.Trader.Core.Fields;
-using Matriks.Lean.Algotrader.AlgoBase;
-using Matriks.Lean.Algotrader.Models;
-using Matriks.Lean.Algotrader.Trading;
 using System.Timers;
-using Matriks.Trader.Core.TraderModels;
 using System.Text;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -22,8 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
-
-
+using Matriks.Indicators;
+using Matriks.Lean.Algotrader.Models;
 
 namespace Kalitte.Trading
 {
@@ -75,15 +64,8 @@ namespace Kalitte.Trading
 
         protected SignalResultX CalculateSignal(DateTime? t = null)
         {
-
-       
-
-            // fetch historical quotes from your feed (your method)
-
-
-
             OrderSide? finalResult = null;
-            var mp = Algo.GetMarketPrice(Symbol, t); 
+            var mp = Algo.GetMarketPrice(Symbol, t);
 
             if (mp == 0)
             {
@@ -93,47 +75,57 @@ namespace Kalitte.Trading
             decimal i1Val = i1.CurrentValue, i2Val = i2.CurrentValue;
 
             var l1 = i1k.NextValue(mp);
-            var l2 = i2k.NextValue(mp);            
+            var l2 = i2k.NextValue(mp);
 
-            var newResultBar = new Quote() {  Date = t ?? DateTime.Now, Close = l1 - l2 };
+            var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 - l2 };
             differenceBars.Push(newResultBar);
+
+            var fl = differenceBars.FirstLast;
+
+            //var speed = (fl.Item2.Close - fl.Item1.Close) / differenceBars.Count;
+
+            //if (t.Value.Second % 15 == 0) Log($"Speed of MA difs is {speed}", LogLevel.Debug, t);
 
             var ldif = Math.Round(l1 - l2, 5);
             var idif = Math.Round(i1Val - i2Val, 5);
 
-            //if (Math.Abs(ldif - idif) > 0.2M)
-            //{
-            //Log("-- Too much indicator difference between us and matrix --", LogLevel.Debug, t);
+            if (Math.Abs(ldif - idif) > 0.2M && !Simulation)
+            {
+                Log("-- Too much indicator difference between us and matrix --", LogLevel.Debug, t);
                 Log($"Bardata: {i1k.InputBars.Last}", LogLevel.Debug, t);
                 Log($"Currents: my1: {l1}  i1: {i1Val} my2: {l2} l2: {i2Val}", LogLevel.Debug, t);
                 Log($"Difs: mp:{mp}  ldif: {ldif} idif: {idif} diff: {ldif - idif}", LogLevel.Debug, t);
-            //}
-            
+            }
+
             if (differenceBars.Count >= Periods)
-            {                
+            {
                 var cross = differenceBars.Cross(0);
                 var ema = differenceBars.List.GetEma(Periods).Last();
 
-                if (lastCross == 0 && cross != 0) lastCross = cross;
+                if (lastCross == 0 && cross != 0)
+                {
+                    lastCross = cross;
+                    differenceBars.Clear();
+                }
 
-                
                 if (lastCross > 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
                 else if (lastCross < 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
 
-                lastCross = finalResult.HasValue ? 0 : lastCross;
+                //lastCross = finalResult.HasValue ? 0 : lastCross;
 
                 //if (lastEma < 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
                 //else if (lastEma > 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
 
-                //if (finalResult.HasValue)
-                //{
-                Log($"Status: cross: {cross}, lastEma: {lastEma}, ema: {ema.Ema} split: {AvgChange}", LogLevel.Debug, t);
-                //}
+                if (finalResult.HasValue)
+                {                    
+                    Log($"Status: mp: {mp} order: {finalResult} lastCross: {lastCross}, cross: {cross}, lastEma: {lastEma}, ema: {ema.Ema} split: {AvgChange}", LogLevel.Debug, t);
+                    lastCross = 0;                    
+                }
 
                 if (lastEma == 0) lastEma = ema.Ema.Value;
 
                 lastEma = finalResult.HasValue ? 0 : lastEma;
-            }           
+            }
 
             return new SignalResultX(this)
             {

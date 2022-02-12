@@ -13,7 +13,9 @@ namespace Kalitte.Trading.Indicators
     {
         FinanceBars InputBars { get; }
         decimal NextValue(decimal newVal);
-    }
+        decimal? CurrentValue { get; }
+        List<decimal?> Results { get; }
+}
 
     public abstract class TradingIndicator<R>: ITradingIndicator where R: ResultBase
     {
@@ -27,15 +29,29 @@ namespace Kalitte.Trading.Indicators
         public string Symbol { get; private set; }
 
         public FinanceBars InputBars { get; }
-        public FinanceList<R> Results { get; set; } = null;
+        public FinanceList<R> ResultList { get; set; } = null;
 
-        
+        protected abstract decimal? ToValue(R result);
+
+        public decimal? CurrentValue { get
+            {
+                return ResultList.Count > 0 ? ToValue(ResultList.Last): null;
+            }
+        }
+
+        public List<decimal?> Results
+        {
+            get
+            {
+                return ResultList.List.Select(p=> ToValue(p)).ToList();
+            }
+        }
 
         public TradingIndicator(FinanceBars bars, FinanceList<R> initialResults = null)
         {
             //this.Algo = Algo;
             InputBars = bars;
-            Results = initialResults == null ? new FinanceList<R>(0, null): initialResults;
+            ResultList = initialResults == null ? new FinanceList<R>(0, null): initialResults;
         }
 
         public TradingIndicator()
@@ -43,7 +59,8 @@ namespace Kalitte.Trading.Indicators
 
         }
 
-        public abstract R NextResult(IQuote quote);
         public abstract decimal NextValue(decimal newVal);
+        public abstract R NextResult(IQuote quote);
+        //public abstract decimal NextValue(R result);
     }
 }

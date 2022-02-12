@@ -1,28 +1,16 @@
 ﻿// algo
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Kalitte.Trading.Indicators;
 using Matriks.Data.Symbol;
-using Matriks.Engines;
 using Matriks.Indicators;
-using Matriks.Symbols;
-using Matriks.AlgoTrader;
+using Matriks.Lean.Algotrader.Models;
 using Matriks.Trader.Core;
 using Matriks.Trader.Core.Fields;
-using Matriks.Lean.Algotrader.AlgoBase;
-using Matriks.Lean.Algotrader.Models;
-using Matriks.Lean.Algotrader.Trading;
-using System.Timers;
 using Matriks.Trader.Core.TraderModels;
-using System.Text;
-using System.Collections.Concurrent;
-using System.Reflection;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 
 namespace Kalitte.Trading.Algos
 {
@@ -85,11 +73,17 @@ namespace Kalitte.Trading.Algos
         [Parameter(9)]
         public decimal LossPuan = 9;
 
-        //[Parameter(0)]
-        public int RsiLong = 0;
+        [Parameter(68)]
+        public int RsiHighLimit = 0;
 
-        //[Parameter(0)]
-        public int RsiShort = 0;
+        [Parameter(32)]
+        public int RsiLowLimit = 0;
+
+        [Parameter(9)]
+        public int Rsi = 9;
+
+        [Parameter(8)]
+        public int RsiAnalysisPeriod = 8;
 
         [Parameter(0)]
         public int MACDShortPeriod = 0;
@@ -120,38 +114,34 @@ namespace Kalitte.Trading.Algos
         //Ema ema5;
         //Ema ema9;
 
-        FinanceBars bars = null;
+        FinanceBars periodBars = null;
+        //FinanceBars priceBars = null;
 
         decimal simulationPriceDif = 0;
 
 
         int virtualOrderCounter = 0;
         ExchangeOrder positionRequest = null;
-        //System.Timers.Timer orderTimer;
-
-
         int simulationCount = 0;
         bool boolsSignalsStarted = false;
-        decimal lastPrice = 0;
+
+
+        
 
         public void InitMySignals(DateTime t)
         {
             var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
             mdp.FileName = "all.txt";
             mdp.SaveDaily = true;
-            bars = mdp.GetContentAsQuote(t);
-            
-
-            //bd.ForEach(x => bars.Push(x));
-
-            Log($"Bars initialized. Last bar is: {bars.Last}", LogLevel.Debug, t);
-            
+            periodBars = mdp.GetContentAsQuote(t);
+            Log($"Bars initialized. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
+           
 
             var ma = signals.Where(p => p.Name == "cross:ma59").FirstOrDefault() as CrossSignal;
             if (ma != null)
             {
-                var movema5 = new Ema(bars, MovPeriod);
-                var mov2ema9 = new Ema(bars, MovPeriod2);
+                var movema5 = new Ema(periodBars, MovPeriod);
+                var mov2ema9 = new Ema(periodBars, MovPeriod2);
                 ma.i1k = movema5;
                 ma.i2k = mov2ema9;
             }
@@ -162,15 +152,20 @@ namespace Kalitte.Trading.Algos
             if (macds != null)
             {
 
-                var macdi = new Macd(bars, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
+                var macdi = new Macd(periodBars, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
 
                 macds.i1k = macdi;
                 macds.i2k = macdi.Trigger;
             }
 
 
+            var rsiRange = signals.Where(p => p.Name == "rsi").FirstOrDefault() as RangeSignal;
 
-
+            if (rsiRange != null)
+            {
+                var rsi = new Rsi(periodBars, Rsi);
+                rsiRange.i1k = rsi;
+            }
 
         }
 
@@ -180,40 +175,27 @@ namespace Kalitte.Trading.Algos
             mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
             rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);
             macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
-
-
-
             
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-
-
                 var ma = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { AvgChange = MaAvgChange, Periods = MaPeriods };
-
-
-
                 this.signals.Add(ma);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-
-
-
                 var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { AvgChange = MacdAvgChange, Periods = MacdPeriods };
-
-
-
                 this.signals.Add(macds);
             }
 
             if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
-            if (!SimulateOrderSignal && this.ProfitQuantity > 0 || this.LossQuantity > 0) this.signals.Add(new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity));
-            if (!SimulateOrderSignal && RsiLong > 0 || RsiShort > 0) this.signals.Add(new RangeSignal("rsi", Symbol, this, rsi, RsiShort == 0 ? new decimal?() : RsiShort, RsiLong == 0 ? new decimal() : RsiLong) { Periods = 1 });
+            if (!SimulateOrderSignal && (this.ProfitQuantity > 0 || this.LossQuantity > 0)) this.signals.Add(new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity));
+            if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0)) this.signals.Add(new RangeSignal("rsi", Symbol, this, rsi, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { AnalysisPeriod = RsiAnalysisPeriod });
 
             signals.ForEach(p =>
             {
+                
                 p.TimerEnabled = !Simulation;
                 p.Simulation = Simulation;
                 p.OnSignal += SignalReceieved;
@@ -222,7 +204,6 @@ namespace Kalitte.Trading.Algos
 
         public override void OnInit()
         {
-            //AddSymbol(Symbol, Simulation ? SymbolPeriod.Min : SymbolPeriod);
             AddSymbol(Symbol, SymbolPeriod);
             WorkWithPermanentSignal(true);
             SendOrderSequential(false);
@@ -231,7 +212,6 @@ namespace Kalitte.Trading.Algos
                 AddSymbolMarketData(Symbol);
             }
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
-
             InitSignals();
             if (!Simulation) InitMySignals(DateTime.Now);
         }
@@ -247,7 +227,7 @@ namespace Kalitte.Trading.Algos
             var assembly = typeof(MaProfit).Assembly.GetName();
             var ma = MovPeriod > 0 ? $"Ma[{MovPeriod}/{MovPeriod2}]" : "";
             var macd = MACDShortPeriod > 0 ? $"Macd[{MACDShortPeriod}/{MACDLongPeriod}]" : "";
-            Log($"Inited instance {InstanceName} [{this.Symbol}, {ma} {macd}] using assemly {assembly.FullName}");
+            Log($"Inited instance {InstanceName} [{this.Symbol}, {ma} {macd}] using assemly {assembly.FullName}", LogLevel.Result);
             LoadRealPositions(this.Symbol);
             if (!Simulation) CompleteInit();
         }
@@ -275,8 +255,8 @@ namespace Kalitte.Trading.Algos
                     }
 
                     var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                    bars.Push(newQuote);
-                    Log($"Pushed new bar, current bar is: {bars.Last.Date}", LogLevel.Info, time);
+                    periodBars.Push(newQuote);
+                    Log($"Pushed new bar, current bar is: {periodBars.Last.Date}", LogLevel.Info, time);
 
                     //foreach (var signal in signals)
                     //{
@@ -312,7 +292,7 @@ namespace Kalitte.Trading.Algos
                 try
                 {
                     var newQuote = new Quote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
-                    bars.Push(newQuote);
+                    periodBars.Push(newQuote);
                     Log($"Pushed new quote: {newQuote.ToString()}", LogLevel.Debug, bd.BarDataIndexer[last]);
                 }
                 catch (Exception ex)
@@ -386,7 +366,7 @@ namespace Kalitte.Trading.Algos
 
             if (marketPrice == 0)
             {
-                Log($"{signal.Name} couldnot be executed since market price is zero", LogLevel.Debug, result.SignalTime);
+                Log($"{signal.Name} couldnot be executed since market price is zero", LogLevel.Warning, result.SignalTime);
             }
 
             if (!portfolio.IsEmpty)
@@ -409,7 +389,6 @@ namespace Kalitte.Trading.Algos
         private void Decide(Signal signal, SignalEventArgs data)
         {
             var result = data.Result;
-            //Log($"Deciding with {signalResults.Count} results from {signals.Count} signals.", LogLevel.Debug);
             var waitOthers = waitForOperationAndOrders("Decide");
             if (!waitOthers) return;
             operationWait.Reset();
@@ -522,7 +501,7 @@ namespace Kalitte.Trading.Algos
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-            Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Info, positionRequest.Resulted);
+            Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Result, positionRequest.Resulted);
             this.positionRequest = null;
             orderWait.Set();
         }
@@ -590,7 +569,7 @@ namespace Kalitte.Trading.Algos
         {
             //orderTimer.Stop();
             signals.ForEach(p => p.Stop());
-            Log($"Completed Algo.\n {printPortfolio()}",  LogLevel.Info);
+            Log($"Completed Algo.\n {printPortfolio()}",  LogLevel.Result);
             if (Simulation) Process.Start(LogFile);
         }
     }

@@ -81,7 +81,7 @@ namespace Kalitte.Trading
 
         public override void LogMarketData(DateTime t, decimal[] price)
         {
-            string append = $"{t.ToString("yyyy.MM.dd HH:mm:ss")}{Seperator}{string.Join(Convert.ToString(Seperator), price)}\n";
+            string append = $"{t.ToString("yyyy.MM.dd HH:mm:ss")}{Seperator}{string.Join(Convert.ToString(Seperator), price.Select(p=>p.ToString(CultureInfo.InvariantCulture)))}\n";
             string file = GetFileName(t);
             if (!Directory.Exists(Path.GetDirectoryName(file))) Directory.CreateDirectory(Path.GetDirectoryName(file));
             File.AppendAllText(file, append);
@@ -101,7 +101,7 @@ namespace Kalitte.Trading
                     {
                         var key = parts[0];
                         parts.RemoveAt(0);
-                        content.Add(parts.Select(p => decimal.Parse(p)).ToArray());
+                        content.Add(parts.Select(p => decimal.Parse(p, CultureInfo.InvariantCulture)).ToArray());
                     }
                     catch (ArgumentException ex)
                     {
@@ -128,7 +128,7 @@ namespace Kalitte.Trading
                     {
                         var key = parts[0];
                         parts.RemoveAt(0);
-                        content.Add(key, parts.Select(p => decimal.Parse(p)).ToArray());
+                        content.Add(key, parts.Select(p => decimal.Parse(p, CultureInfo.InvariantCulture)).ToArray());
                     }
                     catch (ArgumentException ex)
                     {

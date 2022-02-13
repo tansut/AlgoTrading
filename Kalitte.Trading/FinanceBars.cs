@@ -251,7 +251,7 @@ namespace Kalitte.Trading
             get
             {
 
-                //rwl.AcquireReaderLock(timeOut);
+                rwl.AcquireReaderLock(timeOut);
                 try
                 {
                     return items.Select(p =>
@@ -271,7 +271,7 @@ namespace Kalitte.Trading
                 }
                 finally
                 {
-                    //rwl.ReleaseReaderLock();
+                    rwl.ReleaseReaderLock();
                 }
 
             }

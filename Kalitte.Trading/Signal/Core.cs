@@ -138,7 +138,13 @@ namespace Kalitte.Trading
         {
             
         }
-        
+
+
+        protected virtual void Reset()
+        {
+
+        }
+
         public virtual void Start()
         {
             if (!checkLock.WaitOne(30000))

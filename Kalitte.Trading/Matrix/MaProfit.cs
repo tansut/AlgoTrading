@@ -41,11 +41,11 @@ namespace Kalitte.Trading.Matrix
         public int MovPeriod2 = 9;
 
 
-        [Parameter(0.25)]
-        public decimal MaAvgChange = 0.1M;
+        [Parameter(0.02)]
+        public decimal MaAvgChange = 0.02M;
 
-        [Parameter(30)]
-        public int MaPeriods = 8;
+        [Parameter(25)]
+        public int MaPeriods = 25;
 
 
 
@@ -125,7 +125,7 @@ namespace Kalitte.Trading.Matrix
         ExchangeOrder positionRequest = null;
         int simulationCount = 0;
         public StartableState SignalsState { get; private set; } = StartableState.Stopped;
-        bool boolsSignalsStarted = false;
+       
 
 
         public void StartSignals()
@@ -268,10 +268,16 @@ namespace Kalitte.Trading.Matrix
             var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 30, 0);
             var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
+            // t1 = new DateTime(t.Year, t.Month, t.Day, 10, 38, 0);
+            // t2 = new DateTime(t.Year, t.Month, t.Day, 10, 39, 0);
+
+            //t3 = new DateTime(t.Year, t.Month, t.Day, 10, 40, 0);
+            //t4 = new DateTime(t.Year, t.Month, t.Day, 10, 42, 0);
+
             seansTimer.Enabled = false;
             try
             {
-                if (t >= t1 && t <= t2 || t >= t3 && t <= t4)
+                if ((t >= t1 && t <= t2) || (t >= t3 && t <= t4))
                 {
                     if (SignalsState == StartableState.Stopped)
                     {
@@ -337,7 +343,7 @@ namespace Kalitte.Trading.Matrix
                 {
                     //if (simulationCount > 12) return;                                       
 
-                    if (!boolsSignalsStarted)
+                    if (SignalsState != StartableState.Started)
                     {
                         InitMySignals(time);
                         CompleteInit();
@@ -345,7 +351,7 @@ namespace Kalitte.Trading.Matrix
 
                     var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
                     periodBars.Push(newQuote);
-                    Log($"Pushed new bar, current bar is: {periodBars.Last.Date}", LogLevel.Info, time);
+                    Log($"Pushed new bar, current bar is: {periodBars.Last}", LogLevel.Info, time);
 
                     //foreach (var signal in signals)
                     //{
@@ -667,8 +673,11 @@ namespace Kalitte.Trading.Matrix
             Log($"Market price difference total: {this.simulationPriceDif}", LogLevel.FinalResult);
             Log($"Total orders filled:: {this.orderCounter}", LogLevel.FinalResult);
             Log($"{printPortfolio()}", LogLevel.FinalResult);
-            if (Simulation && this.UserPortfolioList.GetPortfolio(Symbol).PL < 200) File.Delete(LogFile);
-            else if (Simulation) Process.Start(LogFile);
+            
+            var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
+            
+            //if (Simulation && netPL < 200) File.Delete(LogFile);
+            if (Simulation) Process.Start(LogFile);
         }
     }
 

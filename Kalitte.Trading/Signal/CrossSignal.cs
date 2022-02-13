@@ -44,19 +44,21 @@ namespace Kalitte.Trading
 
         public override void Start()
         {
+            Reset();
+            base.Start();            
+        }
+
+        protected override void Reset()
+        {
             differenceBars = new FinanceBars(Periods);
             lastEma = 0;
             lastCross = 0;
-            base.Start();            
         }
 
         public override void Stop()
         {
             base.Stop();
-            lastEma = 0;
-            lastCross = 0;
-            differenceBars.Clear();
-            
+            Reset();            
         }
 
 

@@ -39,7 +39,7 @@ namespace Kalitte.Trading.Matrix
 
         public string InstanceName { get; set; }
 
-        protected DateTime? TimeSet = null;
+        protected  DateTime? TimeSet = null;
 
 
         public PortfolioList UserPortfolioList = new PortfolioList();
@@ -79,17 +79,14 @@ namespace Kalitte.Trading.Matrix
         {
             if ((int)level >= this.LoggingLevel)
             {
-                t = t ?? AlgoTime;
-                string opTime = t.HasValue ? t.Value.ToString("yyyy.MM.dd HH:mm:sss") + "*" : DateTime.Now.ToString("yyyy.MM.dd HH:mm:sss");
+                var time = t ?? AlgoTime;
+                string opTime = time.ToString("yyyy.MM.dd HH:mm:sss");
                 var content = $"[{level}:{opTime}]: {text}" + Environment.NewLine;
-
-                Debug(content);
-                var file = LogFile;
-
-                //var bytes = Encoding.UTF8.GetBytes(content);
-                //logStream.Write(bytes, 0, bytes.Length);
-                File.AppendAllText(file, content + Environment.NewLine);
-
+                lock(this)
+                {
+                    Debug(content);
+                    File.AppendAllText(LogFile, content + Environment.NewLine);
+                }
             }
         }
 

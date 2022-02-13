@@ -12,10 +12,17 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Matrix
 {
 
+    public class DelayedOrder
+    {
+        public ExchangeOrder order;
+        public DateTime scheduled2;
+        public DateTime created;
+    }
 
 
     public class MaProfit : AlgoBase
@@ -125,7 +132,7 @@ namespace Kalitte.Trading.Matrix
         ExchangeOrder positionRequest = null;
         int simulationCount = 0;
         public StartableState SignalsState { get; private set; } = StartableState.Stopped;
-       
+
 
 
         public void StartSignals()
@@ -276,12 +283,6 @@ namespace Kalitte.Trading.Matrix
             var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 30, 0);
             var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
-            // t1 = new DateTime(t.Year, t.Month, t.Day, 10, 38, 0);
-            // t2 = new DateTime(t.Year, t.Month, t.Day, 10, 39, 0);
-
-            //t3 = new DateTime(t.Year, t.Month, t.Day, 10, 40, 0);
-            //t4 = new DateTime(t.Year, t.Month, t.Day, 10, 42, 0);
-
             seansTimer.Enabled = false;
             try
             {
@@ -301,7 +302,8 @@ namespace Kalitte.Trading.Matrix
                         StopSignals();
                     }
                 }
-            } finally
+            }
+            finally
             {
                 seansTimer.Enabled = true;
             }
@@ -341,36 +343,34 @@ namespace Kalitte.Trading.Matrix
 
             if (Simulation)
             {
-             
-
 
                 lock (this)
                 {
 
                     var bd = barDataCurrentValues.LastUpdate;
-                    var time = AlgoTime = bd.DTime;
+                    AlgoTime = bd.DTime;
                     var seconds = GetSymbolPeriodSeconds(SymbolPeriod);
 
                     //if (simulationCount > 12) return;                                       
 
                     if (SignalsState != StartableState.Started)
                     {
-                        var lastDay = new DateTime(time.Year, time.Month, time.Day).AddDays(-1).AddHours(22).AddMinutes(50);
+                        var lastDay = new DateTime(AlgoTime.Year, AlgoTime.Month, AlgoTime.Day).AddDays(-1).AddHours(22).AddMinutes(50);
                         InitMySignals(lastDay);
                         CompleteInit();
-                    } 
+                    }
 
-                    Log($"Running backtest for period: {periodBars.Last}", LogLevel.Verbose, time);
-                 
-
+                    Log($"Running backtest for period: {periodBars.Last}", LogLevel.Verbose);
+                    
                     for (var i = 0; i < seconds; i++)
-                    {
-                        var t = AlgoTime = time.AddSeconds(i);
+                    {                        
                         foreach (var signal in signals)
                         {
-                            var result = signal.Check(t);
-                            var waitOthers = waitForOperationAndOrders("Backtest");
+                            var result = signal.Check(AlgoTime);
+                            //var waitOthers = waitForOperationAndOrders("Backtest");
+                            Thread.Sleep(1);
                         }
+                        AlgoTime = AlgoTime.AddSeconds(1);
                     }
                     simulationCount++;
 
@@ -388,7 +388,7 @@ namespace Kalitte.Trading.Matrix
                 var last = bd.BarDataIndexer.LastBarIndex;
                 try
                 {
-                    var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };                    
+                    var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
                     periodBars.Push(newQuote);
                     Log($"Pushed new quote, last is now: {periodBars.Last}", LogLevel.Debug, bd.BarDataIndexer[last]);
 
@@ -411,6 +411,16 @@ namespace Kalitte.Trading.Matrix
             if (!result2 && !Simulation) Log($"Waitng for last order to complete: {message}", LogLevel.Warning);
             return result1 && result2;
         }
+
+        //private Boolean waitForOperationAndOrders(string message)
+        //{
+        //    var wait = Simulation ? 0 : 100;
+        //    var result1 = Simulation && UseVirtualOrders ? operationWait.WaitOne(): operationWait.WaitOne(wait);
+        //    var result2 = Simulation && UseVirtualOrders ? orderWait.WaitOne(): orderWait.WaitOne(wait);
+        //    if (!result1 && !Simulation) Log($"Waiting for last operation to complete: {message}", LogLevel.Warning);
+        //    if (!result2 && !Simulation) Log($"Waitng for last order to complete: {message}", LogLevel.Warning);
+        //    return result1 && result2;
+        //}
 
         private void SignalReceieved(Signal signal, SignalEventArgs data)
         {
@@ -581,8 +591,34 @@ namespace Kalitte.Trading.Matrix
             var order = this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
             order.Sent = t ?? DateTime.Now;
 
-            Log($"Order created, waiting to complete. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info, t);
-            if (this.UseVirtualOrders || this.AutoCompleteOrders) FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);
+            Log($"Order created, waiting to complete. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info);
+            if (this.UseVirtualOrders || this.AutoCompleteOrders)
+            {
+                if (this.Simulation)
+                {
+                    var algoTime = AlgoTime;
+                    var data = new DelayedOrder() { created= algoTime, order=positionRequest, scheduled2=AlgoTime.AddSeconds(2) };
+                    Log($"Simulating real environment for {data.order.Id} time is: {data.created}, schedule to: {data.scheduled2}", LogLevel.Debug);
+                    new Thread((req) =>
+                    {
+                        Thread.CurrentThread.IsBackground = true;
+                        var o = (DelayedOrder)req;
+                        Log($"Simulate thread started for {o.order.Id} time is: {AlgoTime}, schedule to: {o.scheduled2}", LogLevel.Debug);
+                        var safeSide = 0;
+                        while (safeSide++ < 5000)
+                        {
+                            var dif = AlgoTime - o.scheduled2;
+                            if (dif.Seconds > 0)
+                            {
+                                Log($"Simulation completed at {AlgoTime}  for {o.order.Id}", LogLevel.Debug);
+                                FillCurrentOrder(o.order.UnitPrice, o.order.Quantity);
+                                break;
+                            }
+                            Thread.Sleep(1);
+                        }
+                    }).Start(data);                    
+                } else FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);               
+            }
         }
 
 
@@ -600,7 +636,7 @@ namespace Kalitte.Trading.Matrix
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-            Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Order, positionRequest.Resulted);
+            Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Order);
             this.positionRequest = null;
             orderCounter++;
             orderWait.Set();
@@ -628,10 +664,6 @@ namespace Kalitte.Trading.Matrix
                             //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
                         }
                         this.FillCurrentOrder(order.Price, this.positionRequest.Quantity);
-                    }
-                    else if (UseVirtualOrders)
-                    {
-                        this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
                     }
                     else
                     {
@@ -678,11 +710,11 @@ namespace Kalitte.Trading.Matrix
             Log($"Market price difference total: {this.simulationPriceDif}", LogLevel.FinalResult);
             Log($"Total orders filled:: {this.orderCounter}", LogLevel.FinalResult);
             Log($"{printPortfolio()}", LogLevel.FinalResult);
-            
+
             var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
-            
-            if (Simulation && netPL < 150) File.Delete(LogFile);
-            else if (Simulation) Process.Start(LogFile);
+
+            //if (Simulation && netPL < 150) File.Delete(LogFile);
+            if (Simulation) Process.Start(LogFile);
         }
     }
 

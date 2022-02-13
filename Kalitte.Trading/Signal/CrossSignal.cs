@@ -29,10 +29,12 @@ namespace Kalitte.Trading
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
         private FinanceBars differenceBars;
+        private FinanceBars emaBars;
 
 
         private decimal lastEma = 0;
         private decimal lastCross = 0;
+
 
 
 
@@ -44,21 +46,26 @@ namespace Kalitte.Trading
 
         public override void Start()
         {
-            Reset();
             base.Start();            
         }
 
-        protected override void Reset()
+        protected override void ResetInternal()
         {
-            differenceBars = new FinanceBars(Periods);
-            lastEma = 0;
-            lastCross = 0;
+
         }
 
         public override void Stop()
         {
             base.Stop();
-            Reset();            
+              
+        }
+
+        public override void Init()
+        {
+            differenceBars = new FinanceBars(Periods);
+            emaBars = new FinanceBars(Periods);
+            lastEma = 0;
+            lastCross = 0;
         }
 
 
@@ -91,11 +98,7 @@ namespace Kalitte.Trading
             var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 - l2 };
             differenceBars.Push(newResultBar);
 
-            var fl = differenceBars.FirstLast;
 
-            //var speed = (fl.Item2.Close - fl.Item1.Close) / differenceBars.Count;
-
-            //if (t.Value.Second % 15 == 0) Log($"Speed of MA difs is {speed}", LogLevel.Debug, t);
 
             var ldif = Math.Round(l1 - l2, 5);
             var idif = Math.Round(i1Val - i2Val, 5);
@@ -112,6 +115,17 @@ namespace Kalitte.Trading
             {
                 var cross = differenceBars.Cross(0);
                 var ema = differenceBars.List.GetEma(Periods).Last();
+                emaBars.Push(new MyQuote() { Date = ema.Date, Close = ema.Ema.Value });
+
+                if (emaBars.Count >= Periods)
+                {
+                    var fl = emaBars.FirstLast;
+
+                    var speed = (fl.Item2.Close - fl.Item1.Close) / emaBars.Count;
+
+                    //if (t.Value.Second % 15 == 0) Log($"Speed of MA difs is {speed}", LogLevel.Debug, t);
+                }
+
 
                 if (lastCross == 0 && cross != 0)
                 {
@@ -129,7 +143,7 @@ namespace Kalitte.Trading
 
                 if (finalResult.HasValue)
                 {                    
-                    Log($"Status: mp: {mp} order: {finalResult} lastCross: {lastCross}, cross: {cross}, lastEma: {lastEma}, ema: {ema.Ema} split: {AvgChange}", LogLevel.Debug, t);
+                    Log($"Status: order:{finalResult}, mp:{mp}, lastCross:{lastCross}, cross:{cross}, lastEma:{lastEma}, ema:{ema.Ema}, split:{AvgChange}", LogLevel.Info, t);
                     lastCross = 0;                    
                 }
 

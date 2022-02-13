@@ -14,6 +14,7 @@ namespace Kalitte.Trading.Indicators
     public class Ema : TradingIndicator<EmaResult>
     {
 
+
         public override string ToString()
         {
             return $"{base.ToString()}:({Periods})";
@@ -33,13 +34,18 @@ namespace Kalitte.Trading.Indicators
         private void createResult()
         {
             ResultList.Clear();
-            var result = InputBars.LastItems(Periods).GetEma(Periods).ToList();
+            var result = LastBars.GetEma(Periods).ToList();
             result.ForEach(r => ResultList.Push(r));
         }
 
         protected override decimal? ToValue(EmaResult result)
         {
             return result.Ema;
+        }
+
+        public IList<IQuote> LastBars
+        {
+            get { return InputBars.LastItems(Periods); }
         }
 
 
@@ -75,6 +81,7 @@ namespace Kalitte.Trading.Indicators
                     //}
                     //temp.Add(e.Item);
                     //var lastResult = temp.GetEma(Periods);
+
                     var ema = new EmaResult() { Date = e.Item.Date };
                     var close = (double)(e.Item.Close);
                     var lastEma = (double)(ResultList.Last.Ema);

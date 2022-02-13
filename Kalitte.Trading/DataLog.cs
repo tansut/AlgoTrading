@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Globalization;
 using Skender.Stock.Indicators;
+using Kalitte.Trading.Matrix;
 
 namespace Kalitte.Trading
 {
@@ -164,8 +165,12 @@ namespace Kalitte.Trading
 
             foreach (var line in content)
             {
-                var date = DateTime.Parse(line.Key, CultureInfo.InvariantCulture);                
-                if (date.AddSeconds(0.1) > t) return result;
+                var date = DateTime.Parse(line.Key, CultureInfo.InvariantCulture);
+                if (date > t)
+                {
+                    //AlgoBase.Current.Log($"{date} is greater than {t} ");
+                    return result;
+                }
                 var q = new MyQuote()
                 {
                     Date = date,

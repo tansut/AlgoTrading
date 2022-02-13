@@ -139,8 +139,29 @@ namespace Kalitte.Trading
             
         }
 
+        //public virtual void Reset()
+        //{
+        //    if (!checkLock.WaitOne(30000))
+        //    {
+        //        Log("Timeout in waiting operation", LogLevel.Error);
+        //    }
+        //}
 
-        protected virtual void Reset()
+        protected virtual void ResetInternal()
+        {
+
+        }
+
+        public virtual void Reset()
+        {
+            if (!checkLock.WaitOne(30000))
+            {
+                Log("Timeout in starting signal", LogLevel.Error);
+            }
+            else ResetInternal();
+        }
+
+        public virtual void Init()
         {
 
         }
@@ -204,7 +225,7 @@ namespace Kalitte.Trading
             //    Log($"Error stopping task {this.Name}. {ex.Message}", LogLevel.Error);
             //}
 
-            Log($"Stopped.", LogLevel.Debug);
+            //Log($"Stopped.", LogLevel.Debug);
 
 
         }

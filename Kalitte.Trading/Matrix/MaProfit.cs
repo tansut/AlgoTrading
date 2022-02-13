@@ -174,11 +174,14 @@ namespace Kalitte.Trading.Matrix
 
         public void InitMySignals(DateTime t)
         {
-            var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
-            mdp.FileName = "all.txt";
-            mdp.SaveDaily = true;
-            periodBars = mdp.GetContentAsQuote(t);
-            Log($"Bars initialized. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
+            if (periodBars == null)
+            {
+                var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
+                mdp.FileName = "all.txt";
+                mdp.SaveDaily = true;
+                periodBars = mdp.GetContentAsQuote(t);
+                Log($"Bars initialized using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
+            }
 
 
             var ma = signals.Where(p => p.Name == "cross:ma59").FirstOrDefault() as CrossSignal;
@@ -210,6 +213,11 @@ namespace Kalitte.Trading.Matrix
                 var rsi = new Rsi(periodBars, Rsi);
                 rsiRange.i1k = rsi;
             }
+
+            signals.ForEach(p =>
+            {
+                p.Init();
+            });
 
         }
 
@@ -333,34 +341,27 @@ namespace Kalitte.Trading.Matrix
 
             if (Simulation)
             {
-                var bd = barDataCurrentValues.LastUpdate;
-                var time = barDataCurrentValues.LastUpdate.DTime;
-
-
+             
 
 
                 lock (this)
                 {
+
+                    var bd = barDataCurrentValues.LastUpdate;
+                    var time = AlgoTime = bd.DTime;
+                    var seconds = GetSymbolPeriodSeconds(SymbolPeriod);
+
                     //if (simulationCount > 12) return;                                       
 
                     if (SignalsState != StartableState.Started)
                     {
-                        InitMySignals(time);
+                        var lastDay = new DateTime(time.Year, time.Month, time.Day).AddDays(-1).AddHours(22).AddMinutes(50);
+                        InitMySignals(lastDay);
                         CompleteInit();
-                    }
+                    } 
 
-                    var newQuote = new Quote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                    periodBars.Push(newQuote);
-                    Log($"Pushed new bar, current bar is: {periodBars.Last}", LogLevel.Info, time);
-
-                    //foreach (var signal in signals)
-                    //{
-                    //    Log($"Checking signal {signal.Name} for {time}", LogLevel.Debug, time);
-                    //    var result = signal.Check(time);
-                    //    var waitOthers = waitForOperationAndOrders("Backtest");
-                    //}
-
-                    var seconds = GetSymbolPeriodSeconds(SymbolPeriod);
+                    Log($"Running backtest for period: {periodBars.Last}", LogLevel.Verbose, time);
+                 
 
                     for (var i = 0; i < seconds; i++)
                     {
@@ -373,6 +374,9 @@ namespace Kalitte.Trading.Matrix
                     }
                     simulationCount++;
 
+                    var newQuote = new MyQuote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
+                    periodBars.Push(newQuote);
+                    Log($"Pushed new bar, last bar is now: {periodBars.Last}", LogLevel.Verbose);
                 }
 
 
@@ -384,9 +388,10 @@ namespace Kalitte.Trading.Matrix
                 var last = bd.BarDataIndexer.LastBarIndex;
                 try
                 {
-                    var newQuote = new Quote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
+                    var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };                    
                     periodBars.Push(newQuote);
-                    Log($"Pushed new quote: {newQuote.ToString()}", LogLevel.Debug, bd.BarDataIndexer[last]);
+                    Log($"Pushed new quote, last is now: {periodBars.Last}", LogLevel.Debug, bd.BarDataIndexer[last]);
+
                 }
                 catch (Exception ex)
                 {
@@ -676,8 +681,8 @@ namespace Kalitte.Trading.Matrix
             
             var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
             
-            //if (Simulation && netPL < 200) File.Delete(LogFile);
-            if (Simulation) Process.Start(LogFile);
+            if (Simulation && netPL < 150) File.Delete(LogFile);
+            else if (Simulation) Process.Start(LogFile);
         }
     }
 

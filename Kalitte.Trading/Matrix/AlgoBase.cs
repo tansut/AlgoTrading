@@ -26,6 +26,8 @@ namespace Kalitte.Trading.Matrix
     public class AlgoBase : MatriksAlgo, IDisposable, ILogProvider
     {
 
+        public static AlgoBase Current;
+
         [Parameter(0)]
         public int LoggingLevel { get; set; }
 
@@ -50,6 +52,7 @@ namespace Kalitte.Trading.Matrix
             if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
             this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));
             //logStream = new FileStream(LogFile, FileMode.Create, FileAccess.Write, FileShare.Read, 4096);
+            Current = this;
 
         }
 

@@ -17,6 +17,16 @@ namespace Kalitte.Trading
             csp = new RNGCryptoServiceProvider();
         }
 
+        public double NextDouble()
+        {            
+            var bytes = new Byte[8];
+            csp.GetBytes(bytes);
+            // Step 2: bit-shift 11 and 53 based on double's mantissa bits
+            var ul = BitConverter.ToUInt64(bytes, 0) / (1 << 11);
+            Double d = ul / (Double)(1UL << 53);
+            return d;
+        }
+
         public int Next(int minValue, int maxExclusiveValue)
         {
             if (minValue >= maxExclusiveValue)

@@ -609,6 +609,11 @@ namespace Kalitte.Trading.Matrix
         {
             orderWait.Reset();
             var price = lprice > 0 ? lprice : GetMarketPrice(this.Symbol, t);
+            if (price == 0)
+            {
+                Log($"Unable to get a marketprice at {t}, using close {periodBars.Last.Close} from {periodBars.Last}", LogLevel.Warning, t);
+                price = periodBars.Last.Close;
+            }
             string orderid;
             decimal limitPrice = Math.Round((price + price * 0.02M * (side == OrderSide.Sell ? -1 : 1)) * 4, MidpointRounding.ToEven) / 4;
 

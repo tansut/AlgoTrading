@@ -131,10 +131,13 @@ namespace Kalitte.Trading
                 {
                     lastCross = cross;
                     differenceBars.Clear();
+                } else
+                {
+                    if (lastCross != 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
+                    else if (lastCross != 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
                 }
 
-                if (lastCross > 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
-                else if (lastCross < 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
+
 
                 //lastCross = finalResult.HasValue ? 0 : lastCross;
 
@@ -144,7 +147,8 @@ namespace Kalitte.Trading
                 if (finalResult.HasValue)
                 {                    
                     Log($"Status: order:{finalResult}, mp:{mp}, lastCross:{lastCross}, cross:{cross}, lastEma:{lastEma}, ema:{ema.Ema}, split:{AvgChange}", LogLevel.Info, t);
-                    lastCross = 0;                    
+                    differenceBars.Clear();
+                    //lastCross = 0;                    
                 }
 
                 if (lastEma == 0) lastEma = ema.Ema.Value;

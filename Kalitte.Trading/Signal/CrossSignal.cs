@@ -115,16 +115,16 @@ namespace Kalitte.Trading
             {
                 var cross = differenceBars.Cross(0);
                 var ema = differenceBars.List.GetEma(Periods).Last();
-                emaBars.Push(new MyQuote() { Date = ema.Date, Close = ema.Ema.Value });
+                //emaBars.Push(new MyQuote() { Date = ema.Date, Close = ema.Ema.Value });
 
-                if (emaBars.Count >= Periods)
-                {
-                    var fl = emaBars.FirstLast;
+                //if (emaBars.Count >= Periods)
+                //{
+                //    var fl = emaBars.FirstLast;
 
-                    var speed = (fl.Item2.Close - fl.Item1.Close) / emaBars.Count;
+                //    var speed = (fl.Item2.Close - fl.Item1.Close) / emaBars.Count;
 
-                    //if (t.Value.Second % 15 == 0) Log($"Speed of MA difs is {speed}", LogLevel.Debug, t);
-                }
+                //    //if (t.Value.Second % 15 == 0) Log($"Speed of MA difs is {speed}", LogLevel.Debug, t);
+                //}
 
 
                 if (lastCross == 0 && cross != 0)

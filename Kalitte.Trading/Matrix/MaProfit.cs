@@ -36,8 +36,8 @@ namespace Kalitte.Trading.Matrix
         //[SymbolParameter("F_XU0300222")]
         public string Symbol = "F_XU0300222";
 
-        [Parameter(SymbolPeriod.Min10)]
-        public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
+        [Parameter(SymbolPeriod.Min15)]
+        public SymbolPeriod SymbolPeriod = SymbolPeriod.Min15;
 
         [Parameter(2)]
         public decimal OrderQuantity = 2M;
@@ -145,7 +145,7 @@ namespace Kalitte.Trading.Matrix
             if (this.delayedOrder != null)
             {
                 var dif = AlgoTime - delayedOrder.scheduled2;
-                if (dif.Seconds > 0)
+                if (dif.Seconds >= 0)
                 {
                     Log($"Simulation completed at {t}  for {delayedOrder.order.Id}", LogLevel.Debug);
                     FillCurrentOrder(delayedOrder.order.UnitPrice, delayedOrder.order.Quantity);

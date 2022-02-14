@@ -28,13 +28,14 @@ namespace Kalitte.Trading
 
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
+        public int NextOrderMultiplier = 2;
+
         private FinanceBars differenceBars;
-        private FinanceBars emaBars;
+        private FinanceBars longTermBars;
 
 
         private decimal lastEma = 0;
-        private decimal lastCross = 0;
-
+        private decimal lastCross = 0;        
 
 
 
@@ -46,7 +47,7 @@ namespace Kalitte.Trading
 
         public override void Start()
         {
-            base.Start();            
+            base.Start();
         }
 
         protected override void ResetInternal()
@@ -57,13 +58,13 @@ namespace Kalitte.Trading
         public override void Stop()
         {
             base.Stop();
-              
+
         }
 
         public override void Init()
         {
             differenceBars = new FinanceBars(Periods);
-            emaBars = new FinanceBars(Periods);
+            longTermBars = new FinanceBars(Periods * NextOrderMultiplier);
             lastEma = 0;
             lastCross = 0;
         }
@@ -77,7 +78,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {Periods} avgChange: {AvgChange}";
+            return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {Periods} avgChange: {AvgChange} noMultiplier: {NextOrderMultiplier}";
         }
 
         protected SignalResultX CalculateSignal(DateTime? t = null)
@@ -97,46 +98,35 @@ namespace Kalitte.Trading
 
             var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 - l2 };
             differenceBars.Push(newResultBar);
-
-
+            longTermBars.Push(newResultBar);    
 
             var ldif = Math.Round(l1 - l2, 5);
             var idif = Math.Round(i1Val - i2Val, 5);
 
-            if (Math.Abs(ldif - idif) > 0.2M && !Simulation)
+            //if (Math.Abs(ldif - idif) > 0.2M && !Simulation)
+            //{
+            //    Log("-- Too much indicator difference between us and matrix --", LogLevel.Debug, t);
+            //    Log($"Bardata: {i1k.InputBars.Last}", LogLevel.Debug, t);
+            //    Log($"Currents: my1: {l1}  i1: {i1Val} my2: {l2} l2: {i2Val}", LogLevel.Debug, t);
+            //    Log($"Difs: mp:{mp}  ldif: {ldif} idif: {idif} diff: {ldif - idif}", LogLevel.Debug, t);
+            //}
+
+            var cross = differenceBars.Cross(0);
+
+            if (lastCross == 0 && cross != 0)
             {
-                Log("-- Too much indicator difference between us and matrix --", LogLevel.Debug, t);
-                Log($"Bardata: {i1k.InputBars.Last}", LogLevel.Debug, t);
-                Log($"Currents: my1: {l1}  i1: {i1Val} my2: {l2} l2: {i2Val}", LogLevel.Debug, t);
-                Log($"Difs: mp:{mp}  ldif: {ldif} idif: {idif} diff: {ldif - idif}", LogLevel.Debug, t);
+                lastCross = cross;
+                differenceBars.Clear();
+                Log($"Cross determined. Cross value: {cross}", LogLevel.Debug, t);
             }
 
-            if (differenceBars.Count >= Periods)
+
+            if (differenceBars.IsFull && longTermBars.IsFull)
             {
-                var cross = differenceBars.Cross(0);
                 var ema = differenceBars.List.GetEma(Periods).Last();
-                //emaBars.Push(new MyQuote() { Date = ema.Date, Close = ema.Ema.Value });
 
-                //if (emaBars.Count >= Periods)
-                //{
-                //    var fl = emaBars.FirstLast;
-
-                //    var speed = (fl.Item2.Close - fl.Item1.Close) / emaBars.Count;
-
-                //    //if (t.Value.Second % 15 == 0) Log($"Speed of MA difs is {speed}", LogLevel.Debug, t);
-                //}
-
-
-                if (lastCross == 0 && cross != 0)
-                {
-                    lastCross = cross;
-                    differenceBars.Clear();
-                } else
-                {
-                    if (lastCross != 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
-                    else if (lastCross != 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
-                }
-
+                if (lastCross != 0 && ema.Ema.Value > AvgChange) finalResult = OrderSide.Buy;
+                else if (lastCross != 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
 
 
                 //lastCross = finalResult.HasValue ? 0 : lastCross;
@@ -145,10 +135,9 @@ namespace Kalitte.Trading
                 //else if (lastEma > 0 && ema.Ema.Value < -AvgChange) finalResult = OrderSide.Sell;
 
                 if (finalResult.HasValue)
-                {                    
+                {
                     Log($"Status: order:{finalResult}, mp:{mp}, lastCross:{lastCross}, cross:{cross}, lastEma:{lastEma}, ema:{ema.Ema}, split:{AvgChange}", LogLevel.Info, t);
-                    differenceBars.Clear();
-                    //lastCross = 0;                    
+                    longTermBars.Clear();               
                 }
 
                 if (lastEma == 0) lastEma = ema.Ema.Value;

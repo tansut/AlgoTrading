@@ -473,7 +473,13 @@ namespace Kalitte.Trading
         //}
 
 
-
+        public bool IsFull
+        {
+            get
+            {
+                return this.Count >= QueSize;
+            }
+        }
 
 
         public decimal Cross(decimal baseVal)

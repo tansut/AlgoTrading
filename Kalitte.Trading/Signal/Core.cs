@@ -49,7 +49,7 @@ namespace Kalitte.Trading
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
-        //public OrderSide? LastSignalResult { get; protected set; }
+        public OrderSide? LastSignalResult { get; protected set; }
         public volatile bool IsRunning = false;
 
         protected Task collectorTask = null;
@@ -73,7 +73,7 @@ namespace Kalitte.Trading
             Enabled = true;
             TimerEnabled = false;
             Simulation = false;
-            //LastSignalResult = null;
+            LastSignalResult = null;
             //CheckCount = 0;
         }
 
@@ -122,7 +122,7 @@ namespace Kalitte.Trading
                 var result = CheckInternal(t);
                 result.SignalTime = t ?? DateTime.Now;
                 raiseSignal(new SignalEventArgs() { Result = result });
-                //LastSignalResult = result.finalResult;
+                LastSignalResult = result.finalResult ?? LastSignalResult;
                 return result;
             } catch (Exception ex)
             {

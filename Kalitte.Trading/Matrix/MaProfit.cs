@@ -36,6 +36,7 @@ namespace Kalitte.Trading.Matrix
         //[SymbolParameter("F_XU0300222")]
         public string Symbol = "F_XU0300222";
 
+
         [Parameter(SymbolPeriod.Min15)]
         public SymbolPeriod SymbolPeriod = SymbolPeriod.Min15;
 
@@ -49,11 +50,16 @@ namespace Kalitte.Trading.Matrix
         public int MovPeriod2 = 9;
 
 
-        [Parameter(0.02)]
-        public decimal MaAvgChange = 0.02M;
+        [Parameter(0.15)]
+        public decimal MaAvgChange = 0.15M;
 
-        [Parameter(25)]
-        public int MaPeriods = 25;
+        [Parameter(15)]
+        public int MaPeriods = 15;
+
+        [Parameter(2)]
+        public int CrossNextOrderMultiplier = 2;
+
+        
 
         [Parameter(0)]
         public decimal ExpectedNetPl = 0;
@@ -78,16 +84,16 @@ namespace Kalitte.Trading.Matrix
         [Parameter(0)]
         public decimal LossQuantity = 0;
 
-        [Parameter(9)]
-        public decimal ProfitPuan = 9;
+        [Parameter(16)]
+        public decimal ProfitPuan = 16;
 
         [Parameter(9)]
         public decimal LossPuan = 9;
 
-        [Parameter(68)]
+        [Parameter(0)]
         public int RsiHighLimit = 0;
 
-        [Parameter(32)]
+        [Parameter(0)]
         public int RsiLowLimit = 0;
 
         [Parameter(9)]
@@ -105,11 +111,11 @@ namespace Kalitte.Trading.Matrix
         [Parameter(0.05)]
         public decimal MacdAvgChange = 0.05M;
 
-        [Parameter(6)]
-        public int MacdPeriods = 6;
+        [Parameter(15)]
+        public int MacdPeriods = 15;
 
-        [Parameter(3)]
-        public int MACDTrigger = 3;
+        [Parameter(6)]
+        public int MACDTrigger = 6;
 
         [Parameter(false)]
         public bool AlwaysGetProfit = false;
@@ -151,14 +157,14 @@ namespace Kalitte.Trading.Matrix
                     FillCurrentOrder(delayedOrder.order.UnitPrice, delayedOrder.order.Quantity);
                     this.delayedOrder = null;
                 }
-            }            
+            }
         }
 
         public void CountOrder(string signal, decimal quantity)
         {
-            lock(ordersBySignals)
+            lock (ordersBySignals)
             {
-                decimal existing ;
+                decimal existing;
                 if (ordersBySignals.TryGetValue(signal, out existing))
                 {
                     ordersBySignals[signal] = existing + quantity;
@@ -213,13 +219,28 @@ namespace Kalitte.Trading.Matrix
 
         public void InitMySignals(DateTime t)
         {
+
             if (periodBars == null)
             {
-                var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
-                mdp.FileName = "all.txt";
-                mdp.SaveDaily = true;
-                periodBars = mdp.GetContentAsQuote(t);
-                Log($"Bars initialized using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
+                periodBars = new FinanceBars();
+                try
+                {
+                    //var bd = GetBarData(Symbol, SymbolPeriod);
+                    //for (var i = 0; i < bd.BarDataIndexer.LastBarIndex; i++)
+                    //{
+                    //    if (bd.BarDataIndexer[i] > t) break;
+                    //    var quote = new MyQuote() { Date = bd.BarDataIndexer[i], Open = bd.Open[i], High = bd.High[i], Low = bd.Low[i], Close = bd.Close[i], Volume = bd.Volume[i] };
+                    //    periodBars.Push(quote);
+                    //}
+                    var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
+                    mdp.FileName = "all.txt";
+                    mdp.SaveDaily = true;
+                    periodBars = mdp.GetContentAsQuote(t);
+                    Log($"Initialized total {periodBars.Count} using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
+                } catch(Exception ex)
+                {
+                    Log($"Error initializing bars {ex.Message}", LogLevel.Error, t);
+                }
             }
 
 
@@ -270,13 +291,14 @@ namespace Kalitte.Trading.Matrix
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-                var ma = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { AvgChange = MaAvgChange, Periods = MaPeriods };
+                var ma = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MaAvgChange, Periods = MaPeriods };
+                
                 this.signals.Add(ma);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { AvgChange = MacdAvgChange, Periods = MacdPeriods };
+                var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MacdAvgChange, Periods = MacdPeriods };
                 this.signals.Add(macds);
             }
 
@@ -302,17 +324,16 @@ namespace Kalitte.Trading.Matrix
                 AddSymbolMarketData(Symbol);
             }
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
-            InitSignals();
-            if (!Simulation) InitMySignals(DateTime.Now);
+            InitSignals();            
 
         }
 
         private void SeansTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             var t = DateTime.Now;
-            var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
+            var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 5);
             var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 30, 0);
-            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 30, 0);
+            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 30, 5);
             var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
             seansTimer.Enabled = false;
@@ -352,7 +373,6 @@ namespace Kalitte.Trading.Matrix
                 seansTimer.Elapsed += SeansTimer_Elapsed;
             }
             else StartSignals();
-
         }
 
         public override string ToString()
@@ -366,6 +386,7 @@ namespace Kalitte.Trading.Matrix
             var assembly = typeof(MaProfit).Assembly.GetName();
             Log($"{this}", LogLevel.Info);
             LoadRealPositions(this.Symbol);
+            if (!Simulation) InitMySignals(DateTime.Now);
             if (!Simulation) CompleteInit();
         }
 
@@ -393,7 +414,7 @@ namespace Kalitte.Trading.Matrix
                     }
 
                     Log($"Running backtest for period: {periodBars.Last}", LogLevel.Verbose);
-                    
+
                     for (var i = 0; i < seconds; i++)
                     {
                         var time = AlgoTime;
@@ -423,12 +444,12 @@ namespace Kalitte.Trading.Matrix
                 {
                     var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
                     periodBars.Push(newQuote);
-                    Log($"Pushed new quote, last is now: {periodBars.Last}", LogLevel.Debug, bd.BarDataIndexer[last]);
+                    Log($"Pushed new quote, last is now: {periodBars.Last}", LogLevel.Debug);
 
                 }
                 catch (Exception ex)
                 {
-                    Log($"data update: {ex.Message}", LogLevel.Error, barDataCurrentValues.LastUpdate.DTime);
+                    Log($"data update: {ex.Message}", LogLevel.Error);
                 }
             }
         }
@@ -441,7 +462,7 @@ namespace Kalitte.Trading.Matrix
             var result1 = operationWait.WaitOne(wait);
             var result2 = orderWait.WaitOne(wait);
             if (!result1 && !Simulation) Log($"Waiting for last operation to complete: {message}", LogLevel.Warning);
-            if (!result2 && !Simulation) Log($"Waitng for last order to complete: {message}", LogLevel.Warning);
+            if (!result2 && !Simulation) Log($"Waiting for last order to complete: {message}", LogLevel.Warning);
             return result1 && result2;
         }
 
@@ -636,39 +657,14 @@ namespace Kalitte.Trading.Matrix
                 if (this.Simulation)
                 {
                     var algoTime = AlgoTime;
-                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(2 + new RandomGenerator().NextDouble() * 2) };
+                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(0.5 + new RandomGenerator().NextDouble() * 2) };
                     Log($"Simulating real environment for {delayedOrder.order.Id} time is: {delayedOrder.created}, schedule to: {delayedOrder.scheduled2}", LogLevel.Debug);
-                    //var algoTime = AlgoTime;
-                    //var data = new DelayedOrder() { created= algoTime, order=positionRequest, scheduled2=AlgoTime.AddSeconds(2) };
-                    //Log($"Simulating real environment for {data.order.Id} time is: {data.created}, schedule to: {data.scheduled2}", LogLevel.Debug);
-                    //new Thread((req) =>
-                    //{
-                    //    Thread.CurrentThread.IsBackground = true;
-                    //    var o = (DelayedOrder)req;
-                    //    Log($"Simulate thread started for {o.order.Id} time is: {AlgoTime}, schedule to: {o.scheduled2}", LogLevel.Debug);
-                    //    var safeSide = 0;
-                    //    while (safeSide++ < 5000)
-                    //    {
-                    //        var dif = AlgoTime - o.scheduled2;
-                    //        if (dif.Seconds > 0)
-                    //        {
-                    //            Log($"Simulation completed at {AlgoTime}  for {o.order.Id}", LogLevel.Debug);
-                    //            FillCurrentOrder(o.order.UnitPrice, o.order.Quantity);
-                    //            break;
-                    //        }
-                    //        Thread.Sleep(1);
-                    //    }
-                    //}).Start(data);                    
-                } else FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);               
+                }
+                else FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);
             }
         }
 
 
-
-        DateTime RoundUp(DateTime dt, TimeSpan d)
-        {
-            return new DateTime((dt.Ticks + d.Ticks - 1) / d.Ticks * d.Ticks, dt.Kind);
-        }
 
 
 
@@ -752,7 +748,7 @@ namespace Kalitte.Trading.Matrix
             signals.ForEach(p => Log($"{p}", LogLevel.FinalResult));
             Log($"----------------------", LogLevel.FinalResult);
             Log($"Market price difference total: {this.simulationPriceDif}", LogLevel.FinalResult);
-            foreach(var item in ordersBySignals)
+            foreach (var item in ordersBySignals)
             {
                 Log($"{item.Key}:{item.Value}", LogLevel.FinalResult);
             }
@@ -762,7 +758,7 @@ namespace Kalitte.Trading.Matrix
 
             var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
 
-            if (Simulation && ExpectedNetPl > 0 &&  netPL < ExpectedNetPl) File.Delete(LogFile);
+            if (Simulation && ExpectedNetPl > 0 && netPL < ExpectedNetPl) File.Delete(LogFile);
             else if (Simulation) Process.Start(LogFile);
         }
     }

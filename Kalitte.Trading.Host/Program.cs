@@ -24,8 +24,12 @@ public class Program
         var b1 = new FinanceBars(5);
 
 
+        var l = new List<MyQuote>();
+        l.Add(new MyQuote() { Date = DateTime.Now, Close=25 });
+        l.Add(new MyQuote() { Date = DateTime.Now, Close=75 });
 
-        
+        Console.Write(l.GetSma(2).Last().Sma.Value);
+
 
 
         var mdp = new MarketDataFileLogger("F_XU0300222", @"c:\kalitte\log", "Min10");

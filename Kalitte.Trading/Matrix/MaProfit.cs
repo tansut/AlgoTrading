@@ -43,6 +43,13 @@ namespace Kalitte.Trading.Matrix
         [Parameter(2)]
         public decimal OrderQuantity = 2M;
 
+
+        [Parameter(1)]
+        public int PriceCollectionPeriod = 1;
+
+        [Parameter(false)]
+        public bool UseSmaForCross = false;
+
         [Parameter(5)]
         public int MovPeriod = 5;
 
@@ -291,14 +298,14 @@ namespace Kalitte.Trading.Matrix
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-                var ma = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MaAvgChange, Periods = MaPeriods };
+                var ma = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { UseSma = UseSmaForCross, UseZeroZone =false, PriceCollectionPeriod= PriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MaAvgChange, Periods = MaPeriods };
                 
                 this.signals.Add(ma);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MacdAvgChange, Periods = MacdPeriods };
+                var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { UseSma = UseSmaForCross, UseZeroZone =true, PriceCollectionPeriod= PriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MacdAvgChange, Periods = MacdPeriods };
                 this.signals.Add(macds);
             }
 
@@ -685,7 +692,7 @@ namespace Kalitte.Trading.Matrix
 
         public override void OnOrderUpdate(IOrder order)
         {
-            Log($"OrderUpdate: status: {order.OrdStatus.Obj} orderid: {order.CliOrdID} fa: {order.FilledAmount}", LogLevel.Debug);
+            Log($"OrderUpdate: status: {order.OrdStatus.Obj} cliD: {order.CliOrdID} oid: {order.OrderID} algoid: {order.AlgoId} fa: {order.FilledAmount}", LogLevel.Debug);
             if (order.OrdStatus.Obj == OrdStatus.Filled)
             {
                 //if (!BackTestMode) Log($"OrderUpdate: pos: {this.positionRequest} status: {order.OrdStatus.Obj} orderid: {order.CliOrdID} fa: {order.FilledAmount} fq: {order.FilledQty} price: {order.Price} lastx: {order.LastPx}", LogLevel.Debug, this.positionRequest != null ? this.positionRequest.Time: DateTime.Now);
@@ -716,7 +723,7 @@ namespace Kalitte.Trading.Matrix
                 {
                     CancelCurrentOrder(order);
                 }
-            }
+            }  
         }
 
         private void CancelCurrentOrder(IOrder order)
@@ -760,7 +767,9 @@ namespace Kalitte.Trading.Matrix
 
             if (Simulation && ExpectedNetPl > 0 && netPL < ExpectedNetPl) File.Delete(LogFile);
             else if (Simulation) Process.Start(LogFile);
+            base.OnStopped();
         }
+        
     }
 
 }

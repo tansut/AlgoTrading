@@ -87,7 +87,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{this.Symbol}:{this.SideStr}/{this.Quantity}:{this.FilledQuantity}/{this.UnitPrice}:{this.FilledUnitPrice} {this.Comment} Commission: {CommissionPaid}";
+            return $"[{this.Id}]{this.Symbol}:{this.SideStr}/{this.Quantity}:{this.FilledQuantity}/{this.UnitPrice}:{this.FilledUnitPrice} {this.Comment} Commission: {CommissionPaid}";
         }
 
         public ExchangeOrder Clone()

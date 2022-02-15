@@ -30,7 +30,7 @@ namespace Kalitte.Trading.Indicators
         public MacdTrigger(Macd owner) : base(owner.InputBars)
         {
             Owner = owner;
-            ResultList = new FinanceList<EmaResult>();
+            createResult();
             Owner.ResultList.ListEvent += Bars_ListEvent;
         }
 
@@ -88,7 +88,7 @@ namespace Kalitte.Trading.Indicators
         {
             ResultList.Clear();
             var results = LastBars.GetMacd(this.Fast, this.Slow, this.Signal).ToList();
-            results.ForEach(r => ResultList.Push(r));
+            results.ForEach(r => ResultList.Push(r));            
         }
 
 

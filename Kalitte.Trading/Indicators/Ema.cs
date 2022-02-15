@@ -23,13 +23,13 @@ namespace Kalitte.Trading.Indicators
         public Ema(FinanceBars bars, int periods) : base(bars)
         {
             this.Periods = periods;
-            bars.ListEvent += BarChanged;            
+            bars.ListEvent += BarChanged;
             createResult();
         }
 
         public bool HasResult => ResultList.Count > 0 && ResultList.Last.Ema.HasValue;
 
-        
+
 
         private void createResult()
         {
@@ -61,7 +61,7 @@ namespace Kalitte.Trading.Indicators
         {
             var lastEma = (double)(ResultList.Last.Ema);
             var ema = (decimal)FinanceBars.EmaNext((double)quote.Close, lastEma, Periods);
-            return new EmaResult() {  Date = quote.Date, Ema=ema };
+            return new EmaResult() { Date = quote.Date, Ema = ema };
         }
 
         private void BarChanged(object sender, ListEventArgs<IQuote> e)
@@ -70,7 +70,8 @@ namespace Kalitte.Trading.Indicators
             {
                 ResultList.Clear();
 
-            } else if (HasResult)
+            }
+            else if (HasResult)
             {
                 if (e.Action == ListAction.ItemAdded)
                 {

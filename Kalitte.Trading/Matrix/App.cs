@@ -45,7 +45,7 @@ namespace Matriks.Lean.Algotrader
     {
         public override void OnInit()
         {
-            //this.Simulation = true;
+            
             base.OnInit();
         }
     }

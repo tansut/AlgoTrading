@@ -39,15 +39,7 @@ namespace Kalitte.Trading.Matrix
 
 
         public string logDir = @"c:\kalitte\log";
-        //private MarketDataFileLogger logger;
-        //private MarketDataFileLogger rsiLogger;
-        //private MarketDataFileLogger ma59Logger;
-        //private MarketDataFileLogger macd953Logger;
-
-        MOV mov;
-        MOV mov2;
-        RSI rsi;
-        MACD macd;
+        private MarketDataFileLogger priceLogger;
         VOLUME volume;
 
         List<SymbolPeriod> periodList = new List<SymbolPeriod>(new SymbolPeriod[] { SymbolPeriod.Min, SymbolPeriod.Min5, SymbolPeriod.Min10, SymbolPeriod.Min15,
@@ -57,15 +49,20 @@ namespace Kalitte.Trading.Matrix
         List<IIndicator> indicatorList = new List<IIndicator>();
         List<MarketDataFileLogger> loggerList = new List<MarketDataFileLogger>();
 
-        int MovPeriod = 5;
-        int MovPeriod2 = 9;
 
-        int MACDLongPeriod = 9;
-        int MACDShortPeriod = 5;
+        public override void OnTimer()
+        {
+            var t = DateTime.Now;
+            var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
+            var t2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
-        int MACDTrigger = 3;
 
-
+            if (t >= t1 && t <= t2)
+            {
+                var price = GetMarketData(Symbol, SymbolUpdateField.Last);
+                priceLogger.LogMarketData(DateTime.Now, new decimal[] { price, volume.CurrentValue });
+            }
+        }
 
         public override void OnInitCompleted()
         {
@@ -98,9 +95,12 @@ namespace Kalitte.Trading.Matrix
 
         public override void OnInit()
         {
+            AddSymbol(Symbol, SymbolPeriod);
             AddSymbolMarketData(Symbol);
             SetTimerInterval(1);
             WorkWithPermanentSignal(true);
+
+            this.priceLogger = new MarketDataFileLogger(Symbol, logDir, "price");
 
             foreach (var sp in periodList)
             {
@@ -111,10 +111,6 @@ namespace Kalitte.Trading.Matrix
                 loggerList.Add(logger);
             }
 
-            mov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod, MovMethod.Exponential);
-            mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
-            rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);
-            macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
             volume = VolumeIndicator(Symbol, SymbolPeriod);
 
 
@@ -131,12 +127,7 @@ namespace Kalitte.Trading.Matrix
                 bd.WClose[i], 
                 bd.Volume[i], 
                 bd.Diff[i], 
-                bd.DiffPercent[i], 
-                mov.CurrentValue, 
-                mov2.CurrentValue, 
-                rsi.CurrentValue, 
-                macd.CurrentValue, 
-                macd.MacdTrigger.CurrentValue });
+                bd.DiffPercent[i]});
 
 
         }

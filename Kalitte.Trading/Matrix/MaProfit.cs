@@ -37,8 +37,8 @@ namespace Kalitte.Trading.Matrix
         public string Symbol = "F_XU0300222";
 
 
-        [Parameter(SymbolPeriod.Min15)]
-        public SymbolPeriod SymbolPeriod = SymbolPeriod.Min15;
+        [Parameter(SymbolPeriod.Min10)]
+        public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
 
         [Parameter(2)]
         public decimal OrderQuantity = 2M;
@@ -53,8 +53,8 @@ namespace Kalitte.Trading.Matrix
         [Parameter(0.15)]
         public decimal MaAvgChange = 0.15M;
 
-        [Parameter(15)]
-        public int MaPeriods = 15;
+        [Parameter(25)]
+        public int MaPeriods = 25;
 
         [Parameter(2)]
         public int CrossNextOrderMultiplier = 2;
@@ -87,8 +87,8 @@ namespace Kalitte.Trading.Matrix
         [Parameter(16)]
         public decimal ProfitPuan = 16;
 
-        [Parameter(9)]
-        public decimal LossPuan = 9;
+        [Parameter(4)]
+        public decimal LossPuan = 4;
 
         [Parameter(0)]
         public int RsiHighLimit = 0;
@@ -333,7 +333,7 @@ namespace Kalitte.Trading.Matrix
             var t = DateTime.Now;
             var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 5);
             var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 30, 0);
-            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 30, 5);
+            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 5);
             var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
             seansTimer.Enabled = false;

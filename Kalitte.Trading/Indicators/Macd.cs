@@ -119,6 +119,7 @@ namespace Kalitte.Trading.Indicators
         public IList<IQuote> LastBars
         {
             get { return InputBars.LastItems(Signal + Slow + startIndex); }
+            //get { return InputBars.List; }
         }
 
         public override decimal NextValue(decimal newVal)

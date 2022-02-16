@@ -47,21 +47,14 @@ namespace Kalitte.Trading
             this.i2 = i2;
         }
 
-        public override void Start()
-        {
-            base.Start();
-        }
+
 
         protected override void ResetInternal()
         {
 
         }
 
-        public override void Stop()
-        {
-            base.Stop();
 
-        }
 
         public override void Init()
         {

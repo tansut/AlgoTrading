@@ -59,10 +59,6 @@ namespace Kalitte.Trading
 
         }
 
-        public override void Start()
-        {
-            base.Start();            
-        }
 
         public override string ToString()
         {

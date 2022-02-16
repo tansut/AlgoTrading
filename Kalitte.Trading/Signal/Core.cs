@@ -56,7 +56,7 @@ namespace Kalitte.Trading
         protected CancellationTokenSource collectorTaskTokenSource;
 
 
-        private ManualResetEvent checkLock = new ManualResetEvent(true);
+        public ManualResetEvent InOperationLock = new ManualResetEvent(true);
 
         public event SignalEventHandler OnSignal;
 
@@ -116,7 +116,7 @@ namespace Kalitte.Trading
 
         public virtual SignalResultX Check(DateTime? t = null)
         {
-            checkLock.Reset();
+            InOperationLock.Reset();
             try
             {
                 var result = CheckInternal(t);
@@ -130,7 +130,7 @@ namespace Kalitte.Trading
                 return new SignalResultX(this) {  finalResult = null };
             } finally
             {
-                checkLock.Set();
+                InOperationLock.Set();
             }
         }
 
@@ -154,7 +154,7 @@ namespace Kalitte.Trading
 
         public virtual void Reset()
         {
-            if (!checkLock.WaitOne(30000))
+            if (!InOperationLock.WaitOne(30000))
             {
                 Log("Timeout in starting signal", LogLevel.Error);
             }
@@ -168,7 +168,7 @@ namespace Kalitte.Trading
 
         public virtual void Start()
         {
-            if (!checkLock.WaitOne(30000))
+            if (!InOperationLock.WaitOne(30000))
             {
                 Log("Timeout in starting signal", LogLevel.Error);
             }
@@ -204,7 +204,7 @@ namespace Kalitte.Trading
                 _timer = null;
             }
             this.IsRunning = false;
-            if (!checkLock.WaitOne(30000))
+            if (!InOperationLock.WaitOne(30000))
             {
                 Log("Timeout in stopping signal", LogLevel.Error);
             }

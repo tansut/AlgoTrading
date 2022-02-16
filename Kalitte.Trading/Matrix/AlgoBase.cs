@@ -28,8 +28,8 @@ namespace Kalitte.Trading.Matrix
 
         public static AlgoBase Current;
 
-        [Parameter(0)]
-        public int LoggingLevel { get; set; }
+        [Parameter(1)]
+        public int LoggingLevel { get; set; } = 1;
 
         [Parameter(false)]
         public bool Simulation = false;

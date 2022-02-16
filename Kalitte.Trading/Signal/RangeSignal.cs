@@ -92,19 +92,19 @@ namespace Kalitte.Trading
 
             if (bars.Count >= AnalysisPeriod)
             {
-                var ema = bars.List.GetEma(AnalysisPeriod).Last();                
-                if (Min.HasValue && ema.Ema.Value < Min.Value)
+                var val = bars.List.GetSma(AnalysisPeriod).Last().Sma.Value;                
+                if (Min.HasValue && val < Min.Value)
                 {
                     result = OrderSide.Buy;
                     status = RangeStatus.BelowMin;
-                    value = ema.Ema.Value;
+                    value = val;
                     //Log($"Ema: {ema.Ema} Status: {status} Result: {result}", LogLevel.Debug, t);
                 }
-                else if (Max.HasValue && ema.Ema.Value > Max.Value)
+                else if (Max.HasValue && val > Max.Value)
                 {
                     result = OrderSide.Sell;
                     status = RangeStatus.AboveHigh;
-                    value = ema.Ema.Value;
+                    value = val;
 
                     //Log($"Ema: {ema.Ema} Status: {status} Result: {result}", LogLevel.Debug, t);
                 }

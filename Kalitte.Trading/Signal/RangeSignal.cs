@@ -37,7 +37,7 @@ namespace Kalitte.Trading
         public RangeStatus? Status { get; set; }
         public decimal Value { get; set; }
 
-        public RangeSignalResult(Signal signal, RangeStatus? status) : base(signal)
+        public RangeSignalResult(Signal signal, RangeStatus? status, DateTime t) : base(signal, t)
         {
             this.Status = status;
         }
@@ -85,14 +85,14 @@ namespace Kalitte.Trading
             }
 
             if (i1k.CurrentValue.HasValue)
-            {                
-                bars.Push(new MyQuote() { Date = DateTime.Now, Close = i1k.NextValue(mp) });               
+            {
+                bars.Push(new MyQuote() { Date = DateTime.Now, Close = i1k.NextValue(mp) });
             }
             decimal value = 0;
 
             if (bars.Count >= AnalysisPeriod)
             {
-                var val = bars.List.GetSma(AnalysisPeriod).Last().Sma.Value;                
+                var val = bars.List.GetSma(AnalysisPeriod).Last().Sma.Value;
                 if (Min.HasValue && val < Min.Value)
                 {
                     result = OrderSide.Buy;
@@ -111,7 +111,7 @@ namespace Kalitte.Trading
 
             }
 
-            return new RangeSignalResult(this, status) { Value= value, finalResult = result };
+            return new RangeSignalResult(this, status, t ?? DateTime.Now) { Value = value, finalResult = result };
         }
 
     }

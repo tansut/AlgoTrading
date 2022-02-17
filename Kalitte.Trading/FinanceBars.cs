@@ -481,6 +481,25 @@ namespace Kalitte.Trading
             }
         }
 
+        public decimal derivative(int toBack, int from = 0)
+        {
+            rwl.AcquireReaderLock(timeOut);
+            try
+            {
+                var count = this.items.Count;
+                var lastIndex = count - from;
+                var firstIndex = Math.Max(lastIndex - toBack, 0);                                
+                return (this.items[lastIndex].Close - this.items[firstIndex].Close) / toBack;
+
+            }
+            finally
+            {
+                rwl.ReleaseReaderLock();
+            }
+
+
+        }
+
 
         public decimal Cross(decimal baseVal)
         {

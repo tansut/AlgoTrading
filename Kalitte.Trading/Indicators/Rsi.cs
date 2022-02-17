@@ -26,12 +26,16 @@ namespace Kalitte.Trading.Indicators
             createResult();
             this.InputBars.ListEvent += InputBars_BarEvent;
             startIndex = 0;
+            
+            
+            
         }
 
         private void createResult()
         {
             ResultList.Clear();
             var results = LastBars.GetRsi(Periods).ToList();
+            AlgoBase.Current.Log($"LAST RSI: {results.Last().Date} {results.Last().Rsi}");
             results.ForEach(r => ResultList.Push(r));
         }
 
@@ -64,7 +68,7 @@ namespace Kalitte.Trading.Indicators
 
         public IList<IQuote> LastBars
         {
-            get { return InputBars.LastItems(Periods+1); }
+            get { return InputBars.LastItems(startIndex + 2 * Periods + 1); }
         }
 
         public override decimal NextValue(decimal newVal)

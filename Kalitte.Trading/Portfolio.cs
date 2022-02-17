@@ -107,7 +107,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL} Commission: {CommissionPaid} NetPL: {PL-CommissionPaid}";
+            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL} Commission: {CommissionPaid} NetPL: {PL - CommissionPaid}";
         }
 
         public PortfolioItem(string symbol, OrderSide side, decimal quantity, decimal unitPrice)
@@ -132,8 +132,7 @@ namespace Kalitte.Trading
                 this.Quantity = position.FilledQuantity;
                 this.AvgCost = position.FilledUnitPrice;
             }
-            else
-                if (this.Side == position.Side)
+            else if (this.Side == position.Side)
             {
                 this.AvgCost = ((this.Total + position.Total) / (this.Quantity + position.FilledQuantity));
                 this.Quantity += position.FilledQuantity;
@@ -141,12 +140,7 @@ namespace Kalitte.Trading
             }
             else
             {
-                if (this.Quantity == position.FilledQuantity)
-                {
-                    this.AvgCost = 0;
-                    this.Quantity = 0;
-                }
-                else if (this.Quantity > position.FilledQuantity)
+                if (this.Quantity >= position.FilledQuantity)
                 {
                     var delta = position.FilledQuantity;
                     var direction = this.Side == OrderSide.Buy ? 1 : -1;
@@ -203,9 +197,9 @@ namespace Kalitte.Trading
             }
         }
 
-        
 
-        
+
+
 
 
         public PortfolioItem Add(ExchangeOrder position)

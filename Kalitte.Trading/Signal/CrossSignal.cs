@@ -51,7 +51,10 @@ namespace Kalitte.Trading
 
         protected override void ResetInternal()
         {
-
+            priceBars.Clear();
+            differenceBars.Clear();
+            lastCross = 0;
+            lastEma = 0;
         }
 
 
@@ -75,6 +78,8 @@ namespace Kalitte.Trading
         {
             return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {Periods} pricePeriod: {PriceCollectionPeriod} useSma: {UseSma} zeroZones: {UseZeroZone} avgChange: {AvgChange}";
         }
+
+
 
         protected SignalResultX CalculateSignal(DateTime? t = null)
         {
@@ -157,7 +162,7 @@ namespace Kalitte.Trading
 
             
 
-            return new SignalResultX(this)
+            return new SignalResultX(this, t ?? DateTime.Now)
             {
                 finalResult = finalResult
             };

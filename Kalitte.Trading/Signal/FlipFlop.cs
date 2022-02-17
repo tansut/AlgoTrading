@@ -37,7 +37,7 @@ namespace Kalitte.Trading
         {
             var result = this.Side;
             this.Side = result == OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy;
-            return new SignalResultX(this) { finalResult = result };
+            return new SignalResultX(this, t ?? DateTime.Now) { finalResult = result };
         }
 
 

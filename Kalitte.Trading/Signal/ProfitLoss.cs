@@ -36,7 +36,7 @@ namespace Kalitte.Trading
         public decimal PortfolioCost { get; set; }
         public ProfitOrLoss Direction { get; set; }
 
-        public ProfitLossResult(Signal signal): base(signal)
+        public ProfitLossResult(Signal signal, DateTime t): base(signal, t)
         {
 
         }
@@ -110,7 +110,7 @@ namespace Kalitte.Trading
                 //else Algo.Log($"No cation takeprofit: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
             }
 
-            return new ProfitLossResult(this) { Direction= direction, PL=pl, MarketPrice=price,PortfolioCost=avgCost, finalResult = result };
+            return new ProfitLossResult(this, t ?? DateTime.Now) { Direction= direction, PL=pl, MarketPrice=price,PortfolioCost=avgCost, finalResult = result };
 
 
         }

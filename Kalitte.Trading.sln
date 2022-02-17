@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1966B5A9-1770-49F8-B2F0-FDA135A7B972}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		commit.bat = commit.bat
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kalitte.Trading", "Kalitte.Trading\Kalitte.Trading.csproj", "{FAECB14A-99DF-4FD0-96C2-FEBD491FC18E}"
@@ -14,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kalitte.Trading.Host", "Kal
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Merge", "Merge\Merge.csproj", "{FF172370-BB8F-4196-B6C6-1EA9EF3DC618}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kalitte.Trading.Tests", "Kalitte.Trading.Tests\Kalitte.Trading.Tests.csproj", "{1A13AF6E-2D65-456A-92B0-3655FC928147}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kalitte.Trading.Tests", "Kalitte.Trading.Tests\Kalitte.Trading.Tests.csproj", "{1A13AF6E-2D65-456A-92B0-3655FC928147}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

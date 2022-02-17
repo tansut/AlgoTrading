@@ -19,14 +19,19 @@ namespace Kalitte.Trading
         public Signal Signal { get; set; }
         public DateTime SignalTime { get; set; }
 
-        public SignalResultX(Signal signal): this(signal, DateTime.Now)
-        {
-        }
+        //public SignalResultX(Signal signal): this(signal)
+        //{
+        //}
 
         public SignalResultX(Signal signal, DateTime signalTime)
         {
             this.Signal = signal;
             this.SignalTime = signalTime;
+        }
+
+        public override string ToString()
+        {
+            return $"time: {SignalTime}, finalResult: {finalResult}";
         }
     }
 
@@ -127,7 +132,7 @@ namespace Kalitte.Trading
             } catch (Exception ex)
             {
                 Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
-                return new SignalResultX(this) {  finalResult = null };
+                return new SignalResultX(this, t ?? DateTime.Now) {  finalResult = null };
             } finally
             {
                 InOperationLock.Set();

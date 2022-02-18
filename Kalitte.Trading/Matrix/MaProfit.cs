@@ -48,8 +48,8 @@ namespace Kalitte.Trading.Matrix
         public int CrossPriceCollectionPeriod = 2;
 
 
-        [Parameter(10)]
-        public int RsiPriceCollectionPeriod = 10;
+        [Parameter(4)]
+        public int RsiPriceCollectionPeriod = 4;
 
         [Parameter(true)]
         public bool UseSmaForCross = true;
@@ -61,11 +61,11 @@ namespace Kalitte.Trading.Matrix
         public int MovPeriod2 = 9;
 
 
-        [Parameter(0.12)]
-        public decimal MaAvgChange = 0.12M;
+        [Parameter(0.15)]
+        public decimal MaAvgChange = 0.15M;
 
-        [Parameter(16)]
-        public int MaPeriods = 16;
+        [Parameter(15)]
+        public int MaPeriods = 1;
 
         [Parameter(2)]
         public int CrossNextOrderMultiplier = 2;
@@ -95,23 +95,23 @@ namespace Kalitte.Trading.Matrix
         [Parameter(0)]
         public decimal LossQuantity = 0;
 
-        [Parameter(12)]
+        [Parameter(16)]
         public decimal ProfitPuan = 16;
 
         [Parameter(4)]
         public decimal LossPuan = 4;
 
-        [Parameter(0)]
-        public int RsiHighLimit = 0;
+        [Parameter(72)]
+        public int RsiHighLimit = 72;
 
-        [Parameter(0)]
-        public int RsiLowLimit = 0;
+        [Parameter(28)]
+        public int RsiLowLimit = 28;
 
         [Parameter(9)]
         public int Rsi = 9;
 
-        [Parameter(30)]
-        public int RsiAnalysisPeriod = 120;
+        [Parameter(60)]
+        public int RsiAnalysisPeriod = 60;
 
         [Parameter(0)]
         public int MACDShortPeriod = 0;
@@ -319,13 +319,13 @@ namespace Kalitte.Trading.Matrix
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-               this.maSignal = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { UseSma = UseSmaForCross, UseZeroZone = false, PriceCollectionPeriod = CrossPriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MaAvgChange, Periods = MaPeriods };
+               this.maSignal = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MaAvgChange, Periods = MaPeriods };
                 this.signals.Add(maSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { UseSma = UseSmaForCross, UseZeroZone = true, PriceCollectionPeriod = CrossPriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MacdAvgChange, Periods = MacdPeriods };
+                var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { UseSma = UseSmaForCross,  PriceCollectionPeriod = CrossPriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MacdAvgChange, Periods = MacdPeriods };
                 this.signals.Add(macds);
             }
 
@@ -340,7 +340,7 @@ namespace Kalitte.Trading.Matrix
             if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0))
             {
                 rsiRangeSignal = new RangeSignal("rsi", Symbol, this, rsi, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { AnalysisPeriod = RsiAnalysisPeriod };
-                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this) { UseSma = this.UseSmaForCross, Periods = RsiAnalysisPeriod, PriceCollectionPeriod = this.RsiPriceCollectionPeriod };
+                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { UseSma = this.UseSmaForCross, Periods = RsiAnalysisPeriod, PriceCollectionPeriod = this.RsiPriceCollectionPeriod };
                 this.signals.Add(rsiRangeSignal);
                 this.signals.Add(rsiTrendSignal);
             }
@@ -370,10 +370,10 @@ namespace Kalitte.Trading.Matrix
         private void SeansTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             var t = DateTime.Now;
-            var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 5);
-            var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 35, 0);
-            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 5);
-            var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 5);
+            var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 1);
+            var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
+            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 1);
+            var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
             seansTimer.Enabled = false;
             try
@@ -593,7 +593,6 @@ namespace Kalitte.Trading.Matrix
 
         private void HandleRsiTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
-            Log($"[rsi-trend: {result.SignalTime}]  v/c:{result.CurrentValue}/{result.Change} trend:{result.Direction} {result.finalResult}");
 
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
 
@@ -605,19 +604,25 @@ namespace Kalitte.Trading.Matrix
                 return;
             }
 
-            if (!portfolio.IsEmpty && portfolio.Quantity < OrderQuantity)
-            {
-                if (result.Direction == TrendDirection.Down && result.LastBarValue > RsiHighLimit && portfolio.IsLong && portfolio.AvgCost < marketPrice)
-                {
-                    if (maSignal != null) maSignal.Reset();
-                    sendOrder(Symbol, portfolio.Quantity, OrderSide.Sell, $"[{result.Signal.Name}:{result.Direction}]", 0, ChartIcon.PositionClose, result.SignalTime, result);
+            Log($"[rsi-trend]: {result}", LogLevel.Debug, result.SignalTime);
 
+            if (!portfolio.IsEmpty)
+            {
+                var quantity = portfolio.Quantity < OrderQuantity ? portfolio.Quantity: 0;
+                if (quantity > 0) {
+                    if (result.Direction == TrendDirection.Down && portfolio.IsLong && portfolio.AvgCost < marketPrice)
+                    {                        
+                        if (maSignal != null) maSignal.Reset();
+                        sendOrder(Symbol, quantity, OrderSide.Sell, $"[{result.Signal.Name}:{result.Direction}]", 0, ChartIcon.PositionClose, result.SignalTime, result);
+
+                    }
+                    else if (result.Direction == TrendDirection.Up && portfolio.IsShort && portfolio.AvgCost > marketPrice)
+                    {                        
+                        if (maSignal != null) maSignal.Reset();
+                        sendOrder(Symbol, quantity, OrderSide.Buy, $"[{result.Signal.Name}:{result.Direction}]", 0, ChartIcon.PositionClose, result.SignalTime, result);
+                    }
                 }
-                else if (result.Direction == TrendDirection.Up && result.LastBarValue < RsiLowLimit && portfolio.IsShort && portfolio.AvgCost > marketPrice)
-                {
-                    if (maSignal != null) maSignal.Reset();
-                    sendOrder(Symbol, portfolio.Quantity, OrderSide.Buy, $"[{result.Signal.Name}:{result.Direction}]", 0, ChartIcon.PositionClose, result.SignalTime, result);
-                }
+
             }
 
 

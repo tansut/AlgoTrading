@@ -49,7 +49,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()} | current: {CurrentValue} lastBar: {LastBarValue} change: {Change} direction: {Direction}";
+            return $"{base.ToString()} | direction: {Direction} current: {CurrentValue} lastBar: {LastBarValue} change: {Change} ";
         }
     }
 
@@ -57,30 +57,29 @@ namespace Kalitte.Trading
     {
         public ITradingIndicator i1k;
         public int PriceCollectionPeriod = 5;
-        public decimal AvgChange = 0.3M;
         public int Periods = 5;
+        public decimal? Min { get; set; }
+        public decimal? Max { get; set; }
 
 
         private FinanceBars analysisBars;
         private FinanceBars priceBars;
         private List<decimal> derivs;
 
-        private IQuote lastBar = null;
-        private decimal? lastValue = null;
-        private TrendDirection lastDirection = TrendDirection.None;
-
         public bool UseSma = true;
 
 
-        public TrendSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner) : base(name, symbol, owner)
+        public TrendSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner, decimal? min, decimal? max) : base(name, symbol, owner)
         {
+            Min = min;
+            Max = max;
         }
 
         public override void Init()
         {
             analysisBars = new FinanceBars(Periods);
             priceBars = new FinanceBars(PriceCollectionPeriod);
-            derivs = new  List<decimal>();
+            derivs = new List<decimal>();
             i1k.InputBars.ListEvent += InputBars_ListEvent;
             generateDerivs();
         }
@@ -90,10 +89,10 @@ namespace Kalitte.Trading
             generateDerivs();
         }
 
-        //public override string ToString()
-        //{
-        //    return $"{base.ToString()}: {Min}-{Max} range, period: {AnalysisPeriod}";
-        //}
+        public override string ToString()
+        {
+            return $"{base.ToString()}: Range: {Min}-{Max} Period: {Periods} PriceCollection: {PriceCollectionPeriod} useSma: {UseSma}";
+        }
 
 
         private void generateDerivs()
@@ -150,28 +149,40 @@ namespace Kalitte.Trading
                 var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 };
                 analysisBars.Push(newResultBar);
 
-                if (analysisBars.Count >= Periods)
+                if (analysisBars.Count >= Periods && derivs.Count > 0)
                 {
-                    if (derivs.Count > 0)
-                    {
-                        var currentVal = UseSma ? analysisBars.List.GetSma(Periods).Last().Sma.Value : analysisBars.List.GetEma(Periods).Last().Ema.Value;
-                        result.CurrentValue = currentVal;
-                        var lastBarData = i1k.Results.Last().Value;
-                        result.Change = currentVal - lastBarData;
-                        result.LastBarValue = lastBarData;
+                    var currentVal = UseSma ? analysisBars.List.GetSma(Periods).Last().Sma.Value : analysisBars.List.GetEma(Periods).Last().Ema.Value;
+                    var lastBarData = i1k.Results.Last().Value;
 
+                    result.CurrentValue = currentVal;
+                    result.Change = currentVal - lastBarData;
+                    result.LastBarValue = lastBarData;
+
+                    var checkedLimits = true;
+
+                    if (Min.HasValue && lastBarData > Min.Value)
+                    {
+                        checkedLimits = false;
+                    }
+                    else if (Max.HasValue && lastBarData < Max.Value)
+                    {
+                        checkedLimits |= false;
+                    }
+
+
+                    if (checkedLimits)
+                    {
                         if (result.Change < 0) result.Direction = TrendDirection.Down;
                         else if (result.Change > 0) result.Direction = TrendDirection.Up;
-
-
-
-                        if (result.Direction != TrendDirection.None)
-                        {
-                            result.finalResult = result.Direction == TrendDirection.Up ? OrderSide.Buy : OrderSide.Sell;
-                        }
-
-                        Log($"trend-signal: result: {result}", LogLevel.Verbose, t);
                     }
+
+                    if (result.Direction != TrendDirection.None)
+                    {
+                        result.finalResult = result.Direction == TrendDirection.Up ? OrderSide.Buy : OrderSide.Sell;
+                    }
+
+                    Log($"trend-signal: result: {result}", LogLevel.Verbose, t);
+
 
                     analysisBars.Clear();
                 }

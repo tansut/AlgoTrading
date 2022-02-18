@@ -35,7 +35,7 @@ namespace Kalitte.Trading.Indicators
         {
             ResultList.Clear();
             var results = LastBars.GetRsi(Periods).ToList();
-            AlgoBase.Current.Log($"LAST RSI: {results.Last().Date} {results.Last().Rsi}");
+            //AlgoBase.Current.Log($"LAST RSI: {results.Last().Date} {results.Last().Rsi}");
             results.ForEach(r => ResultList.Push(r));
         }
 

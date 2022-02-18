@@ -31,6 +31,7 @@ namespace Kalitte.Trading
         public int PriceCollectionPeriod = 5;
         private FinanceBars differenceBars;
         private FinanceBars priceBars;
+        private FinanceBars crossBars;
 
 
         private decimal lastCross = 0;
@@ -50,6 +51,7 @@ namespace Kalitte.Trading
         {
             priceBars.Clear();
             differenceBars.Clear();
+            crossBars.Clear();  
             lastCross = 0;
         }
 
@@ -59,10 +61,21 @@ namespace Kalitte.Trading
         {
             differenceBars = new FinanceBars(Periods);
             priceBars = new FinanceBars(PriceCollectionPeriod);
+            crossBars = new FinanceBars(Periods);
             ResetInternal();
+            this.i1k.InputBars.ListEvent += InputBars_ListEvent;
         }
 
-
+        private void InputBars_ListEvent(object sender, ListEventArgs<IQuote> e)
+        {
+            if (!InOperationLock.WaitOne(5000))
+            {                
+                Log("Timeout in bars change event", LogLevel.Error);
+            }
+            Log($"Clearing analysis data due to new bar: {e.Action}, {e.Item}", LogLevel.Debug);
+            priceBars.Clear();
+            differenceBars.Clear();
+        }
 
         protected override void Colllect()
         {
@@ -102,9 +115,8 @@ namespace Kalitte.Trading
                 var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 - l2 };
                 differenceBars.Push(newResultBar);
 
-                var ldif = Math.Round(l1 - l2, 5);
-
-                var cross = differenceBars.Cross(0);
+                crossBars.Push(newResultBar);
+                var cross = crossBars.Cross(0);
 
                 if (lastCross == 0 && cross != 0)
                 {

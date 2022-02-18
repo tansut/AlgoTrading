@@ -159,7 +159,7 @@ namespace Kalitte.Trading
 
         public virtual void Reset()
         {
-            if (!InOperationLock.WaitOne(30000))
+            if (!InOperationLock.WaitOne(5000))
             {
                 Log("Timeout in starting signal", LogLevel.Error);
             }
@@ -173,7 +173,7 @@ namespace Kalitte.Trading
 
         public virtual void Start()
         {
-            if (!InOperationLock.WaitOne(30000))
+            if (!InOperationLock.WaitOne(5000))
             {
                 Log("Timeout in starting signal", LogLevel.Error);
             }

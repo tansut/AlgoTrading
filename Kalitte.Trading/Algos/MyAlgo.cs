@@ -67,11 +67,15 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(4)]
         public decimal LossPuan { get; set; } = 4;
 
-        [AlgoParam(72)]
-        public int RsiHighLimit { get; set; } = 72;
+        [AlgoParam(65)]
+        public decimal RsiHighLimit { get; set; } = 72M;
 
-        [AlgoParam(28)]
-        public int RsiLowLimit { get; set; } = 28;
+        [AlgoParam(35)]
+        public decimal RsiLowLimit { get; set; } = 28M;
+        
+        [AlgoParam(3)]
+        public decimal MinRsiChange { get; set; } = 3M;
+
 
         [AlgoParam(9)]
         public int Rsi { get; set; } = 9;
@@ -104,9 +108,14 @@ namespace Kalitte.Trading.Algos
         TakeProfitOrLossSignal takeProfitSignal = null;
         RangeSignal rsiRangeSignal = null;
         TrendSignal rsiTrendSignal = null;
+        TrendSignal priceTrend = null;
 
         public override void InitMySignals(DateTime t)
         {
+
+            var price = new Price(PeriodBars, 9);
+            priceTrend.i1k = price;
+
             if (maSignal != null)
             {
                 var movema5 = new Ema(PeriodBars, MovPeriod);
@@ -147,7 +156,12 @@ namespace Kalitte.Trading.Algos
 
         public void InitSignals()
         {
+            this.priceTrend = new TrendSignal("price-trend", Symbol, this);
+            priceTrend.Periods = 2;
+            priceTrend.PriceCollectionPeriod = 1;
+            priceTrend.ReferenceType = TrendReference.LastCheck;
 
+            this.Signals.Add(this.priceTrend);
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
@@ -259,6 +273,11 @@ namespace Kalitte.Trading.Algos
             }
         }
 
+        private void HandlePriceTrendSignal(TrendSignal signal, TrendSignalResult result)
+        {
+            //Log($"[price-trend]: {result}", LogLevel.Critical, result.SignalTime);
+        }
+
         private void HandleRsiTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
 
@@ -280,7 +299,7 @@ namespace Kalitte.Trading.Algos
                 if (quantity > 0)
                 {
                     var trend = result.Trend;
-                    if (Math.Abs(trend.Change) < 3) return;
+                    if (Math.Abs(trend.Change) < MinRsiChange) return;
                     if ((trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp)  && portfolio.IsLong && portfolio.AvgCost < marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
@@ -326,6 +345,12 @@ namespace Kalitte.Trading.Algos
                     var tpSignal = (TrendSignal)(result.Signal);
                     var signalResult = (TrendSignalResult)result;
                     HandleRsiTrendSignal(tpSignal, signalResult);
+                }
+                else if (result.Signal.Name == "price-trend")
+                {
+                    var tpSignal = (TrendSignal)(result.Signal);
+                    var signalResult = (TrendSignalResult)result;
+                    HandlePriceTrendSignal(tpSignal, signalResult);
                 }
                 else HandleBuyOrSellSignal(signal, result);
 

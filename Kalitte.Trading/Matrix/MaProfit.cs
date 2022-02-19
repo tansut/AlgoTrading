@@ -89,11 +89,14 @@ namespace Kalitte.Trading.Matrix
         [Parameter(4)]
         public decimal LossPuan { get; set; } = 4;
 
-        [Parameter(72)]
-        public int RsiHighLimit { get; set; } = 72;
+        [Parameter(65)]
+        public decimal RsiHighLimit { get; set; } = 65;
 
-        [Parameter(28)]
-        public int RsiLowLimit { get; set; } = 28;
+        [Parameter(35)]
+        public int RsiLowLimit { get; set; } = 35;
+
+        [Parameter(3)]
+        public decimal MinRsiChange { get; set; } = 3M;
 
         [Parameter(9)]
         public int Rsi { get; set; } = 9;

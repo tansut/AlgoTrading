@@ -10,18 +10,21 @@ using Skender.Stock.Indicators;
 namespace Kalitte.Trading.Indicators
 {
 
+    public class PriceResult: ResultBase
+    {
+        public decimal Price { get; set; }
+    }
 
-    public class Rsi : IndicatorBase<RsiResult>
+    public class Price : IndicatorBase<PriceResult>
     {
 
         int startIndex = 0;
-
         public override string ToString()
         {
             return $"{base.ToString()}:({Periods})";
         }
 
-        public Rsi(FinanceBars bars, int periods) : base(bars)
+        public Price(FinanceBars bars, int periods) : base(bars)
         {
             this.Periods = periods;              
             createResult();
@@ -35,14 +38,14 @@ namespace Kalitte.Trading.Indicators
         private void createResult()
         {
             ResultList.Clear();
-            var results = LastBars.GetRsi(Periods).ToList();
+            var results = LastBars.Select(p=>new PriceResult() { Price = p.Close, Date=p.Date}).ToList();
             results.ForEach(r => ResultList.Push(r));
         }
 
 
-        protected override IndicatorResult ToValue(RsiResult result)
+        protected override IndicatorResult ToValue(PriceResult result)
         {
-            return new IndicatorResult(result.Date, (decimal?)result.Rsi);
+            return new IndicatorResult(result.Date, result.Price);
         }
 
 
@@ -68,20 +71,18 @@ namespace Kalitte.Trading.Indicators
 
         public IList<IQuote> LastBars
         {
-            get { return InputBars.LastItems(startIndex + 2 * Periods + 1); }
+            get { return InputBars.LastItems(startIndex + Periods); }
         }
 
         public override decimal NextValue(decimal newVal)
         {
-            return (decimal)(NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Rsi ?? 0);
+            return (decimal)(NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Price);
 
         }
 
-        public override RsiResult NextResult(IQuote quote)
+        public override PriceResult NextResult(IQuote quote)
         {
-            var list = LastBars;
-            list.Add(quote);
-            return list.GetRsi(Periods).Last();
+            return new PriceResult() { Price = quote.Close, Date = quote.Date };
         }
     }
 }

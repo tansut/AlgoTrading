@@ -26,6 +26,11 @@ namespace Kalitte.Trading
         None
     }
 
+    public enum TrendReference
+    {
+        LastBar,
+        LastCheck
+    }
 
 
     public class TrendResult
@@ -53,7 +58,7 @@ namespace Kalitte.Trading
         {
             if (Reference == null)
             {
-                return $"date: {Date}, dir: {Direction} nv:{NewValue} ov: {OldValue}";
+                return $"date: {Date}, dir: {Direction} ch: {Change} nv:{NewValue} ov: {OldValue}";
             }
             else
                 return $"date: {Date}, dir: {Direction} ch: {Change} nv:{NewValue} ov: {OldValue} ref:[{Reference.Date}, {Reference.Direction}, {Reference.Change}]";
@@ -95,11 +100,13 @@ namespace Kalitte.Trading
         private FinanceBars analysisBars;
         private FinanceBars priceBars;
         private List<TrendResult> BarTrendResults;
+        public TrendReference ReferenceType { get; set; } = TrendReference.LastBar;
+        private decimal? lastValue = null;
 
         public bool UseSma = true;
 
 
-        public TrendSignal(string name, string symbol, AlgoBase owner, decimal? min, decimal? max) : base(name, symbol, owner)
+        public TrendSignal(string name, string symbol, AlgoBase owner, decimal? min = null, decimal? max  = null) : base(name, symbol, owner)
         {
             Min = min;
             Max = max;
@@ -207,18 +214,23 @@ namespace Kalitte.Trading
                 if (analysisBars.Count >= Periods && BarTrendResults.Count > 0)
                 {
                     var currentVal = UseSma ? analysisBars.List.GetSma(Periods).Last().Sma.Value : analysisBars.List.GetEma(Periods).Last().Ema.Value;
-                    var lastBarData = i1k.Results.Last().Value.Value;
+                    var lastReference = i1k.Results.Last().Value.Value;
 
-                    result.Trend = getTrendDirection(lastBarData, currentVal, BarTrendResults.LastOrDefault());
+                    if (this.ReferenceType == TrendReference.LastCheck && lastValue.HasValue)
+                    {
+                        lastReference = lastValue.Value;
+                    }
+
+                    result.Trend = getTrendDirection(lastReference, currentVal, this.ReferenceType == TrendReference.LastCheck ? null:  BarTrendResults.LastOrDefault());
                     result.Trend.Date = t ?? DateTime.Now;
 
                     var checkedLimits = !Min.HasValue && !Max.HasValue;
 
-                    if (Min.HasValue && lastBarData <= Min.Value)
+                    if (Min.HasValue && lastReference <= Min.Value)
                     {
                         checkedLimits = true;
                     }
-                    else if (Max.HasValue && lastBarData >= Max.Value)
+                    else if (Max.HasValue && lastReference >= Max.Value)
                     {
                         checkedLimits = true;
                     }
@@ -233,6 +245,8 @@ namespace Kalitte.Trading
                         result.finalResult = BuySell.Sell; // result.Trend.Direction == TrendDirection.ChangeToUp || result.Trend.Direction == TrendDirection. ? BuySell.Buy : BuySell.Sell;
                         //analysisBars.Clear();
                     }
+
+                    lastValue = currentVal;
 
                     Log($"trend-signal: result: {result}", LogLevel.Verbose, t);
                 }

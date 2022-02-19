@@ -22,15 +22,15 @@ public class Program
 
         var algo = new MyAlgo();
 
-        var sDate = new DateTime(2022,02,17, 9,30,0);
-        var fDate = new DateTime(2022,02,17, 23,0,0);
+        var sDate = new DateTime(2022,02,14, 9,30,0);
+        var fDate = new DateTime(2022,02,14, 23,0,0);
 
         var initValues = new Dictionary<string, object>();
-        initValues.Add("ProfitPuan", 16M);
-        initValues.Add("RsiHighLimit", 65);
+        //initValues.Add("ProfitPuan", 16M);
+        //initValues.Add("RsiHighLimit", 0);
         //initValues.Add("RsiLowLimit", 0);
-        initValues.Add("RsiAnalysisPeriod", 30);
-        initValues.Add("RsiPriceCollectionPeriod", 5);
+        initValues.Add("RsiAnalysisPeriod", 15);
+        initValues.Add("RsiPriceCollectionPeriod", 3);
 
         initValues.Add("LoggingLevel", LogLevel.Warning);
 

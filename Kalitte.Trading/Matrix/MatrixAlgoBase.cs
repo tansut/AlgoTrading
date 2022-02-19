@@ -26,12 +26,9 @@ namespace Kalitte.Trading.Matrix
 {
     public abstract class MatrixAlgoBase<T> : MatriksAlgo, IDisposable, IExchange where T : Kalitte.Trading.Algos.AlgoBase
     {
-
-        //public static MatrixAlgoBase<T> Current;
-
         public T Algo { get; set; }
 
-        [Parameter(1)]
+        [Parameter(0)]
         public int LoggingLevel { get; set; } = 0;
 
         [Parameter(false)]
@@ -99,8 +96,8 @@ namespace Kalitte.Trading.Matrix
 
         public override void OnInit()
         {
-            Algo.Simulation = this.Simulation;
-            Algo.LoggingLevel = (LogLevel)this.LoggingLevel;
+            //Algo.Simulation = this.Simulation;
+            //Algo.LoggingLevel = (LogLevel)this.LoggingLevel;
             Algo.Init();
         }
 
@@ -158,6 +155,11 @@ namespace Kalitte.Trading.Matrix
             var item = Algo.UserPortfolioList.GetPortfolio(position.Symbol);
             LoadFromTraderPosition(item, position);
             return item;
+        }
+
+        public override string ToString()
+        {
+            return Algo.ToString();
         }
 
         public void LoadRealPositions(string symbol)

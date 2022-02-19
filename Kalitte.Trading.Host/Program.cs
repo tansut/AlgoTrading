@@ -22,8 +22,8 @@ public class Program
 
         var algo = new MyAlgo();
 
-        var sDate = new DateTime(2022,02,18, 9,30,0);
-        var fDate = new DateTime(2022,02,18, 18,15,0);
+        var sDate = new DateTime(2022,02,17, 9,30,0);
+        var fDate = new DateTime(2022,02,17, 18,30,0);
 
         Backtest t = new Backtest(algo, sDate, fDate);
         t.Start();

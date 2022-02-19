@@ -134,11 +134,8 @@ namespace Kalitte.Trading.Matrix
             {
                 AddSymbolMarketData(Symbol);
             }           
-            //Algo.Symbol = this.Symbol;
-            //Algo.SymbolPeriod = (BarPeriod)Enum.Parse(typeof(BarPeriod), SymbolPeriod.ToString());
             SetAlgoProperties();
             base.OnInit();
-
         }
 
 
@@ -148,15 +145,11 @@ namespace Kalitte.Trading.Matrix
 
             if (Simulation)
             {
-
                 lock (this)
                 {
-
                     var bd = barDataCurrentValues.LastUpdate;
                     Algo.AlgoTime = bd.DTime;
                     var seconds = Algo.GetSymbolPeriodSeconds(SymbolPeriod.ToString());
-
-
 
                     //if (simulationCount > 12) return;                                       
 
@@ -235,6 +228,8 @@ namespace Kalitte.Trading.Matrix
                 Algo.InitCompleted();
             }
         }
+
+
 
 
         protected override MyAlgo createAlgoInstance()

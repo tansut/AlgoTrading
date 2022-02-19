@@ -46,7 +46,7 @@ namespace Kalitte.Trading
         {
             get;  set;
         }
-        public OrderSide Side
+        public BuySell Side
         {
             get; set;
         }
@@ -55,7 +55,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return this.Quantity > 0 && this.Side == OrderSide.Buy;
+                return this.Quantity > 0 && this.Side == BuySell.Buy;
             }
         }
 
@@ -63,7 +63,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return this.Quantity > 0 && this.Side == OrderSide.Sell;
+                return this.Quantity > 0 && this.Side == BuySell.Sell;
             }
         }
 
@@ -79,7 +79,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return this.Side == OrderSide.Buy ? "long" : "short";
+                return this.Side == BuySell.Buy ? "long" : "short";
             }
         }
 
@@ -96,7 +96,7 @@ namespace Kalitte.Trading
             return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL} Commission: {CommissionPaid} NetPL: {PL - CommissionPaid}";
         }
 
-        public PortfolioItem(string symbol, OrderSide side, decimal quantity, decimal unitPrice)
+        public PortfolioItem(string symbol, BuySell side, decimal quantity, decimal unitPrice)
         {
             this.Symbol = symbol;
             this.Side = side;
@@ -104,7 +104,7 @@ namespace Kalitte.Trading
             this.AvgCost = unitPrice;
         }
 
-        public PortfolioItem(string symbol) : this(symbol, OrderSide.Buy, 0, 0)
+        public PortfolioItem(string symbol) : this(symbol, BuySell.Buy, 0, 0)
         {
 
         }
@@ -129,7 +129,7 @@ namespace Kalitte.Trading
                 if (this.Quantity >= position.FilledQuantity)
                 {
                     var delta = position.FilledQuantity;
-                    var direction = this.Side == OrderSide.Buy ? 1 : -1;
+                    var direction = this.Side == BuySell.Buy ? 1 : -1;
                     var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost));
                     PL += profit;
                     this.Quantity -= position.FilledQuantity;
@@ -141,7 +141,7 @@ namespace Kalitte.Trading
                 else
                 {
                     var delta = this.Quantity;
-                    var direction = this.Side == OrderSide.Buy ? 1 : -1;
+                    var direction = this.Side == BuySell.Buy ? 1 : -1;
                     var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost));
                     PL += profit;
                     this.Side = position.Side;

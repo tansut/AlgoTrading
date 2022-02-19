@@ -11,8 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
-using Matriks.Indicators;
-using Matriks.Lean.Algotrader.Models;
 using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
@@ -89,7 +87,7 @@ namespace Kalitte.Trading
 
         protected SignalResultX CalculateSignal(DateTime? t = null)
         {
-            OrderSide? finalResult = null;
+            BuySell? finalResult = null;
             var mp = Algo.GetMarketPrice(Symbol, t);
 
             if (mp > 0 ) priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
@@ -123,8 +121,8 @@ namespace Kalitte.Trading
                     decimal last1 = i1k.Results.Last().Value;
                     decimal last2 = i2k.Results.Last().Value;
 
-                    if (lastCross != 0 && lastAvg > AvgChange) finalResult = OrderSide.Buy;
-                    else if (lastCross != 0 && lastAvg < -AvgChange) finalResult = OrderSide.Sell;
+                    if (lastCross != 0 && lastAvg > AvgChange) finalResult = BuySell.Buy;
+                    else if (lastCross != 0 && lastAvg < -AvgChange) finalResult = BuySell.Sell;
 
 
                     //Log($"Status: order:{finalResult}, lastAvg: {lastAvg} i1Last: {last1} i2Last:{last2} mpNow:{mp}, mpAvg: {mpAverage}, lastCross:{lastCross}, cross:{cross}", LogLevel.Debug, t);

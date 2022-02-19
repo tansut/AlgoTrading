@@ -2,18 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Matriks.Data.Symbol;
-using Matriks.Engines;
-using Matriks.Indicators;
-using Matriks.Symbols;
-using Matriks.AlgoTrader;
-using Matriks.Trader.Core;
-using Matriks.Trader.Core.Fields;
-using Matriks.Lean.Algotrader.AlgoBase;
-using Matriks.Lean.Algotrader.Models;
-using Matriks.Lean.Algotrader.Trading;
 using System.Timers;
-using Matriks.Trader.Core.TraderModels;
 using System.Text;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -72,7 +61,7 @@ namespace Kalitte.Trading
 
         protected override SignalResultX CheckInternal(DateTime? t = null)
         {
-            OrderSide? result = null;
+            BuySell? result = null;
             RangeStatus? status = null;
 
             var mp = Algo.GetMarketPrice(Symbol, t);
@@ -94,14 +83,14 @@ namespace Kalitte.Trading
                 var val = bars.List.GetSma(AnalysisPeriod).Last().Sma.Value;
                 if (Min.HasValue && val < Min.Value)
                 {
-                    result = OrderSide.Buy;
+                    result = BuySell.Buy;
                     status = RangeStatus.BelowMin;
                     value = val;
                     //Log($"Ema: {ema.Ema} Status: {status} Result: {result}", LogLevel.Debug, t);
                 }
                 else if (Max.HasValue && val > Max.Value)
                 {
-                    result = OrderSide.Sell;
+                    result = BuySell.Sell;
                     status = RangeStatus.AboveHigh;
                     value = val;
 

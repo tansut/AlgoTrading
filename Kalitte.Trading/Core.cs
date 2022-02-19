@@ -24,6 +24,22 @@ using System.Threading.Tasks;
 namespace Kalitte.Trading
 {
 
+    [System.AttributeUsage(System.AttributeTargets.Property |
+                   System.AttributeTargets.Field)]
+    public class AlgoParam : Attribute
+    {
+        public object Value { get; set; } = null;
+        public AlgoParam(object val = null)
+        {
+
+        }
+
+        public AlgoParam()
+        {
+
+        }
+    }
+
     public class AlgoParameter<T> where T: IEquatable<T>
     {
         public string Name { get; set; }
@@ -93,6 +109,12 @@ namespace Kalitte.Trading
         Other = 9
     }
 
+    public enum BuySell
+    {
+        Buy = 0,
+        Sell = 1
+    }
+
     public enum BarPeriod
     {
         Min = 1,
@@ -111,6 +133,24 @@ namespace Kalitte.Trading
         Month = 14,
         Year = 15
     }
+
+    public enum OrderIcon
+    {
+        None = 0,
+        Buy = 1,
+        Sell = 2,
+        Stop = 3,
+        ShortSell = 4,
+        PositionClose = 5,
+        Up = 6,
+        Down = 7,
+        StopLoss = 8,
+        TakeProfit = 9
+    }
+
+
+
+
 
     public static class Extensions
     {

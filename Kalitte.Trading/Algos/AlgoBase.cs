@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Algos
@@ -26,6 +27,13 @@ namespace Kalitte.Trading.Algos
         decimal GetMarketPrice(string symbol, DateTime? t = null);
     }
 
+    public interface IExchange: IMarketDataProvider
+    {
+        string CreateMarketOrder(string symbol, decimal quantity, BuySell side, string icon, bool night);
+        string CreateLimitOrder(string symbol, decimal quantity, BuySell side, decimal limitPrice, string icon, bool night);
+
+    }
+
     public class DelayedOrder
     {
         public ExchangeOrder order;
@@ -33,24 +41,38 @@ namespace Kalitte.Trading.Algos
         public DateTime created;
     }
 
-    public class AlgoBase
+    public abstract class AlgoBase
     {
         public static AlgoBase Current;
 
-        public IMarketDataProvider DataProvider { get; set; }
+        public IExchange Exchange { get; set; }
 
+        [AlgoParam()]
         public LogLevel LoggingLevel { get; set; } = LogLevel.Info;
+
+        [AlgoParam()]
         public bool Simulation { get; set; } = false;
-        public string LogDir = @"c:\kalitte\log";
+        public string LogDir { get; set; } = @"c:\kalitte\log";
         public MarketDataFileLogger PriceLogger;
         public string InstanceName { get; set; }
-        public string Symbol { get; set; }
+
+        [AlgoParam()]
+        public string Symbol { get; set; }        
+        
+        [AlgoParam()]
         public BarPeriod SymbolPeriod { get; set; }
+
+        [AlgoParam()]
+        public bool UseVirtualOrders { get; set; }
+
+        [AlgoParam()]
+        public bool AutoCompleteOrders { get; set; }
+        
 
         protected DateTime? TimeSet = null;
 
         public PortfolioList UserPortfolioList = new PortfolioList();
-        decimal simulationPriceDif = 0;
+        public decimal simulationPriceDif = 0;
         private static Dictionary<string, int> symbolPeriodCache = new Dictionary<string, int>();
 
         private DelayedOrder delayedOrder = null;
@@ -62,9 +84,15 @@ namespace Kalitte.Trading.Algos
         public Dictionary<string, decimal> ordersBySignals = new Dictionary<string, decimal>();
 
         int virtualOrderCounter = 0;
-        ExchangeOrder positionRequest = null;
-        int simulationCount = 0;
+        public ExchangeOrder positionRequest = null;
+        public int simulationCount = 0;
         public StartableState SignalsState { get; private set; } = StartableState.Stopped;
+
+        public ManualResetEvent orderWait = new ManualResetEvent(true);
+        public ManualResetEvent operationWait = new ManualResetEvent(true);
+
+        public abstract void Decide(Signal signal, SignalEventArgs data);
+
 
         public void CheckDelayedOrders(DateTime t)
         {
@@ -79,6 +107,29 @@ namespace Kalitte.Trading.Algos
                 }
             }
         }
+
+        public void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
+        {
+            this.positionRequest.FilledUnitPrice = filledUnitPrice;
+            this.positionRequest.FilledQuantity = filledQuantity;
+            var portfolio = this.UserPortfolioList.Add(this.positionRequest);
+            Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Order);
+            if (this.positionRequest.OriginSignal != null) CountOrder(this.positionRequest.OriginSignal.Signal.Name, filledQuantity);
+            this.positionRequest = null;
+            orderCounter++;
+            orderWait.Set();
+        }
+
+        public void CancelCurrentOrder(string reason)
+        {
+            Log($"Order rejected/cancelled [{reason}]", LogLevel.Warning, this.positionRequest.Created);
+            this.positionRequest = null;
+            orderWait.Set();
+        }
+
+
+
+
 
         public void CountOrder(string signal, decimal quantity)
         {
@@ -135,6 +186,42 @@ namespace Kalitte.Trading.Algos
 
         }
 
+        private void SeansTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            var t = DateTime.Now;
+            var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 1);
+            var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
+            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 1);
+            var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
+
+            seansTimer.Enabled = false;
+            try
+            {
+                if ((t >= t1 && t <= t2) || (t >= t3 && t <= t4))
+                {
+                    if (SignalsState == StartableState.Stopped)
+                    {
+                        Log($"Time seems OK, starting signals ...");
+                        StartSignals();
+                    }
+                }
+                else
+                {
+                    if (SignalsState == StartableState.Started)
+                    {
+                        Log($"Time seems OK, stopping signals ...");
+                        StopSignals();
+                    }
+                }
+            }
+            finally
+            {
+                seansTimer.Enabled = true;
+            }
+
+        }
+
+
 
         public void LoadBars(DateTime t)
         {
@@ -171,7 +258,7 @@ namespace Kalitte.Trading.Algos
                     Log($"Error initializing bars {ex.Message}", LogLevel.Error, t);
                 }
 
-            return periodBars
+            return periodBars;
             
         }
 
@@ -184,14 +271,65 @@ namespace Kalitte.Trading.Algos
             Current = this;
         }
 
+        public Boolean waitForOperationAndOrders(string message)
+        {
+            var wait = Simulation ? 0 : 100;
+            var result1 = operationWait.WaitOne(wait);
+            var result2 = orderWait.WaitOne(wait);
+            if (!result1 && !Simulation) Log($"Waiting for last operation to complete: {message}", LogLevel.Warning);
+            if (!result2 && !Simulation) Log($"Waiting for last order to complete: {message}", LogLevel.Warning);
+            return result1 && result2;
+        }
 
-        public void Init()
+        public void SignalReceieved(Signal signal, SignalEventArgs data)
+        {
+            SignalResultX existing;
+            BuySell? oldFinalResult = null;
+            lock (SignalResults)
+            {
+                if (SignalResults.TryGetValue(signal.Name, out existing))
+                    oldFinalResult = existing.finalResult;
+                SignalResults[signal.Name] = data.Result;
+            }
+            if (oldFinalResult != data.Result.finalResult)
+            {
+                Log($"Signal {signal.Name} changed from {oldFinalResult} -> {data.Result.finalResult }", LogLevel.Debug, data.Result.SignalTime);
+                if (data.Result.finalResult.HasValue) Decide(signal, data);
+            }
+        }
+
+
+        public virtual void Init()
         {
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
         }
 
-        public void Stop()
+        public virtual void InitMySignals(DateTime t)
         {
+
+        }
+
+        public virtual void InitCompleted()
+        {
+            if (!Simulation)
+            {
+                Log($"Setting seans timer ...");
+                seansTimer = new System.Timers.Timer(1000);
+                seansTimer.Enabled = true;
+                seansTimer.Elapsed += SeansTimer_Elapsed;
+            }
+            else StartSignals();
+        }
+
+        public virtual void Stop()
+        {
+            if (!Simulation)
+            {
+                seansTimer.Stop();
+                seansTimer.Dispose();
+            }
+            StopSignals();
+
             Log($"Completed {this}", LogLevel.FinalResult);
             Signals.ForEach(p => Log($"{p}", LogLevel.FinalResult));
             Log($"----------------------", LogLevel.FinalResult);
@@ -204,11 +342,47 @@ namespace Kalitte.Trading.Algos
             Log($"{printPortfolio()}", LogLevel.FinalResult);
             Log($"----------------------", LogLevel.FinalResult);
 
-            var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
 
-            if (Simulation && ExpectedNetPl > 0 && netPL < ExpectedNetPl) File.Delete(Algo.LogFile);
-            else if (Simulation) Process.Start(LogFile);
         }
+
+        public void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResultX signalResult = null)
+        {
+            orderWait.Reset();
+            var price = lprice > 0 ? lprice : this.GetMarketPrice(this.Symbol, t);
+            if (price == 0)
+            {
+                Log($"Unable to get a marketprice at {t}, using close {PeriodBars.Last.Close} from {PeriodBars.Last}", LogLevel.Warning, t);
+                price = PeriodBars.Last.Close;
+            }
+            string orderid;
+            decimal limitPrice = Math.Round((price + price * 0.02M * (side == BuySell.Sell ? -1 : 1)) * 4, MidpointRounding.ToEven) / 4;
+
+            if (UseVirtualOrders)
+            {
+                orderid = virtualOrderCounter++.ToString();
+            }
+            else
+            {
+                orderid = Simulation ? Exchange.CreateMarketOrder(symbol, quantity, side, icon.ToString(), (t ?? DateTime.Now).Hour >= 19) :
+                    Exchange.CreateLimitOrder(symbol, quantity, side, limitPrice, icon.ToString(), (t ?? DateTime.Now).Hour >= 19);
+            }
+            var order = this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
+            order.OriginSignal = signalResult;
+            order.Sent = t ?? DateTime.Now;
+
+            Log($"Order created, waiting to complete. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info);
+            if (this.UseVirtualOrders || this.AutoCompleteOrders)
+            {
+                if (this.Simulation)
+                {
+                    var algoTime = AlgoTime;
+                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(0.5 + new RandomGenerator().NextDouble() * 2) };
+                    Log($"Simulating real environment for {delayedOrder.order.Id} time is: {delayedOrder.created}, schedule to: {delayedOrder.scheduled2}", LogLevel.Debug);
+                }
+                else FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);
+            }
+        }
+
 
         public int GetSymbolPeriodSeconds(string period)
         {
@@ -275,7 +449,7 @@ namespace Kalitte.Trading.Algos
                 var content = $"[{level}:{opTime}]: {text}" + Environment.NewLine;
                 lock (this)
                 {
-                    //Debug(content);
+                    Console.WriteLine(content);
                     File.AppendAllText(LogFile, content + Environment.NewLine);
                 }
             }
@@ -301,7 +475,7 @@ namespace Kalitte.Trading.Algos
                 }
                 return price;
             }
-            else return DataProvider.GetMarketPrice(symbol, t);
+            else return Exchange.GetMarketPrice(symbol, t);
 
         }
 

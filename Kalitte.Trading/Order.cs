@@ -31,7 +31,7 @@ namespace Kalitte.Trading
         public DateTime Resulted { get; set; }
         public string Symbol;
         public string Id;
-        public OrderSide Side;
+        public BuySell Side;
         public decimal UnitPrice;
         public decimal Quantity;
         public string Comment;
@@ -65,7 +65,7 @@ namespace Kalitte.Trading
 
         public SignalResultX OriginSignal { get; set; }
 
-        public ExchangeOrder(string symbol, string id, OrderSide side, decimal quantity, decimal unitPrice, string comment = "", DateTime? t = null)
+        public ExchangeOrder(string symbol, string id, BuySell side, decimal quantity, decimal unitPrice, string comment = "", DateTime? t = null)
         {
             this.Symbol = symbol;
             this.Id = id;
@@ -81,7 +81,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return this.Side == OrderSide.Buy ? "long" : "short";
+                return this.Side == BuySell.Buy ? "long" : "short";
             }
         }
 

@@ -14,9 +14,13 @@ using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
+
+
+
+
     public class SignalResultX
     {
-        public OrderSide? finalResult = null;
+        public BuySell? finalResult = null;
         public Signal Signal { get; set; }
         public DateTime SignalTime { get; set; }
 
@@ -55,7 +59,7 @@ namespace Kalitte.Trading
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
-        public OrderSide? LastSignalResult { get; protected set; }
+        public BuySell? LastSignalResult { get; protected set; }
         public volatile bool IsRunning = false;
 
         protected Task collectorTask = null;
@@ -105,7 +109,7 @@ namespace Kalitte.Trading
                 {
                     restartTimer = true;
                 }
-                result = this.Check();                
+                result = this.Check();
             }
             finally
             {
@@ -115,7 +119,7 @@ namespace Kalitte.Trading
                     if (restartTimer) _timer.Start();
                 }
             }
-            
+
         }
 
         protected abstract SignalResultX CheckInternal(DateTime? t = null);
@@ -130,11 +134,13 @@ namespace Kalitte.Trading
                 raiseSignal(new SignalEventArgs() { Result = result });
                 LastSignalResult = result.finalResult ?? LastSignalResult;
                 return result;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
-                return new SignalResultX(this, t ?? DateTime.Now) {  finalResult = null };
-            } finally
+                return new SignalResultX(this, t ?? DateTime.Now) { finalResult = null };
+            }
+            finally
             {
                 InOperationLock.Set();
             }
@@ -142,7 +148,7 @@ namespace Kalitte.Trading
 
         protected virtual void Colllect()
         {
-            
+
         }
 
         //public virtual void Reset()
@@ -236,7 +242,7 @@ namespace Kalitte.Trading
 
         }
 
-        
+
 
 
         protected virtual void raiseSignal(SignalEventArgs data)

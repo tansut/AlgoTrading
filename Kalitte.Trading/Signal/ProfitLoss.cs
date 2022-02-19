@@ -2,18 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Matriks.Data.Symbol;
-using Matriks.Engines;
-using Matriks.Indicators;
-using Matriks.Symbols;
-using Matriks.AlgoTrader;
-using Matriks.Trader.Core;
-using Matriks.Trader.Core.Fields;
-using Matriks.Lean.Algotrader.AlgoBase;
-using Matriks.Lean.Algotrader.Models;
-using Matriks.Lean.Algotrader.Trading;
 using System.Timers;
-using Matriks.Trader.Core.TraderModels;
 using System.Text;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -70,7 +59,7 @@ namespace Kalitte.Trading
         protected override SignalResultX CheckInternal(DateTime? t = null)
         {
 
-            OrderSide? result = null;
+            BuySell? result = null;
             decimal price = 0M;
             decimal pl = 0M;
             decimal avgCost = 0M;
@@ -88,25 +77,25 @@ namespace Kalitte.Trading
                 {
                     //Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Verbose, t);
                 }
-                else if (ProfitQuantity > 0 && portfolio.Side == OrderSide.Buy && pl >= this.ProfitPriceChange)
+                else if (ProfitQuantity > 0 && portfolio.Side == BuySell.Buy && pl >= this.ProfitPriceChange)
                 {
                     direction = ProfitOrLoss.Profit;
-                    result = OrderSide.Sell;
+                    result = BuySell.Sell;
                 }
-                else if (ProfitQuantity > 0 && portfolio.Side == OrderSide.Sell && -pl >= this.ProfitPriceChange)
+                else if (ProfitQuantity > 0 && portfolio.Side == BuySell.Sell && -pl >= this.ProfitPriceChange)
                 {
                     direction = ProfitOrLoss.Profit;
-                    result = OrderSide.Buy;
+                    result = BuySell.Buy;
                 }
-                else if (LossQuantity > 0 && portfolio.Side == OrderSide.Buy && pl <= -this.LossPriceChange)
+                else if (LossQuantity > 0 && portfolio.Side == BuySell.Buy && pl <= -this.LossPriceChange)
                 {
                     direction = ProfitOrLoss.Loss;
-                    result = OrderSide.Sell;
+                    result = BuySell.Sell;
                 }
-                else if (LossQuantity > 0 && portfolio.Side == OrderSide.Sell && pl >= this.LossPriceChange)
+                else if (LossQuantity > 0 && portfolio.Side == BuySell.Sell && pl >= this.LossPriceChange)
                 {
                     direction = ProfitOrLoss.Loss;
-                    result = OrderSide.Buy;
+                    result = BuySell.Buy;
                 }
                 //else Algo.Log($"No cation takeprofit: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
             }

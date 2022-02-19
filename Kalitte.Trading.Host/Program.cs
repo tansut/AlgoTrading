@@ -9,6 +9,7 @@ using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
 using Kalitte.Trading.Tests;
 using Kalitte.Trading.Matrix;
+using Kalitte.Trading.Algos;
 
 public class Program
 {
@@ -18,9 +19,20 @@ public class Program
     public static void Main()
     {
 
+
+        var algo = new MyAlgo();
+
+        var sDate = new DateTime(2022,02,18, 9,30,0);
+        var fDate = new DateTime(2022,02,18, 18,15,0);
+
+        Backtest t = new Backtest(algo, sDate, fDate);
+        t.Start();
+
+        return;
+
         //var test = new TestAlgo();
 
-        var maa = new MaProfit();
+        
 
         var b1 = new FinanceBars(5);
 

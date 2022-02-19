@@ -96,7 +96,7 @@ namespace Kalitte.Trading.Matrix
         public int RsiLowLimit { get; set; } = 28;
 
         [Parameter(9)]
-        public int  Rsi { get; set; } = 9;
+        public int Rsi { get; set; } = 9;
 
         [Parameter(60)]
         public int RsiAnalysisPeriod { get; set; } = 60;
@@ -122,9 +122,9 @@ namespace Kalitte.Trading.Matrix
         [Parameter(false)]
         public bool AlwaysStopLoss { get; set; } = false;
 
+        private DateTime? lastSimulationDay = null;
 
 
- 
         public override void OnInit()
         {
             AddSymbol(Symbol, SymbolPeriod);
@@ -133,7 +133,7 @@ namespace Kalitte.Trading.Matrix
             if ((ProfitQuantity > 0 || LossQuantity > 0) && !Simulation)
             {
                 AddSymbolMarketData(Symbol);
-            }           
+            }
             SetAlgoProperties();
             base.OnInit();
         }
@@ -146,31 +146,36 @@ namespace Kalitte.Trading.Matrix
             if (Simulation)
             {
                 lock (this)
-                {
+                {                    
                     var bd = barDataCurrentValues.LastUpdate;
                     Algo.AlgoTime = bd.DTime;
+                    
+
                     var seconds = Algo.GetSymbolPeriodSeconds(SymbolPeriod.ToString());
 
                     //if (simulationCount > 12) return;                                       
 
+                    var lastDay = new DateTime(Algo.AlgoTime.Year, Algo.AlgoTime.Month, Algo.AlgoTime.Day).AddDays(-1).AddHours(22).AddMinutes(50);
                     if (Algo.SignalsState != StartableState.Started)
-                    {
-                        var lastDay = new DateTime(Algo.AlgoTime.Year, Algo.AlgoTime.Month, Algo.AlgoTime.Day).AddDays(-1).AddHours(22).AddMinutes(50);
+                    {                        
                         Algo.LoadBars(this.Symbol, lastDay);
                         Algo.InitMySignals(lastDay);
                         Algo.InitCompleted();
                     }
 
-                    try
+                    if (!lastSimulationDay.HasValue) lastSimulationDay = Algo.AlgoTime;
+
+                    if (lastSimulationDay.HasValue && (Algo.AlgoTime - lastSimulationDay.Value).Days > 0)
                     {
-                        Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Verbose);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug(ex.Message);
+                        lastSimulationDay = Algo.AlgoTime;
+                        var bd2 = Algo.GetPeriodBars(Algo.Symbol, lastDay).Last;
+                        var dayQuote = new MyQuote() { Date = lastDay, High = bd2.High, Close = bd2.Close, Low = bd2.Low, Open = bd2.Open, Volume = bd2.Volume };
+                        Algo.PeriodBars.Push(dayQuote);
+                        Algo.Log($"Pushed new day bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                        Algo.Signals.ForEach(p => p.Reset());
                     }
 
-
+                    Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Verbose);
 
                     for (var i = 0; i < seconds; i++)
                     {
@@ -213,16 +218,16 @@ namespace Kalitte.Trading.Matrix
 
 
         public override void OnInitCompleted()
-        {
-            var assembly = typeof(MaProfit).Assembly.GetName();
-            Algo.Log($"{this}", LogLevel.Info);
-            if (Algo.UseVirtualOrders)
-            {
-                Algo.Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
-            }
-            LoadRealPositions(Algo.Symbol);
+        {           
             if (!Simulation)
             {
+                var assembly = typeof(MaProfit).Assembly.GetName();
+                Algo.Log($"{this}", LogLevel.Info);
+                if (Algo.UseVirtualOrders)
+                {
+                    Algo.Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
+                }
+                LoadRealPositions(Algo.Symbol);
                 Algo.LoadBars(this.Symbol, DateTime.Now);
                 Algo.InitMySignals(DateTime.Now);
                 Algo.InitCompleted();

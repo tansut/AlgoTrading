@@ -64,7 +64,7 @@ namespace Kalitte.Trading.Matrix
                         {
                             var gain = ((order.Price - Algo.positionRequest.UnitPrice) * (Algo.positionRequest.Side == BuySell.Buy ? 1 : -1) * Algo.positionRequest.Quantity);
                             Algo.simulationPriceDif += gain;
-                            Algo.Log($"Filled price difference for order {order.CliOrdID}: Potential: {Algo.positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, Algo.positionRequest.Resulted);
+                            //Algo.Log($"Filled price difference for order {order.CliOrdID}: Potential: {Algo.positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, Algo.positionRequest.Resulted);
                             //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
                         }
                         Algo.FillCurrentOrder(order.Price, Algo.positionRequest.Quantity);
@@ -96,8 +96,6 @@ namespace Kalitte.Trading.Matrix
 
         public override void OnInit()
         {
-            //Algo.Simulation = this.Simulation;
-            //Algo.LoggingLevel = (LogLevel)this.LoggingLevel;
             Algo.Init();
         }
 
@@ -166,10 +164,13 @@ namespace Kalitte.Trading.Matrix
         {
             var positions = Simulation ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
             LoadRealPositions(positions, p => p.Symbol == symbol);
-            Algo.Log($"- PORTFOLIO -");
-            if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
-            else Algo.Log("!! Portfolio is empty !!");
-            Algo.Log($"- END PORTFOLIO -");
+            if (!Simulation)
+            {
+                Algo.Log($"- PORTFOLIO -");
+                if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
+                else Algo.Log("!! Portfolio is empty !!");
+                Algo.Log($"- END PORTFOLIO -");
+            }            
         }
 
         public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)

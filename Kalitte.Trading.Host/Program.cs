@@ -23,9 +23,12 @@ public class Program
         var algo = new MyAlgo();
 
         var sDate = new DateTime(2022,02,17, 9,30,0);
-        var fDate = new DateTime(2022,02,17, 18,30,0);
+        var fDate = new DateTime(2022,02,18, 23,0,0);
 
-        Backtest t = new Backtest(algo, sDate, fDate);
+        var initValues = new Dictionary<string, object>();
+        initValues.Add("ProfitPuan", 16M);
+
+        Backtest t = new Backtest(algo, sDate, fDate, initValues);
         t.Start();
 
         return;

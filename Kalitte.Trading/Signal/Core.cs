@@ -90,7 +90,8 @@ namespace Kalitte.Trading
 
         public void Log(string message, LogLevel level, DateTime? t = null)
         {
-            Algo.Log($"{this.Name}[{Thread.CurrentThread.ManagedThreadId}]: {message}", level, t ?? Algo.AlgoTime);
+            var th = Algo.Simulation ? "x" : Thread.CurrentThread.ManagedThreadId.ToString();
+            Algo.Log($"{this.Name}[{th}]: {message}", level, t ?? Algo.AlgoTime);
         }
 
         protected virtual void onTick(Object source, ElapsedEventArgs e)

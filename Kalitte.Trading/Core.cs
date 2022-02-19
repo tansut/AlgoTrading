@@ -24,8 +24,7 @@ using System.Threading.Tasks;
 namespace Kalitte.Trading
 {
 
-    [System.AttributeUsage(System.AttributeTargets.Property |
-                   System.AttributeTargets.Field)]
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field)]
     public class AlgoParam : Attribute
     {
         public object Value { get; set; } = null;
@@ -44,13 +43,11 @@ namespace Kalitte.Trading
     {
         public string Name { get; set; }
         public T Value { get; set; }
-        //public T DefaultValue { get; set; }
 
         public AlgoParameter(string name, T value)
         {
             this.Name = name;
             this.Value = value;
-            //this.DefaultValue = default(T);
         }
     }
 

@@ -192,9 +192,9 @@ namespace Kalitte.Trading.Algos
         private void SeansTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             var t = DateTime.Now;
-            var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 1);
+            var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
             var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
-            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 1);
+            var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
             var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
             seansTimer.Enabled = false;
@@ -229,6 +229,7 @@ namespace Kalitte.Trading.Algos
         public void LoadBars(string symbol, DateTime t)
         {
             this.PeriodBars = GetPeriodBars(symbol, t);
+            Log($"Initialized total {PeriodBars.Count} using time {t}. Last bar is: {PeriodBars.Last}", LogLevel.Debug, t);
         }
 
         public FinanceBars GetPeriodBars(string symbol, DateTime t)
@@ -253,8 +254,7 @@ namespace Kalitte.Trading.Algos
                         mdp.FileName = "all.txt";
                         mdp.SaveDaily = true;
                         periodBars = mdp.GetContentAsQuote(t);
-                    }
-                    Log($"Initialized total {periodBars.Count} using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
+                    }                    
                 }
                 catch (Exception ex)
                 {
@@ -304,6 +304,20 @@ namespace Kalitte.Trading.Algos
 
         public virtual void Init()
         {
+            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
+           
+            //for (var i = 0; i < properties.Count(); i++)
+            //{
+            //    var line = $"{properties[i].Name}\t{properties[i].GetValue(this)}";
+            //    Log($"{line}");                
+            //}
+            StringBuilder sb = new StringBuilder("\n-- USED PARAMETERS --\n");
+            foreach (var item in properties)
+            {
+                sb.Append($"{item.Name} \t {item.GetValue(this)}\n");                
+            }
+            sb.Append("----------\n");
+            Log(sb.ToString(), LogLevel.Info);
             
         }
 
@@ -379,7 +393,8 @@ namespace Kalitte.Trading.Algos
                 if (this.Simulation)
                 {
                     var algoTime = AlgoTime;
-                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(0.5 + new RandomGenerator().NextDouble() * 2) };
+                    //this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(0.5 + new RandomGenerator().NextDouble() * 2) };
+                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(1.2) };
                     Log($"Simulating real environment for {delayedOrder.order.Id} time is: {delayedOrder.created}, schedule to: {delayedOrder.scheduled2}", LogLevel.Debug);
                 }
                 else FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);

@@ -17,7 +17,6 @@ namespace Kalitte.Trading.Tests
                 ////var bytes = Encoding.UTF8.GetBytes(content);
                 ////logStream.Write(bytes, 0, bytes.Length);
                 //File.AppendAllText(file, content + Environment.NewLine);
-
             }
         }
     }

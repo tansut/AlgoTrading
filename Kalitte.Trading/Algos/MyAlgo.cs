@@ -291,7 +291,6 @@ namespace Kalitte.Trading.Algos
                         sendOrder(Symbol, quantity, BuySell.Buy, $"[{result.Signal.Name}:{result.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
                     }
                 }
-
             }
 
 

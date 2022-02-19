@@ -22,9 +22,10 @@ namespace Kalitte.Trading
 
         public void Start()
         {
+            string symbol = "F_XU0300222";
             Algo.Simulation = true;
             Algo.UseVirtualOrders = true;
-            Algo.Symbol = "F_XU0300222";
+            Algo.Symbol = symbol;
             Algo.SymbolPeriod = BarPeriod.Min10;
 
             Algo.AlgoTime = StartTime;
@@ -34,7 +35,7 @@ namespace Kalitte.Trading
 
             var lastDay = new DateTime(Algo.AlgoTime.Year, Algo.AlgoTime.Month, Algo.AlgoTime.Day).AddDays(-1).AddHours(22).AddMinutes(50);
 
-            Algo.LoadBars(lastDay);
+            Algo.LoadBars(symbol, lastDay);
             Algo.InitMySignals(Algo.AlgoTime);
             Algo.InitCompleted();
 
@@ -66,7 +67,7 @@ namespace Kalitte.Trading
                 Algo.simulationCount++;
 
                 
-                var bd = Algo.GetPeriodBars(p).Last;
+                var bd = Algo.GetPeriodBars(symbol, p).Last;
                 var newQuote = new MyQuote() { Date = p, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
                 Algo.PeriodBars.Push(newQuote);
                 Algo.Log($"Pushed new bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Verbose);

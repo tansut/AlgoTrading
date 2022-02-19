@@ -48,19 +48,22 @@ namespace Kalitte.Trading.Algos
         public IExchange Exchange { get; set; }
 
         [AlgoParam()]
-        public LogLevel LoggingLevel { get; set; } = LogLevel.Info;
+        public LogLevel LoggingLevel { get; set; } = LogLevel.Verbose;
 
         [AlgoParam()]
         public bool Simulation { get; set; } = false;
+
         public string LogDir { get; set; } = @"c:\kalitte\log";
         public MarketDataFileLogger PriceLogger;
         public string InstanceName { get; set; }
 
-        [AlgoParam()]
-        public string Symbol { get; set; }        
-        
-        [AlgoParam()]
-        public BarPeriod SymbolPeriod { get; set; }
+        [AlgoParam("F_XU0300222")]
+        public string Symbol { get; set; } = "F_XU0300222";
+
+
+        [AlgoParam(BarPeriod.Min10)]
+        public BarPeriod SymbolPeriod { get; set; } = BarPeriod.Min10;
+
 
         [AlgoParam()]
         public bool UseVirtualOrders { get; set; }
@@ -223,12 +226,12 @@ namespace Kalitte.Trading.Algos
 
 
 
-        public void LoadBars(DateTime t)
+        public void LoadBars(string symbol, DateTime t)
         {
-            this.PeriodBars = GetPeriodBars(t);
+            this.PeriodBars = GetPeriodBars(symbol, t);
         }
 
-        public FinanceBars GetPeriodBars(DateTime t)
+        public FinanceBars GetPeriodBars(string symbol, DateTime t)
         {
             
                 var periodBars = new FinanceBars();
@@ -246,7 +249,7 @@ namespace Kalitte.Trading.Algos
                     //}
                     //else
                     {
-                        var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
+                        var mdp = new MarketDataFileLogger(symbol, LogDir, SymbolPeriod.ToString());
                         mdp.FileName = "all.txt";
                         mdp.SaveDaily = true;
                         periodBars = mdp.GetContentAsQuote(t);
@@ -301,7 +304,7 @@ namespace Kalitte.Trading.Algos
 
         public virtual void Init()
         {
-            this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
+            
         }
 
         public virtual void InitMySignals(DateTime t)
@@ -348,7 +351,7 @@ namespace Kalitte.Trading.Algos
         public void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResultX signalResult = null)
         {
             orderWait.Reset();
-            var price = lprice > 0 ? lprice : this.GetMarketPrice(this.Symbol, t);
+            var price = lprice > 0 ? lprice : this.GetMarketPrice(symbol, t);
             if (price == 0)
             {
                 Log($"Unable to get a marketprice at {t}, using close {PeriodBars.Last.Close} from {PeriodBars.Last}", LogLevel.Warning, t);

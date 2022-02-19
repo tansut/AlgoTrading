@@ -133,9 +133,9 @@ namespace Kalitte.Trading.Matrix
             if ((ProfitQuantity > 0 || LossQuantity > 0) && !Simulation)
             {
                 AddSymbolMarketData(Symbol);
-            }                        
-           
-            Algo.SymbolPeriod = (BarPeriod)Enum.Parse(typeof(BarPeriod), SymbolPeriod.ToString());
+            }           
+            //Algo.Symbol = this.Symbol;
+            //Algo.SymbolPeriod = (BarPeriod)Enum.Parse(typeof(BarPeriod), SymbolPeriod.ToString());
             SetAlgoProperties();
             base.OnInit();
 
@@ -156,24 +156,33 @@ namespace Kalitte.Trading.Matrix
                     Algo.AlgoTime = bd.DTime;
                     var seconds = Algo.GetSymbolPeriodSeconds(SymbolPeriod.ToString());
 
-                    
+
 
                     //if (simulationCount > 12) return;                                       
 
                     if (Algo.SignalsState != StartableState.Started)
                     {
                         var lastDay = new DateTime(Algo.AlgoTime.Year, Algo.AlgoTime.Month, Algo.AlgoTime.Day).AddDays(-1).AddHours(22).AddMinutes(50);
-                        Algo.LoadBars(lastDay);
+                        Algo.LoadBars(this.Symbol, lastDay);
                         Algo.InitMySignals(lastDay);
                         Algo.InitCompleted();
                     }
 
-                    Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                    try
+                    {
+                        Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug(ex.Message);
+                    }
+
+
 
                     for (var i = 0; i < seconds; i++)
                     {
                         var time = Algo.AlgoTime;
-                        foreach (var signal in Signals)
+                        foreach (var signal in Algo.Signals)
                         {
                             var result = signal.Check(time);
                             //var waitOthers = waitForOperationAndOrders("Backtest");
@@ -185,7 +194,7 @@ namespace Kalitte.Trading.Matrix
 
                     var newQuote = new MyQuote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
                     Algo.PeriodBars.Push(newQuote);
-                    Log($"Pushed new bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                    Algo.Log($"Pushed new bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Verbose);
                 }
             }
             else
@@ -195,15 +204,15 @@ namespace Kalitte.Trading.Matrix
                 try
                 {
                     var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
-                    var wait = ManualResetEvent.WaitAll(Signals.Select(p => p.InOperationLock).ToArray(), 5000);
-                    if (!wait) Log($"Timeout for waiting signal operations, continue to push bar ...");
+                    var wait = ManualResetEvent.WaitAll(Algo.Signals.Select(p => p.InOperationLock).ToArray(), 5000);
+                    if (!wait) Algo.Log($"Timeout for waiting signal operations, continue to push bar ...");
                     Algo.PeriodBars.Push(newQuote);
-                    Log($"Pushed new quote, last is now: {Algo.PeriodBars.Last}", LogLevel.Debug);
+                    Algo.Log($"Pushed new quote, last is now: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
                 }
                 catch (Exception ex)
                 {
-                    Log($"data update: {ex.Message}", LogLevel.Error);
+                    Algo.Log($"data update: {ex.Message}", LogLevel.Error);
                 }
             }
         }
@@ -213,18 +222,18 @@ namespace Kalitte.Trading.Matrix
         public override void OnInitCompleted()
         {
             var assembly = typeof(MaProfit).Assembly.GetName();
-            Log($"{this}", LogLevel.Info);
+            Algo.Log($"{this}", LogLevel.Info);
             if (Algo.UseVirtualOrders)
             {
-                Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
+                Algo.Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
             }
             LoadRealPositions(Algo.Symbol);
             if (!Simulation)
             {
-                Algo.LoadBars(DateTime.Now);
+                Algo.LoadBars(this.Symbol, DateTime.Now);
                 Algo.InitMySignals(DateTime.Now);
                 Algo.InitCompleted();
-            }            
+            }
         }
 
 

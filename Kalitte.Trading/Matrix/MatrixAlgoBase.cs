@@ -24,7 +24,7 @@ using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading.Matrix
 {
-    public abstract class MatrixAlgoBase<T> : MatriksAlgo, IDisposable, IExchange, ILogProvider where T: Kalitte.Trading.Algos.AlgoBase
+    public abstract class MatrixAlgoBase<T> : MatriksAlgo, IDisposable, IExchange where T : Kalitte.Trading.Algos.AlgoBase
     {
 
         //public static MatrixAlgoBase<T> Current;
@@ -32,7 +32,7 @@ namespace Kalitte.Trading.Matrix
         public T Algo { get; set; }
 
         [Parameter(1)]
-        public int LoggingLevel { get; set; } = 1;
+        public int LoggingLevel { get; set; } = 0;
 
         [Parameter(false)]
         public bool Simulation { get; set; } = false;
@@ -41,7 +41,7 @@ namespace Kalitte.Trading.Matrix
 
         public string CreateMarketOrder(string symbol, decimal quantity, BuySell side, string icon, bool night)
         {
-            return this.SendMarketOrder(symbol, quantity, side == BuySell.Buy ? OrderSide.Buy: OrderSide.Sell, (ChartIcon)Enum.Parse(typeof(ChartIcon), icon), night);
+            return this.SendMarketOrder(symbol, quantity, side == BuySell.Buy ? OrderSide.Buy : OrderSide.Sell, (ChartIcon)Enum.Parse(typeof(ChartIcon), icon), night);
         }
 
         public string CreateLimitOrder(string symbol, decimal quantity, BuySell side, decimal limitPrice, string icon, bool night)
@@ -54,10 +54,9 @@ namespace Kalitte.Trading.Matrix
 
         public override void OnOrderUpdate(IOrder order)
         {
-            Log($"OrderUpdate: status: {order.OrdStatus.Obj} cliD: {order.CliOrdID} oid: {order.OrderID} algoid: {order.AlgoId} fa: {order.FilledAmount}", LogLevel.Debug);
+            Algo.Log($"OrderUpdate: status: {order.OrdStatus.Obj} cliD: {order.CliOrdID} oid: {order.OrderID} algoid: {order.AlgoId} fa: {order.FilledAmount}", LogLevel.Debug);
             if (order.OrdStatus.Obj == OrdStatus.Filled)
-            {
-                //if (!BackTestMode) Log($"OrderUpdate: pos: {this.positionRequest} status: {order.OrdStatus.Obj} orderid: {order.CliOrdID} fa: {order.FilledAmount} fq: {order.FilledQty} price: {order.Price} lastx: {order.LastPx}", LogLevel.Debug, this.positionRequest != null ? this.positionRequest.Time: DateTime.Now);
+            {                
 
                 if (Algo.positionRequest != null && Algo.positionRequest.Id == order.CliOrdID)
                 {
@@ -68,7 +67,7 @@ namespace Kalitte.Trading.Matrix
                         {
                             var gain = ((order.Price - Algo.positionRequest.UnitPrice) * (Algo.positionRequest.Side == BuySell.Buy ? 1 : -1) * Algo.positionRequest.Quantity);
                             Algo.simulationPriceDif += gain;
-                            Log($"Filled price difference for order {order.CliOrdID}: Potential: {Algo.positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, Algo.positionRequest.Resulted);
+                            Algo.Log($"Filled price difference for order {order.CliOrdID}: Potential: {Algo.positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, Algo.positionRequest.Resulted);
                             //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
                         }
                         Algo.FillCurrentOrder(order.Price, Algo.positionRequest.Quantity);
@@ -98,13 +97,6 @@ namespace Kalitte.Trading.Matrix
             Algo.Exchange = this;
         }
 
-
-        public void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null)
-        {
-            Algo.Log(text, level, t);
-            Debug(text);
-        }
-
         public override void OnInit()
         {
             Algo.Simulation = this.Simulation;
@@ -122,15 +114,15 @@ namespace Kalitte.Trading.Matrix
         public void SetAlgoProperties()
         {
             var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(ParameterAttribute), true));
+            Debug($"Setting Algo Properties({properties.Count()})");
             foreach (var item in properties)
             {
+                Debug($"{item.Name} -> {item.GetValue(this)}");
                 Algo.GetType().GetProperty(item.Name).SetValue(Algo, item.GetValue(this));
             }
         }
 
 
-        public List<Signal> Signals = new List<Signal>();
-        public ConcurrentDictionary<string, SignalResultX> SignalResults = new ConcurrentDictionary<string, SignalResultX>();
 
         internal void LoadRealPositions(Dictionary<string, AlgoTraderPosition> positions, Func<AlgoTraderPosition, bool> filter)
         {
@@ -172,10 +164,10 @@ namespace Kalitte.Trading.Matrix
         {
             var positions = Simulation ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
             LoadRealPositions(positions, p => p.Symbol == symbol);
-            Log($"- PORTFOLIO -");
-            if (Algo.UserPortfolioList.Count > 0) Log($"{Algo.UserPortfolioList.Print()}");
-            else Log("!! Portfolio is empty !!");
-            Log($"- END PORTFOLIO -");
+            Algo.Log($"- PORTFOLIO -");
+            if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
+            else Algo.Log("!! Portfolio is empty !!");
+            Algo.Log($"- END PORTFOLIO -");
         }
 
         public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)

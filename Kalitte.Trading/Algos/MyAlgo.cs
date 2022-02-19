@@ -15,12 +15,7 @@ namespace Kalitte.Trading.Algos
     {
 
 
-        [AlgoParam("F_XU0300222")]
-        public string Symbol { get; set; } = "F_XU0300222";
 
-
-        [AlgoParam(BarPeriod.Min10)]
-        public BarPeriod SymbolPeriod { get; set; } = BarPeriod.Min10;
 
         [AlgoParam(2)]
         public decimal OrderQuantity { get; set; } = 2M;
@@ -192,6 +187,7 @@ namespace Kalitte.Trading.Algos
 
         public override void Init()
         {
+            this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
             InitSignals();
             base.Init();
         }

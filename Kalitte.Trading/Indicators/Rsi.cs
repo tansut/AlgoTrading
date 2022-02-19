@@ -40,9 +40,9 @@ namespace Kalitte.Trading.Indicators
         }
 
 
-        protected override decimal? ToValue(RsiResult result)
+        protected override IndicatorResult ToValue(RsiResult result)
         {
-            return (decimal?)result.Rsi;
+            return new IndicatorResult(result.Date, (decimal?)result.Rsi);
         }
 
 

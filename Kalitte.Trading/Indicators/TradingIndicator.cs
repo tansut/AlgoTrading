@@ -10,12 +10,24 @@ using System.Threading.Tasks;
 namespace Kalitte.Trading.Indicators
 {
 
+    public class IndicatorResult
+    {
+        public DateTime Date { get; set; }
+        public decimal? Value { get; set; }
+
+        public IndicatorResult(DateTime date, decimal? value)
+        {
+            Date = date;    
+            Value = value;
+        }
+    }
+
     public interface ITradingIndicator
     {
         FinanceBars InputBars { get; }
         decimal NextValue(decimal newVal);
         decimal? CurrentValue { get; }
-        List<decimal?> Results { get; }
+        List<IndicatorResult> Results { get; }
         int Periods { get; set; }
         string Symbol { get;  set; }
 
@@ -44,15 +56,15 @@ namespace Kalitte.Trading.Indicators
         }
 
 
-        protected abstract decimal? ToValue(R result);
+        protected abstract IndicatorResult ToValue(R result);
 
         public decimal? CurrentValue { get
             {
-                return ResultList.Count > 0 ? ToValue(ResultList.Last): null;
+                return ResultList.Count > 0 ? ToValue(ResultList.Last).Value: null;
             }
         }
 
-        public List<decimal?> Results
+        public List<IndicatorResult> Results
         {
             get
             {

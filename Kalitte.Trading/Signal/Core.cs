@@ -38,6 +38,11 @@ namespace Kalitte.Trading
         {
             return $"time: {SignalTime}, finalResult: {finalResult}";
         }
+
+        public override int GetHashCode()
+        {
+            return finalResult.GetHashCode();
+        }
     }
 
 

@@ -272,23 +272,24 @@ namespace Kalitte.Trading.Algos
                 return;
             }
 
-            Log($"[rsi-trend]: {result}", LogLevel.Debug, result.SignalTime);
+            Log($"[rsi-trend]: {result}", LogLevel.Critical, result.SignalTime);
 
             if (!portfolio.IsEmpty)
             {
                 var quantity = portfolio.Quantity < OrderQuantity ? portfolio.Quantity : 0;
                 if (quantity > 0)
                 {
-                    if (result.Direction == TrendDirection.Down && portfolio.IsLong && portfolio.AvgCost < marketPrice)
+                    var trend = result.Trend;
+                    if (trend.Direction == TrendDirection.ReturnDown && portfolio.IsLong && portfolio.AvgCost < marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
-                        sendOrder(Symbol, quantity, BuySell.Sell, $"[{result.Signal.Name}:{result.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
+                        sendOrder(Symbol, quantity, BuySell.Sell, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
 
                     }
-                    else if (result.Direction == TrendDirection.Up && portfolio.IsShort && portfolio.AvgCost > marketPrice)
+                    else if (trend.Direction == TrendDirection.ReturnUp && portfolio.IsShort && portfolio.AvgCost > marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
-                        sendOrder(Symbol, quantity, BuySell.Buy, $"[{result.Signal.Name}:{result.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
+                        sendOrder(Symbol, quantity, BuySell.Buy, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
                     }
                 }
             }

@@ -38,9 +38,9 @@ namespace Kalitte.Trading.Indicators
             result.ForEach(r => ResultList.Push(r));
         }
 
-        protected override decimal? ToValue(EmaResult result)
+        protected override IndicatorResult ToValue(EmaResult result)
         {
-            return result.Ema;
+            return new IndicatorResult(result.Date, result.Ema);
         }
 
         public IList<IQuote> LastBars

@@ -49,9 +49,9 @@ namespace Kalitte.Trading.Indicators
 
         }
 
-        protected override decimal? ToValue(EmaResult result)
+        protected override IndicatorResult ToValue(EmaResult result)
         {
-            return result.Ema;
+            return new IndicatorResult(result.Date, result.Ema);
 
         }
     }
@@ -127,9 +127,9 @@ namespace Kalitte.Trading.Indicators
             return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Macd ?? 0;
         }
 
-        protected override decimal? ToValue(MacdResult result)
+        protected override IndicatorResult ToValue(MacdResult result)
         {
-            return result.Macd;
+            return new IndicatorResult(result.Date, result.Macd);
         }
 
 

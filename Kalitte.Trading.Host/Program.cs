@@ -27,6 +27,7 @@ public class Program
 
         var initValues = new Dictionary<string, object>();
         initValues.Add("ProfitPuan", 16M);
+        initValues.Add("LoggingLevel", LogLevel.Order);
 
         Backtest t = new Backtest(algo, sDate, fDate, initValues);
         t.Start();

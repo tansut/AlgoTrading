@@ -118,8 +118,8 @@ namespace Kalitte.Trading
 
                     var lastAvg = UseSma ? differenceBars.List.GetSma(Periods).Last().Sma.Value : differenceBars.List.GetEma(Periods).Last().Ema.Value;
                     
-                    decimal last1 = i1k.Results.Last().Value;
-                    decimal last2 = i2k.Results.Last().Value;
+                    decimal last1 = i1k.Results.Last().Value.Value;
+                    decimal last2 = i2k.Results.Last().Value.Value;
 
                     if (lastCross != 0 && lastAvg > AvgChange) finalResult = BuySell.Buy;
                     else if (lastCross != 0 && lastAvg < -AvgChange) finalResult = BuySell.Sell;

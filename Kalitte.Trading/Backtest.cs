@@ -87,10 +87,10 @@ namespace Kalitte.Trading
         Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>> GetDates(DateTime t)
         {
             var m1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
-            var m2 = new DateTime(t.Year, t.Month, t.Day, 18, 20, 0);
+            var m2 = new DateTime(t.Year, t.Month, t.Day, 18, 10, 1);
 
             var n1 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
-            var n2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
+            var n2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 1);
 
             return new Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>>(
                    new Tuple<DateTime, DateTime>(m1, m2), new Tuple<DateTime, DateTime>(n1, n2)

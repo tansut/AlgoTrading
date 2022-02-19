@@ -10,7 +10,7 @@ using Skender.Stock.Indicators;
 namespace Kalitte.Trading.Indicators
 {
 
-    public class MacdTrigger : TradingIndicator<EmaResult>
+    public class MacdTrigger : IndicatorBase<EmaResult>
     {
         public Macd Owner;
 
@@ -56,7 +56,7 @@ namespace Kalitte.Trading.Indicators
         }
     }
 
-    public class Macd : TradingIndicator<MacdResult>
+    public class Macd : IndicatorBase<MacdResult>
     {
         public int Slow { get; set; }
         public int Fast { get; set; }

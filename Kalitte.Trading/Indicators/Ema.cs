@@ -11,7 +11,7 @@ namespace Kalitte.Trading.Indicators
 
 
 
-    public class Ema : TradingIndicator<EmaResult>
+    public class Ema : IndicatorBase<EmaResult>
     {
 
 

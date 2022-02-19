@@ -11,7 +11,7 @@ namespace Kalitte.Trading.Indicators
 {
 
 
-    public class Rsi : TradingIndicator<RsiResult>
+    public class Rsi : IndicatorBase<RsiResult>
     {
 
         int startIndex = 0;

@@ -23,11 +23,16 @@ public class Program
         var algo = new MyAlgo();
 
         var sDate = new DateTime(2022,02,17, 9,30,0);
-        var fDate = new DateTime(2022,02,18, 23,0,0);
+        var fDate = new DateTime(2022,02,17, 23,0,0);
 
         var initValues = new Dictionary<string, object>();
         initValues.Add("ProfitPuan", 16M);
-        initValues.Add("LoggingLevel", LogLevel.Order);
+        initValues.Add("RsiHighLimit", 65);
+        //initValues.Add("RsiLowLimit", 0);
+        initValues.Add("RsiAnalysisPeriod", 30);
+        initValues.Add("RsiPriceCollectionPeriod", 5);
+
+        initValues.Add("LoggingLevel", LogLevel.Warning);
 
         Backtest t = new Backtest(algo, sDate, fDate, initValues);
         t.Start();

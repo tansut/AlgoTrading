@@ -20,8 +20,8 @@ namespace Kalitte.Trading
     {
 
 
-        public ITradingIndicator i1k;
-        public ITradingIndicator i2k;
+        public IIndicator i1k;
+        public IIndicator i2k;
 
         public decimal AvgChange = 0.3M;
         public int Periods = 5;

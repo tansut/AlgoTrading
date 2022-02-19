@@ -280,13 +280,14 @@ namespace Kalitte.Trading.Algos
                 if (quantity > 0)
                 {
                     var trend = result.Trend;
-                    if (trend.Direction == TrendDirection.ReturnDown && portfolio.IsLong && portfolio.AvgCost < marketPrice)
+                    if (Math.Abs(trend.Change) < 3) return;
+                    if ((trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp)  && portfolio.IsLong && portfolio.AvgCost < marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
                         sendOrder(Symbol, quantity, BuySell.Sell, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
 
                     }
-                    else if (trend.Direction == TrendDirection.ReturnUp && portfolio.IsShort && portfolio.AvgCost > marketPrice)
+                    else if ((trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown) && portfolio.IsShort && portfolio.AvgCost > marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
                         sendOrder(Symbol, quantity, BuySell.Buy, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);

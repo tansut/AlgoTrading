@@ -288,7 +288,7 @@ namespace Kalitte.Trading.Algos
         {
             SignalResultX existing;
             BuySell? oldFinalResult = null;
-            int oldHashCode=0;
+            int? oldHashCode = null;
             lock (SignalResults)
             {
                 if (SignalResults.TryGetValue(signal.Name, out existing))
@@ -299,7 +299,8 @@ namespace Kalitte.Trading.Algos
                 SignalResults[signal.Name] = data.Result;
             }
             if (oldHashCode != data.Result.GetHashCode())
-            {
+            //if (oldFinalResult != data.Result.finalResult)
+             {
                 Log($"Signal {signal.Name} changed from {existing} -> {data.Result }", LogLevel.Debug, data.Result.SignalTime);
                 if (data.Result.finalResult.HasValue) Decide(signal, data);
             }

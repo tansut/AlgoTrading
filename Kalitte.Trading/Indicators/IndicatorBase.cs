@@ -22,7 +22,7 @@ namespace Kalitte.Trading.Indicators
         }
     }
 
-    public interface ITradingIndicator
+    public interface IIndicator
     {
         FinanceBars InputBars { get; }
         decimal NextValue(decimal newVal);
@@ -34,7 +34,7 @@ namespace Kalitte.Trading.Indicators
 
     }
 
-    public abstract class TradingIndicator<R>: ITradingIndicator where R: ResultBase
+    public abstract class IndicatorBase<R>: IIndicator where R: ResultBase
     {
         protected System.Timers.Timer _timer = null;
         private static object _locker = new object();
@@ -72,14 +72,14 @@ namespace Kalitte.Trading.Indicators
             }
         }
 
-        public TradingIndicator(FinanceBars bars, FinanceList<R> initialResults = null)
+        public IndicatorBase(FinanceBars bars, FinanceList<R> initialResults = null)
         {
             //this.Algo = Algo;
             InputBars = bars;
             ResultList = initialResults == null ? new FinanceList<R>(0, null): initialResults;
         }
 
-        public TradingIndicator()
+        public IndicatorBase()
         {
 
         }

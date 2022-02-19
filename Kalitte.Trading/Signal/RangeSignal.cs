@@ -38,7 +38,7 @@ namespace Kalitte.Trading
         public decimal? Min { get; set; }
         public decimal? Max { get; set; }
         public int AnalysisPeriod { get; set; } = 3;
-        public ITradingIndicator i1k;
+        public IIndicator i1k;
 
         FinanceBars bars;
 

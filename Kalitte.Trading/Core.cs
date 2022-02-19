@@ -108,8 +108,8 @@ namespace Kalitte.Trading
 
     public enum BuySell
     {
-        Buy = 0,
-        Sell = 1
+        Buy = 1,
+        Sell = 2
     }
 
     public enum BarPeriod

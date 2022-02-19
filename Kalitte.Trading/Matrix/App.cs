@@ -59,13 +59,10 @@ namespace Matriks.Lean.Algotrader
         }
     }
 
-    public class log : Kalitte.Trading.Matrix.PriceLogger
-    {
 
-    }
 
-    public class bardatalogger : Kalitte.Trading.Matrix.BarDataLogger
-    {
+    //public class bardatalogger : Kalitte.Trading.Matrix.BarDataLogger
+    //{
 
-    }
+    //}
 }

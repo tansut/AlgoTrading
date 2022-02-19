@@ -20,6 +20,7 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
@@ -27,7 +28,7 @@ namespace Kalitte.Trading
     {
         public OrderSide Side { get; set; }
 
-        public FlipFlopSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner, OrderSide side = OrderSide.Buy) : base(name, symbol, owner)
+        public FlipFlopSignal(string name, string symbol, AlgoBase owner, OrderSide side = OrderSide.Buy) : base(name, symbol, owner)
         {
             this.Side = side;
         }

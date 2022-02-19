@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Skender.Stock.Indicators;
 using Kalitte.Trading.Indicators;
+using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
@@ -48,15 +49,13 @@ namespace Kalitte.Trading
         public decimal? Min { get; set; }
         public decimal? Max { get; set; }
         public int AnalysisPeriod { get; set; } = 3;
-        public IIndicator Indicator { get; set; }
         public ITradingIndicator i1k;
 
         FinanceBars bars;
 
-        public RangeSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner, IIndicator indicator,
+        public RangeSignal(string name, string symbol, AlgoBase owner, 
             decimal? min, decimal? max) : base(name, symbol, owner)
         {
-            Indicator = indicator;
             Min = min;
             Max = max;
         }
@@ -78,11 +77,11 @@ namespace Kalitte.Trading
 
             var mp = Algo.GetMarketPrice(Symbol, t);
 
-            if (mp == 0)
-            {
-                mp = i1k.InputBars.Last.Close;
-                Log($"Used last close bar price { mp } since market price is unavailable.", LogLevel.Warning, t);
-            }
+            //if (mp == 0)
+            //{
+            //    mp = i1k.InputBars.Last.Close;
+            //    Log($"Used last close bar price { mp } since market price is unavailable.", LogLevel.Warning, t);
+            //}
 
             if (i1k.CurrentValue.HasValue)
             {

@@ -1,4 +1,4 @@
-﻿// algo
+﻿//algo
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +20,11 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading.Matrix
 {
-    public class BarDataLogger : AlgoBase
+    public class BarDataLogger : MatrixAlgoBase<AlgoBase>
     {
 
 
@@ -75,7 +76,7 @@ namespace Kalitte.Trading.Matrix
                     var fbd = GetBarData(Symbol, sp);
                     for (var i = 0; i < fbd.BarDataIndexer.LastBarIndex; i++)
                     {
-                        var bdidx = periodList.FindIndex(p => p == fbd.PeriodInfo.ToSymbolPeriod());
+                        var bdidx = periodList.FindIndex(p => p.ToString() == fbd.PeriodInfo.ToSymbolPeriod().ToString());
                         var logger = loggerList[bdidx];
                         if (!logger.GetMarketData(fbd.BarDataIndexer[i]).HasValue)
                             LogBardata(fbd, i);
@@ -118,7 +119,7 @@ namespace Kalitte.Trading.Matrix
 
         void LogBardata(ISymbolBarData bd, int i)
         {
-            var bdidx = periodList.FindIndex(p => p == bd.PeriodInfo.ToSymbolPeriod());
+            var bdidx = periodList.FindIndex(p => p.ToString() == bd.PeriodInfo.ToSymbolPeriod().ToString());
             loggerList[bdidx].LogMarketData(bd.BarDataIndexer[i], new decimal[] { 
                 bd.Open[i], 
                 bd.High[i], 

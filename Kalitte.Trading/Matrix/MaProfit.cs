@@ -1,4 +1,5 @@
 ﻿// algo
+using Kalitte.Trading.Algos;
 using Kalitte.Trading.Indicators;
 using Matriks.Data.Symbol;
 using Matriks.Indicators;
@@ -18,15 +19,10 @@ using System.Threading.Tasks;
 namespace Kalitte.Trading.Matrix
 {
 
-    public class DelayedOrder
-    {
-        public ExchangeOrder order;
-        public DateTime scheduled2;
-        public DateTime created;
-    }
 
 
-    public class MaProfit : AlgoBase
+
+    public class MaProfit : MatrixAlgoBase<MyAlgo>
     {
         private ManualResetEvent orderWait = new ManualResetEvent(true);
         private ManualResetEvent operationWait = new ManualResetEvent(true);
@@ -136,10 +132,6 @@ namespace Kalitte.Trading.Matrix
 
 
 
-        MOV mov;
-        MOV mov2;
-        RSI rsi;
-        MACD macd;
 
 
 
@@ -149,126 +141,13 @@ namespace Kalitte.Trading.Matrix
         TrendSignal rsiTrendSignal = null;
 
 
-        private DelayedOrder delayedOrder = null;
-        System.Timers.Timer seansTimer;
-
-        FinanceBars periodBars = null;
-        //FinanceBars priceBars = null;
-
-        decimal simulationPriceDif = 0;
-        int orderCounter = 0;
-
-        public Dictionary<string, decimal> ordersBySignals = new Dictionary<string, decimal>();
-
-
-        int virtualOrderCounter = 0;
-        ExchangeOrder positionRequest = null;
-        int simulationCount = 0;
-        public StartableState SignalsState { get; private set; } = StartableState.Stopped;
-
-        private void CheckDelayedOrders(DateTime t)
-        {
-            if (this.delayedOrder != null)
-            {
-                var dif = AlgoTime - delayedOrder.scheduled2;
-                if (dif.Seconds >= 0)
-                {
-                    Log($"Simulation completed at {t}  for {delayedOrder.order.Id}", LogLevel.Debug);
-                    FillCurrentOrder(delayedOrder.order.UnitPrice, delayedOrder.order.Quantity);
-                    this.delayedOrder = null;
-                }
-            }
-        }
-
-        public void CountOrder(string signal, decimal quantity)
-        {
-            lock (ordersBySignals)
-            {
-                decimal existing;
-                if (ordersBySignals.TryGetValue(signal, out existing))
-                {
-                    ordersBySignals[signal] = existing + quantity;
-                }
-                else ordersBySignals[signal] = quantity;
-            }
-        }
-
-        public void StartSignals()
-        {
-            SignalsState = StartableState.StartInProgress;
-            try
-            {
-                foreach (var signal in signals)
-                {                    
-                    signal.Start();
-                    Log($"Started signal {signal}", LogLevel.Info);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log($"Error starting signals: {ex.Message}, {ex.Message}", LogLevel.Error);
-            }
-
-            SignalsState = StartableState.Started; ;
-        }
-
-        public void StopSignals()
-        {
-            SignalsState = StartableState.StopInProgress;
-            try
-            {
-                foreach (var signal in signals)
-                {
-
-                    signal.Stop();
-                    Log($"Stopped signal {signal}", LogLevel.Info);
-
-                }
-            }
-            catch (Exception ex)
-            {
-                Log($"Error stopping signals: {ex.Message}, {ex.StackTrace}", LogLevel.Error);
-            }
-
-            SignalsState = StartableState.Stopped;
-
-
-        }
-
+        
 
 
         public void InitMySignals(DateTime t)
         {
 
-            if (periodBars == null)
-            {
-                periodBars = new FinanceBars();
-                try
-                {
-                    var bd = GetBarData(Symbol, SymbolPeriod);
-                    if (bd != null && bd.BarDataIndexer != null)
-                    {
-                        for (var i = 0; i < bd.BarDataIndexer.LastBarIndex; i++)
-                        {
-                            if (bd.BarDataIndexer[i] > t) break;
-                            var quote = new MyQuote() { Date = bd.BarDataIndexer[i], Open = bd.Open[i], High = bd.High[i], Low = bd.Low[i], Close = bd.Close[i], Volume = bd.Volume[i] };
-                            periodBars.Push(quote);
-                        }
-                    }
-                    else
-                    {
-                        var mdp = new MarketDataFileLogger(Symbol, LogDir, SymbolPeriod.ToString());
-                        mdp.FileName = "all.txt";
-                        mdp.SaveDaily = true;
-                        periodBars = mdp.GetContentAsQuote(t);
-                    }
-                    Log($"Initialized total {periodBars.Count} using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
-                }
-                catch (Exception ex)
-                {
-                    Log($"Error initializing bars {ex.Message}", LogLevel.Error, t);
-                }
-            }
+            
 
             
             if (maSignal != null)
@@ -280,7 +159,7 @@ namespace Kalitte.Trading.Matrix
             }
 
 
-            var macds = signals.Where(p => p.Name == "cross:macd593").FirstOrDefault() as CrossSignal;
+            var macds = Signals.Where(p => p.Name == "cross:macd593").FirstOrDefault() as CrossSignal;
 
             if (macds != null)
             {
@@ -302,7 +181,7 @@ namespace Kalitte.Trading.Matrix
             }
 
 
-            signals.ForEach(p =>
+            Signals.ForEach(p =>
             {
                 p.Init();
             });
@@ -311,41 +190,37 @@ namespace Kalitte.Trading.Matrix
 
         public void InitSignals()
         {
-            mov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod, MovMethod.Exponential);
-            mov2 = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, MovPeriod2, MovMethod.Exponential);
-            rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, 14);
-            macd = MACDIndicator(Symbol, SymbolPeriod, OHLCType.Close, MACDLongPeriod, MACDShortPeriod, MACDTrigger);
 
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-               this.maSignal = new CrossSignal("cross:ma59", Symbol, this, mov, mov2) { UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MaAvgChange, Periods = MaPeriods };
-                this.signals.Add(maSignal);
+               this.maSignal = new CrossSignal("cross:ma59", Symbol, Algo) { UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MaAvgChange, Periods = MaPeriods };
+                this.Signals.Add(maSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                var macds = new CrossSignal("cross:macd593", Symbol, this, macd, macd.MacdTrigger) { UseSma = UseSmaForCross,  PriceCollectionPeriod = CrossPriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MacdAvgChange, Periods = MacdPeriods };
-                this.signals.Add(macds);
+                var macds = new CrossSignal("cross:macd593", Symbol, Algo) { UseSma = UseSmaForCross,  PriceCollectionPeriod = CrossPriceCollectionPeriod, NextOrderMultiplier = CrossNextOrderMultiplier, AvgChange = MacdAvgChange, Periods = MacdPeriods };
+                this.Signals.Add(macds);
             }
 
 
 
-            if (SimulateOrderSignal) this.signals.Add(new FlipFlopSignal("flipflop", Symbol, this, OrderSide.Buy));
+            if (SimulateOrderSignal) this.Signals.Add(new FlipFlopSignal("flipflop", Symbol, Algo, OrderSide.Buy));
             if (!SimulateOrderSignal && (this.ProfitQuantity > 0 || this.LossQuantity > 0))
             {
-                this.takeProfitSignal = new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity);
-                this.signals.Add(takeProfitSignal);
+                this.takeProfitSignal = new TakeProfitOrLossSignal("profitOrLoss", Symbol, Algo, this.ProfitPuan, this.ProfitQuantity, this.LossPuan, this.LossQuantity);
+                this.Signals.Add(takeProfitSignal);
             }
             if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0))
             {
-                rsiRangeSignal = new RangeSignal("rsi", Symbol, this, rsi, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { AnalysisPeriod = RsiAnalysisPeriod };
-                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { UseSma = this.UseSmaForCross, Periods = RsiAnalysisPeriod, PriceCollectionPeriod = this.RsiPriceCollectionPeriod };
-                this.signals.Add(rsiRangeSignal);
-                this.signals.Add(rsiTrendSignal);
+                rsiRangeSignal = new RangeSignal("rsi", Symbol, Algo, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { AnalysisPeriod = RsiAnalysisPeriod };
+                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, Algo, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { UseSma = this.UseSmaForCross, Periods = RsiAnalysisPeriod, PriceCollectionPeriod = this.RsiPriceCollectionPeriod };
+                this.Signals.Add(rsiRangeSignal);
+                this.Signals.Add(rsiTrendSignal);
             }
 
-            signals.ForEach(p =>
+            Signals.ForEach(p =>
             {
                 p.TimerEnabled = !Simulation;
                 p.Simulation = Simulation;
@@ -361,9 +236,11 @@ namespace Kalitte.Trading.Matrix
             if ((ProfitQuantity > 0 || LossQuantity > 0) && !Simulation)
             {
                 AddSymbolMarketData(Symbol);
-            }
-            this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
+            }            
             InitSignals();
+            Algo.Symbol = Symbol;
+            Algo.SymbolPeriod = (BarPeriod)Enum.Parse(typeof(BarPeriod), SymbolPeriod.ToString());
+            base.OnInit();
 
         }
 
@@ -417,7 +294,7 @@ namespace Kalitte.Trading.Matrix
         public override string ToString()
         {
             var assembly = typeof(MaProfit).Assembly.GetName();
-            return $"Instance {InstanceName} [{this.Symbol}/{SymbolPeriod}] using assembly {assembly.FullName}";
+            return $"Instance {Algo.InstanceName} [{this.Symbol}/{SymbolPeriod}] using assembly {assembly.FullName}";
         }
 
         public override void OnInitCompleted()
@@ -429,7 +306,11 @@ namespace Kalitte.Trading.Matrix
                 Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
             }
             LoadRealPositions(this.Symbol);
-            if (!Simulation) InitMySignals(DateTime.Now);
+            if (!Simulation)
+            {
+                Algo.LoadBars(DateTime.Now);
+                InitMySignals(DateTime.Now);
+            }
             if (!Simulation) CompleteInit();
         }
 
@@ -444,36 +325,39 @@ namespace Kalitte.Trading.Matrix
                 {
 
                     var bd = barDataCurrentValues.LastUpdate;
-                    AlgoTime = bd.DTime;
-                    var seconds = GetSymbolPeriodSeconds(SymbolPeriod);
+                    Algo.AlgoTime = bd.DTime;
+                    var seconds = Algo.GetSymbolPeriodSeconds(SymbolPeriod.ToString());
+
+                    
 
                     //if (simulationCount > 12) return;                                       
 
-                    if (SignalsState != StartableState.Started)
+                    if (Algo.SignalsState != StartableState.Started)
                     {
-                        var lastDay = new DateTime(AlgoTime.Year, AlgoTime.Month, AlgoTime.Day).AddDays(-1).AddHours(22).AddMinutes(50);
+                        var lastDay = new DateTime(Algo.AlgoTime.Year, Algo.AlgoTime.Month, Algo.AlgoTime.Day).AddDays(-1).AddHours(22).AddMinutes(50);
+                        Algo.LoadBars(lastDay);
                         InitMySignals(lastDay);
                         CompleteInit();
                     }
 
-                    Log($"Running backtest for period: {periodBars.Last}", LogLevel.Verbose);
+                    Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Verbose);
 
                     for (var i = 0; i < seconds; i++)
                     {
-                        var time = AlgoTime;
-                        foreach (var signal in signals)
+                        var time = Algo.AlgoTime;
+                        foreach (var signal in Signals)
                         {
                             var result = signal.Check(time);
                             //var waitOthers = waitForOperationAndOrders("Backtest");
                         }
-                        CheckDelayedOrders(time);
-                        AlgoTime = AlgoTime.AddSeconds(1);
+                        Algo.CheckDelayedOrders(time);
+                        Algo.AlgoTime = Algo.AlgoTime.AddSeconds(1);
                     }
-                    simulationCount++;
+                    Algo.simulationCount++;
 
                     var newQuote = new MyQuote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                    periodBars.Push(newQuote);
-                    Log($"Pushed new bar, last bar is now: {periodBars.Last}", LogLevel.Verbose);
+                    Algo.PeriodBars.Push(newQuote);
+                    Log($"Pushed new bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Verbose);
                 }
             }
             else
@@ -483,7 +367,7 @@ namespace Kalitte.Trading.Matrix
                 try
                 {
                     var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
-                    var wait = ManualResetEvent.WaitAll(signals.Select(p => p.InOperationLock).ToArray(), 5000);
+                    var wait = ManualResetEvent.WaitAll(Signals.Select(p => p.InOperationLock).ToArray(), 5000);
                     if (!wait) Log($"Timeout for waiting signal operations, continue to push bar ...");
                     periodBars.Push(newQuote);
                     Log($"Pushed new quote, last is now: {periodBars.Last}", LogLevel.Debug);
@@ -522,11 +406,11 @@ namespace Kalitte.Trading.Matrix
         {
             SignalResultX existing;
             OrderSide? oldFinalResult = null;
-            lock (signalResults)
+            lock (SignalResults)
             {
-                if (signalResults.TryGetValue(signal.Name, out existing))
+                if (SignalResults.TryGetValue(signal.Name, out existing))
                     oldFinalResult = existing.finalResult;
-                signalResults[signal.Name] = data.Result;
+                SignalResults[signal.Name] = data.Result;
             }
             if (oldFinalResult != data.Result.finalResult)
             {
@@ -554,7 +438,7 @@ namespace Kalitte.Trading.Matrix
                 Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Debug, result.SignalTime);
                 sendOrder(Symbol, result.Direction == ProfitOrLoss.Profit ? signal.ProfitQuantity : signal.LossQuantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result.MarketPrice, result.Direction == ProfitOrLoss.Profit ? ChartIcon.TakeProfit : ChartIcon.StopLoss, result.SignalTime, result);
             }
-            else Log($"[{result.Signal.Name}:{result.Direction}] received but quantity doesnot match. Portfolio: {pq} oq: {this.OrderQuantity}", LogLevel.Verbose, result.SignalTime);
+            //else Log($"[{result.Signal.Name}:{result.Direction}] received but quantity doesnot match. Portfolio: {pq} oq: {this.OrderQuantity}", LogLevel.Verbose, result.SignalTime);
         }
 
 
@@ -566,7 +450,7 @@ namespace Kalitte.Trading.Matrix
             if (result.finalResult == OrderSide.Sell && portfolio.IsShort) return;
 
             var pq = portfolio.Quantity;
-            var marketPrice = GetMarketPrice(Symbol, result.SignalTime);
+            var marketPrice = Algo.GetMarketPrice(Symbol, result.SignalTime);
 
             if (marketPrice == 0)
             {
@@ -579,15 +463,15 @@ namespace Kalitte.Trading.Matrix
                 Log($"[{result.Signal.Name}:{result.Status} {result.Value}] received.", LogLevel.Debug, result.SignalTime);
                 if (portfolio.Side == OrderSide.Sell && result.Status == RangeStatus.BelowMin && portfolio.AvgCost > marketPrice)
                 {
-                    Log($"{signal.Name} simulate position close,  buy.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
+                    //Log($"{signal.Name} simulate position close,  buy.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
                     //sendOrder(Symbol, portfolio.Quantity, OrderSide.Buy, $"[{result.Signal.Name}:{result.Status}]", 0, ChartIcon.PositionClose, result.SignalTime, result);
                 }
                 else if (portfolio.Side == OrderSide.Buy && result.Status == RangeStatus.AboveHigh && portfolio.AvgCost < marketPrice)
                 {
-                    Log($"{signal.Name} simulate position close,  sell.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
+                    //Log($"{signal.Name} simulate position close,  sell.  Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}", LogLevel.Debug, result.SignalTime);
                     //sendOrder(Symbol, portfolio.Quantity, OrderSide.Sell, $"[{result.Signal.Name}:{result.Status}]", 0, ChartIcon.PositionClose, result.SignalTime, result);
                 }
-                else Log($"{signal.Name} ignored. Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}");
+                //else Log($"{signal.Name} ignored. Rsi: {signal.Indicator.CurrentValue}, Market price: {marketPrice}, {portfolio.ToString()}");
             }
         }
 
@@ -596,7 +480,7 @@ namespace Kalitte.Trading.Matrix
 
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
 
-            var marketPrice = GetMarketPrice(Symbol, result.SignalTime);
+            var marketPrice = Algo.GetMarketPrice(Symbol, result.SignalTime);
 
             if (marketPrice == 0)
             {
@@ -716,7 +600,7 @@ namespace Kalitte.Trading.Matrix
         protected void sendOrder(string symbol, decimal quantity, OrderSide side, string comment = "", decimal lprice = 0, ChartIcon icon = ChartIcon.None, DateTime? t = null, SignalResultX signalResult = null)
         {
             orderWait.Reset();
-            var price = lprice > 0 ? lprice : GetMarketPrice(this.Symbol, t);
+            var price = lprice > 0 ? lprice : Algo.GetMarketPrice(this.Symbol, t);
             if (price == 0)
             {
                 Log($"Unable to get a marketprice at {t}, using close {periodBars.Last.Close} from {periodBars.Last}", LogLevel.Warning, t);
@@ -743,8 +627,8 @@ namespace Kalitte.Trading.Matrix
             {
                 if (this.Simulation)
                 {
-                    var algoTime = AlgoTime;
-                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(0.5 + new RandomGenerator().NextDouble() * 2) };
+                    var algoTime = Algo.AlgoTime;
+                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = Algo.AlgoTime.AddSeconds(0.5 + new RandomGenerator().NextDouble() * 2) };
                     Log($"Simulating real environment for {delayedOrder.order.Id} time is: {delayedOrder.created}, schedule to: {delayedOrder.scheduled2}", LogLevel.Debug);
                 }
                 else FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);
@@ -813,15 +697,7 @@ namespace Kalitte.Trading.Matrix
             orderWait.Set();
         }
 
-        public string printPortfolio()
-        {
-            var portfolio = UserPortfolioList.Print();
-            if (Simulation && portfolio.Length > 0)
-            {
-                portfolio.Append($"Market price difference: [{ simulationPriceDif}] Expected: [PL: {simulationPriceDif + UserPortfolioList.PL} NetPL: {simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission}]");
-            }
-            return "-- RECENT PORTFOLIO --" + Environment.NewLine + portfolio.ToString() + Environment.NewLine + "-- END PORTFOLIO --";
-        }
+
 
         public override void OnStopped()
         {
@@ -831,25 +707,13 @@ namespace Kalitte.Trading.Matrix
                 seansTimer.Dispose();
             }
             StopSignals();
-            Log($"Completed {this}", LogLevel.FinalResult);
-            signals.ForEach(p => Log($"{p}", LogLevel.FinalResult));
-            Log($"----------------------", LogLevel.FinalResult);
-            Log($"Market price difference total: {this.simulationPriceDif}", LogLevel.FinalResult);
-            foreach (var item in ordersBySignals)
-            {
-                Log($"{item.Key}:{item.Value}", LogLevel.FinalResult);
-            }
-            Log($"Total orders filled:: {this.orderCounter}", LogLevel.FinalResult);
-            Log($"{printPortfolio()}", LogLevel.FinalResult);
-            Log($"----------------------", LogLevel.FinalResult);
-
-            var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
-
-            if (Simulation && ExpectedNetPl > 0 && netPL < ExpectedNetPl) File.Delete(LogFile);
-            else if (Simulation) Process.Start(LogFile);
             base.OnStopped();
         }
 
+        protected override MyAlgo createAlgoInstance()
+        {
+            return new MyAlgo();
+        }
     }
 
 }

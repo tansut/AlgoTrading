@@ -1,0 +1,14 @@
+﻿// algo
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Kalitte.Trading.Algos
+{
+    public class MyAlgo: AlgoBase
+    {
+
+    }
+}

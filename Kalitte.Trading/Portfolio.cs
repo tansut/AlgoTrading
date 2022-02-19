@@ -26,39 +26,25 @@ namespace Kalitte.Trading
     public class PortfolioItem
     {
 
-        public static PortfolioItem FromTraderPosition(AlgoTraderPosition p)
-        {
-            var item = new PortfolioItem(p.Symbol);
-            item.LoadFromTraderPosition(p);
-            return item;
-        }
 
-        public void LoadFromTraderPosition(AlgoTraderPosition p)
-        {
-            this.Symbol = p.Symbol;
-            this.Side = p.Side.Obj == Matriks.Trader.Core.Fields.Side.Buy ? OrderSide.Buy : OrderSide.Sell;
-            this.AvgCost = p.AvgCost;
-            this.Quantity = Math.Abs(p.QtyNet);
-
-        }
 
         public decimal CommissionPaid { get; set; } = 0M;
 
         public string Symbol
         {
-            get; private set;
+            get;  set;
         }
         public decimal PL
         {
-            get; private set;
+            get;  set;
         }
         public decimal AvgCost
         {
-            get; private set;
+            get;  set;
         }
         public decimal Quantity
         {
-            get; private set;
+            get;  set;
         }
         public OrderSide Side
         {
@@ -217,26 +203,6 @@ namespace Kalitte.Trading
                 sb.AppendLine(item.Value.ToString());
             }
             return sb;
-        }
-
-        internal void LoadRealPositions(Dictionary<string, AlgoTraderPosition> positions, Func<AlgoTraderPosition, bool> filter)
-        {
-            this.Clear();
-            foreach (var position in positions)
-            {
-                if (position.Value.IsSymbol)
-                {
-                    if (filter(position.Value))
-                        this.Add(position.Key, PortfolioItem.FromTraderPosition(position.Value));
-                }
-            }
-        }
-
-        public PortfolioItem UpdateFromTrade(AlgoTraderPosition position)
-        {
-            var item = this.GetPortfolio(position.Symbol);
-            item.LoadFromTraderPosition(position);
-            return item;
         }
     }
 

@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Matriks.Lean.Algotrader.Models;
+using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
@@ -49,7 +50,7 @@ namespace Kalitte.Trading
         protected System.Timers.Timer _timer = null;
         private static object _locker = new object();
         public string Name { get; set; }
-        public Kalitte.Trading.Matrix.AlgoBase Algo { get; set; }
+        public AlgoBase Algo { get; set; }
         public bool Enabled { get; set; }
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
@@ -70,7 +71,7 @@ namespace Kalitte.Trading
             return $"{this.GetType().Name}[{this.Name}]";
         }
 
-        public Signal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner)
+        public Signal(string name, string symbol, AlgoBase owner)
         {
             Name = name;
             Symbol = symbol;

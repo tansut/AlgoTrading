@@ -13,14 +13,13 @@ using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
 using Matriks.Indicators;
 using Matriks.Lean.Algotrader.Models;
+using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
 
     public class CrossSignal : Signal
     {
-        public IIndicator i1 = null;
-        public IIndicator i2 = null;
 
 
         public ITradingIndicator i1k;
@@ -39,10 +38,9 @@ namespace Kalitte.Trading
         public bool UseSma = true;
 
 
-        public CrossSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner, IIndicator i1, IIndicator i2) : base(name, symbol, owner)
+        public CrossSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
         {
-            this.i1 = i1;
-            this.i2 = i2;
+
         }
 
 
@@ -94,14 +92,7 @@ namespace Kalitte.Trading
             OrderSide? finalResult = null;
             var mp = Algo.GetMarketPrice(Symbol, t);
 
-            if (mp == 0)
-            {
-                mp = i1k.InputBars.Last.Close;
-                Log($"Used last close bar price { mp } since market price is unavailable.", LogLevel.Warning, t);
-            }
-
-
-            priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
+            if (mp > 0 ) priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
 
             if (priceBars.IsFull && mp >= 0)
             {
@@ -136,15 +127,13 @@ namespace Kalitte.Trading
                     else if (lastCross != 0 && lastAvg < -AvgChange) finalResult = OrderSide.Sell;
 
 
-                    Log($"Status: order:{finalResult}, lastAvg: {lastAvg} i1Last: {last1} i2Last:{last2} mpNow:{mp}, mpAvg: {mpAverage}, lastCross:{lastCross}, cross:{cross}", LogLevel.Debug, t);
+                    //Log($"Status: order:{finalResult}, lastAvg: {lastAvg} i1Last: {last1} i2Last:{last2} mpNow:{mp}, mpAvg: {mpAverage}, lastCross:{lastCross}, cross:{cross}", LogLevel.Debug, t);
 
                     if (finalResult.HasValue)
                     {
 
                         differenceBars.Clear();
                     }
-
-
                 }
             }
 

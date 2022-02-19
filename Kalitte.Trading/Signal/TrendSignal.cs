@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Skender.Stock.Indicators;
 using Kalitte.Trading.Indicators;
+using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
@@ -69,7 +70,7 @@ namespace Kalitte.Trading
         public bool UseSma = true;
 
 
-        public TrendSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner, decimal? min, decimal? max) : base(name, symbol, owner)
+        public TrendSignal(string name, string symbol, AlgoBase owner, decimal? min, decimal? max) : base(name, symbol, owner)
         {
             Min = min;
             Max = max;
@@ -99,7 +100,6 @@ namespace Kalitte.Trading
         {
             derivs.Clear();
             var list = i1k.Results;
-            var sep = ",";
             for (var i = 0; i < list.Count; i++)
             {
                 var index = i + 1;
@@ -128,14 +128,7 @@ namespace Kalitte.Trading
 
             var mp = Algo.GetMarketPrice(Symbol, t);
 
-            if (mp == 0)
-            {
-                mp = i1k.InputBars.Last.Close;
-                Log($"Used last close bar price { mp } since market price is unavailable.", LogLevel.Warning, t);
-            }
-
-
-            priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
+            if (mp > 0) priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
 
 
             if (priceBars.IsFull && mp >= 0)
@@ -158,15 +151,15 @@ namespace Kalitte.Trading
                     result.Change = currentVal - lastBarData;
                     result.LastBarValue = lastBarData;
 
-                    var checkedLimits = true;
+                    var checkedLimits = !Min.HasValue && !Max.HasValue;
 
-                    if (Min.HasValue && lastBarData > Min.Value)
+                    if (Min.HasValue && lastBarData <= Min.Value)
                     {
-                        checkedLimits = false;
+                        checkedLimits = true;
                     }
-                    else if (Max.HasValue && lastBarData < Max.Value)
+                    else if (Max.HasValue && lastBarData >= Max.Value)
                     {
-                        checkedLimits |= false;
+                        checkedLimits = true;
                     }
 
 
@@ -179,12 +172,13 @@ namespace Kalitte.Trading
                     if (result.Direction != TrendDirection.None)
                     {
                         result.finalResult = result.Direction == TrendDirection.Up ? OrderSide.Buy : OrderSide.Sell;
+                        analysisBars.Clear();
                     }
 
                     Log($"trend-signal: result: {result}", LogLevel.Verbose, t);
 
 
-                    analysisBars.Clear();
+                   
                 }
             }
 

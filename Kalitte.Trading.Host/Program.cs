@@ -8,6 +8,7 @@ using Microsoft.AspNet.SignalR.Client.Transports;
 using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
 using Kalitte.Trading.Tests;
+using Kalitte.Trading.Matrix;
 
 public class Program
 {
@@ -17,9 +18,9 @@ public class Program
     public static void Main()
     {
 
-        var test = new TestAlgo();
+        //var test = new TestAlgo();
 
-
+        var maa = new MaProfit();
 
         var b1 = new FinanceBars(5);
 

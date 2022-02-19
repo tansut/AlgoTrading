@@ -1,4 +1,5 @@
 ﻿// algo
+using Kalitte.Trading.Algos;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace Kalitte.Trading.Indicators
         protected System.Timers.Timer _timer = null;
         private static object _locker = new object();
         public string Name { get; set; }
-        public Kalitte.Trading.Matrix.AlgoBase Algo { get; set; }
+        public AlgoBase Algo { get; set; }
         public bool Enabled { get; set; }
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }

@@ -20,6 +20,7 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
@@ -49,7 +50,7 @@ namespace Kalitte.Trading
         public decimal LossPriceChange { get; set; }
         public decimal LossQuantity { get; set; }
 
-        public TakeProfitOrLossSignal(string name, string symbol, Kalitte.Trading.Matrix.AlgoBase owner, 
+        public TakeProfitOrLossSignal(string name, string symbol, AlgoBase owner, 
             decimal profitPriceChange, decimal profitQuantity, decimal lossPriceChange, decimal lossQuantity) : base(name, symbol, owner)
         {
             ProfitPriceChange = profitPriceChange;
@@ -85,7 +86,7 @@ namespace Kalitte.Trading
                
                 if (price == 0 || avgCost == 0)
                 {
-                    Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Verbose, t);
+                    //Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Verbose, t);
                 }
                 else if (ProfitQuantity > 0 && portfolio.Side == OrderSide.Buy && pl >= this.ProfitPriceChange)
                 {

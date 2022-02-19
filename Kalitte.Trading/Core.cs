@@ -93,6 +93,25 @@ namespace Kalitte.Trading
         Other = 9
     }
 
+    public enum BarPeriod
+    {
+        Min = 1,
+        Min5 = 2,
+        Min10 = 3,
+        Min15 = 4,
+        Min20 = 5,
+        Min30 = 6,
+        Min60 = 7,
+        Min120 = 8,
+        Min180 = 9,
+        Min240 = 10,
+        Session = 11,
+        Day = 12,
+        Week = 13,
+        Month = 14,
+        Year = 15
+    }
+
     public static class Extensions
     {
         public static decimal ToCurrency(this decimal d)

@@ -303,9 +303,9 @@ namespace Kalitte.Trading.Algos
                 var periods = (int)Math.Round((1 - val) / 3.25M * 100);
 
 
-                //maSignal.InOperationLock.WaitOne();
-                //maSignal.AvgChange = avgChange;
-                //maSignal.Periods = periods;
+                maSignal.InOperationLock.WaitOne();
+                maSignal.AvgChange = avgChange;
+                maSignal.Periods = periods;
 
                 //Log($"{val} {avgChange} {periods}", LogLevel.Critical, result.SignalTime);
             }
@@ -337,13 +337,13 @@ namespace Kalitte.Trading.Algos
                     if ((trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp)  && portfolio.IsLong && portfolio.AvgCost < marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
-                        sendOrder(Symbol, quantity, BuySell.Sell, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
+                        sendOrder(Symbol, quantity*3, BuySell.Sell, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
 
                     }
                     else if ((trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown) && portfolio.IsShort && portfolio.AvgCost > marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
-                        sendOrder(Symbol, quantity, BuySell.Buy, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
+                        sendOrder(Symbol, quantity*3, BuySell.Buy, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
                     }
                 }
             }

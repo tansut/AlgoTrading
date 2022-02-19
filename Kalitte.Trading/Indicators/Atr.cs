@@ -11,7 +11,7 @@ namespace Kalitte.Trading.Indicators
 {
 
 
-    public class Rsi : IndicatorBase<RsiResult>
+    public class Atr : IndicatorBase<AtrResult>
     {
 
         int startIndex = 0;
@@ -21,25 +21,28 @@ namespace Kalitte.Trading.Indicators
             return $"{base.ToString()}:({Periods})";
         }
 
-        public Rsi(FinanceBars bars, int periods) : base(bars)
+        public Atr(FinanceBars bars, int periods) : base(bars)
         {
             this.Periods = periods;              
             createResult();
             this.InputBars.ListEvent += InputBars_BarEvent;
-            startIndex = 0;            
+            startIndex = 0;
+            
+            
+            
         }
 
         private void createResult()
         {
             ResultList.Clear();
-            var results = LastBars.GetRsi(Periods).ToList();
+            var results = LastBars.GetAtr(Periods).ToList();
             results.ForEach(r => ResultList.Push(r));
         }
 
 
-        protected override IndicatorResult ToValue(RsiResult result)
+        protected override IndicatorResult ToValue(AtrResult result)
         {
-            return new IndicatorResult(result.Date, (decimal?)result.Rsi);
+            return new IndicatorResult(result.Date, result.Atrp);
         }
 
 
@@ -65,20 +68,23 @@ namespace Kalitte.Trading.Indicators
 
         public IList<IQuote> LastBars
         {
-            get { return InputBars.LastItems(startIndex + 2 * Periods + 1); }
+            get { return InputBars.LastItems(startIndex + 5 * Periods + 1); }
+            //get { return InputBars.LastItems(InputBars.Count); }
         }
 
         public override decimal NextValue(decimal newVal)
         {
-            return (decimal)(NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Rsi ?? 0);
+            var last = InputBars.Last;
+            var q = new Quote() { Date = DateTime.Now, Low = last.Low, High = last.High, Close = newVal };
+            return (decimal)(NextResult(q).Atrp ?? 0);
 
         }
 
-        public override RsiResult NextResult(IQuote quote)
+        public override AtrResult NextResult(IQuote quote)
         {
             var list = LastBars;
             list.Add(quote);
-            return list.GetRsi(Periods).Last();
+            return list.GetAtr(Periods).Last();
         }
     }
 }

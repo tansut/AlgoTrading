@@ -109,12 +109,16 @@ namespace Kalitte.Trading.Algos
         RangeSignal rsiRangeSignal = null;
         TrendSignal rsiTrendSignal = null;
         TrendSignal priceTrend = null;
+        TrendSignal atrTrend = null;
 
         public override void InitMySignals(DateTime t)
         {
 
             var price = new Price(PeriodBars, 9);
             priceTrend.i1k = price;
+
+            var atr = new Atr(PeriodBars, 2);
+            atrTrend.i1k = atr;
 
             if (maSignal != null)
             {
@@ -161,7 +165,15 @@ namespace Kalitte.Trading.Algos
             priceTrend.PriceCollectionPeriod = 1;
             priceTrend.ReferenceType = TrendReference.LastCheck;
 
+            this.atrTrend = new TrendSignal("atr-trend", Symbol, this);
+            priceTrend.Periods = 3;
+            priceTrend.PriceCollectionPeriod = 2;
+            
+
+
             this.Signals.Add(this.priceTrend);
+            this.Signals.Add(this.atrTrend);
+
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
@@ -278,6 +290,28 @@ namespace Kalitte.Trading.Algos
             //Log($"[price-trend]: {result}", LogLevel.Critical, result.SignalTime);
         }
 
+        private void HandleAtrTrendSignal(TrendSignal signal, TrendSignalResult result)
+        {
+            //Log($"[atr-trend]: {result}", LogLevel.Critical, result.SignalTime);
+
+            if (result.Trend.Direction != TrendDirection.None)
+            {
+                //var avgChange = (1 - result.Trend.NewValue) / 4M;
+                //var periods = (int)Math.Round((1 - result.Trend.NewValue) / 4M * 100);
+                var val = signal.i1k.Results.Last().Value.Value;
+                var avgChange = (1 - val) / 3.25M;
+                var periods = (int)Math.Round((1 - val) / 3.25M * 100);
+
+
+                //maSignal.InOperationLock.WaitOne();
+                //maSignal.AvgChange = avgChange;
+                //maSignal.Periods = periods;
+
+                //Log($"{val} {avgChange} {periods}", LogLevel.Critical, result.SignalTime);
+            }
+
+        }
+
         private void HandleRsiTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
 
@@ -291,7 +325,7 @@ namespace Kalitte.Trading.Algos
                 return;
             }
 
-            Log($"[rsi-trend]: {result}", LogLevel.Critical, result.SignalTime);
+            //Log($"[rsi-trend]: {result}", LogLevel.Critical, result.SignalTime);
 
             if (!portfolio.IsEmpty)
             {
@@ -352,7 +386,13 @@ namespace Kalitte.Trading.Algos
                     var signalResult = (TrendSignalResult)result;
                     HandlePriceTrendSignal(tpSignal, signalResult);
                 }
-                else HandleBuyOrSellSignal(signal, result);
+                else if (result.Signal.Name == "atr-trend")
+                {
+                    var tpSignal = (TrendSignal)(result.Signal);
+                    var signalResult = (TrendSignalResult)result;
+                    HandleAtrTrendSignal(tpSignal, signalResult);
+                }
+                else HandleCrossSignal(signal, result);
 
             }
             finally
@@ -362,7 +402,7 @@ namespace Kalitte.Trading.Algos
         }
 
 
-        public void HandleBuyOrSellSignal(Signal signal, SignalResultX signalResult)
+        public void HandleCrossSignal(Signal signal, SignalResultX signalResult)
         {
             decimal doubleMultiplier = 1.0M;
             BuySell? side = null;
@@ -402,7 +442,8 @@ namespace Kalitte.Trading.Algos
             }
             if (side != null)
             {
-                sendOrder(Symbol, OrderQuantity * doubleMultiplier, side.Value, "[" + signalResult.Signal.Name + "]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+                var cross = (CrossSignal)signalResult.Signal;
+                sendOrder(Symbol, OrderQuantity * doubleMultiplier, side.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.Periods}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }
         }
 

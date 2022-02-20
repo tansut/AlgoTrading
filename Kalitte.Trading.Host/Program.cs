@@ -27,8 +27,8 @@ public class Program
 
         var initValues = new Dictionary<string, object>();
         //initValues.Add("ProfitPuan", 16M);
-        initValues.Add("ProfitQuantity", 2M);
-        initValues.Add("OrderQuantity", 4M);
+        initValues.Add("ProfitQuantity", 1M);
+        initValues.Add("OrderQuantity", 2M);
         initValues.Add("RsiProfitQuantity", 1M);
 
         

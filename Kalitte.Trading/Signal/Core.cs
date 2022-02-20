@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Matriks.Lean.Algotrader.Models;
 using Kalitte.Trading.Algos;
+using Skender.Stock.Indicators;
 
 namespace Kalitte.Trading
 {
@@ -132,6 +133,7 @@ namespace Kalitte.Trading
 
         public virtual SignalResultX Check(DateTime? t = null)
         {
+            InOperationLock.WaitOne();
             InOperationLock.Reset();
             try
             {
@@ -157,13 +159,6 @@ namespace Kalitte.Trading
 
         }
 
-        //public virtual void Reset()
-        //{
-        //    if (!checkLock.WaitOne(30000))
-        //    {
-        //        Log("Timeout in waiting operation", LogLevel.Error);
-        //    }
-        //}
 
         protected virtual void ResetInternal()
         {
@@ -172,31 +167,64 @@ namespace Kalitte.Trading
 
         public virtual void Reset()
         {
-            if (!InOperationLock.WaitOne(5000))
+            InOperationLock.WaitOne();
+            InOperationLock.Reset();
+            try
             {
-                Log("Timeout in starting signal", LogLevel.Error);
+                ResetInternal();
             }
-            else ResetInternal();
+            finally
+            {
+                InOperationLock.Set();
+            }
         }
+
 
         public virtual void Init()
         {
 
         }
 
+        protected virtual void LoadNewBars(object sender, ListEventArgs<IQuote> e)
+        {
+
+        }
+
+        protected virtual void InputbarsChanged(object sender, ListEventArgs<IQuote> e)
+        {
+            InOperationLock.WaitOne();
+            InOperationLock.Reset();
+            try
+            {
+                LoadNewBars(sender, e);
+                Log($"Loaded new bars for {this.Name} Data: {e.Action}, {e.Item}", LogLevel.Debug);
+            }
+            finally
+            {
+                InOperationLock.Set();
+            }
+        }
+
         public virtual void Start()
         {
-            if (!InOperationLock.WaitOne(5000))
+            InOperationLock.WaitOne();
+            InOperationLock.Reset();
+            try
             {
-                Log("Timeout in starting signal", LogLevel.Error);
+                this.IsRunning = true;
+                if (Enabled && TimerEnabled)
+                {
+                    _timer = new System.Timers.Timer(1000);
+                    _timer.Elapsed += this.onTick;
+                    _timer.Start();
+                }
             }
-            this.IsRunning = true;
-            if (Enabled && TimerEnabled)
+            finally
             {
-                _timer = new System.Timers.Timer(1000);
-                _timer.Elapsed += this.onTick;
-                _timer.Start();
+                InOperationLock.Set();
             }
+
+
 
             //collectorTaskTokenSource = new CancellationTokenSource();
             //collectorTask = new Task(() =>
@@ -215,17 +243,28 @@ namespace Kalitte.Trading
 
         public virtual void Stop()
         {
-            if (Enabled && TimerEnabled)
+            InOperationLock.WaitOne();
+            InOperationLock.Reset();
+            try
             {
-                _timer.Stop();
-                _timer.Dispose();
-                _timer = null;
+                if (Enabled && TimerEnabled)
+                {
+                    _timer.Stop();
+                    _timer.Dispose();
+                    _timer = null;
+                }
+                this.IsRunning = false;
             }
-            this.IsRunning = false;
-            if (!InOperationLock.WaitOne(30000))
+            finally
             {
-                Log("Timeout in stopping signal", LogLevel.Error);
+                InOperationLock.Set();
             }
+
+
+            //if (!InOperationLock.WaitOne(30000))
+            //{
+            //    Log("Timeout in stopping signal", LogLevel.Error);
+            //}
             //try
             //{
             //    collectorTaskTokenSource.Cancel();

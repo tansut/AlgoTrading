@@ -112,6 +112,15 @@ namespace Kalitte.Trading
         Sell = 2
     }
 
+    public enum VolatileRatio
+    {
+        Critical,
+        High,
+        Average,
+        BelowAverage,
+        Low
+    }
+
     public enum BarPeriod
     {
         Min = 1,

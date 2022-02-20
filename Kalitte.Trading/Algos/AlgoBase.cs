@@ -46,6 +46,8 @@ namespace Kalitte.Trading.Algos
     {
         public static AlgoBase Current;
 
+        public VolatileRatio VolatileRatio { get; set; } = VolatileRatio.Average;
+
         public IExchange Exchange { get; set; }
 
         [AlgoParam()]
@@ -86,6 +88,8 @@ namespace Kalitte.Trading.Algos
         int orderCounter = 0;
 
         public Dictionary<string, decimal> ordersBySignals = new Dictionary<string, decimal>();
+
+        public Dictionary<string, PerformanceCounter> perfCounters = new Dictionary<string, PerformanceCounter>();
 
         int virtualOrderCounter = 0;
         public ExchangeOrder positionRequest = null;
@@ -353,6 +357,8 @@ namespace Kalitte.Trading.Algos
             return sb;
         }
 
+        
+
 
         public virtual void Init()
         {
@@ -366,8 +372,12 @@ namespace Kalitte.Trading.Algos
 
         }
 
+
+        
+
         public virtual void InitCompleted()
         {
+            //CreatePerformanceCounters();
             if (!Simulation)
             {
                 Log($"Setting seans timer ...");
@@ -377,6 +387,43 @@ namespace Kalitte.Trading.Algos
             }
             else StartSignals();
         }
+
+        public void SetPerformanceCounterValue(string name, decimal value)
+        {
+            var counter = perfCounters[name];
+            counter.IncrementBy(1);
+        }
+
+        private void CreatePerformanceCounters()
+        {
+            if (!PerformanceCounterCategory.Exists(InstanceName))
+            {
+
+                CounterCreationDataCollection counterDataCollection = new CounterCreationDataCollection();
+
+                foreach(var signal in this.Signals)
+                {
+                    CounterCreationData ccd = new CounterCreationData();
+                    ccd.CounterType = PerformanceCounterType.AverageBase;
+                    ccd.CounterName = signal.Name;
+                    counterDataCollection.Add(ccd);
+                }
+
+                PerformanceCounterCategory.Create(InstanceName,
+                    "",
+                    PerformanceCounterCategoryType.SingleInstance, counterDataCollection);                
+            }
+
+            foreach (var signal in this.Signals)
+            {
+                var counter = new PerformanceCounter(InstanceName, signal.Name);
+                perfCounters[signal.Name] = counter;
+            }
+
+            
+
+
+    }
 
         public virtual void Stop()
         {

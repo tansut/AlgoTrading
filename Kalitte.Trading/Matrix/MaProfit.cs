@@ -59,6 +59,9 @@ namespace Kalitte.Trading.Matrix
         [Parameter(15)]
         public int MaPeriods { get; set; } = 1;
 
+        [Parameter(true)]
+        public bool DynamicCross { get; set; } = true;
+
 
         [Parameter(0)]
         public decimal ExpectedNetPl { get; set; } = 0;
@@ -176,18 +179,44 @@ namespace Kalitte.Trading.Matrix
 
                     Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
+
+                    Func<object, SignalResultX> action = (object stateo) =>
+                    {
+                        var state = (Dictionary<string, object>)stateo;
+                        DateTime time = (DateTime)(state["time"]);
+                        return ((Signal)state["signal"]).Check(time);
+
+                    };
+
                     for (var i = 0; i < seconds; i++)
                     {
                         var time = Algo.AlgoTime;
+                        //Algo.Log($"Running signals for {time}", LogLevel.Critical, time);
+                        var tasks = new List<Task<SignalResultX>>();
+
                         foreach (var signal in Algo.Signals)
                         {
-                            var result = signal.Check(time);
+                            var dict = new Dictionary<string, object>();
+                            dict["time"] = time;
+                            dict["signal"] = signal;
+                            tasks.Add(Task<SignalResultX>.Factory.StartNew(action, dict));
                         }
+                        Task.WaitAll(tasks.ToArray());
                         Algo.CheckDelayedOrders(time);
                         Algo.AlgoTime = Algo.AlgoTime.AddSeconds(1);
                     }
-                    Algo.simulationCount++;
 
+                    //for (var i = 0; i < seconds; i++)
+                    //{
+                    //    var time = Algo.AlgoTime;
+                    //    foreach (var signal in Algo.Signals)
+                    //    {
+                    //        var result = signal.Check(time);
+                    //    }
+                    //    Algo.CheckDelayedOrders(time);
+                    //    Algo.AlgoTime = Algo.AlgoTime.AddSeconds(1);
+                    //}
+                    Algo.simulationCount++;
                     var newQuote = new MyQuote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
                     Algo.PushNewBar(Symbol, (BarPeriod)Enum.Parse(typeof(BarPeriod), this.SymbolPeriod.ToString()), newQuote.Date, newQuote);
                 }

@@ -52,6 +52,25 @@ namespace Kalitte.Trading
             return initial == null ? new List<T>() : initial;
         }
 
+        public void Resize(int newSize)
+        {
+            rwl.AcquireWriterLock(timeOut);
+            try
+            {
+                if (this.items.Count > newSize)
+                {
+                    items.Clear();
+                    if (ListEvent != null) ListEvent(this, new Trading.ListEventArgs<T>() { Action = ListAction.Cleared, Item = default(T) });
+                }
+                QueSize = newSize;
+            }
+            finally
+            {
+
+                rwl.ReleaseWriterLock();
+            }
+        }
+
 
         public FinanceList(int size, IEnumerable<T> initial = null)
         {

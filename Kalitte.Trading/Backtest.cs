@@ -26,7 +26,7 @@ namespace Kalitte.Trading
                         propValue = tc.ConvertTo(val, item.PropertyType);
                     }
                     Algo.GetType().GetProperty(item.Name).SetValue(Algo, propValue);
-                }                
+                }
             }
         }
 
@@ -38,7 +38,7 @@ namespace Kalitte.Trading
         {
             Algo = algo;
             StartTime = start;
-            FinishTime = end;            
+            FinishTime = end;
             Algo.Simulation = true;
             Algo.UseVirtualOrders = true;
             if (initValues != null) ApplyProperties(initValues);
@@ -51,18 +51,33 @@ namespace Kalitte.Trading
 
             Algo.AlgoTime = t1;
 
-             for (var p = t1; p < t2;)
+            for (var p = t1; p < t2;)
             {
 
                 Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
+                Func<object, SignalResultX> action = (object stateo) =>
+               {
+                   var state = (Dictionary<string, object>)stateo;
+                   DateTime time = (DateTime)(state["time"]);
+                   return ((Signal)state["signal"]).Check(time);
+
+               };
+
                 for (var i = 0; i < seconds; i++)
                 {
                     var time = Algo.AlgoTime;
+                    //Algo.Log($"Running signals for {time}", LogLevel.Critical, time);
+                    var tasks = new List<Task<SignalResultX>>();
+
                     foreach (var signal in Algo.Signals)
                     {
-                        var result = signal.Check(time);
+                        var dict = new Dictionary<string, object>();
+                        dict["time"] = time;
+                        dict["signal"] = signal;
+                        tasks.Add(Task<SignalResultX>.Factory.StartNew(action, dict));
                     }
+                    Task.WaitAll(tasks.ToArray());
                     Algo.CheckDelayedOrders(time);
                     Algo.AlgoTime = Algo.AlgoTime.AddSeconds(1);
                 }
@@ -71,7 +86,7 @@ namespace Kalitte.Trading
                 //var bd = Algo.GetPeriodBars().Last;
                 //var newQuote = new MyQuote() { Date = p, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
                 //Algo.PeriodBars.Push(newQuote);
-               
+
 
                 p = Algo.AlgoTime;
             }
@@ -90,7 +105,7 @@ namespace Kalitte.Trading
             return new Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>>(
                    new Tuple<DateTime, DateTime>(m1, m2), new Tuple<DateTime, DateTime>(n1, n2)
             );
-            
+
         }
 
         public void Start()
@@ -98,7 +113,7 @@ namespace Kalitte.Trading
             var days = FinishTime - StartTime;
 
 
-            for(var d = 0; d <= days.Days; d++)
+            for (var d = 0; d <= days.Days; d++)
             {
                 var currentDay = StartTime.AddDays(d);
                 var periods = this.GetDates(currentDay);
@@ -106,11 +121,12 @@ namespace Kalitte.Trading
                 var prevDayLastBar = new DateTime(currentDay.Year, currentDay.Month, currentDay.Day).AddDays(-1).AddHours(22).AddMinutes(50);
 
                 if (d == 0)
-                {                    
+                {
                     Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod, prevDayLastBar);
                     Algo.InitMySignals(Algo.AlgoTime);
                     Algo.InitCompleted();
-                } else
+                }
+                else
                 {
                     //var bd = Algo.GetPeriodBars(Algo.Symbol, prevDayLastBar).Last;
                     //var newQuote = new MyQuote() { Date = prevDayLastBar, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };

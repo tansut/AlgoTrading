@@ -30,13 +30,16 @@ public class Program
         initValues.Add("ProfitQuantity", 1M);
         initValues.Add("OrderQuantity", 2M);
         initValues.Add("RsiProfitQuantity", 1M);
+        initValues.Add("DynamicCross", true);
+        //initValues.Add("MaAvgChange", 0.2M);
+        //initValues.Add("MaPeriods", 20);
+
+
+
+
+
 
         
-
-            
-
-
-
 
 
         //initValues.Add("RsiHighLimit", 0M);

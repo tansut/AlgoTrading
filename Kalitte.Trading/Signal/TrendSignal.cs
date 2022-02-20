@@ -123,17 +123,16 @@ namespace Kalitte.Trading
             analysisBars = new FinanceBars(Periods);
             priceBars = new FinanceBars(PriceCollectionPeriod);
             BarTrendResults = new List<TrendResult>();
-            i1k.InputBars.ListEvent += InputBars_ListEvent;
+            i1k.InputBars.ListEvent += base.InputbarsChanged;
             generateDerivs();
         }
 
-        private void InputBars_ListEvent(object sender, ListEventArgs<IQuote> e)
+
+        protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
         {
-            
             generateDerivs();
-            //Log($"{DateTime.Now} received bar change. Last trend is {BarTrendResults.Last()}", LogLevel.Critical);
-
         }
+
 
         public override string ToString()
         {
@@ -249,7 +248,7 @@ namespace Kalitte.Trading
                     if (result.Trend.Direction != TrendDirection.None)
                     {
                         result.finalResult = BuySell.Sell;
-                        if (HowToReset == ResetList.AfterTrend) analysisBars.Clear();
+                        if (HowToReset == ResetList.AfterTrend || HowToReset == ResetList.Always) analysisBars.Clear();
                     } else
                     {
                         if (HowToReset == ResetList.Always) analysisBars.Clear();

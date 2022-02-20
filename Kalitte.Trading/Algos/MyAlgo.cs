@@ -36,6 +36,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(9)]
         public int MovPeriod2 { get; set; } = 9;
 
+        [AlgoParam(true)]
+        public bool DynamicCross { get; set; } = true;
+
 
         [AlgoParam(0.15)]
         public decimal MaAvgChange { get; set; } = 0.15M;
@@ -111,6 +114,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool AlwaysStopLoss { get; set; } = false;
 
+        private decimal crossAvg = 0;
+        private int crossPeriods = 0;
+
 
         public FinanceBars MinBars = null;
 
@@ -173,7 +179,7 @@ namespace Kalitte.Trading.Algos
         //    base.PushNewBar(symbol, period, bar);
         //}
 
-        public override void InitializeBars(string symbol,  BarPeriod period, DateTime t)
+        public override void InitializeBars(string symbol, BarPeriod period, DateTime t)
         {
             //this.MinBars = GetPeriodBars(symbol, period, t);
             base.InitializeBars(symbol, period, t);
@@ -187,8 +193,8 @@ namespace Kalitte.Trading.Algos
             priceTrend.ReferenceType = TrendReference.LastCheck;
 
             this.atrTrend = new TrendSignal("atr-trend", Symbol, this);
-            atrTrend.Periods = 12;
-            atrTrend.PriceCollectionPeriod = 5;
+            atrTrend.Periods = 45;
+            atrTrend.PriceCollectionPeriod = 2;
             atrTrend.HowToReset = ResetList.Always;
 
 
@@ -311,25 +317,81 @@ namespace Kalitte.Trading.Algos
             //Log($"[price-trend]: {result}", LogLevel.Critical, result.SignalTime);
         }
 
+
+        public VolatileRatio EstimateVolatility(decimal val)
+        {
+            if (val < 0.125M) return VolatileRatio.Low;
+            else if (val < 0.25M) return VolatileRatio.BelowAverage;
+            else if (val < 0.50M) return VolatileRatio.Average;
+            else if (val < 0.75M) return VolatileRatio.High;
+            else return VolatileRatio.Critical;
+        }
+
         private void HandleAtrTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
-            Log($"[atr-trend]: {result}", LogLevel.Critical, result.SignalTime);
-
-            if (result.Trend.Direction != TrendDirection.None)
+            if (DynamicCross)
             {
-                //var avgChange = (1 - result.Trend.NewValue) / 4M;
-                //var periods = (int)Math.Round((1 - result.Trend.NewValue) / 4M * 100);
-                var val = signal.i1k.Results.Last().Value.Value;
-                var avgChange = (1 - val) / 3.25M;
-                var periods = (int)Math.Round((1 - val) / 3.25M * 100);
+                var newVal = EstimateVolatility(result.Trend.NewValue);
+                if (VolatileRatio != newVal)
+                {
+                    VolatileRatio = newVal;
+                    var val = result.Trend.NewValue;
+                    double ratio = 0;
+                    switch (VolatileRatio)
+                    {
+                        case VolatileRatio.Low:
+                            {
+                                ratio = 0.20;
+                                break;
+                            }
+                        case VolatileRatio.BelowAverage:
+                            {
+                                ratio = 0.15;
+                                break;
+                            }
+                        case VolatileRatio.High:
+                            {
+                                ratio = -0.15;
+                                break;
+                            }
+                        case VolatileRatio.Critical:
+                            {
+                                ratio = -0.30;
+                                break;
+                            }
+                    }
+                    maSignal.InOperationLock.WaitOne();
+                    maSignal.InOperationLock.Reset();
+                    try
+                    {
+                        maSignal.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})");
+                    } finally
+                    {
+                        maSignal.InOperationLock.Set();
+                    }
 
-
-                //maSignal.InOperationLock.WaitOne();
-                //maSignal.AvgChange = avgChange;
-                //maSignal.Periods = periods;
-
-                //Log($"{val} {avgChange} {periods}", LogLevel.Critical, result.SignalTime);
+                    //Log($"Current volatility level: {VolatileRatio}. Adjusted cross to {maSignal.AvgChange}, {maSignal.Periods}. Signal: {result}", LogLevel.Critical, result.SignalTime);
+                }
             }
+            //Log($"[atr-trend]: {result.Trend.NewValue}", LogLevel.Critical, result.SignalTime);
+            //EstimateVolatility(result.Trend.NewValue);
+
+
+            //if (result.Trend.Direction != TrendDirection.None)
+            //{
+            //    //var avgChange = (1 - result.Trend.NewValue) / 4M;
+            //    //var periods = (int)Math.Round((1 - result.Trend.NewValue) / 4M * 100);
+            //    var val = signal.i1k.Results.Last().Value.Value;
+            //    var avgChange = (1 - val) / 3.25M;
+            //    var periods = (int)Math.Round((1 - val) / 3.25M * 100);
+
+
+            //    //maSignal.InOperationLock.WaitOne();
+            //    //maSignal.AvgChange = avgChange;
+            //    //maSignal.Periods = periods;
+
+            //    //Log($"{val} {avgChange} {periods}", LogLevel.Critical, result.SignalTime);
+            //}
 
         }
 
@@ -350,7 +412,7 @@ namespace Kalitte.Trading.Algos
 
             if (!portfolio.IsEmpty)
             {
-                var quantity =  portfolio.Quantity <= RsiProfitQuantity ? 0 : RsiProfitQuantity;
+                var quantity = portfolio.Quantity <= OrderQuantity ? RsiProfitQuantity : 0; // : RsiProfitQuantity;
                 if (quantity > 0)
                 {
                     var trend = result.Trend;

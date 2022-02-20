@@ -17,7 +17,7 @@ namespace Kalitte.Trading
 {
 
 
-    public class CrossSignalResult: SignalResultX
+    public class CrossSignalResult : SignalResultX
     {
         public decimal i1Val { get; set; }
         public decimal i2Val { get; set; }
@@ -42,6 +42,11 @@ namespace Kalitte.Trading
 
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
+
+
+        public decimal InitialAvgChange;
+        public int InitialPeriods;
+
         public int PriceCollectionPeriod = 5;
         private FinanceBars differenceBars;
         private FinanceBars priceBars;
@@ -51,6 +56,8 @@ namespace Kalitte.Trading
         private decimal lastCross = 0;
         public int NextOrderMultiplier = 1;
         public bool UseSma = true;
+
+        private bool sensitivityAdjusted = false;
 
 
         public CrossSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
@@ -64,28 +71,28 @@ namespace Kalitte.Trading
         {
             priceBars.Clear();
             differenceBars.Clear();
-            crossBars.Clear();  
+            crossBars.Clear();
             lastCross = 0;
         }
 
 
 
+
+
         public override void Init()
         {
+            this.InitialPeriods = Periods;
+            this.InitialAvgChange = AvgChange;
+
             differenceBars = new FinanceBars(Periods);
             priceBars = new FinanceBars(PriceCollectionPeriod);
             crossBars = new FinanceBars(Periods);
             ResetInternal();
-            this.i1k.InputBars.ListEvent += InputBars_ListEvent;
+            this.i1k.InputBars.ListEvent += base.InputbarsChanged;
         }
 
-        private void InputBars_ListEvent(object sender, ListEventArgs<IQuote> e)
+        protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
         {
-            if (!InOperationLock.WaitOne(5000))
-            {                
-                Log("Timeout in bars change event", LogLevel.Error);
-            }
-            Log($"Clearing analysis data due to new bar: {e.Action}, {e.Item}", LogLevel.Debug);
             priceBars.Clear();
             differenceBars.Clear();
         }
@@ -93,6 +100,15 @@ namespace Kalitte.Trading
         protected override void Colllect()
         {
 
+        }
+
+        public void AdjustSensitivity(double ratio, string reason)
+        {
+            AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
+            Periods = InitialPeriods + Convert.ToInt32((InitialPeriods * (decimal)ratio));
+            differenceBars.Resize(Periods);
+            crossBars.Resize(Periods);
+            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {Periods}", LogLevel.Critical);
         }
 
         public override string ToString()
@@ -107,7 +123,7 @@ namespace Kalitte.Trading
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
             var mp = Algo.GetMarketPrice(Symbol, t);
 
-            if (mp > 0 ) priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
+            if (mp > 0) priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
 
             if (priceBars.IsFull && mp >= 0)
             {
@@ -121,6 +137,8 @@ namespace Kalitte.Trading
                 var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 - l2 };
                 differenceBars.Push(newResultBar);
 
+                //Log($"pushed difference bars {differenceBars.Count}", LogLevel.Critical);
+
                 crossBars.Push(newResultBar);
                 var cross = crossBars.Cross(0);
 
@@ -128,13 +146,14 @@ namespace Kalitte.Trading
                 {
                     lastCross = cross;
                     differenceBars.Clear();
+
                 }
 
                 if (differenceBars.Count >= Periods)
                 {
 
                     var lastAvg = UseSma ? differenceBars.List.GetSma(Periods).Last().Sma.Value : differenceBars.List.GetEma(Periods).Last().Ema.Value;
-                    
+
                     decimal last1 = i1k.Results.Last().Value.Value;
                     decimal last2 = i2k.Results.Last().Value.Value;
 
@@ -146,15 +165,24 @@ namespace Kalitte.Trading
                     else if (lastCross != 0 && lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
 
 
-                    //Log($"Status: order:{finalResult}, lastAvg: {lastAvg} i1Last: {last1} i2Last:{last2} mpNow:{mp}, mpAvg: {mpAverage}, lastCross:{lastCross}, cross:{cross}", LogLevel.Debug, t);
+                    //Log($"Status: order:{result.finalResult}, lastAvg: {lastAvg} i1Last: {last1} i2Last:{last2} mpNow:{mp}, mpAvg: {mpAverage}, lastCross:{lastCross}, cross:{cross}", LogLevel.Critical, t);
 
                     if (result.finalResult.HasValue)
                     {
-
+                        if (!sensitivityAdjusted) AdjustSensitivity(0.30, "Cross Received");
+                        sensitivityAdjusted = true;
                         differenceBars.Clear();
                     }
+                    else { if (sensitivityAdjusted)
+                        {
+                            sensitivityAdjusted = false;
+                            AdjustSensitivity(0.0, "Revert");
+                        }
+                    }
                 }
+
             }
+
 
 
 

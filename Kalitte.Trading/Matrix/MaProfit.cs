@@ -99,6 +99,9 @@ namespace Kalitte.Trading.Matrix
         [Parameter(3)]
         public decimal MinRsiChange { get; set; } = 3M;
 
+        [Parameter(1)]
+        public decimal RsiProfitQuantity { get; set; } = 1M;
+
         [Parameter(9)]
         public int Rsi { get; set; } = 9;
 
@@ -146,9 +149,6 @@ namespace Kalitte.Trading.Matrix
 
         public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
         {
-
-            
-
             if (Simulation)
             {
                 lock (this)
@@ -227,7 +227,6 @@ namespace Kalitte.Trading.Matrix
                 var last = bd.BarDataIndexer.LastBarIndex;
                 try
                 {
-                    Algo.WaitSignalOperations();
                     var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
                     Algo.PushNewBar(Symbol, (BarPeriod)Enum.Parse(typeof(BarPeriod), this.SymbolPeriod.ToString()), newQuote.Date, newQuote);
                 }

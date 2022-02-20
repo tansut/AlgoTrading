@@ -108,7 +108,7 @@ namespace Kalitte.Trading
             Periods = InitialPeriods + Convert.ToInt32((InitialPeriods * (decimal)ratio));
             differenceBars.Resize(Periods);
             crossBars.Resize(Periods);
-            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {Periods}", LogLevel.Critical);
+            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {Periods}", LogLevel.Warning);
         }
 
         public override string ToString()

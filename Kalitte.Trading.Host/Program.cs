@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client.Transports;
 using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
-using Kalitte.Trading.Tests;
 using Kalitte.Trading.Matrix;
 using Kalitte.Trading.Algos;
 
@@ -22,7 +21,7 @@ public class Program
 
         var algo = new MyAlgo();
 
-        var sDate = new DateTime(2022,02,17, 9,30,0);
+        var sDate = new DateTime(2022,02,14, 9,30,0);
         var fDate = new DateTime(2022,02,18, 23,0,0);
 
         var initValues = new Dictionary<string, object>();
@@ -33,15 +32,6 @@ public class Program
         initValues.Add("DynamicCross", true);
         //initValues.Add("MaAvgChange", 0.2M);
         //initValues.Add("MaPeriods", 20);
-
-
-
-
-
-
-        
-
-
         //initValues.Add("RsiHighLimit", 0M);
         //initValues.Add("RsiLowLimit", 0M);
         //initValues.Add("CrossPriceCollectionPeriod", 2);
@@ -50,7 +40,7 @@ public class Program
         //initValues.Add("RsiAnalysisPeriod", 15);
         //initValues.Add("RsiPriceCollectionPeriod", 2);
 
-        initValues.Add("LoggingLevel", LogLevel.Order);
+        initValues.Add("LoggingLevel", LogLevel.Warning);
 
         Backtest t = new Backtest(algo, sDate, fDate, initValues);
         t.Start();

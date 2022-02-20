@@ -250,7 +250,7 @@ namespace Kalitte.Trading.Algos
                 if (bar != null)
                 {
                     PeriodBars.Push(bar);
-                    Log($"Pushed new bar, last bar is now: {PeriodBars.Last}", LogLevel.Debug);
+                    Log($"Pushed new bar, last bar is now: {PeriodBars.Last}", LogLevel.Debug, date);
                     return bar;
                 }
             }

@@ -1,13 +1,9 @@
 ﻿// algo
 using Kalitte.Trading.Indicators;
-using Matriks.Lean.Algotrader.Models;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Algos
 {
@@ -18,7 +14,7 @@ namespace Kalitte.Trading.Algos
 
 
         [AlgoParam(2)]
-        public decimal OrderQuantity { get; set; } = 4M;
+        public decimal OrderQuantity { get; set; } = 2M;
 
 
         [AlgoParam(2)]
@@ -76,19 +72,24 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(40)]
         public decimal RsiLowLimit { get; set; } = 40M;
 
-        [AlgoParam(3)]
-        public decimal MinRsiChange { get; set; } = 3M;
+        [AlgoParam(2)]
+        public decimal MinRsiChange { get; set; } = 2M;
 
 
         [AlgoParam(1)]
         public decimal RsiProfitQuantity { get; set; } = 1M;
 
+        [AlgoParam(2)]
+        public decimal RsiProfitPuan { get; set; } = 2M;
+
+
+
         [AlgoParam(false)]
         public bool AlwaysGetRsiProfit { get; set; } = false;
 
 
-        [AlgoParam(9)]
-        public int Rsi { get; set; } = 9;
+        [AlgoParam(14)]
+        public int Rsi { get; set; } = 14;
 
         [AlgoParam(60)]
         public int RsiAnalysisPeriod { get; set; } = 60;
@@ -114,8 +115,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool AlwaysStopLoss { get; set; } = false;
 
-        private decimal crossAvg = 0;
-        private int crossPeriods = 0;
 
 
         public FinanceBars MinBars = null;
@@ -215,8 +214,8 @@ namespace Kalitte.Trading.Algos
                 this.Signals.Add(takeProfitSignal);
             }
             if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0))
-            {                
-                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { UseSma = this.UseSmaForCross, Periods = RsiAnalysisPeriod, PriceCollectionPeriod = this.RsiPriceCollectionPeriod };                
+            {
+                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { UseSma = this.UseSmaForCross, Periods = RsiAnalysisPeriod, PriceCollectionPeriod = this.RsiPriceCollectionPeriod };
                 this.Signals.Add(rsiTrendSignal);
             }
 
@@ -272,7 +271,7 @@ namespace Kalitte.Trading.Algos
 
         private void HandlePriceTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
-            
+
         }
 
 
@@ -323,7 +322,8 @@ namespace Kalitte.Trading.Algos
                     try
                     {
                         maSignal.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})");
-                    } finally
+                    }
+                    finally
                     {
                         maSignal.InOperationLock.Set();
                     }
@@ -350,18 +350,18 @@ namespace Kalitte.Trading.Algos
 
             if (!portfolio.IsEmpty)
             {
-                var quantity = portfolio.Quantity <= OrderQuantity ? Math.Min(RsiProfitQuantity, portfolio.Quantity)  : 0; // : RsiProfitQuantity;
+                var quantity = portfolio.Quantity <= OrderQuantity ? Math.Min(RsiProfitQuantity, portfolio.Quantity) : 0; // : RsiProfitQuantity;
                 if (quantity > 0)
                 {
                     var trend = result.Trend;
                     if (Math.Abs(trend.Change) < MinRsiChange) return;
-                    if ((trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp) && portfolio.IsLong && portfolio.AvgCost < marketPrice)
+                    if ((trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp) && portfolio.IsLong && (portfolio.AvgCost + RsiProfitPuan) <= marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
                         sendOrder(Symbol, quantity, BuySell.Sell, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
 
                     }
-                    else if ((trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown) && portfolio.IsShort && portfolio.AvgCost > marketPrice)
+                    else if ((trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown) && portfolio.IsShort && portfolio.AvgCost >= (marketPrice + RsiProfitPuan))
                     {
                         if (maSignal != null) maSignal.Reset();
                         sendOrder(Symbol, quantity, BuySell.Buy, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);

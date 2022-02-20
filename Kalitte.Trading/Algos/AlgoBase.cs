@@ -148,8 +148,7 @@ namespace Kalitte.Trading.Algos
         {
             lock (ordersBySignals)
             {
-                decimal existing;
-                if (ordersBySignals.TryGetValue(signal, out existing))
+                if (ordersBySignals.TryGetValue(signal, out decimal existing))
                 {
                     ordersBySignals[signal] = existing + quantity;
                 }

@@ -96,14 +96,17 @@ namespace Kalitte.Trading.Matrix
         [Parameter(40.0)]
         public decimal RsiLowLimit { get; set; } = 40M;
 
-        [Parameter(3)]
-        public decimal MinRsiChange { get; set; } = 3M;
+        [Parameter(2)]
+        public decimal MinRsiChange { get; set; } = 2M;
 
         [Parameter(1)]
         public decimal RsiProfitQuantity { get; set; } = 1M;
 
-        [Parameter(9)]
-        public int Rsi { get; set; } = 9;
+        [Parameter(2)]
+        public decimal RsiProfitPuan { get; set; } = 2M;
+
+        [Parameter(14)]
+        public int Rsi { get; set; } = 14;
 
         [Parameter(60)]
         public int RsiAnalysisPeriod { get; set; } = 60;

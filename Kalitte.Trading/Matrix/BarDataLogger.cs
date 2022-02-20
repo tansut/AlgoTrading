@@ -39,7 +39,7 @@ namespace Kalitte.Trading.Matrix
         public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
 
 
-        public string logDir = @"c:\kalitte\log";
+        
         private MarketDataFileLogger priceLogger;
         VOLUME volume;
 
@@ -101,12 +101,12 @@ namespace Kalitte.Trading.Matrix
             SetTimerInterval(1);
             WorkWithPermanentSignal(true);
 
-            this.priceLogger = new MarketDataFileLogger(Symbol, logDir, "price");
+            this.priceLogger = new MarketDataFileLogger(Symbol, Algo.LogDir, "price");
 
             foreach (var sp in periodList)
             {
                 AddSymbol(Symbol, sp);
-                var logger = new MarketDataFileLogger(Symbol, logDir, "" + sp.ToString());
+                var logger = new MarketDataFileLogger(Symbol, Algo.LogDir, "" + sp.ToString());
                 logger.SaveDaily = true;
                 logger.FileName = "all.txt";
                 loggerList.Add(logger);
@@ -147,9 +147,14 @@ namespace Kalitte.Trading.Matrix
 
             } catch(Exception ex)
             {
-                Log($"{ex.Message} / {ex.StackTrace}");
+                Algo.Log($"{ex.Message} / {ex.StackTrace}");
             }
            
+        }
+
+        protected override AlgoBase createAlgoInstance()
+        {
+            return new Log();
         }
     }
 

@@ -58,7 +58,7 @@ namespace Kalitte.Trading
              for (var p = t1; p < t2;)
             {
 
-                Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
                 for (var i = 0; i < seconds; i++)
                 {
@@ -75,10 +75,9 @@ namespace Kalitte.Trading
                 var bd = Algo.GetPeriodBars(Algo.Symbol, p).Last;
                 var newQuote = new MyQuote() { Date = p, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
                 Algo.PeriodBars.Push(newQuote);
-                Algo.Log($"Pushed new bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                Algo.Log($"Pushed new bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
-                p = p.AddSeconds(seconds);
-                Algo.AlgoTime = p;
+                p = Algo.AlgoTime;
             }
 
         }
@@ -87,10 +86,10 @@ namespace Kalitte.Trading
         Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>> GetDates(DateTime t)
         {
             var m1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
-            var m2 = new DateTime(t.Year, t.Month, t.Day, 18, 10, 1);
+            var m2 = new DateTime(t.Year, t.Month, t.Day, 18, 20, 0);
 
             var n1 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
-            var n2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 1);
+            var n2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
             return new Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>>(
                    new Tuple<DateTime, DateTime>(m1, m2), new Tuple<DateTime, DateTime>(n1, n2)
@@ -107,6 +106,7 @@ namespace Kalitte.Trading
             {
                 var currentDay = StartTime.AddDays(d);
                 var periods = this.GetDates(currentDay);
+                Algo.AlgoTime = periods.Item1.Item1;
                 var prevDayLastBar = new DateTime(currentDay.Year, currentDay.Month, currentDay.Day).AddDays(-1).AddHours(22).AddMinutes(50);
 
                 if (d == 0)
@@ -116,17 +116,14 @@ namespace Kalitte.Trading
                     Algo.InitCompleted();
                 } else
                 {
-                    var bd = Algo.GetPeriodBars(Algo.Symbol, prevDayLastBar).Last;
-                    var newQuote = new MyQuote() { Date = prevDayLastBar, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                    Algo.PeriodBars.Push(newQuote);
-                    Algo.Log($"Pushed new day bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                    //var bd = Algo.GetPeriodBars(Algo.Symbol, prevDayLastBar).Last;
+                    //var newQuote = new MyQuote() { Date = prevDayLastBar, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
+                    //Algo.PeriodBars.Push(newQuote);
+                    //Algo.Log($"Pushed new day bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Debug);
+                    Algo.Signals.ForEach(p => p.Reset());
                 }
                 Run(periods.Item1.Item1, periods.Item1.Item2);
                 Run(periods.Item2.Item1, periods.Item2.Item2);
-                if (d < days.Days)
-                {
-                    Algo.Signals.ForEach(p=>p.Reset());
-                }
             }
             Algo.Stop();
         }

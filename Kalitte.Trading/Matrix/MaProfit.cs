@@ -64,8 +64,6 @@ namespace Kalitte.Trading.Matrix
         public decimal ExpectedNetPl { get; set; } = 0;
 
 
-        [Parameter(true)]
-        public bool DoublePositions { get; set; } = true;
 
 
         [Parameter(false)]
@@ -89,11 +87,11 @@ namespace Kalitte.Trading.Matrix
         [Parameter(4)]
         public decimal LossPuan { get; set; } = 4;
 
-        [Parameter(65)]
-        public decimal RsiHighLimit { get; set; } = 65;
+        [Parameter(60.0)]
+        public decimal RsiHighLimit { get; set; } = 60M;
 
-        [Parameter(35)]
-        public int RsiLowLimit { get; set; } = 35;
+        [Parameter(40.0)]
+        public decimal RsiLowLimit { get; set; } = 40M;
 
         [Parameter(3)]
         public decimal MinRsiChange { get; set; } = 3M;
@@ -146,19 +144,21 @@ namespace Kalitte.Trading.Matrix
         public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
         {
 
+            
+
             if (Simulation)
             {
                 lock (this)
                 {                    
                     var bd = barDataCurrentValues.LastUpdate;
                     Algo.AlgoTime = bd.DTime;
-                    
+                    var algoDay = new DateTime(Algo.AlgoTime.Year, Algo.AlgoTime.Month, Algo.AlgoTime.Day);
 
                     var seconds = Algo.GetSymbolPeriodSeconds(SymbolPeriod.ToString());
 
                     //if (simulationCount > 12) return;                                       
 
-                    var lastDay = new DateTime(Algo.AlgoTime.Year, Algo.AlgoTime.Month, Algo.AlgoTime.Day).AddDays(-1).AddHours(22).AddMinutes(50);
+                    var lastDay = algoDay.AddDays(-1).AddHours(22).AddMinutes(50);
                     if (Algo.SignalsState != StartableState.Started)
                     {                        
                         Algo.LoadBars(this.Symbol, lastDay);
@@ -166,19 +166,19 @@ namespace Kalitte.Trading.Matrix
                         Algo.InitCompleted();
                     }
 
-                    if (!lastSimulationDay.HasValue) lastSimulationDay = Algo.AlgoTime;
+                    if (!lastSimulationDay.HasValue) lastSimulationDay = algoDay;
 
-                    if (lastSimulationDay.HasValue && (Algo.AlgoTime - lastSimulationDay.Value).Days > 0)
+                    if ((algoDay - lastSimulationDay.Value).Days > 0)
                     {
                         lastSimulationDay = Algo.AlgoTime;
-                        var bd2 = Algo.GetPeriodBars(Algo.Symbol, lastDay).Last;
-                        var dayQuote = new MyQuote() { Date = lastDay, High = bd2.High, Close = bd2.Close, Low = bd2.Low, Open = bd2.Open, Volume = bd2.Volume };
-                        Algo.PeriodBars.Push(dayQuote);
-                        Algo.Log($"Pushed new day bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                        //var bd2 = Algo.GetPeriodBars(Algo.Symbol, lastDay).Last;
+                        //var dayQuote = new MyQuote() { Date = lastDay, High = bd2.High, Close = bd2.Close, Low = bd2.Low, Open = bd2.Open, Volume = bd2.Volume };
+                        //Algo.PeriodBars.Push(dayQuote);
+                        //Algo.Log($"Pushed new day bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Debug);
                         Algo.Signals.ForEach(p => p.Reset());
                     }
 
-                    Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                    Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
                     for (var i = 0; i < seconds; i++)
                     {
@@ -195,7 +195,7 @@ namespace Kalitte.Trading.Matrix
 
                     var newQuote = new MyQuote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
                     Algo.PeriodBars.Push(newQuote);
-                    Algo.Log($"Pushed new bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Verbose);
+                    Algo.Log($"Pushed new bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Debug);
                 }
             }
             else
@@ -204,9 +204,8 @@ namespace Kalitte.Trading.Matrix
                 var last = bd.BarDataIndexer.LastBarIndex;
                 try
                 {
+                    Algo.WaitSignalOperations();
                     var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
-                    var wait = ManualResetEvent.WaitAll(Algo.Signals.Select(p => p.InOperationLock).ToArray(), 5000);
-                    if (!wait) Algo.Log($"Timeout for waiting signal operations, continue to push bar ...");
                     Algo.PeriodBars.Push(newQuote);
                     Algo.Log($"Pushed new quote, last is now: {Algo.PeriodBars.Last}", LogLevel.Debug);
 

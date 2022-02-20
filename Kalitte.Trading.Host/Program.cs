@@ -22,25 +22,32 @@ public class Program
 
         var algo = new MyAlgo();
 
-        var sDate = new DateTime(2022,02,14, 9,30,0);
+        var sDate = new DateTime(2022,02,17, 9,30,0);
         var fDate = new DateTime(2022,02,18, 23,0,0);
 
         var initValues = new Dictionary<string, object>();
         //initValues.Add("ProfitPuan", 16M);
-        initValues.Add("RsiHighLimit", 60M);
-        initValues.Add("RsiLowLimit", 40M);
-        initValues.Add("CrossPriceCollectionPeriod", 2);
-        initValues.Add("MaAvgChange", 0.15M);
-        initValues.Add("MaPeriods", 25);
+        initValues.Add("ProfitQuantity", 2M);
+        initValues.Add("OrderQuantity", 4M);
+        initValues.Add("RsiProfitQuantity", 1M);
 
-      
+        
+
+            
 
 
 
-        initValues.Add("RsiAnalysisPeriod", 15);
-        initValues.Add("RsiPriceCollectionPeriod", 2);
 
-        initValues.Add("LoggingLevel", LogLevel.Warning);
+
+        //initValues.Add("RsiHighLimit", 0M);
+        //initValues.Add("RsiLowLimit", 0M);
+        //initValues.Add("CrossPriceCollectionPeriod", 2);
+        //initValues.Add("MaAvgChange", 0.15M);
+        //initValues.Add("MaPeriods", 15);
+        //initValues.Add("RsiAnalysisPeriod", 15);
+        //initValues.Add("RsiPriceCollectionPeriod", 2);
+
+        initValues.Add("LoggingLevel", LogLevel.Order);
 
         Backtest t = new Backtest(algo, sDate, fDate, initValues);
         t.Start();

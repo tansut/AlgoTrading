@@ -22,7 +22,7 @@ namespace Kalitte.Trading.Indicators
         }
     }
 
-    public interface IIndicator
+    public interface ITechnicalIndicator
     {
         FinanceBars InputBars { get; }
         decimal NextValue(decimal newVal);
@@ -34,7 +34,7 @@ namespace Kalitte.Trading.Indicators
 
     }
 
-    public abstract class IndicatorBase<R>: IIndicator where R: ResultBase
+    public abstract class IndicatorBase<R>: ITechnicalIndicator where R: ResultBase
     {
         protected System.Timers.Timer _timer = null;
         private static object _locker = new object();

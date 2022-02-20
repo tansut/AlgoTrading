@@ -11,22 +11,21 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading.Algos
 {
-    public class MyAlgo: AlgoBase
+    public class MyAlgo : AlgoBase
     {
 
 
 
 
         [AlgoParam(2)]
-        public decimal OrderQuantity { get; set; } = 2M;
+        public decimal OrderQuantity { get; set; } = 4M;
 
 
         [AlgoParam(2)]
         public int CrossPriceCollectionPeriod { get; set; } = 2;
 
 
-        [AlgoParam(4)]
-        public int RsiPriceCollectionPeriod { get; set; } = 4;
+
 
         [AlgoParam(true)]
         public bool UseSmaForCross { get; set; } = true;
@@ -49,8 +48,6 @@ namespace Kalitte.Trading.Algos
         public decimal ExpectedNetPl { get; set; } = 0;
 
 
-        [AlgoParam(true)]
-        public bool DoublePositions { get; set; } = true;
 
         [AlgoParam(false)]
         public bool SimulateOrderSignal { get; set; } = false;
@@ -67,14 +64,24 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(4)]
         public decimal LossPuan { get; set; } = 4;
 
-        [AlgoParam(65)]
-        public decimal RsiHighLimit { get; set; } = 72M;
+        [AlgoParam(4)]
+        public int RsiPriceCollectionPeriod { get; set; } = 4;
 
-        [AlgoParam(35)]
-        public decimal RsiLowLimit { get; set; } = 28M;
-        
+        [AlgoParam(60)]
+        public decimal RsiHighLimit { get; set; } = 60M;
+
+        [AlgoParam(40)]
+        public decimal RsiLowLimit { get; set; } = 40M;
+
         [AlgoParam(3)]
         public decimal MinRsiChange { get; set; } = 3M;
+
+
+        [AlgoParam(1)]
+        public decimal RsiProfitQuantity { get; set; } = 1M;
+
+        [AlgoParam(false)]
+        public bool AlwaysGetRsiProfit { get; set; } = false;
 
 
         [AlgoParam(9)]
@@ -168,7 +175,7 @@ namespace Kalitte.Trading.Algos
             this.atrTrend = new TrendSignal("atr-trend", Symbol, this);
             priceTrend.Periods = 3;
             priceTrend.PriceCollectionPeriod = 2;
-            
+
 
 
             this.Signals.Add(this.priceTrend);
@@ -303,9 +310,9 @@ namespace Kalitte.Trading.Algos
                 var periods = (int)Math.Round((1 - val) / 3.25M * 100);
 
 
-                maSignal.InOperationLock.WaitOne();
-                maSignal.AvgChange = avgChange;
-                maSignal.Periods = periods;
+                //maSignal.InOperationLock.WaitOne();
+                //maSignal.AvgChange = avgChange;
+                //maSignal.Periods = periods;
 
                 //Log($"{val} {avgChange} {periods}", LogLevel.Critical, result.SignalTime);
             }
@@ -329,21 +336,21 @@ namespace Kalitte.Trading.Algos
 
             if (!portfolio.IsEmpty)
             {
-                var quantity = portfolio.Quantity < OrderQuantity ? portfolio.Quantity : 0;
+                var quantity =  portfolio.Quantity <= RsiProfitQuantity ? 0 : RsiProfitQuantity;
                 if (quantity > 0)
                 {
                     var trend = result.Trend;
                     if (Math.Abs(trend.Change) < MinRsiChange) return;
-                    if ((trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp)  && portfolio.IsLong && portfolio.AvgCost < marketPrice)
+                    if ((trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp) && portfolio.IsLong && portfolio.AvgCost < marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
-                        sendOrder(Symbol, quantity*3, BuySell.Sell, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
+                        sendOrder(Symbol, quantity, BuySell.Sell, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
 
                     }
                     else if ((trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown) && portfolio.IsShort && portfolio.AvgCost > marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();
-                        sendOrder(Symbol, quantity*3, BuySell.Buy, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
+                        sendOrder(Symbol, quantity, BuySell.Buy, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
                     }
                 }
             }
@@ -402,49 +409,20 @@ namespace Kalitte.Trading.Algos
         }
 
 
+
+
         public void HandleCrossSignal(Signal signal, SignalResultX signalResult)
         {
-            decimal doubleMultiplier = 1.0M;
-            BuySell? side = null;
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
 
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
-            if (signalResult.finalResult == BuySell.Buy)
-            {
-                if (!portfolio.IsLong)
-                {
-                    side = BuySell.Buy;
-                    if (this.DoublePositions)
-                    {
-                        if (portfolio.IsShort)
-                        {
-                            doubleMultiplier = ((portfolio.Quantity == OrderQuantity / 2.0M) && (ProfitQuantity > 0)) ? 1.5M : 2.0M;
-                        }
-                    }
-                }
-            }
+            var orderQuantity = portfolio.Quantity + OrderQuantity;
 
-            else if (signalResult.finalResult == BuySell.Sell)
-            {
-                if (!portfolio.IsShort)
-                {
-                    side = BuySell.Sell;
-                    if (this.DoublePositions)
-                    {
-                        if (portfolio.IsLong)
-                        {
-                            doubleMultiplier = ((portfolio.Quantity == OrderQuantity / 2.0M) && (ProfitQuantity > 0)) ? 1.5M : 2.0M;
-                        }
-                    }
-                }
-            }
-            if (side != null)
-            {
-                var cross = (CrossSignal)signalResult.Signal;
-                sendOrder(Symbol, OrderQuantity * doubleMultiplier, side.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.Periods}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
-            }
+            var cross = (CrossSignal)signalResult.Signal;
+            sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.Periods}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+
         }
 
 

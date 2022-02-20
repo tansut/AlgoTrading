@@ -96,6 +96,11 @@ namespace Kalitte.Trading.Algos
 
         public abstract void Decide(Signal signal, SignalEventArgs data);
 
+        public bool WaitSignalOperations(int timeOut = 1000)
+        {
+            return ManualResetEvent.WaitAll(Signals.Select(p=>p.InOperationLock).ToArray(), timeOut);
+        }
+
 
         public void CheckDelayedOrders(DateTime t)
         {
@@ -117,7 +122,7 @@ namespace Kalitte.Trading.Algos
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
             Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Order);
-            if (this.positionRequest.OriginSignal != null) CountOrder(this.positionRequest.OriginSignal.Signal.Name, filledQuantity);
+            if (this.positionRequest.SignalResult != null) CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
             this.positionRequest = null;
             orderCounter++;
             orderWait.Set();
@@ -193,7 +198,7 @@ namespace Kalitte.Trading.Algos
         {
             var t = DateTime.Now;
             var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
-            var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
+            var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 20, 0);
             var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
             var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
@@ -301,16 +306,15 @@ namespace Kalitte.Trading.Algos
             if (oldHashCode != data.Result.GetHashCode())
             //if (oldFinalResult != data.Result.finalResult)
              {
-                Log($"Signal {signal.Name} changed from {existing} -> {data.Result }", LogLevel.Debug, data.Result.SignalTime);
+                Log($"Signal {signal.Name} changed from {existing} -> {data.Result }", LogLevel.Verbose, data.Result.SignalTime);
                 if (data.Result.finalResult.HasValue) Decide(signal, data);
             }
         }
 
-
-        public virtual void Init()
+        public StringBuilder PropSummary()
         {
             var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
-           
+
             //for (var i = 0; i < properties.Count(); i++)
             //{
             //    var line = $"{properties[i].Name}\t{properties[i].GetValue(this)}";
@@ -319,10 +323,17 @@ namespace Kalitte.Trading.Algos
             StringBuilder sb = new StringBuilder("\n-- USED PARAMETERS --\n");
             foreach (var item in properties)
             {
-                sb.Append($"{item.Name} \t {item.GetValue(this)}\n");                
+                sb.Append($"{item.Name} \t {item.GetValue(this)}\n");
             }
             sb.Append("----------\n");
-            Log(sb.ToString(), LogLevel.Info);
+            return sb;
+        }
+
+
+        public virtual void Init()
+        {
+
+            
             
         }
 
@@ -353,6 +364,7 @@ namespace Kalitte.Trading.Algos
             StopSignals();
 
             Log($"Completed {this}", LogLevel.FinalResult);
+            Log(PropSummary().ToString(), LogLevel.FinalResult);
             Signals.ForEach(p => Log($"{p}", LogLevel.FinalResult));
             Log($"----------------------", LogLevel.FinalResult);
             Log($"Market price difference total: {this.simulationPriceDif}", LogLevel.FinalResult);
@@ -389,10 +401,14 @@ namespace Kalitte.Trading.Algos
                     Exchange.CreateLimitOrder(symbol, quantity, side, limitPrice, icon.ToString(), (t ?? DateTime.Now).Hour >= 19);
             }
             var order = this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
-            order.OriginSignal = signalResult;
+            order.SignalResult = signalResult;
             order.Sent = t ?? DateTime.Now;
 
-            Log($"Order created, waiting to complete. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info);
+            Log($"New order submitted. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Order, t);
+            if (order.SignalResult != null)
+                Log($"Signal [{order.SignalResult.Signal.Name}] result: {order.SignalResult}", LogLevel.Order, t);
+            Log($"Used bar: {this.PeriodBars.Last}", LogLevel.Order, t);
+            
             if (this.UseVirtualOrders || this.AutoCompleteOrders)
             {
                 if (this.Simulation)

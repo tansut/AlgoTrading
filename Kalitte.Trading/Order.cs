@@ -63,7 +63,7 @@ namespace Kalitte.Trading
             }
         }
 
-        public SignalResultX OriginSignal { get; set; }
+        public SignalResultX SignalResult { get; set; }
 
         public ExchangeOrder(string symbol, string id, BuySell side, decimal quantity, decimal unitPrice, string comment = "", DateTime? t = null)
         {

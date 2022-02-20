@@ -16,12 +16,29 @@ using Kalitte.Trading.Algos;
 namespace Kalitte.Trading
 {
 
+
+    public class CrossSignalResult: SignalResultX
+    {
+        public decimal i1Val { get; set; }
+        public decimal i2Val { get; set; }
+        public decimal Dif { get; set; }
+
+        public CrossSignalResult(Signal signal, DateTime t) : base(signal, t)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} | i1:{i1Val} i2:{i2Val} dif:{Dif}";
+        }
+    }
+
     public class CrossSignal : Signal
     {
 
 
-        public IIndicator i1k;
-        public IIndicator i2k;
+        public ITechnicalIndicator i1k;
+        public ITechnicalIndicator i2k;
 
         public decimal AvgChange = 0.3M;
         public int Periods = 5;
@@ -87,7 +104,7 @@ namespace Kalitte.Trading
 
         protected SignalResultX CalculateSignal(DateTime? t = null)
         {
-            BuySell? finalResult = null;
+            var result = new CrossSignalResult(this, t ?? DateTime.Now);
             var mp = Algo.GetMarketPrice(Symbol, t);
 
             if (mp > 0 ) priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
@@ -121,13 +138,17 @@ namespace Kalitte.Trading
                     decimal last1 = i1k.Results.Last().Value.Value;
                     decimal last2 = i2k.Results.Last().Value.Value;
 
-                    if (lastCross != 0 && lastAvg > AvgChange) finalResult = BuySell.Buy;
-                    else if (lastCross != 0 && lastAvg < -AvgChange) finalResult = BuySell.Sell;
+                    result.i1Val = last1;
+                    result.i2Val = last2;
+                    result.Dif = lastAvg;
+
+                    if (lastCross != 0 && lastAvg > AvgChange) result.finalResult = BuySell.Buy;
+                    else if (lastCross != 0 && lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
 
 
                     //Log($"Status: order:{finalResult}, lastAvg: {lastAvg} i1Last: {last1} i2Last:{last2} mpNow:{mp}, mpAvg: {mpAverage}, lastCross:{lastCross}, cross:{cross}", LogLevel.Debug, t);
 
-                    if (finalResult.HasValue)
+                    if (result.finalResult.HasValue)
                     {
 
                         differenceBars.Clear();
@@ -138,10 +159,7 @@ namespace Kalitte.Trading
 
 
 
-            return new SignalResultX(this, t ?? DateTime.Now)
-            {
-                finalResult = finalResult
-            };
+            return result;
 
             //if (lastCross == 0 && cross !=  0) lastCrossValue = cross;
 

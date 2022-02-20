@@ -92,7 +92,7 @@ namespace Kalitte.Trading
 
     public class TrendSignal : Signal
     {
-        public IIndicator i1k;
+        public ITechnicalIndicator i1k;
         public int PriceCollectionPeriod = 5;
         public int Periods = 5;
         public decimal? Min { get; set; }

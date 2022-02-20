@@ -42,10 +42,6 @@ namespace Kalitte.Trading
             Algo.Simulation = true;
             Algo.UseVirtualOrders = true;
             if (initValues != null) ApplyProperties(initValues);
-
-            //Algo.Symbol = "F_XU0300222";
-            //Algo.LoggingLevel = LogLevel.Verbose;
-            //Algo.SymbolPeriod = BarPeriod.Min10;
             Algo.Init();
         }
 
@@ -71,11 +67,11 @@ namespace Kalitte.Trading
                     Algo.AlgoTime = Algo.AlgoTime.AddSeconds(1);
                 }
                 Algo.simulationCount++;
-
-                var bd = Algo.GetPeriodBars(Algo.Symbol, p).Last;
-                var newQuote = new MyQuote() { Date = p, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                Algo.PeriodBars.Push(newQuote);
-                Algo.Log($"Pushed new bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Debug);
+                Algo.PushNewBar(Algo.Symbol, Algo.SymbolPeriod, p);
+                //var bd = Algo.GetPeriodBars().Last;
+                //var newQuote = new MyQuote() { Date = p, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
+                //Algo.PeriodBars.Push(newQuote);
+               
 
                 p = Algo.AlgoTime;
             }
@@ -111,7 +107,7 @@ namespace Kalitte.Trading
 
                 if (d == 0)
                 {                    
-                    Algo.LoadBars(Algo.Symbol, prevDayLastBar);
+                    Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod, prevDayLastBar);
                     Algo.InitMySignals(Algo.AlgoTime);
                     Algo.InitCompleted();
                 } else

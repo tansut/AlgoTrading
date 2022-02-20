@@ -32,6 +32,12 @@ namespace Kalitte.Trading
         LastCheck
     }
 
+    public enum ResetList
+    {
+        None,
+        AfterTrend,
+        Always
+    }
 
     public class TrendResult
     {
@@ -102,8 +108,8 @@ namespace Kalitte.Trading
         private List<TrendResult> BarTrendResults;
         public TrendReference ReferenceType { get; set; } = TrendReference.LastBar;
         private decimal? lastValue = null;
-
         public bool UseSma = true;
+        public ResetList HowToReset { get; set; } = ResetList.None;
 
 
         public TrendSignal(string name, string symbol, AlgoBase owner, decimal? min = null, decimal? max  = null) : base(name, symbol, owner)
@@ -242,8 +248,11 @@ namespace Kalitte.Trading
 
                     if (result.Trend.Direction != TrendDirection.None)
                     {
-                        result.finalResult = BuySell.Sell; // result.Trend.Direction == TrendDirection.ChangeToUp || result.Trend.Direction == TrendDirection. ? BuySell.Buy : BuySell.Sell;
-                        //analysisBars.Clear();
+                        result.finalResult = BuySell.Sell;
+                        if (HowToReset == ResetList.AfterTrend) analysisBars.Clear();
+                    } else
+                    {
+                        if (HowToReset == ResetList.Always) analysisBars.Clear();
                     }
 
                     lastValue = currentVal;

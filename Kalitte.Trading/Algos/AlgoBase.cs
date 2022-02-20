@@ -1,4 +1,5 @@
 ﻿// algo
+using Skender.Stock.Indicators;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -81,7 +82,7 @@ namespace Kalitte.Trading.Algos
         private DelayedOrder delayedOrder = null;
         System.Timers.Timer seansTimer;
 
-        public FinanceBars PeriodBars = null;        
+        public  FinanceBars PeriodBars = null;        
         int orderCounter = 0;
 
         public Dictionary<string, decimal> ordersBySignals = new Dictionary<string, decimal>();
@@ -229,15 +230,38 @@ namespace Kalitte.Trading.Algos
 
         }
 
-
-
-        public void LoadBars(string symbol, DateTime t)
+        public virtual IQuote PushNewBar(string symbol, BarPeriod period, DateTime date, IQuote bar = null)
         {
-            this.PeriodBars = GetPeriodBars(symbol, t);
+            if (this.Symbol == symbol && this.SymbolPeriod == period)
+            {
+                if (bar == null)
+                {
+                    var lastBar = this.GetPeriodBars(symbol, period, date).Last;
+                    if (lastBar.Date != date)
+                    {
+                        Log($"{symbol} {period} {date} bar couldn't be retreived", LogLevel.Error);
+                    }
+                    else bar = lastBar;
+                }
+                if (bar != null)
+                {
+                    PeriodBars.Push(bar);
+                    Log($"Pushed new bar, last bar is now: {PeriodBars.Last}", LogLevel.Debug);
+                    return bar;
+                }
+            }
+            return null;
+        }
+
+
+
+        public virtual void InitializeBars(string symbol, BarPeriod period, DateTime t)
+        {
+            this.PeriodBars = GetPeriodBars(symbol, period, t);
             Log($"Initialized total {PeriodBars.Count} using time {t}. Last bar is: {PeriodBars.Last}", LogLevel.Debug, t);
         }
 
-        public FinanceBars GetPeriodBars(string symbol, DateTime t)
+        public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t)
         {
             
                 var periodBars = new FinanceBars();
@@ -255,7 +279,7 @@ namespace Kalitte.Trading.Algos
                     //}
                     //else
                     {
-                        var mdp = new MarketDataFileLogger(symbol, LogDir, SymbolPeriod.ToString());
+                        var mdp = new MarketDataFileLogger(symbol, LogDir, period.ToString());
                         mdp.FileName = "all.txt";
                         mdp.SaveDaily = true;
                         periodBars = mdp.GetContentAsQuote(t);

@@ -111,6 +111,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool AlwaysStopLoss { get; set; } = false;
 
+
+        public FinanceBars MinBars = null;
+
         CrossSignal maSignal = null;
         TakeProfitOrLossSignal takeProfitSignal = null;
         RangeSignal rsiRangeSignal = null;
@@ -165,6 +168,17 @@ namespace Kalitte.Trading.Algos
 
         }
 
+        //public override void PushNewBar(string symbol, BarPeriod period, Skender.Stock.Indicators.IQuote bar)
+        //{
+        //    base.PushNewBar(symbol, period, bar);
+        //}
+
+        public override void InitializeBars(string symbol,  BarPeriod period, DateTime t)
+        {
+            //this.MinBars = GetPeriodBars(symbol, period, t);
+            base.InitializeBars(symbol, period, t);
+        }
+
         public void InitSignals()
         {
             this.priceTrend = new TrendSignal("price-trend", Symbol, this);
@@ -173,9 +187,9 @@ namespace Kalitte.Trading.Algos
             priceTrend.ReferenceType = TrendReference.LastCheck;
 
             this.atrTrend = new TrendSignal("atr-trend", Symbol, this);
-            priceTrend.Periods = 3;
-            priceTrend.PriceCollectionPeriod = 2;
-
+            atrTrend.Periods = 12;
+            atrTrend.PriceCollectionPeriod = 5;
+            atrTrend.HowToReset = ResetList.Always;
 
 
             this.Signals.Add(this.priceTrend);
@@ -299,7 +313,7 @@ namespace Kalitte.Trading.Algos
 
         private void HandleAtrTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
-            //Log($"[atr-trend]: {result}", LogLevel.Critical, result.SignalTime);
+            Log($"[atr-trend]: {result}", LogLevel.Critical, result.SignalTime);
 
             if (result.Trend.Direction != TrendDirection.None)
             {

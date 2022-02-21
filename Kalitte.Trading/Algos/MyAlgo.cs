@@ -36,11 +36,11 @@ namespace Kalitte.Trading.Algos
         public bool DynamicCross { get; set; } = true;
 
 
-        [AlgoParam(0.15)]
-        public decimal MaAvgChange { get; set; } = 0.15M;
+        [AlgoParam(0.25)]
+        public decimal MaAvgChange { get; set; } = 0.25M;
 
         [AlgoParam(15)]
-        public int MaPeriods { get; set; } = 15;
+        public int MaPeriods { get; set; } = 25;
 
 
         [AlgoParam(0)]

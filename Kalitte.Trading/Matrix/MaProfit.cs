@@ -53,11 +53,11 @@ namespace Kalitte.Trading.Matrix
         public int MovPeriod2 { get; set; } = 9;
 
 
-        [Parameter(0.15)]
-        public decimal MaAvgChange { get; set; } = 0.15M;
+        [Parameter(0.25)]
+        public decimal MaAvgChange { get; set; } = 0.25M;
 
-        [Parameter(15)]
-        public int MaPeriods { get; set; } = 1;
+        [Parameter(25)]
+        public int MaPeriods { get; set; } = 25;
 
         [Parameter(true)]
         public bool DynamicCross { get; set; } = true;

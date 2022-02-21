@@ -107,7 +107,7 @@ namespace Kalitte.Trading
         void calculatePower(PowerSignalResult s, DateTime t)
         {
             var volumeAvg = volumeBars.List.GetEma(Math.Min(volumeBars.Count, VolumeCollectionPeriod), CandlePart.Volume).Last().Ema.Value;
-            var volumePerSecond = (double)volumeAvg; // calculateVolumeBySecond(t, volumeAvg);
+            var volumePerSecond = (double)volumeAvg; 
             var volume = volumePerSecond * Indicator.SliceSeconds;
             var last = (double)Indicator.ResultList.Last.Volume;
             var ratio = (volume / last);
@@ -148,11 +148,11 @@ namespace Kalitte.Trading
                 var avg = periodBars.List.GetSma(periodBars.Count, CandlePart.Volume).Last().Sma.Value * Indicator.SliceSeconds;    
                 periodBars.Clear();
                 Indicator.Bars.Push(new MyQuote() {  Date = time, Volume = avg });
-                Log($"Pushed new volume to bars: {time} {avg}", LogLevel.Critical);
+                Log($"Pushed new volume to bars: {time} {avg}", LogLevel.Verbose);
 
             }
 
-            if (volumeBars.IsFull)  calculatePower(result, time);
+            if (volumeBars.Count  >0)  calculatePower(result, time);
             return result;
         }
 

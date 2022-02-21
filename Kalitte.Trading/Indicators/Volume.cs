@@ -33,8 +33,8 @@ namespace Kalitte.Trading.Indicators
         {
             this.Lookback = lookback;
             this.SliceSeconds = sliceBySeconds;
-            Helper.SymbolSeconds(InputBars.Period.ToString(), out int periodSeconds);
-            this.Bars = new FinanceList<IQuote>(lookback, bars.LastItems(lookback / (periodSeconds / sliceBySeconds)));
+
+            this.Bars = new FinanceList<IQuote>(lookback * 2, bars.LastItems(lookback));
             Bars.ListEvent += Bars_ListEvent;
             createResult();
         }
@@ -43,13 +43,13 @@ namespace Kalitte.Trading.Indicators
         {
             if (e.Action == ListAction.Cleared) createResult();
             else if (e.Action == ListAction.ItemRemoved) return;
-            Helper.SymbolSeconds(InputBars.Period.ToString(), out int periodSeconds);
-            var sliceVal = periodSeconds / SliceSeconds;
-            var avgVols = e.Item.Volume / sliceVal;
+            //Helper.SymbolSeconds(InputBars.Period.ToString(), out int periodSeconds);
+            //var sliceVal = periodSeconds / SliceSeconds;
+            //var avgVols = e.Item.Volume / sliceVal;
             var res = new VolumeResult()
             {
                 Date = e.Item.Date,
-                Volume = (decimal)FinanceBars.EmaNext((double)avgVols, (double)ResultList.Last.Volume, Lookback)
+                Volume = (decimal)FinanceBars.EmaNext((double)e.Item.Volume, (double)ResultList.Last.Volume, Lookback)
             };
 
             ResultList.Push(res);
@@ -65,11 +65,11 @@ namespace Kalitte.Trading.Indicators
             ResultList.Clear();
             var input = Bars.AsList;
             var results = new List<IQuote>();
-
             Helper.SymbolSeconds(InputBars.Period.ToString(), out int periodSeconds);
+            var start = Bars.Count -  Math.Max(1, (Lookback / (periodSeconds / SliceSeconds)));
             var sliceVal = periodSeconds / SliceSeconds;
 
-            for (var i = 0; i < input.Count; i++)
+            for (var i = start; i < Bars.Count ; i++)
             {
                 var avgVols = input[i].Volume / sliceVal;
                 var res = new MyQuote()
@@ -78,12 +78,13 @@ namespace Kalitte.Trading.Indicators
                     Volume = avgVols
                 };
                 results.Add(res);
+                if (results.Count >= Lookback) break;
             }
-            var emas = results.GetEma(results.Count, CandlePart.Volume).ToList();
+            var emas = results.GetSma(results.Count, CandlePart.Volume).ToList();
             emas.ForEach(e =>
             {
-                if (e.Ema.HasValue)
-                    ResultList.Push(new VolumeResult() { Volume = e.Ema.Value });
+                if (e.Sma.HasValue)
+                    ResultList.Push(new VolumeResult() { Volume = e.Sma.Value });
             });
         }
 

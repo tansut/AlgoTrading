@@ -37,8 +37,8 @@ public class Program
         //initValues.Add("RsiLowLimit", 30M);
         //initValues.Add("RsiProfitPuan", 2M);
         //initValues.Add("ProfitPuan", 16M);
-        //initValues.Add("ProfitQuantity", 0M);
-        //initValues.Add("OrderQuantity", 2M);
+        initValues.Add("ProfitQuantity", 2M);
+        initValues.Add("OrderQuantity", 4M);
         //initValues.Add("RsiProfitQuantity", 1M);
         //initValues.Add("DynamicCross", false);
         //initValues.Add("MaAvgChange", 0.25M);

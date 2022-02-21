@@ -137,7 +137,7 @@ namespace Kalitte.Trading.Algos
             var atr = new Atrp(PeriodBars, 2);
             atrTrend.i1k = atr;
 
-            var power = new Volume(PeriodBars, 30, 60);            
+            var power = new Volume(PeriodBars, 60, 60);            
             powerSignal.Indicator = power;
             powerSignal.VolumeCollectionPeriod = 15;
 
@@ -291,43 +291,43 @@ namespace Kalitte.Trading.Algos
         private void HandleAtrTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
             
-            if (DynamicCross)
-            {
-                var newVal = EstimateVolatility(result.Trend.NewValue);
-                if (VolatileRatio != newVal)
-                {
-                    VolatileRatio = newVal;
-                    var val = result.Trend.NewValue;
-                    double ratio = 0;
-                    switch (VolatileRatio)
-                    {
-                        case VolatileRatio.Low:
-                            {
-                                ratio = 0.20;
-                                break;
-                            }
-                        case VolatileRatio.BelowAverage:
-                            {
-                                ratio = 0.15;
-                                break;
-                            }
-                        case VolatileRatio.High:
-                            {
-                                ratio = -0.15;
-                                break;
-                            }
-                        case VolatileRatio.Critical:
-                            {
-                                ratio = -0.30;
-                                break;
-                            }
-                    }
-                    Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})"));
+            //if (DynamicCross)
+            //{
+            //    var newVal = EstimateVolatility(result.Trend.NewValue);
+            //    if (VolatileRatio != newVal)
+            //    {
+            //        VolatileRatio = newVal;
+            //        var val = result.Trend.NewValue;
+            //        double ratio = 0;
+            //        switch (VolatileRatio)
+            //        {
+            //            case VolatileRatio.Low:
+            //                {
+            //                    ratio = 0.20;
+            //                    break;
+            //                }
+            //            case VolatileRatio.BelowAverage:
+            //                {
+            //                    ratio = 0.15;
+            //                    break;
+            //                }
+            //            case VolatileRatio.High:
+            //                {
+            //                    ratio = -0.15;
+            //                    break;
+            //                }
+            //            case VolatileRatio.Critical:
+            //                {
+            //                    ratio = -0.30;
+            //                    break;
+            //                }
+            //        }
+            //        Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})"));
 
 
-                    //Log($"Current volatility level: {VolatileRatio}. Adjusted cross to {maSignal.AvgChange}, {maSignal.Periods}. Signal: {result}", LogLevel.Critical, result.SignalTime);
-                }
-            }
+            //        //Log($"Current volatility level: {VolatileRatio}. Adjusted cross to {maSignal.AvgChange}, {maSignal.Periods}. Signal: {result}", LogLevel.Critical, result.SignalTime);
+            //    }
+            //}
         }
 
         private void HandleRsiTrendSignal(TrendSignal signal, TrendSignalResult result)
@@ -347,7 +347,7 @@ namespace Kalitte.Trading.Algos
 
             if (!portfolio.IsEmpty)
             {
-                var quantity = portfolio.Quantity < OrderQuantity && portfolio.Quantity >= RsiProfitQuantity ? Math.Min(portfolio.Quantity, RsiProfitQuantity) : 0; // : RsiProfitQuantity;
+                var quantity = portfolio.Quantity <= OrderQuantity && portfolio.Quantity > RsiProfitQuantity ? Math.Min(portfolio.Quantity, RsiProfitQuantity) : 0; // : RsiProfitQuantity;
                 if (quantity > 0)
                 {
                     var trend = result.Trend;
@@ -422,50 +422,16 @@ namespace Kalitte.Trading.Algos
 
         void HandlePowerSignal(PowerSignal signal, PowerSignalResult result)
         {
-            ////if (DynamicCross)
-            ////{
-            ////    var newVal = EstimateVolatility(result.Trend.NewValue);
-            ////    if (VolatileRatio != newVal)
-            ////    {
-            ////        VolatileRatio = newVal;
-            ////        var val = result.Trend.NewValue;
-            ////        double ratio = 0;
-            ////        switch (VolatileRatio)
-            ////        {
-            ////            case VolatileRatio.Low:
-            ////                {
-            ////                    ratio = 0.20;
-            ////                    break;
-            ////                }
-            ////            case VolatileRatio.BelowAverage:
-            ////                {
-            ////                    ratio = 0.15;
-            ////                    break;
-            ////                }
-            ////            case VolatileRatio.High:
-            ////                {
-            ////                    ratio = -0.15;
-            ////                    break;
-            ////                }
-            ////            case VolatileRatio.Critical:
-            ////                {
-            ////                    ratio = -0.30;
-            ////                    break;
-            ////                }
-            ////        }
-            ////        Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})"));
-
-
-            ////        //Log($"Current volatility level: {VolatileRatio}. Adjusted cross to {maSignal.AvgChange}, {maSignal.Periods}. Signal: {result}", LogLevel.Critical, result.SignalTime);
-            ////    }
-            ////}
-            if (LastPower == null || LastPower.Power != result.Power)
+           
+            if ((LastPower == null  || LastPower.Power != result.Power) && result.Power != PowerRatio.Unknown)
             {
                 var last = LastPower != null ? LastPower.Power.ToString() : "";
                 Log($"Power changed from {last} -> {result.Power}. Signal: {result} ", LogLevel.Warning, result.SignalTime);
                 LastPower = result;
+                var ratio = (double)(60 - result.Value) / 100;  
+                if (DynamicCross && ratio > 0) Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{result.Power}/{result.Value}"));
             }
-            Log($"{result}", LogLevel.Critical, result.SignalTime);            
+            //Log($"{result}", LogLevel.Critical, result.SignalTime);            
         }
 
         public void HandleCrossSignal(Signal signal, SignalResultX signalResult)

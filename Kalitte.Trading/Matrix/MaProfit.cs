@@ -25,14 +25,14 @@ namespace Kalitte.Trading.Matrix
     public class MaProfit : MatrixAlgoBase<MyAlgo>
     {
 
-        [SymbolParameter("F_XU0300222")]
+        //[SymbolParameter("F_XU0300222")]
         public string Symbol { get; set; } = "F_XU0300222";
 
 
         [Parameter(SymbolPeriod.Min10)]
         public SymbolPeriod SymbolPeriod { get; set; } = SymbolPeriod.Min10;
 
-        [Parameter(2)]
+        [Parameter(4)]
         public decimal OrderQuantity { get; set; } = 2M;
 
 
@@ -69,7 +69,7 @@ namespace Kalitte.Trading.Matrix
 
 
 
-        [Parameter(false)]
+        //[Parameter(false)]
         public bool UseVirtualOrders { get; set; } = false;
 
         [Parameter(false)]
@@ -78,7 +78,7 @@ namespace Kalitte.Trading.Matrix
         [Parameter(false)]
         public bool SimulateOrderSignal { get; set; } = false;
 
-        [Parameter(1)]
+        [Parameter(2)]
         public decimal ProfitQuantity { get; set; } = 1;
 
         [Parameter(0)]

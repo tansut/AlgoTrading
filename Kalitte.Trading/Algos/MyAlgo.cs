@@ -348,7 +348,7 @@ namespace Kalitte.Trading.Algos
 
             if (!portfolio.IsEmpty)
             {
-                var quantity = portfolio.Quantity <= OrderQuantity ? Math.Min(RsiProfitQuantity, portfolio.Quantity) : 0; // : RsiProfitQuantity;
+                var quantity = portfolio.Quantity < OrderQuantity && portfolio.Quantity >= RsiProfitQuantity ? Math.Min(portfolio.Quantity, RsiProfitQuantity) : 0; // : RsiProfitQuantity;
                 if (quantity > 0)
                 {
                     var trend = result.Trend;

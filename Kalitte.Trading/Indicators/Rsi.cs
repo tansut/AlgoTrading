@@ -18,12 +18,12 @@ namespace Kalitte.Trading.Indicators
 
         public override string ToString()
         {
-            return $"{base.ToString()}:({Periods})";
+            return $"{base.ToString()}:({Lookback})";
         }
 
         public Rsi(FinanceBars bars, int periods) : base(bars)
         {
-            this.Periods = periods;              
+            this.Lookback = periods;              
             createResult();
             this.InputBars.ListEvent += InputBars_BarEvent;
             startIndex = 0;            
@@ -32,7 +32,7 @@ namespace Kalitte.Trading.Indicators
         private void createResult()
         {
             ResultList.Clear();
-            var results = LastBars.GetRsi(Periods).ToList();
+            var results = LastBars.GetRsi(Lookback).ToList();
             results.ForEach(r => ResultList.Push(r));
         }
 
@@ -65,7 +65,7 @@ namespace Kalitte.Trading.Indicators
 
         public IList<IQuote> LastBars
         {
-            get { return InputBars.LastItems(startIndex + 2 * Periods + 1); }
+            get { return InputBars.LastItems(startIndex + 2 * Lookback + 1); }
         }
 
         public override decimal NextValue(decimal newVal)
@@ -78,7 +78,7 @@ namespace Kalitte.Trading.Indicators
         {
             var list = LastBars;
             list.Add(quote);
-            return list.GetRsi(Periods).Last();
+            return list.GetRsi(Lookback).Last();
         }
     }
 }

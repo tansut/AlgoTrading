@@ -4,13 +4,14 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Kalitte.Trading.Algos
 {
     public class MyAlgo : AlgoBase
     {
 
-
+        public PowerSignalResult LastPower { get; set; } = null;
 
 
         [AlgoParam(2)]
@@ -120,10 +121,12 @@ namespace Kalitte.Trading.Algos
         public FinanceBars MinBars = null;
 
         CrossSignal maSignal = null;
+        CrossSignal macSignal = null;
         TakeProfitOrLossSignal takeProfitSignal = null;
         TrendSignal rsiTrendSignal = null;
         TrendSignal priceTrend = null;
         TrendSignal atrTrend = null;
+        PowerSignal powerSignal = null;
 
         public override void InitMySignals(DateTime t)
         {
@@ -131,8 +134,12 @@ namespace Kalitte.Trading.Algos
             var price = new Price(PeriodBars, 9);
             priceTrend.i1k = price;
 
-            var atr = new Atr(PeriodBars, 2);
+            var atr = new Atrp(PeriodBars, 2);
             atrTrend.i1k = atr;
+
+            var power = new Volume(PeriodBars, 30, 120);            
+            powerSignal.Indicator = power;
+            powerSignal.VolumeCollectionPeriod = 15;
 
             if (maSignal != null)
             {
@@ -142,16 +149,13 @@ namespace Kalitte.Trading.Algos
                 maSignal.i2k = mov2ema9;
             }
 
-
-            var macds = Signals.Where(p => p.Name == "cross:macd593").FirstOrDefault() as CrossSignal;
-
-            if (macds != null)
+            if (macSignal != null)
             {
 
                 var macdi = new Macd(PeriodBars, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
 
-                macds.i1k = macdi;
-                macds.i2k = macdi.Trigger;
+                macSignal.i1k = macdi;
+                macSignal.i2k = macdi.Trigger;
             }
 
             if (rsiTrendSignal != null)
@@ -188,9 +192,11 @@ namespace Kalitte.Trading.Algos
             atrTrend.PriceCollectionPeriod = 2;
             atrTrend.HowToReset = ResetList.Always;
 
+            this.powerSignal = new PowerSignal("power", Symbol, this);
 
             this.Signals.Add(this.priceTrend);
             this.Signals.Add(this.atrTrend);
+            this.Signals.Add(this.powerSignal);
 
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
@@ -201,8 +207,8 @@ namespace Kalitte.Trading.Algos
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                var macds = new CrossSignal("cross:macd593", Symbol, this) { UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, Periods = MacdPeriods };
-                this.Signals.Add(macds);
+                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, Periods = MacdPeriods };
+                this.Signals.Add(macSignal);
             }
 
 
@@ -317,16 +323,8 @@ namespace Kalitte.Trading.Algos
                                 break;
                             }
                     }
-                    maSignal.InOperationLock.WaitOne();
-                    maSignal.InOperationLock.Reset();
-                    try
-                    {
-                        maSignal.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})");
-                    }
-                    finally
-                    {
-                        maSignal.InOperationLock.Set();
-                    }
+                    Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})"));
+
 
                     //Log($"Current volatility level: {VolatileRatio}. Adjusted cross to {maSignal.AvgChange}, {maSignal.Periods}. Signal: {result}", LogLevel.Critical, result.SignalTime);
                 }
@@ -407,6 +405,12 @@ namespace Kalitte.Trading.Algos
                     var signalResult = (TrendSignalResult)result;
                     HandleAtrTrendSignal(tpSignal, signalResult);
                 }
+                else if (result.Signal.Name == "power")
+                {
+                    var tpSignal = (PowerSignal)(result.Signal);
+                    var signalResult = (PowerSignalResult)result;
+                    HandlePowerSignal(tpSignal, signalResult);
+                }
                 else HandleCrossSignal(signal, result);
 
             }
@@ -417,7 +421,16 @@ namespace Kalitte.Trading.Algos
         }
 
 
-
+        void HandlePowerSignal(PowerSignal signal, PowerSignalResult result)
+        {
+            if (LastPower == null || LastPower.Power != result.Power)
+            {
+                var last = LastPower != null ? LastPower.Power.ToString() : "";
+                Log($"Power changed from {last} -> {result.Power}. Signal: {result} ", LogLevel.Warning, result.SignalTime);
+                LastPower = result;
+            }
+            Log($"{result}", LogLevel.Verbose, result.SignalTime);            
+        }
 
         public void HandleCrossSignal(Signal signal, SignalResultX signalResult)
         {

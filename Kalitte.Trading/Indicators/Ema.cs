@@ -17,12 +17,12 @@ namespace Kalitte.Trading.Indicators
 
         public override string ToString()
         {
-            return $"{base.ToString()}:({Periods})";
+            return $"{base.ToString()}:({Lookback})";
         }
 
         public Ema(FinanceBars bars, int periods) : base(bars)
         {
-            this.Periods = periods;
+            this.Lookback = periods;
             bars.ListEvent += BarChanged;
             createResult();
         }
@@ -34,7 +34,7 @@ namespace Kalitte.Trading.Indicators
         private void createResult()
         {
             ResultList.Clear();
-            var result = LastBars.GetEma(Periods).ToList();
+            var result = LastBars.GetEma(Lookback).ToList();
             result.ForEach(r => ResultList.Push(r));
         }
 
@@ -45,7 +45,7 @@ namespace Kalitte.Trading.Indicators
 
         public IList<IQuote> LastBars
         {
-            get { return InputBars.LastItems(Periods); }
+            get { return InputBars.LastItems(Lookback); }
         }
 
 
@@ -53,14 +53,14 @@ namespace Kalitte.Trading.Indicators
         public override decimal NextValue(decimal newVal)
         {
             var lastEma = (double)(ResultList.Last.Ema);
-            var ema = (decimal)FinanceBars.EmaNext((double)newVal, lastEma, Periods);
+            var ema = (decimal)FinanceBars.EmaNext((double)newVal, lastEma, Lookback);
             return ema;
         }
 
         public override EmaResult NextResult(IQuote quote)
         {
             var lastEma = (double)(ResultList.Last.Ema);
-            var ema = (decimal)FinanceBars.EmaNext((double)quote.Close, lastEma, Periods);
+            var ema = (decimal)FinanceBars.EmaNext((double)quote.Close, lastEma, Lookback);
             return new EmaResult() { Date = quote.Date, Ema = ema };
         }
 
@@ -86,7 +86,7 @@ namespace Kalitte.Trading.Indicators
                     var ema = new EmaResult() { Date = e.Item.Date };
                     var close = (double)(e.Item.Close);
                     var lastEma = (double)(ResultList.Last.Ema);
-                    ema.Ema = (decimal)FinanceBars.EmaNext(close, lastEma, Periods);
+                    ema.Ema = (decimal)FinanceBars.EmaNext(close, lastEma, Lookback);
                     ResultList.Push(new EmaResult() { Date = ema.Date, Ema = ema.Ema });
                     //Results.Push(lastResult.Last());
 

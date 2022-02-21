@@ -28,9 +28,9 @@ namespace Kalitte.Trading.Indicators
         decimal NextValue(decimal newVal);
         decimal? CurrentValue { get; }
         List<IndicatorResult> Results { get; }
-        int Periods { get; set; }
+        int Lookback { get; set; }
         string Symbol { get;  set; }
-
+        //CandlePart Candle { get; set; }
 
     }
 
@@ -44,11 +44,12 @@ namespace Kalitte.Trading.Indicators
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
         public string Symbol { get; set; }
+        //public CandlePart Candle { get; set; } = CandlePart.Close;
 
         public FinanceBars InputBars { get; }
         public FinanceList<R> ResultList { get; set; } = null;
 
-        public int Periods { get; set; }
+        public int Lookback { get; set; }
 
         public override string ToString()
         {

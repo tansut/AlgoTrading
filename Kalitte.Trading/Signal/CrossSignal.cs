@@ -102,19 +102,34 @@ namespace Kalitte.Trading
 
         }
 
-        public void AdjustSensitivity(double ratio, string reason)
+        protected void AdjustSensitivityInternal(double ratio, string reason)
         {
             AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
             Periods = InitialPeriods + Convert.ToInt32((InitialPeriods * (decimal)ratio));
             differenceBars.Resize(Periods);
             crossBars.Resize(Periods);
             Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {Periods}", LogLevel.Warning);
+
+        }
+        public void AdjustSensitivity(double ratio, string reason)
+        {
+            InOperationLock.WaitOne();
+            InOperationLock.Reset();
+            try
+            {
+                AdjustSensitivityInternal(ratio, reason);
+            }
+            finally
+            {
+                InOperationLock.Set();
+            }
         }
 
         public override string ToString()
         {
             return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {Periods} pricePeriod: {PriceCollectionPeriod} useSma: {UseSma} avgChange: {AvgChange}";
         }
+
 
 
 
@@ -169,14 +184,14 @@ namespace Kalitte.Trading
 
                     if (result.finalResult.HasValue)
                     {
-                        if (!sensitivityAdjusted) AdjustSensitivity(0.30, "Cross Received");
+                        if (!sensitivityAdjusted) AdjustSensitivityInternal(0.30, "Cross Received");
                         sensitivityAdjusted = true;
                         differenceBars.Clear();
                     }
                     else { if (sensitivityAdjusted)
                         {
                             sensitivityAdjusted = false;
-                            AdjustSensitivity(0.0, "Revert");
+                            AdjustSensitivityInternal(0.0, "Revert");
                         }
                     }
                 }

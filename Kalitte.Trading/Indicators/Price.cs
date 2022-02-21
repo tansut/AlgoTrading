@@ -21,18 +21,15 @@ namespace Kalitte.Trading.Indicators
         int startIndex = 0;
         public override string ToString()
         {
-            return $"{base.ToString()}:({Periods})";
+            return $"{base.ToString()}:({Lookback})";
         }
 
         public Price(FinanceBars bars, int periods) : base(bars)
         {
-            this.Periods = periods;              
+            this.Lookback = periods;              
             createResult();
             this.InputBars.ListEvent += InputBars_BarEvent;
-            startIndex = 0;
-            
-            
-            
+            startIndex = 0;                                   
         }
 
         private void createResult()
@@ -71,7 +68,7 @@ namespace Kalitte.Trading.Indicators
 
         public IList<IQuote> LastBars
         {
-            get { return InputBars.LastItems(startIndex + Periods); }
+            get { return InputBars.LastItems(startIndex + Lookback); }
         }
 
         public override decimal NextValue(decimal newVal)

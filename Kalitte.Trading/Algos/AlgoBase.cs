@@ -26,13 +26,14 @@ namespace Kalitte.Trading.Algos
     public interface IMarketDataProvider
     {
         decimal GetMarketPrice(string symbol, DateTime? t = null);
+        decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null);
     }
 
-    public interface IExchange: IMarketDataProvider
+    public interface IExchange : IMarketDataProvider
     {
         string CreateMarketOrder(string symbol, decimal quantity, BuySell side, string icon, bool night);
         string CreateLimitOrder(string symbol, decimal quantity, BuySell side, decimal limitPrice, string icon, bool night);
-
+        void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null);
     }
 
     public class DelayedOrder
@@ -73,18 +74,17 @@ namespace Kalitte.Trading.Algos
 
         [AlgoParam()]
         public bool AutoCompleteOrders { get; set; }
-        
+
 
         protected DateTime? TimeSet = null;
 
         public PortfolioList UserPortfolioList = new PortfolioList();
         public decimal simulationPriceDif = 0;
-        private static Dictionary<string, int> symbolPeriodCache = new Dictionary<string, int>();
 
         private DelayedOrder delayedOrder = null;
         System.Timers.Timer seansTimer;
 
-        public  FinanceBars PeriodBars = null;        
+        public FinanceBars PeriodBars = null;
         int orderCounter = 0;
 
         public Dictionary<string, decimal> ordersBySignals = new Dictionary<string, decimal>();
@@ -103,7 +103,7 @@ namespace Kalitte.Trading.Algos
 
         public bool WaitSignalOperations(int timeOut = 1000)
         {
-            return ManualResetEvent.WaitAll(Signals.Select(p=>p.InOperationLock).ToArray(), timeOut);
+            return ManualResetEvent.WaitAll(Signals.Select(p => p.InOperationLock).ToArray(), timeOut);
         }
 
 
@@ -266,35 +266,36 @@ namespace Kalitte.Trading.Algos
 
         public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t)
         {
-            
-                var periodBars = new FinanceBars();
-                try
+
+            var periodBars = new FinanceBars();
+            try
+            {
+                //var bd = GetBarData(Symbol, SymbolPeriod);
+                //if (bd != null && bd.BarDataIndexer != null)
+                //{
+                //    for (var i = 0; i < bd.BarDataIndexer.LastBarIndex; i++)
+                //    {
+                //        if (bd.BarDataIndexer[i] > t) break;
+                //        var quote = new MyQuote() { Date = bd.BarDataIndexer[i], Open = bd.Open[i], High = bd.High[i], Low = bd.Low[i], Close = bd.Close[i], Volume = bd.Volume[i] };
+                //        periodBars.Push(quote);
+                //    }
+                //}
+                //else
                 {
-                    //var bd = GetBarData(Symbol, SymbolPeriod);
-                    //if (bd != null && bd.BarDataIndexer != null)
-                    //{
-                    //    for (var i = 0; i < bd.BarDataIndexer.LastBarIndex; i++)
-                    //    {
-                    //        if (bd.BarDataIndexer[i] > t) break;
-                    //        var quote = new MyQuote() { Date = bd.BarDataIndexer[i], Open = bd.Open[i], High = bd.High[i], Low = bd.Low[i], Close = bd.Close[i], Volume = bd.Volume[i] };
-                    //        periodBars.Push(quote);
-                    //    }
-                    //}
-                    //else
-                    {
-                        var mdp = new MarketDataFileLogger(symbol, LogDir, period.ToString());
-                        mdp.FileName = "all.txt";
-                        mdp.SaveDaily = true;
-                        periodBars = mdp.GetContentAsQuote(t);
-                    }                    
+                    var mdp = new MarketDataFileLogger(symbol, LogDir, period.ToString());
+                    mdp.FileName = "all.txt";
+                    mdp.SaveDaily = true;
+                    periodBars = mdp.GetContentAsQuote(t);
+                    periodBars.Period = period;
                 }
-                catch (Exception ex)
-                {
-                    Log($"Error initializing bars {ex.Message}", LogLevel.Error, t);
-                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Error initializing bars {ex.Message}", LogLevel.Error, t);
+            }
 
             return periodBars;
-            
+
         }
 
 
@@ -332,7 +333,7 @@ namespace Kalitte.Trading.Algos
             }
             if (oldHashCode != data.Result.GetHashCode())
             //if (oldFinalResult != data.Result.finalResult)
-             {
+            {
                 Log($"Signal {signal.Name} changed from {existing} -> {data.Result }", LogLevel.Verbose, data.Result.SignalTime);
                 if (data.Result.finalResult.HasValue) Decide(signal, data);
             }
@@ -356,14 +357,14 @@ namespace Kalitte.Trading.Algos
             return sb;
         }
 
-        
+
 
 
         public virtual void Init()
         {
 
-            
-            
+
+
         }
 
         public virtual void InitMySignals(DateTime t)
@@ -372,7 +373,7 @@ namespace Kalitte.Trading.Algos
         }
 
 
-        
+
 
         public virtual void InitCompleted()
         {
@@ -400,7 +401,7 @@ namespace Kalitte.Trading.Algos
 
                 CounterCreationDataCollection counterDataCollection = new CounterCreationDataCollection();
 
-                foreach(var signal in this.Signals)
+                foreach (var signal in this.Signals)
                 {
                     CounterCreationData ccd = new CounterCreationData();
                     ccd.CounterType = PerformanceCounterType.AverageBase;
@@ -410,7 +411,7 @@ namespace Kalitte.Trading.Algos
 
                 PerformanceCounterCategory.Create(InstanceName,
                     "",
-                    PerformanceCounterCategoryType.SingleInstance, counterDataCollection);                
+                    PerformanceCounterCategoryType.SingleInstance, counterDataCollection);
             }
 
             foreach (var signal in this.Signals)
@@ -419,10 +420,10 @@ namespace Kalitte.Trading.Algos
                 perfCounters[signal.Name] = counter;
             }
 
-            
 
 
-    }
+
+        }
 
         public virtual void Stop()
         {
@@ -478,7 +479,7 @@ namespace Kalitte.Trading.Algos
             if (order.SignalResult != null)
                 Log($"Signal [{order.SignalResult.Signal.Name}] result: {order.SignalResult}", LogLevel.Order, t);
             Log($"Used bar: {this.PeriodBars.Last}", LogLevel.Order, t);
-            
+
             if (this.UseVirtualOrders || this.AutoCompleteOrders)
             {
                 if (this.Simulation)
@@ -496,7 +497,7 @@ namespace Kalitte.Trading.Algos
         public int GetSymbolPeriodSeconds(string period)
         {
             int result;
-            symbolPeriodCache.TryGetValue(period, out result);
+            Helper.SymbolSeconds(period, out result);
             if (result == 0) throw new ArgumentException("Not supported period");
             return result;
         }
@@ -511,19 +512,7 @@ namespace Kalitte.Trading.Algos
             return "-- RECENT PORTFOLIO --" + Environment.NewLine + portfolio.ToString() + Environment.NewLine + "-- END PORTFOLIO --";
         }
 
-        static AlgoBase()
-        {
-            symbolPeriodCache.Add(BarPeriod.Min.ToString(), 60);
-            symbolPeriodCache.Add(BarPeriod.Min5.ToString(), 5 * 60);
-            symbolPeriodCache.Add(BarPeriod.Min10.ToString(), 10 * 60);
-            symbolPeriodCache.Add(BarPeriod.Min15.ToString(), 15 * 60);
-            symbolPeriodCache.Add(BarPeriod.Min20.ToString(), 20 * 60);
-            symbolPeriodCache.Add(BarPeriod.Min30.ToString(), 30 * 60);
-            symbolPeriodCache.Add(BarPeriod.Min60.ToString(), 60 * 60);
-            symbolPeriodCache.Add(BarPeriod.Min120.ToString(), 120 * 60);
-            symbolPeriodCache.Add(BarPeriod.Min180.ToString(), 180 * 60);
-            symbolPeriodCache.Add(BarPeriod.Min240.ToString(), 180 * 60);
-        }
+
 
         public List<Signal> Signals = new List<Signal>();
         public ConcurrentDictionary<string, SignalResultX> SignalResults = new ConcurrentDictionary<string, SignalResultX>();
@@ -535,7 +524,7 @@ namespace Kalitte.Trading.Algos
             {
                 return TimeSet ?? DateTime.Now;
             }
-             set
+            set
             {
                 TimeSet = value;
             }
@@ -560,32 +549,60 @@ namespace Kalitte.Trading.Algos
                 {
                     Console.WriteLine(content);
                     File.AppendAllText(LogFile, content + Environment.NewLine);
+                    if (Exchange != null) Exchange.Log(content, level, t);
                 }
             }
+        }
+
+        public DateTime NextBar(DateTime current, BarPeriod period)
+        {
+            Helper.SymbolSeconds(period.ToString(), out int periodSeconds);
+            var minutes = periodSeconds / 60;
+            var expected = current.AddSeconds(periodSeconds);
+            if (expected.Hour >= 23) expected = current.Date.AddHours(24 + 9.5);
+            else if (expected.Hour == 18 && expected.Minute >= 10) expected = current.Date.AddHours(19);
+            return expected;
+        }
+
+        public decimal[] GetMarketData(string symbol, BarPeriod period, DateTime? t = null)
+        {
+            var values = PriceLogger.GetMarketDataList(t.Value);
+            if (values.Length == 0)
+            {
+                int toBack = 0, toForward = 0;
+                while (toBack-- > -5)
+                {
+                    toForward++;
+                    values = PriceLogger.GetMarketDataList(t.Value.AddSeconds(toBack));
+                    if (values.Length > 0) return values;
+                    values = PriceLogger.GetMarketDataList(t.Value.AddSeconds(toForward));
+                    if (values.Length > 0) return values;
+
+                }
+            }
+            return values;
+        }
+
+        public virtual decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null)
+        {
+            if (Simulation)
+            {
+                var list = GetMarketData(symbol, SymbolPeriod, t);
+                var price = list.Length > 0 ? list[1] : 0;
+                return price;
+            }
+            else return Exchange.GetVolume(symbol, period, t);
         }
 
         public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)
         {
             if (Simulation)
             {
-                var price = PriceLogger.GetMarketData(t.Value) ?? 0;
-                if (price == 0)
-                {
-                    int toBack = 0, toForward = 0;
-                    while (toBack-- > -5)
-                    {
-                        toForward++;
-                        price = PriceLogger.GetMarketData(t.Value.AddSeconds(toBack)) ?? 0;
-                        if (price > 0) return price;
-                        price = PriceLogger.GetMarketData(t.Value.AddSeconds(toForward)) ?? 0;
-                        if (price > 0) return price;
-
-                    }
-                }
+                var list = GetMarketData(symbol, SymbolPeriod, t);
+                var price = list.Length > 0 ? list[0]: 0;
                 return price;
             }
             else return Exchange.GetMarketPrice(symbol, t);
-
         }
 
 

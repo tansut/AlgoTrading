@@ -26,6 +26,9 @@ namespace Kalitte.Trading.Matrix
 {
     public abstract class MatrixAlgoBase<T> : MatriksAlgo, IDisposable, IExchange where T : Kalitte.Trading.Algos.AlgoBase
     {
+
+        VOLUME volume;
+
         public T Algo { get; set; }
 
         [Parameter(0)]
@@ -95,10 +98,16 @@ namespace Kalitte.Trading.Matrix
         }
 
         public override void OnInit()
-        {
+        {            
             Algo.Init();
+            volume = VolumeIndicator(Algo.Symbol, (SymbolPeriod)Enum.Parse(typeof(SymbolPeriod), Algo.SymbolPeriod.ToString()));
+            
         }
 
+        public void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null)
+        {
+            Debug(text);
+        }
 
         public override void OnStopped()
         {
@@ -171,6 +180,11 @@ namespace Kalitte.Trading.Matrix
                 else Algo.Log("!! Portfolio is empty !!");
                 Algo.Log($"- END PORTFOLIO -");
             }            
+        }
+
+        public decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null)
+        {
+            return volume.CurrentValue;
         }
 
         public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)

@@ -149,7 +149,7 @@ namespace Kalitte.Trading
             decimal[] result;
             var f1 = content.TryGetValue(t.ToString("yyyy.MM.dd HH:mm:sss"), out result);
             if (!f1) content.TryGetValue(t.ToString("mm-ss"), out result);
-            return result;
+            return result == null ? new decimal[0]: result;
         }
     }
 

@@ -11,19 +11,19 @@ namespace Kalitte.Trading.Indicators
 {
 
 
-    public class Atr : IndicatorBase<AtrResult>
+    public class Atrp : IndicatorBase<AtrResult>
     {
 
         int startIndex = 0;
 
         public override string ToString()
         {
-            return $"{base.ToString()}:({Periods})";
+            return $"{base.ToString()}:({Lookback})";
         }
 
-        public Atr(FinanceBars bars, int periods) : base(bars)
+        public Atrp(FinanceBars bars, int periods) : base(bars)
         {
-            this.Periods = periods;              
+            this.Lookback = periods;              
             createResult();
             this.InputBars.ListEvent += InputBars_BarEvent;
             startIndex = 0;
@@ -35,7 +35,7 @@ namespace Kalitte.Trading.Indicators
         private void createResult()
         {
             ResultList.Clear();
-            var results = LastBars.GetAtr(Periods).ToList();
+            var results = LastBars.GetAtr(Lookback).ToList();
             results.ForEach(r => ResultList.Push(r));
         }
 
@@ -68,7 +68,7 @@ namespace Kalitte.Trading.Indicators
 
         public IList<IQuote> LastBars
         {
-            get { return InputBars.LastItems(startIndex + 5 * Periods + 1); }
+            get { return InputBars.LastItems(startIndex + 5 * Lookback + 1); }
             //get { return InputBars.LastItems(InputBars.Count); }
         }
 
@@ -85,7 +85,7 @@ namespace Kalitte.Trading.Indicators
         {
             var list = LastBars;
             list.Add(quote);
-            return list.GetAtr(Periods).Last();
+            return list.GetAtr(Lookback).Last();
         }
     }
 }

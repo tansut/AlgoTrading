@@ -167,7 +167,7 @@ namespace Kalitte.Trading.Matrix
                     var lastDay = algoDay.AddDays(-1).AddHours(22).AddMinutes(50);
                     if (Algo.SignalsState != StartableState.Started)
                     {                        
-                        Algo.InitializeBars(this.Symbol, (BarPeriod)Enum.Parse(typeof(BarPeriod), this.SymbolPeriod.ToString()), lastDay);
+                        Algo.InitializeBars(this.Symbol, Algo.SymbolPeriod, lastDay);
                         Algo.InitMySignals(lastDay);
                         Algo.InitCompleted();
                     }
@@ -221,7 +221,7 @@ namespace Kalitte.Trading.Matrix
                     //}
                     Algo.simulationCount++;
                     var newQuote = new MyQuote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                    Algo.PushNewBar(Symbol, (BarPeriod)Enum.Parse(typeof(BarPeriod), this.SymbolPeriod.ToString()), newQuote.Date, newQuote);
+                    Algo.PushNewBar(Symbol, Algo.SymbolPeriod, newQuote.Date, newQuote);
                 }
             }
             else
@@ -253,7 +253,7 @@ namespace Kalitte.Trading.Matrix
                     Algo.Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
                 }
                 LoadRealPositions(Algo.Symbol);
-                Algo.InitializeBars(this.Symbol, (BarPeriod)Enum.Parse(typeof(BarPeriod), this.SymbolPeriod.ToString()), DateTime.Now);
+                Algo.InitializeBars(this.Symbol, Algo.SymbolPeriod, DateTime.Now);
                 Algo.InitMySignals(DateTime.Now);
                 Algo.InitCompleted();
             }

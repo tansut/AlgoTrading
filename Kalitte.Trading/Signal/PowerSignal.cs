@@ -29,7 +29,7 @@ namespace Kalitte.Trading
 
     public class PowerSignalResult : SignalResultX
     {
-        internal double volumePerSlice;
+        internal double CurrentVolume;
 
         public decimal Value { get; set; }
         public PowerRatio Power { get
@@ -45,6 +45,7 @@ namespace Kalitte.Trading
 
         public double VolumePerSecond { get; internal set; }
         public double Strenght { get; internal set; }
+        public double LastVolume { get; internal set; }
 
         public PowerSignalResult(Signal signal, DateTime t) : base(signal, t)
         {
@@ -53,7 +54,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()} | [{Power}] Rsi:{Value} Rs:{Strenght} Volume/sec: {VolumePerSecond} Volume/slice: {volumePerSlice}";
+            return $"{base.ToString()} | [{Power}] Rsi:{Value} Rs:{Strenght} Volume/sec: {VolumePerSecond} Volume/slice: {CurrentVolume} Prev:{LastVolume}";
         }
 
         public override int GetHashCode()
@@ -108,11 +109,13 @@ namespace Kalitte.Trading
             var volumeAvg = volumeBars.List.GetEma(Math.Min(volumeBars.Count, VolumeCollectionPeriod), CandlePart.Volume).Last().Ema.Value;
             var volumePerSecond = (double)volumeAvg; // calculateVolumeBySecond(t, volumeAvg);
             var volume = volumePerSecond * Indicator.SliceSeconds;
-            var ratio = (volume / (double)Indicator.ResultList.Last.Volume);
+            var last = (double)Indicator.ResultList.Last.Volume;
+            var ratio = (volume / last);
             s.Strenght = ratio;
             s.Value = (100 - 100 / (1 +  (decimal)ratio));
             s.VolumePerSecond = volumePerSecond;
-            s.volumePerSlice = volume;
+            s.CurrentVolume = volume;
+            s.LastVolume = last;
         }
 
         protected override SignalResultX CheckInternal(DateTime? t = null)

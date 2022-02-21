@@ -137,7 +137,7 @@ namespace Kalitte.Trading.Algos
             var atr = new Atrp(PeriodBars, 2);
             atrTrend.i1k = atr;
 
-            var power = new Volume(PeriodBars, 30, 120);            
+            var power = new Volume(PeriodBars, 30, 60);            
             powerSignal.Indicator = power;
             powerSignal.VolumeCollectionPeriod = 15;
 
@@ -151,9 +151,7 @@ namespace Kalitte.Trading.Algos
 
             if (macSignal != null)
             {
-
                 var macdi = new Macd(PeriodBars, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
-
                 macSignal.i1k = macdi;
                 macSignal.i2k = macdi.Trigger;
             }
@@ -292,6 +290,7 @@ namespace Kalitte.Trading.Algos
 
         private void HandleAtrTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
+            return;
             if (DynamicCross)
             {
                 var newVal = EstimateVolatility(result.Trend.NewValue);

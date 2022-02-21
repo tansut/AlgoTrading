@@ -290,7 +290,7 @@ namespace Kalitte.Trading.Algos
 
         private void HandleAtrTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
-            return;
+            
             if (DynamicCross)
             {
                 var newVal = EstimateVolatility(result.Trend.NewValue);
@@ -422,13 +422,50 @@ namespace Kalitte.Trading.Algos
 
         void HandlePowerSignal(PowerSignal signal, PowerSignalResult result)
         {
+            ////if (DynamicCross)
+            ////{
+            ////    var newVal = EstimateVolatility(result.Trend.NewValue);
+            ////    if (VolatileRatio != newVal)
+            ////    {
+            ////        VolatileRatio = newVal;
+            ////        var val = result.Trend.NewValue;
+            ////        double ratio = 0;
+            ////        switch (VolatileRatio)
+            ////        {
+            ////            case VolatileRatio.Low:
+            ////                {
+            ////                    ratio = 0.20;
+            ////                    break;
+            ////                }
+            ////            case VolatileRatio.BelowAverage:
+            ////                {
+            ////                    ratio = 0.15;
+            ////                    break;
+            ////                }
+            ////            case VolatileRatio.High:
+            ////                {
+            ////                    ratio = -0.15;
+            ////                    break;
+            ////                }
+            ////            case VolatileRatio.Critical:
+            ////                {
+            ////                    ratio = -0.30;
+            ////                    break;
+            ////                }
+            ////        }
+            ////        Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})"));
+
+
+            ////        //Log($"Current volatility level: {VolatileRatio}. Adjusted cross to {maSignal.AvgChange}, {maSignal.Periods}. Signal: {result}", LogLevel.Critical, result.SignalTime);
+            ////    }
+            ////}
             if (LastPower == null || LastPower.Power != result.Power)
             {
                 var last = LastPower != null ? LastPower.Power.ToString() : "";
                 Log($"Power changed from {last} -> {result.Power}. Signal: {result} ", LogLevel.Warning, result.SignalTime);
                 LastPower = result;
             }
-            Log($"{result}", LogLevel.Verbose, result.SignalTime);            
+            Log($"{result}", LogLevel.Critical, result.SignalTime);            
         }
 
         public void HandleCrossSignal(Signal signal, SignalResultX signalResult)

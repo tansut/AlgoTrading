@@ -33,7 +33,8 @@ namespace Kalitte.Trading.Indicators
         {
             this.Lookback = lookback;
             this.SliceSeconds = sliceBySeconds;
-            this.Bars = new FinanceList<IQuote>(lookback * 2, bars.LastItems(lookback));
+            Helper.SymbolSeconds(InputBars.Period.ToString(), out int periodSeconds);
+            this.Bars = new FinanceList<IQuote>(lookback, bars.LastItems(lookback / (periodSeconds / sliceBySeconds)));
             Bars.ListEvent += Bars_ListEvent;
             createResult();
         }
@@ -78,7 +79,7 @@ namespace Kalitte.Trading.Indicators
                 };
                 results.Add(res);
             }
-            var emas = results.GetEma(Lookback, CandlePart.Volume).ToList();
+            var emas = results.GetEma(results.Count, CandlePart.Volume).ToList();
             emas.ForEach(e =>
             {
                 if (e.Ema.HasValue)

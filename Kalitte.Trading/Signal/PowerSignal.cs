@@ -148,7 +148,7 @@ namespace Kalitte.Trading
                 var avg = periodBars.List.GetSma(periodBars.Count, CandlePart.Volume).Last().Sma.Value * Indicator.SliceSeconds;    
                 periodBars.Clear();
                 Indicator.Bars.Push(new MyQuote() {  Date = time, Volume = avg });
-                Log($"Pushed new volume to bars: {time} {avg}", LogLevel.Verbose);
+                Log($"Pushed new volume to bars: {time} {avg}", LogLevel.Critical);
 
             }
 

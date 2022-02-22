@@ -160,6 +160,7 @@ namespace Kalitte.Trading
                 if (lastCross == 0 && cross != 0)
                 {
                     lastCross = cross;
+                    Log($"Cross identified: {cross}", LogLevel.Debug, t);
                     differenceBars.Clear();
 
                 }

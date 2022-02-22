@@ -34,6 +34,7 @@ namespace Kalitte.Trading.Algos
         string CreateMarketOrder(string symbol, decimal quantity, BuySell side, string icon, bool night);
         string CreateLimitOrder(string symbol, decimal quantity, BuySell side, decimal limitPrice, string icon, bool night);
         void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null);
+        FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t);
     }
 
     public class DelayedOrder
@@ -267,27 +268,18 @@ namespace Kalitte.Trading.Algos
         public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t)
         {
 
-            var periodBars = new FinanceBars();
+            FinanceBars periodBars = null;
             try
             {
-                //var bd = GetBarData(Symbol, SymbolPeriod);
-                //if (bd != null && bd.BarDataIndexer != null)
-                //{
-                //    for (var i = 0; i < bd.BarDataIndexer.LastBarIndex; i++)
-                //    {
-                //        if (bd.BarDataIndexer[i] > t) break;
-                //        var quote = new MyQuote() { Date = bd.BarDataIndexer[i], Open = bd.Open[i], High = bd.High[i], Low = bd.Low[i], Close = bd.Close[i], Volume = bd.Volume[i] };
-                //        periodBars.Push(quote);
-                //    }
-                //}
-                //else
+                //periodBars = Exchange != null ? Exchange.GetPeriodBars(symbol, period, t): null;                
+                if (periodBars == null)
                 {
                     var mdp = new MarketDataFileLogger(symbol, LogDir, period.ToString());
                     mdp.FileName = "all.txt";
                     mdp.SaveDaily = true;
-                    periodBars = mdp.GetContentAsQuote(t);
-                    periodBars.Period = period;
+                    periodBars = mdp.GetContentAsQuote(t);                    
                 }
+                periodBars.Period = period;
             }
             catch (Exception ex)
             {

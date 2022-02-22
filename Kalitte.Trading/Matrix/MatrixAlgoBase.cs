@@ -39,6 +39,23 @@ namespace Kalitte.Trading.Matrix
 
 
 
+        public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t)
+        {
+            var periodBars = new FinanceBars();
+            var bd = GetBarData(symbol, (SymbolPeriod)Enum.Parse(typeof(BarPeriod), period.ToString()));
+            if (bd != null && bd.BarDataIndexer != null)
+            {
+                for (var i = 0; i < bd.BarDataIndexer.LastBarIndex; i++)
+                {
+                    if (bd.BarDataIndexer[i] > t) break;
+                    var quote = new MyQuote() { Date = bd.BarDataIndexer[i], Open = bd.Open[i], High = bd.High[i], Low = bd.Low[i], Close = bd.Close[i], Volume = bd.Volume[i] };
+                    periodBars.Push(quote);
+                }
+            }
+            else return null;
+            return periodBars;
+        }
+
         public string CreateMarketOrder(string symbol, decimal quantity, BuySell side, string icon, bool night)
         {
             return this.SendMarketOrder(symbol, quantity, side == BuySell.Buy ? OrderSide.Buy : OrderSide.Sell, (ChartIcon)Enum.Parse(typeof(ChartIcon), icon), night);

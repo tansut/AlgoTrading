@@ -80,8 +80,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(1)]
         public decimal RsiProfitQuantity { get; set; } = 1M;
 
-        [AlgoParam(2)]
-        public decimal RsiProfitPuan { get; set; } = 2M;
+        [AlgoParam(1)]
+        public decimal RsiProfitPuan { get; set; } = 1M;
 
 
 
@@ -309,7 +309,6 @@ namespace Kalitte.Trading.Algos
                     if (ratio < 0) ratio = 0;
                     Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{result.Power}/{result.Value}"));
                 }
-
             }
 
             //Log($"{result}", LogLevel.Critical, result.SignalTime);            

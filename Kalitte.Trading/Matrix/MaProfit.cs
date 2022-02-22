@@ -102,8 +102,8 @@ namespace Kalitte.Trading.Matrix
         [Parameter(1)]
         public decimal RsiProfitQuantity { get; set; } = 1M;
 
-        [Parameter(2)]
-        public decimal RsiProfitPuan { get; set; } = 2M;
+        [Parameter(1)]
+        public decimal RsiProfitPuan { get; set; } = 1M;
 
         [Parameter(14)]
         public int Rsi { get; set; } = 14;

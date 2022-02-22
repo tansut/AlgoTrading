@@ -40,7 +40,7 @@ public class Program
         //initValues.Add("ProfitQuantity", 2M);
         //initValues.Add("OrderQuantity", 4M);
         //initValues.Add("RsiProfitQuantity", 1M);
-        initValues.Add("DynamicCross", false);
+        //initValues.Add("DynamicCross", false);
         //initValues.Add("MaAvgChange", 0.25M);
         //initValues.Add("MaPeriods", 25);
         

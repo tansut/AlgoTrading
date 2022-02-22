@@ -53,8 +53,8 @@ namespace Kalitte.Trading
 
             for (var p = t1; p < t2;)
             {
-                
 
+                if (p >= DateTime.Now) break;
                 Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
                 Func<object, SignalResultX> action = (object stateo) =>

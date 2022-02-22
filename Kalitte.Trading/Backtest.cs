@@ -53,6 +53,7 @@ namespace Kalitte.Trading
 
             for (var p = t1; p < t2;)
             {
+                
 
                 Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
@@ -83,10 +84,6 @@ namespace Kalitte.Trading
                 }
                 Algo.simulationCount++;
                 Algo.PushNewBar(Algo.Symbol, Algo.SymbolPeriod, p);
-                //var bd = Algo.GetPeriodBars().Last;
-                //var newQuote = new MyQuote() { Date = p, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                //Algo.PeriodBars.Push(newQuote);
-
 
                 p = Algo.AlgoTime;
             }
@@ -116,6 +113,9 @@ namespace Kalitte.Trading
             for (var d = 0; d <= days.Days; d++)
             {
                 var currentDay = StartTime.AddDays(d);
+
+                if (currentDay.DayOfWeek == DayOfWeek.Saturday || currentDay.DayOfWeek == DayOfWeek.Sunday) continue;
+                if (currentDay >= DateTime.Now) break;
                 var periods = this.GetDates(currentDay);
                 Algo.AlgoTime = periods.Item1.Item1;
                 var prevDayLastBar = new DateTime(currentDay.Year, currentDay.Month, currentDay.Day).AddDays(-1).AddHours(22).AddMinutes(50);

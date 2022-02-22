@@ -69,7 +69,7 @@ namespace Kalitte.Trading.Matrix
 
 
 
-        //[Parameter(false)]
+        [Parameter(false)]
         public bool UseVirtualOrders { get; set; } = false;
 
         [Parameter(false)]
@@ -78,7 +78,7 @@ namespace Kalitte.Trading.Matrix
         [Parameter(false)]
         public bool SimulateOrderSignal { get; set; } = false;
 
-        [Parameter(2)]
+        [Parameter(1)]
         public decimal ProfitQuantity { get; set; } = 1;
 
         [Parameter(0)]
@@ -131,6 +131,15 @@ namespace Kalitte.Trading.Matrix
 
         [Parameter(false)]
         public bool AlwaysStopLoss { get; set; } = false;
+
+        [Parameter(60)]
+        public int PowerLookback { get; set; } = 60;
+
+        [Parameter(60)]
+        public int PowerBarSeconds { get; set; } = 60;
+
+        [Parameter(15)]
+        public int PowerVolumeCollectionPeriod { get; set; } = 15;
 
         private DateTime? lastSimulationDay = null;
 

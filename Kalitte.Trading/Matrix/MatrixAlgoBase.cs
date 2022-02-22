@@ -31,8 +31,8 @@ namespace Kalitte.Trading.Matrix
 
         public T Algo { get; set; }
 
-        [Parameter(0)]
-        public int LoggingLevel { get; set; } = 0;
+        [Parameter(1)]
+        public int LoggingLevel { get; set; } = 1;
 
         [Parameter(false)]
         public bool Simulation { get; set; } = false;

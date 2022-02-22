@@ -22,7 +22,7 @@ public class Program
         var algo = new MyAlgo();
 
         var sDate = new DateTime(2022,02,21, 9,30,0);
-        var fDate = new DateTime(2022,02,21, 23,0,0);
+        var fDate = new DateTime(2022,02,22, 23,0,0);
 
         var initValues = new Dictionary<string, object>();
 
@@ -37,20 +37,29 @@ public class Program
         //initValues.Add("RsiLowLimit", 30M);
         //initValues.Add("RsiProfitPuan", 2M);
         //initValues.Add("ProfitPuan", 16M);
-        initValues.Add("ProfitQuantity", 2M);
-        initValues.Add("OrderQuantity", 4M);
+        //initValues.Add("ProfitQuantity", 2M);
+        //initValues.Add("OrderQuantity", 4M);
         //initValues.Add("RsiProfitQuantity", 1M);
-        //initValues.Add("DynamicCross", false);
+        initValues.Add("DynamicCross", false);
         //initValues.Add("MaAvgChange", 0.25M);
         //initValues.Add("MaPeriods", 25);
+        
+        //initValues.Add("PowerLookback", 60);
+        //initValues.Add("PowerBarSeconds", 60);
+        //initValues.Add("PowerVolumeCollectionPeriod", 15);
+        
 
+
+            
+
+            
         //initValues.Add("CrossPriceCollectionPeriod", 2);
         //initValues.Add("MaAvgChange", 0.15M);
         //initValues.Add("MaPeriods", 15);
         //initValues.Add("RsiAnalysisPeriod", 50);
         //initValues.Add("RsiPriceCollectionPeriod", 4);
 
-        initValues.Add("LoggingLevel", LogLevel.Warning);
+        initValues.Add("LoggingLevel", LogLevel.Debug);
 
         Backtest t = new Backtest(algo, sDate, fDate, initValues);
         t.Start();

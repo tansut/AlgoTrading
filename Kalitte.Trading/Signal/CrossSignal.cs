@@ -113,7 +113,7 @@ namespace Kalitte.Trading
         }
         public void AdjustSensitivity(double ratio, string reason)
         {
-            InOperationLock.WaitOne();
+            //InOperationLock.WaitOne();
             InOperationLock.Reset();
             try
             {
@@ -184,14 +184,14 @@ namespace Kalitte.Trading
 
                     if (result.finalResult.HasValue)
                     {
-                        if (!sensitivityAdjusted) AdjustSensitivityInternal(0.30, "Cross Received");
-                        sensitivityAdjusted = true;
+                        //if (!sensitivityAdjusted) AdjustSensitivityInternal(0.30, "Cross Received");
+                        //sensitivityAdjusted = true;
                         differenceBars.Clear();
                     }
                     else { if (sensitivityAdjusted)
                         {
-                            sensitivityAdjusted = false;
-                            AdjustSensitivityInternal(0.0, "Revert");
+                            //sensitivityAdjusted = false;
+                            //AdjustSensitivityInternal(0.0, "Revert");
                         }
                     }
                 }

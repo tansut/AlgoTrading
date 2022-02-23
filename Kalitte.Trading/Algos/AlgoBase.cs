@@ -44,9 +44,35 @@ namespace Kalitte.Trading.Algos
         public DateTime created;
     }
 
+    public class SymbolData
+    {
+        public string Symbol { get; private set; }
+        public FinanceBars Periods { get; private set; }
+
+
+        //public SymbolData(string symbol, BarPeriod period)
+        //{
+        //    Symbol = symbol;
+        //    Periods = new FinanceBars();
+        //    Periods.Period = period;
+        //}
+
+        public SymbolData(string symbol, FinanceBars periods)
+        {
+            Symbol = symbol;
+            Periods = periods;
+            //Periods = new FinanceBars();
+            //Periods.Period = period;
+        }
+    }
+
     public abstract class AlgoBase
     {
+        Dictionary<string, MarketDataFileLogger> dataProviders = new Dictionary<string, MarketDataFileLogger>();
+
         public static AlgoBase Current;
+
+        public List<SymbolData> Symbols { get; set; } = new List<SymbolData>();
 
         public VolatileRatio VolatileRatio { get; set; } = VolatileRatio.Average;
 
@@ -82,10 +108,15 @@ namespace Kalitte.Trading.Algos
         public PortfolioList UserPortfolioList = new PortfolioList();
         public decimal simulationPriceDif = 0;
 
+        public void AddSymbol(SymbolData data)
+        {
+
+        }
+
         private DelayedOrder delayedOrder = null;
         System.Timers.Timer seansTimer;
 
-        public FinanceBars PeriodBars = null;
+        //public FinanceBars PeriodBars = null;
         int orderCounter = 0;
 
         public Dictionary<string, decimal> ordersBySignals = new Dictionary<string, decimal>();
@@ -234,50 +265,47 @@ namespace Kalitte.Trading.Algos
 
         }
 
-        public virtual IQuote PushNewBar(string symbol, BarPeriod period, DateTime date, IQuote bar = null)
+        public virtual IQuote PushNewBar(string symbol, BarPeriod period, IQuote bar)
         {
-            if (this.Symbol == symbol && this.SymbolPeriod == period)
-            {
-                if (bar == null)
-                {
-                    var lastBar = this.GetPeriodBars(symbol, period, date).Last;
-                    if (lastBar.Date != date)
-                    {
-                        Log($"{symbol} {period} {date} bar couldn't be retreived", LogLevel.Error);
-                    }
-                    else bar = lastBar;
-                }
-                if (bar != null)
-                {
-                    PeriodBars.Push(bar);
-                    Log($"Pushed new bar, last bar is now: {PeriodBars.Last}", LogLevel.Debug, date);
-                    return bar;
-                }
-            }
-            return null;
+            var data = GetSymbolData(symbol, period);
+            data.Periods.Push(bar);
+            Log($"Pushed new bar, last bar is now: {data.Periods.Last}", LogLevel.Debug, data.Periods.Last.Date);
+            return bar;
+        }
+
+        public SymbolData GetSymbolData(string symbol, BarPeriod period)
+        {
+            return Symbols.Where(p => p.Symbol == symbol && p.Periods.Period == period).FirstOrDefault();
         }
 
 
 
-        public virtual void InitializeBars(string symbol, BarPeriod period, DateTime t)
-        {
-            this.PeriodBars = GetPeriodBars(symbol, period, t);
-            Log($"Initialized total {PeriodBars.Count} using time {t}. Last bar is: {PeriodBars.Last}", LogLevel.Debug, t);
+        public virtual void InitializeBars(string symbol, BarPeriod period, DateTime? t)
+        {                        
+            var periodBars = GetPeriodBars(symbol, period, t);
+            //var existing = this.Symbols.Select(p => p.Symbol == symbol).FirstOrDefault();
+            //if (existing)
+            this.Symbols.Add(new SymbolData(symbol, periodBars));
+            Log($"Initialized total {periodBars.Count} for {symbol} using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
         }
 
-        public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t)
+        public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime? t)
         {
-
             FinanceBars periodBars = null;
             try
             {
                 //periodBars = Exchange != null ? Exchange.GetPeriodBars(symbol, period, t): null;                
                 if (periodBars == null)
                 {
-                    var mdp = new MarketDataFileLogger(symbol, LogDir, period.ToString());
-                    mdp.FileName = "all.txt";
-                    mdp.SaveDaily = true;
-                    periodBars = mdp.GetContentAsQuote(t);                    
+                    dataProviders.TryGetValue(symbol + period.ToString(), out MarketDataFileLogger mdp);
+                    if (mdp == null)
+                    {
+                        mdp = new MarketDataFileLogger(symbol, LogDir, period.ToString());
+                        mdp.FileName = "all.txt";
+                        mdp.SaveDaily = true;
+                        dataProviders[symbol + period.ToString()] = mdp;
+                    }                    
+                    periodBars = mdp.GetContentAsQuote(t ?? DateTime.Now);                    
                 }
                 periodBars.Period = period;
             }
@@ -445,11 +473,12 @@ namespace Kalitte.Trading.Algos
         public void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResultX signalResult = null)
         {
             orderWait.Reset();
+            var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
             var price = lprice > 0 ? lprice : this.GetMarketPrice(symbol, t);
             if (price == 0)
             {
-                Log($"Unable to get a marketprice at {t}, using close {PeriodBars.Last.Close} from {PeriodBars.Last}", LogLevel.Warning, t);
-                price = PeriodBars.Last.Close;
+                Log($"Unable to get a marketprice at {t}, using close {symbolData.Periods.Last.Close} from {symbolData.Periods.Last}", LogLevel.Warning, t);
+                price = symbolData.Periods.Last.Close;
             }
             string orderid;
             decimal limitPrice = Math.Round((price + price * 0.02M * (side == BuySell.Sell ? -1 : 1)) * 4, MidpointRounding.ToEven) / 4;
@@ -470,7 +499,7 @@ namespace Kalitte.Trading.Algos
             Log($"New order submitted. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Order, t);
             if (order.SignalResult != null)
                 Log($"Signal [{order.SignalResult.Signal.Name}] result: {order.SignalResult}", LogLevel.Order, t);
-            Log($"Used bar: {this.PeriodBars.Last}", LogLevel.Order, t);
+            Log($"Used bar: {symbolData.Periods.Last}", LogLevel.Order, t);
 
             if (this.UseVirtualOrders || this.AutoCompleteOrders)
             {

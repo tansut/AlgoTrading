@@ -83,7 +83,6 @@ namespace Kalitte.Trading
         {
             this.InitialPeriods = Periods;
             this.InitialAvgChange = AvgChange;
-
             differenceBars = new FinanceBars(Periods);
             priceBars = new FinanceBars(PriceCollectionPeriod);
             crossBars = new FinanceBars(Periods);
@@ -151,9 +150,6 @@ namespace Kalitte.Trading
 
                 var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 - l2 };
                 differenceBars.Push(newResultBar);
-
-                //Log($"pushed difference bars {differenceBars.Count}", LogLevel.Critical);
-
                 crossBars.Push(newResultBar);
                 var cross = crossBars.Cross(0);
 

@@ -88,7 +88,8 @@ namespace Kalitte.Trading
         StartInProgress,
         Started,
         StopInProgress,
-        Stopped
+        Stopped,
+        Paused
 
     }
 

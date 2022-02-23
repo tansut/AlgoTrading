@@ -192,7 +192,7 @@ namespace Kalitte.Trading.Matrix
                         Algo.Signals.ForEach(p => p.Reset());
                     }
 
-                    Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
+                    //Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
 
                     Func<object, SignalResultX> action = (object stateo) =>
@@ -233,7 +233,7 @@ namespace Kalitte.Trading.Matrix
                     //}
                     Algo.simulationCount++;
                     var newQuote = new MyQuote() { Date = barDataCurrentValues.LastUpdate.DTime, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                    Algo.PushNewBar(Symbol, Algo.SymbolPeriod, newQuote.Date, newQuote);
+                    Algo.PushNewBar(Symbol, Algo.SymbolPeriod, newQuote);
                 }
             }
             else
@@ -243,7 +243,7 @@ namespace Kalitte.Trading.Matrix
                 try
                 {
                     var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
-                    Algo.PushNewBar(Symbol, (BarPeriod)Enum.Parse(typeof(BarPeriod), this.SymbolPeriod.ToString()), newQuote.Date, newQuote);
+                    Algo.PushNewBar(Symbol, (BarPeriod)Enum.Parse(typeof(BarPeriod), this.SymbolPeriod.ToString()), newQuote);
                 }
                 catch (Exception ex)
                 {
@@ -265,7 +265,7 @@ namespace Kalitte.Trading.Matrix
                     Algo.Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
                 }
                 LoadRealPositions(Algo.Symbol);
-                Algo.InitializeBars(this.Symbol, Algo.SymbolPeriod, DateTime.Now);
+                Algo.InitializeBars(this.Symbol, Algo.SymbolPeriod);
                 Algo.InitMySignals(DateTime.Now);
                 Algo.InitCompleted();
             }

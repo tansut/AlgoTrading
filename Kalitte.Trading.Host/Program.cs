@@ -21,8 +21,8 @@ public class Program
 
         var algo = new MyAlgo();
 
-        var sDate = new DateTime(2022,02,21, 9,30,0);
-        var fDate = new DateTime(2022,02,23, 23,0,0);
+        var sDate = new DateTime(2022,02,18, 9,30,0);
+        var fDate = new DateTime(2022,02,18, 23,0,0);
 
         var initValues = new Dictionary<string, object>();
 
@@ -40,9 +40,9 @@ public class Program
         //initValues.Add("ProfitQuantity", 2M);
         //initValues.Add("OrderQuantity", 2M);
         //initValues.Add("RsiProfitQuantity", 1M);
-        initValues.Add("DynamicCross", false);
-        initValues.Add("MaAvgChange", 0.2M);
-        initValues.Add("MaPeriods", 20);
+        //initValues.Add("DynamicCross", true);
+        //initValues.Add("MaAvgChange", 0.25M);
+        //initValues.Add("MaPeriods", 25);
 
         //initValues.Add("PowerLookback", 60);
         //initValues.Add("PowerBarSeconds", 60);

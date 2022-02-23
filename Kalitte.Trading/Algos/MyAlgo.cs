@@ -139,16 +139,20 @@ namespace Kalitte.Trading.Algos
         TrendSignal atrTrend = null;
         PowerSignal powerSignal = null;
 
+        FinanceBars oneMinBars = null;
+
         public override void InitMySignals(DateTime t)
         {
 
-            var price = new Price(PeriodBars, 9);
+            var periodData = GetSymbolData(this.Symbol, this.SymbolPeriod);
+            var oneMinData = GetSymbolData(this.Symbol, BarPeriod.Min);
+            var price = new Price(periodData.Periods, 9);
             priceTrend.i1k = price;
 
-            var atr = new Atrp(PeriodBars, 2);
+            var atr = new Atrp(periodData.Periods, 2);
             atrTrend.i1k = atr;
 
-            var power = new Volume(PeriodBars, PowerLookback, PowerBarSeconds);            
+            var power = new Volume(periodData.Periods, PowerLookback, PowerBarSeconds);            
             powerSignal.Indicator = power;
             powerSignal.VolumeCollectionPeriod = PowerVolumeCollectionPeriod;
 
@@ -156,8 +160,8 @@ namespace Kalitte.Trading.Algos
             {
                 //maSignal.i1k = new Ema(PeriodBars, MovPeriod);
                 //maSignal.i2k = new Ema(PeriodBars, MovPeriod2);
-                maSignal.i1k = new Macd(PeriodBars, MovPeriod, MovPeriod2, MACDTrigger);
-                maSignal.i2k = new Custom((q) => 0, PeriodBars, MovPeriod + MovPeriod2 + MACDTrigger);
+                maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
+                maSignal.i2k = new Custom((q) => 0, periodData.Periods, MovPeriod + MovPeriod2 + MACDTrigger);
                
 
 
@@ -165,14 +169,14 @@ namespace Kalitte.Trading.Algos
 
             if (macSignal != null)
             {
-                var macdi = new Macd(PeriodBars, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
+                var macdi = new Macd(periodData.Periods, MACDShortPeriod, MACDLongPeriod, MACDTrigger);
                 macSignal.i1k = macdi;
                 macSignal.i2k = macdi.Trigger;
             }
 
             if (rsiTrendSignal != null)
             {
-                var rsi = new Rsi(PeriodBars, Rsi);
+                var rsi = new Rsi(periodData.Periods, Rsi);
                 rsiTrendSignal.i1k = rsi;
             }
 
@@ -182,13 +186,14 @@ namespace Kalitte.Trading.Algos
             {
                 p.Init();
             });
-
         }
 
 
-        public override void InitializeBars(string symbol, BarPeriod period, DateTime t)
+        public override void InitializeBars(string symbol, BarPeriod period, DateTime? t = null)
         {
             //this.MinBars = GetPeriodBars(symbol, period, t);
+            //this.oneMinBars = GetPeriodBars(symbol, BarPeriod.Min, t);
+            //base.InitializeBars(symbol, BarPeriod.Min, t);
             base.InitializeBars(symbol, period, t);
         }
 
@@ -248,6 +253,7 @@ namespace Kalitte.Trading.Algos
         public override void Init()
         {
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
+            //this.AddSymbol(this.Symbol)
             InitSignals();
             base.Init();
         }

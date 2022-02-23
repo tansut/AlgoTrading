@@ -57,6 +57,7 @@ namespace Kalitte.Trading
 
     public abstract class Signal
     {
+        public StartableState State { get; set; } = StartableState.Stopped;
         protected System.Timers.Timer _timer = null;
         private static object _locker = new object();
         public string Name { get; set; }
@@ -66,8 +67,7 @@ namespace Kalitte.Trading
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
         public BuySell? LastSignalResult { get; protected set; }
-        public volatile bool IsRunning = false;
-
+        public DateTime? PausedUntil { get; set; }
         protected Task collectorTask = null;
         protected CancellationTokenSource collectorTaskTokenSource;
 
@@ -79,6 +79,28 @@ namespace Kalitte.Trading
         public override string ToString()
         {
             return $"{this.GetType().Name}[{this.Name}]";
+        }
+
+        public void Pause(DateTime until)
+        {            
+            PausedUntil = until;
+            if (this.State == StartableState.Started)
+            {
+                //this.Stop();
+                this.State = StartableState.Paused;
+            }
+        }
+
+
+        private void CheckPause(DateTime? t)
+        {
+            if (this.State != StartableState.Paused) return;
+            var time = t ?? DateTime.Now;
+            if (time >= PausedUntil)
+            {
+                //this.Start();
+                this.State = StartableState.Started;
+            }
         }
 
         public Signal(string name, string symbol, AlgoBase owner)
@@ -133,14 +155,18 @@ namespace Kalitte.Trading
 
         public virtual SignalResultX Check(DateTime? t = null)
         {
+            if (this.State == StartableState.Paused) return null;
             InOperationLock.WaitOne();
             InOperationLock.Reset();
             try
             {
                 var result = CheckInternal(t);
-                result.SignalTime = t ?? DateTime.Now;
-                raiseSignal(new SignalEventArgs() { Result = result });
-                LastSignalResult = result.finalResult ?? LastSignalResult;
+                if (result != null)
+                {
+                    result.SignalTime = t ?? DateTime.Now;
+                    raiseSignal(new SignalEventArgs() { Result = result });
+                    LastSignalResult = result.finalResult ?? LastSignalResult;
+                }
                 return result;
             }
             catch (Exception ex)
@@ -207,17 +233,18 @@ namespace Kalitte.Trading
 
         public virtual void Start()
         {
+            this.State = StartableState.StartInProgress;
             InOperationLock.WaitOne();
             InOperationLock.Reset();
             try
             {
-                this.IsRunning = true;
                 if (Enabled && TimerEnabled)
                 {
                     _timer = new System.Timers.Timer(1000);
                     _timer.Elapsed += this.onTick;
                     _timer.Start();
                 }
+                this.State = StartableState.Started;
             }
             finally
             {
@@ -243,6 +270,7 @@ namespace Kalitte.Trading
 
         public virtual void Stop()
         {
+            this.State = StartableState.StopInProgress;
             InOperationLock.WaitOne();
             InOperationLock.Reset();
             try
@@ -253,7 +281,7 @@ namespace Kalitte.Trading
                     _timer.Dispose();
                     _timer = null;
                 }
-                this.IsRunning = false;
+                this.State = StartableState.Stopped;
             }
             finally
             {

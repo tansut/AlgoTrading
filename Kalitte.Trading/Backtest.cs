@@ -47,45 +47,56 @@ namespace Kalitte.Trading
 
         public void Run(DateTime t1, DateTime t2, bool firstRun = false)
         {
-            var seconds = Algo.GetSymbolPeriodSeconds(Algo.SymbolPeriod.ToString());
+            //var seconds = Algo.GetSymbolPeriodSeconds(Algo.SymbolPeriod.ToString());
+           
 
-            Algo.AlgoTime = t1;
-
+            var secDict = new Dictionary<int, BarPeriod>();
+            var secondsToStop = Algo.Symbols.Select(p => secDict[Algo.GetSymbolPeriodSeconds(p.Periods.Period.ToString())] = p.Periods.Period).ToList();
+            var seconds = 0;
             for (var p = t1; p < t2;)
             {
-
                 if (p >= DateTime.Now) break;
-                Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
+                Algo.AlgoTime = p;
 
                 Func<object, SignalResultX> action = (object stateo) =>
                {
                    var state = (Dictionary<string, object>)stateo;
                    DateTime time = (DateTime)(state["time"]);
                    return ((Signal)state["signal"]).Check(time);
-
                };
 
-                for (var i = 0; i < seconds; i++)
+                var time = Algo.AlgoTime;
+                var tasks = new List<Task<SignalResultX>>();
+
+                foreach (var signal in Algo.Signals)
                 {
-                    var time = Algo.AlgoTime;
-                    //Algo.Log($"Running signals for {time}", LogLevel.Critical, time);
-                    var tasks = new List<Task<SignalResultX>>();
-
-                    foreach (var signal in Algo.Signals)
-                    {
-                        var dict = new Dictionary<string, object>();
-                        dict["time"] = time;
-                        dict["signal"] = signal;
-                        tasks.Add(Task<SignalResultX>.Factory.StartNew(action, dict));
-                    }
-                    Task.WaitAll(tasks.ToArray());
-                    Algo.CheckDelayedOrders(time);
-                    Algo.AlgoTime = Algo.AlgoTime.AddSeconds(1);
+                    var dict = new Dictionary<string, object>();
+                    dict["time"] = time;
+                    dict["signal"] = signal;
+                    tasks.Add(Task<SignalResultX>.Factory.StartNew(action, dict));
                 }
+                Task.WaitAll(tasks.ToArray());
+                Algo.CheckDelayedOrders(time);
                 Algo.simulationCount++;
-                Algo.PushNewBar(Algo.Symbol, Algo.SymbolPeriod, p);
+                seconds++;
+                
 
-                p = Algo.AlgoTime;
+                foreach (var sec in secDict)
+                {
+                    if (seconds % sec.Key == 0)
+                    {
+                        var period = Algo.GetPeriodBars(Algo.Symbol, sec.Value, p).Last;
+                        var round = Helper.RoundDown(p, TimeSpan.FromSeconds(sec.Key));
+                        if (period == null || period.Date != round)
+                        {
+                            Algo.Log($"Error loading period for {period}", LogLevel.Error, p);
+                        }
+                        else Algo.PushNewBar(Algo.Symbol, sec.Value, period);
+                    }
+                }
+
+                p = p.AddSeconds(1);
+
             }
 
         }

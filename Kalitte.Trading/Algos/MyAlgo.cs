@@ -324,7 +324,7 @@ namespace Kalitte.Trading.Algos
                 double ratio = 0;
                 if (result.Value < PowerCrossThreshold || PowerCrossThreshold == 0)
                 {
-                    ratio = (double)(100 - result.Value) / 100D;
+                    ratio = 0.25 * (double)(100 - result.Value) / 100D;
                 }
                 //if (ratio < 0) ratio = 0;
                 //ratio = (double)(100 - result.Value) / 100D;

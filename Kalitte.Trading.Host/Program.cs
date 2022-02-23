@@ -40,14 +40,14 @@ public class Program
         //initValues.Add("ProfitQuantity", 2M);
         //initValues.Add("OrderQuantity", 2M);
         //initValues.Add("RsiProfitQuantity", 1M);
-        //initValues.Add("DynamicCross", true);
+        initValues.Add("DynamicCross", true);
         //initValues.Add("MaAvgChange", 0.25M);
         initValues.Add("MaPeriods", 60);
         initValues.Add("CrossPriceCollectionPeriod", 10);
         //initValues.Add("PowerLookback", 60);
         //initValues.Add("PowerBarSeconds", 60);
         initValues.Add("PowerVolumeCollectionPeriod", 10);
-        //initValues.Add("PowerCrossThreshold", 0);
+        initValues.Add("PowerCrossThreshold", 50);
 
         //initValues.Add("UseSmaForCross", false);
 

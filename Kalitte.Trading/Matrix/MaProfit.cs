@@ -59,8 +59,8 @@ namespace Kalitte.Trading.Matrix
         [Parameter(25)]
         public int MaPeriods { get; set; } = 25;
 
-        [Parameter(true)]
-        public bool DynamicCross { get; set; } = true;
+        [Parameter(false)]
+        public bool DynamicCross { get; set; } = false;
 
 
         [Parameter(0)]
@@ -111,8 +111,8 @@ namespace Kalitte.Trading.Matrix
         [Parameter(60)]
         public int RsiAnalysisPeriod { get; set; } = 60;
 
-        [Parameter(30)]
-        public int PowerCrossThreshold { get; set; } = 30;
+        [Parameter(0)]
+        public int PowerCrossThreshold { get; set; } = 0;
 
         [Parameter(0)]
         public int MACDShortPeriod { get; set; } = 0;

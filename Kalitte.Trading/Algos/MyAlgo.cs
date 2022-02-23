@@ -1,5 +1,6 @@
 ﻿// algo
 using Kalitte.Trading.Indicators;
+using Skender.Stock.Indicators;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -33,8 +34,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(9)]
         public int MovPeriod2 { get; set; } = 9;
 
-        [AlgoParam(true)]
-        public bool DynamicCross { get; set; } = true;
+        [AlgoParam(false)]
+        public bool DynamicCross { get; set; } = false;
 
 
         [AlgoParam(0.25)]
@@ -125,8 +126,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(9)]
         public int PowerVolumeCollectionPeriod { get; set; } = 15;
 
-        [AlgoParam(30)]
-        public int PowerCrossThreshold { get; set; } = 30;
+        [AlgoParam(0)]
+        public int PowerCrossThreshold { get; set; } = 0;
 
         public FinanceBars MinBars = null;
 
@@ -153,10 +154,13 @@ namespace Kalitte.Trading.Algos
 
             if (maSignal != null)
             {
-                var movema5 = new Ema(PeriodBars, MovPeriod);
-                var mov2ema9 = new Ema(PeriodBars, MovPeriod2);
-                maSignal.i1k = movema5;
-                maSignal.i2k = mov2ema9;
+                //maSignal.i1k = new Ema(PeriodBars, MovPeriod);
+                //maSignal.i2k = new Ema(PeriodBars, MovPeriod2);
+                maSignal.i1k = new Macd(PeriodBars, MovPeriod, MovPeriod2, MACDTrigger);
+                maSignal.i2k = new Custom((q) => 0, PeriodBars, MovPeriod + MovPeriod2 + MACDTrigger);
+               
+
+
             }
 
             if (macSignal != null)

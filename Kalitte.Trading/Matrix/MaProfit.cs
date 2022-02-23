@@ -111,6 +111,9 @@ namespace Kalitte.Trading.Matrix
         [Parameter(60)]
         public int RsiAnalysisPeriod { get; set; } = 60;
 
+        [Parameter(30)]
+        public int PowerCrossThreshold { get; set; } = 30;
+
         [Parameter(0)]
         public int MACDShortPeriod { get; set; } = 0;
 

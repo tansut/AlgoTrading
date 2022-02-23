@@ -36,9 +36,9 @@ namespace Kalitte.Trading
             {
                 if (Value == 0) return PowerRatio.Unknown;
                 if (Value < 20) return PowerRatio.Low;
-                else if (Value < 30) return PowerRatio.BelowAverage;
+                else if (Value < 40) return PowerRatio.BelowAverage;
                 else if (Value < 60) return PowerRatio.Average;
-                else if (Value < 75) return PowerRatio.High;
+                else if (Value < 80) return PowerRatio.High;
                 else return PowerRatio.Critical;
             }
         }

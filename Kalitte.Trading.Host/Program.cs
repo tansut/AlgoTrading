@@ -21,38 +21,42 @@ public class Program
 
         var algo = new MyAlgo();
 
-        var sDate = new DateTime(2022,02,22, 9,30,0);
-        var fDate = new DateTime(2022,02,22, 23,0,0);
+        var sDate = new DateTime(2022,02,23, 9,30,0);
+        var fDate = new DateTime(2022,02,23, 23,0,0);
 
         var initValues = new Dictionary<string, object>();
 
-        
+
 
         //initValues.Add("LossQuantity", 1M);
         //initValues.Add("LossPuan", 8M);
         //initValues.Add("Rsi", 9);
         //initValues.Add("MinRsiChange", 2M);
         //initValues.Add("RsiProfitPuan", 0.1M);
-        //initValues.Add("RsiHighLimit", 60M);
-        //initValues.Add("RsiLowLimit", 30M);
+        //initValues.Add("RsiHighLimit", 0M);
+        //initValues.Add("RsiLowLimit", 0M);
         //initValues.Add("RsiProfitPuan", 2M);
         //initValues.Add("ProfitPuan", 16M);
         //initValues.Add("ProfitQuantity", 2M);
-        //initValues.Add("OrderQuantity", 4M);
+        //initValues.Add("OrderQuantity", 2M);
         //initValues.Add("RsiProfitQuantity", 1M);
-        //initValues.Add("DynamicCross", false);
+        initValues.Add("DynamicCross", false);
         //initValues.Add("MaAvgChange", 0.25M);
         //initValues.Add("MaPeriods", 25);
-        
+
         //initValues.Add("PowerLookback", 60);
         //initValues.Add("PowerBarSeconds", 60);
         //initValues.Add("PowerVolumeCollectionPeriod", 15);
+        //initValues.Add("PowerCrossThreshold", 100);
+        //initValues.Add("CrossPriceCollectionPeriod", 1);
+
         
 
 
-            
 
-            
+
+
+
         //initValues.Add("CrossPriceCollectionPeriod", 2);
         //initValues.Add("MaAvgChange", 0.15M);
         //initValues.Add("MaPeriods", 15);

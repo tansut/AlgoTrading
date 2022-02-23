@@ -470,7 +470,7 @@ namespace Kalitte.Trading.Algos
 
         }
 
-        public void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResultX signalResult = null)
+        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResultX signalResult = null)
         {
             orderWait.Reset();
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);

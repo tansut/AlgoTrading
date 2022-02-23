@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Indicators\Volume.cs" />
     <Compile Remove="MAProfit.cs" />
     <Compile Remove="Matrix\MarketDataLogger.cs" />
     <Compile Remove="Signal\SignalTask.cs" />

@@ -120,8 +120,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(9)]
         public int PowerLookback { get; set; } = 60;
 
-        [AlgoParam(9)]
-        public int PowerBarSeconds { get; set; } = 60;
+        //[AlgoParam(9)]
+        //public int PowerBarSeconds { get; set; } = 60;
 
         [AlgoParam(9)]
         public int PowerVolumeCollectionPeriod { get; set; } = 15;
@@ -139,7 +139,7 @@ namespace Kalitte.Trading.Algos
         TrendSignal atrTrend = null;
         PowerSignal powerSignal = null;
 
-        FinanceBars oneMinBars = null;
+        
 
         public override void InitMySignals(DateTime t)
         {
@@ -152,8 +152,9 @@ namespace Kalitte.Trading.Algos
             var atr = new Atrp(periodData.Periods, 2);
             atrTrend.i1k = atr;
 
-            var power = new Volume(periodData.Periods, PowerLookback, PowerBarSeconds);            
-            powerSignal.Indicator = power;
+            //var power = new Volume(periodData.Periods, PowerLookback, PowerBarSeconds);
+            //
+            powerSignal.Indicator = new Ema(oneMinData.Periods, PowerLookback);
             powerSignal.VolumeCollectionPeriod = PowerVolumeCollectionPeriod;
 
             if (maSignal != null)
@@ -193,7 +194,7 @@ namespace Kalitte.Trading.Algos
         {
             //this.MinBars = GetPeriodBars(symbol, period, t);
             //this.oneMinBars = GetPeriodBars(symbol, BarPeriod.Min, t);
-            //base.InitializeBars(symbol, BarPeriod.Min, t);
+            base.InitializeBars(symbol, BarPeriod.Min, t);
             base.InitializeBars(symbol, period, t);
         }
 
@@ -314,7 +315,7 @@ namespace Kalitte.Trading.Algos
             if ((LastPower == null || LastPower.Power != result.Power) && result.Power != PowerRatio.Unknown)
             {
                 var last = LastPower != null ? LastPower.Power.ToString() : "";
-                Log($"Power changed from {last} -> {result.Power}. Signal: {result} ", LogLevel.Warning, result.SignalTime);
+                //Log($"Power changed from {last} -> {result.Power}. Signal: {result} ", LogLevel.Warning, result.SignalTime);
                 LastPower = result;
             }
 
@@ -496,6 +497,14 @@ namespace Kalitte.Trading.Algos
             //signal.AdjustSensitivity(0.30, "Order Received");
         }
 
+        public override void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResultX signalResult = null)
+        {
+            base.sendOrder(symbol, quantity, side, comment, lprice, icon, t, signalResult);
+            //var sep = ",";
+            //Log($"ATR: {string.Join(sep, atrTrend.i1k.Results.Select(p => p.Value))}", LogLevel.Critical);
+            Log($"ART: {atrTrend.i1k.Results.Last().Date} {atrTrend.i1k.Results.Last().Value}", LogLevel.Critical);
+            Log($"Power: {LastPower}", LogLevel.Critical);
+        }
 
 
         public override string ToString()

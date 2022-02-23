@@ -78,8 +78,7 @@ namespace Kalitte.Trading
                 Task.WaitAll(tasks.ToArray());
                 Algo.CheckDelayedOrders(time);
                 Algo.simulationCount++;
-                seconds++;
-                
+                seconds++;                
 
                 foreach (var sec in secDict)
                 {
@@ -98,7 +97,6 @@ namespace Kalitte.Trading
                 p = p.AddSeconds(1);
 
             }
-
         }
 
 

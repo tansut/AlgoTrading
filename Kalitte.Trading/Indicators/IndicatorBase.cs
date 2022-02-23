@@ -44,7 +44,7 @@ namespace Kalitte.Trading.Indicators
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
         public string Symbol { get; set; }
-        //public CandlePart Candle { get; set; } = CandlePart.Close;
+        public CandlePart Candle { get; set; } = CandlePart.Close;
 
         public FinanceBars InputBars { get; }
         public FinanceList<R> ResultList { get; set; } = null;
@@ -73,9 +73,10 @@ namespace Kalitte.Trading.Indicators
             }
         }
 
-        public IndicatorBase(FinanceBars bars, FinanceList<R> initialResults = null)
+        public IndicatorBase(FinanceBars bars, CandlePart candle = CandlePart.Close, FinanceList<R> initialResults = null)
         {
             //this.Algo = Algo;
+            this.Candle = candle;
             InputBars = bars;
             ResultList = initialResults == null ? new FinanceList<R>(0, null): initialResults;
         }

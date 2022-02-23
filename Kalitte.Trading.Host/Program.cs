@@ -21,8 +21,8 @@ public class Program
 
         var algo = new MyAlgo();
 
-        var sDate = new DateTime(2022,02,18, 9,30,0);
-        var fDate = new DateTime(2022,02,18, 23,0,0);
+        var sDate = new DateTime(2022,02,22, 9,30,0);
+        var fDate = new DateTime(2022,02,22, 23,0,0);
 
         var initValues = new Dictionary<string, object>();
 
@@ -42,15 +42,19 @@ public class Program
         //initValues.Add("RsiProfitQuantity", 1M);
         //initValues.Add("DynamicCross", true);
         //initValues.Add("MaAvgChange", 0.25M);
-        //initValues.Add("MaPeriods", 25);
-
+        initValues.Add("MaPeriods", 60);
+        initValues.Add("CrossPriceCollectionPeriod", 10);
         //initValues.Add("PowerLookback", 60);
         //initValues.Add("PowerBarSeconds", 60);
-        //initValues.Add("PowerVolumeCollectionPeriod", 15);
+        initValues.Add("PowerVolumeCollectionPeriod", 10);
         //initValues.Add("PowerCrossThreshold", 0);
-        //initValues.Add("CrossPriceCollectionPeriod", 1);
 
-        
+        //initValues.Add("UseSmaForCross", false);
+
+
+
+
+
 
 
 
@@ -63,7 +67,7 @@ public class Program
         //initValues.Add("RsiAnalysisPeriod", 50);
         //initValues.Add("RsiPriceCollectionPeriod", 4);
 
-        initValues.Add("LoggingLevel", LogLevel.Order);
+        initValues.Add("LoggingLevel", LogLevel.Warning);
 
         Backtest t = new Backtest(algo, sDate, fDate, initValues);
         t.Start();

@@ -43,9 +43,6 @@ namespace Kalitte.Trading.Indicators
         {
             if (e.Action == ListAction.Cleared) createResult();
             else if (e.Action == ListAction.ItemRemoved) return;
-            //Helper.SymbolSeconds(InputBars.Period.ToString(), out int periodSeconds);
-            //var sliceVal = periodSeconds / SliceSeconds;
-            //var avgVols = e.Item.Volume / sliceVal;
             var res = new VolumeResult()
             {
                 Date = e.Item.Date,

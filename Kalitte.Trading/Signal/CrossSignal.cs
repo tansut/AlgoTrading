@@ -142,8 +142,8 @@ namespace Kalitte.Trading
             if (priceBars.IsFull && mp >= 0)
             {
 
-                decimal mpAverage = priceBars.List.GetSma(priceBars.Count).Last().Sma.Value;
-                priceBars.Clear();
+                decimal mpAverage = priceBars.List.GetEma(priceBars.Count).Last().Ema.Value;
+                //priceBars.Clear();
 
                 var l1 = i1k.NextValue(mpAverage);
                 var l2 = i2k.NextValue(mpAverage);

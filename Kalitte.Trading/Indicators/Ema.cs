@@ -21,7 +21,7 @@ namespace Kalitte.Trading.Indicators
             return $"{base.ToString()}:({Lookback})";
         }
 
-        public Ema(FinanceBars bars, int periods) : base(bars)
+        public Ema(FinanceBars bars, int periods, CandlePart candle = CandlePart.Close) : base(bars, candle)
         {
             this.Lookback = periods;
             bars.ListEvent += BarChanged;
@@ -35,7 +35,7 @@ namespace Kalitte.Trading.Indicators
         private void createResult()
         {
             ResultList.Clear();
-            var result = LastBars.GetEma(Lookback).ToList();
+            var result = LastBars.GetEma(Lookback, this.Candle).ToList();
             result.ForEach(r => ResultList.Push(r));
         }
 
@@ -70,7 +70,7 @@ namespace Kalitte.Trading.Indicators
             //return new EmaResult() { Date = quote.Date, Ema = ema };
             var list = LastBars;
             list.Add(quote);
-            return list.GetEma(this.Lookback).Last();
+            return list.GetEma(this.Lookback, this.Candle).Last();
         }
 
 

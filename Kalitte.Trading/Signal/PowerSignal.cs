@@ -66,10 +66,10 @@ namespace Kalitte.Trading
 
     public class PowerSignal : Signal
     {
-        public Volume Indicator { get; set; }
+        public ITechnicalIndicator Indicator { get; set; }
         
 
-        private FinanceBars periodBars ;
+        //private FinanceBars periodBars ;
         private FinanceBars volumeBars;
 
         public int VolumeCollectionPeriod { get; set; } = 5;
@@ -78,7 +78,7 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            periodBars = new FinanceBars(Indicator.SliceSeconds);
+            //periodBars = new FinanceBars(Indicator.SliceSeconds);
             volumeBars = new FinanceBars(VolumeCollectionPeriod);
             base.Init();
         }
@@ -107,9 +107,10 @@ namespace Kalitte.Trading
         void calculatePower(PowerSignalResult s, DateTime t)
         {
             var volumeAvg = volumeBars.List.GetEma(Math.Min(volumeBars.Count, VolumeCollectionPeriod), CandlePart.Volume).Last().Ema.Value;
-            var volumePerSecond = (double)volumeAvg; 
-            var volume = volumePerSecond * Indicator.SliceSeconds;
-            var last = (double)Indicator.ResultList.Last.Volume;
+            var volumePerSecond = (double)volumeAvg;
+            Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
+            var volume = volumePerSecond * periodSeconds;
+            var last = (double)Indicator.Results.Last().Value.Value;
             var ratio = (volume / last);
             s.Strenght = ratio;
             s.Value = (100 - 100 / (1 +  (decimal)ratio));
@@ -132,7 +133,7 @@ namespace Kalitte.Trading
                 if (volume > 0)
                 {
                     var q = new MyQuote() { Date = time, Volume = (decimal)volume };
-                    periodBars.Push(q);
+                    //periodBars.Push(q);
                     volumeBars.Push(q);
                 }
                 else
@@ -143,16 +144,16 @@ namespace Kalitte.Trading
             }
             else return result;
 
-            if (periodBars.IsFull)
-            {
-                var avg = periodBars.List.GetSma(periodBars.Count, CandlePart.Volume).Last().Sma.Value * Indicator.SliceSeconds;    
-                periodBars.Clear();
-                Indicator.Bars.Push(new MyQuote() {  Date = time, Volume = avg });
-                Log($"Pushed new volume to bars: {time} {avg}", LogLevel.Verbose);
+            //if (periodBars.IsFull)
+            //{
+            //    var avg = periodBars.List.GetSma(periodBars.Count, CandlePart.Volume).Last().Sma.Value * Indicator.SliceSeconds;    
+            //    periodBars.Clear();
+            //    //Indicator.Bars.Push(new MyQuote() {  Date = time, Volume = avg });
+            //    //Log($"Pushed new volume to bars: {time} {avg}", LogLevel.Verbose);
 
-            }
+            //}
 
-            if (volumeBars.Count  >0)  calculatePower(result, time);
+            if (volumeBars.Count  > 0)  calculatePower(result, time);
             return result;
         }
 

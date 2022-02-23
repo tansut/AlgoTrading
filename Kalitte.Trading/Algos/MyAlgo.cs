@@ -135,6 +135,7 @@ namespace Kalitte.Trading.Algos
         CrossSignal macSignal = null;
         TakeProfitOrLossSignal takeProfitSignal = null;
         TrendSignal rsiTrendSignal = null;
+        TrendSignal maTrendSignal = null;
         TrendSignal priceTrend = null;
         TrendSignal atrTrend = null;
         PowerSignal powerSignal = null;
@@ -149,7 +150,7 @@ namespace Kalitte.Trading.Algos
             var price = new Price(periodData.Periods, 9);
             priceTrend.i1k = price;
 
-            var atr = new Atrp(periodData.Periods, 2);
+            var atr = new Atrp(oneMinData.Periods, 2);
             atrTrend.i1k = atr;
 
             //var power = new Volume(periodData.Periods, PowerLookback, PowerBarSeconds);
@@ -319,7 +320,7 @@ namespace Kalitte.Trading.Algos
                 LastPower = result;
             }
 
-            if (DynamicCross)
+            if (DynamicCross && result.Power != PowerRatio.Unknown)
             {
                 double ratio = 0;
                 if (result.Value < PowerCrossThreshold || PowerCrossThreshold == 0)

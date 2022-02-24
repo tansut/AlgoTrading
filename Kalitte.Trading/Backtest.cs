@@ -13,15 +13,13 @@ namespace Kalitte.Trading
 
 
 
-        public DateTime StartTime { get; set; }
-        public DateTime FinishTime { get; set; }
         public AlgoBase Algo { get; set; }
 
         public Backtest(AlgoBase algo, DateTime start, DateTime end)
         {
             Algo = algo;
-            StartTime = start;
-            FinishTime = end;
+            algo.TestStart = start;
+            algo.TestFinish = end;
             Algo.Simulation = true;
             Algo.UseVirtualOrders = true;            
             Algo.Init();
@@ -98,12 +96,12 @@ namespace Kalitte.Trading
 
         public void Start()
         {
-            var days = FinishTime - StartTime;
+            var days = Algo.TestFinish.Value - Algo.TestStart.Value;
 
 
             for (var d = 0; d <= days.Days; d++)
             {
-                var currentDay = StartTime.AddDays(d);
+                var currentDay = Algo.TestStart.Value.AddDays(d);
 
                 if (currentDay.DayOfWeek == DayOfWeek.Saturday || currentDay.DayOfWeek == DayOfWeek.Sunday) continue;
                 if (currentDay >= DateTime.Now) break;
@@ -152,7 +150,7 @@ namespace Kalitte.Trading
                 var initValues = cases[i];                
                 var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { initValues });
                 Backtest test = new Backtest(algo, this.StartTime, this.FinishTime);
-                Console.WriteLine($"Running test case {i} for {algo.InstanceName}");
+                Console.WriteLine($"Running test case {i} for {algo.InstanceName} using {algo.LogFile}");
                 test.Start();
                 Console.WriteLine($"Completed {algo.InstanceName}");
 

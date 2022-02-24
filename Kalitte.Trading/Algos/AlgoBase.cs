@@ -79,11 +79,17 @@ namespace Kalitte.Trading.Algos
 
         public IExchange Exchange { get; set; }
 
+        public DateTime? TestStart { get; set; }
+        public DateTime? TestFinish { get; set; }
+
         [AlgoParam(LogLevel.Verbose)]
         public LogLevel LoggingLevel { get; set; }
 
         [AlgoParam(false)]
         public bool Simulation { get; set; }
+
+        [AlgoParam(true)]
+        public bool LogConsole { get; set; }
 
         [AlgoParam(@"c:\kalitte\log")]
         public string LogDir { get; set; }
@@ -513,6 +519,10 @@ namespace Kalitte.Trading.Algos
             StopSignals();
 
             Log($"Completed {this}", LogLevel.FinalResult);
+            if (TestStart.HasValue)
+            {
+                Log($"For dates {TestStart} - {TestFinish}", LogLevel.FinalResult);
+            }
             Log(PropSummary().ToString(), LogLevel.FinalResult);
             Signals.ForEach(p => Log($"{p}", LogLevel.FinalResult));
             Log($"----------------------", LogLevel.FinalResult);
@@ -627,7 +637,7 @@ namespace Kalitte.Trading.Algos
                 var content = $"[{level}:{opTime}]: {text}" + Environment.NewLine;
                 lock (this)
                 {
-                    Console.WriteLine(content);
+                    if (LogConsole) Console.WriteLine(content);
                     File.AppendAllText(LogFile, content + Environment.NewLine);
                     if (Exchange != null) Exchange.Log(content, level, t);
                 }

@@ -55,14 +55,14 @@ public class Program
 
     public static void Main(string [] args)
     {
-        string execPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-        //var alternates2 = LoadFromFile(Path.Combine(execPath, "alternates.json"));
+        //string execPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        ////var alternates2 = LoadFromFile(Path.Combine(execPath, "alternates.json"));
 
-        var settings1 = new Settings();
-        var initValues1 = AlgoBase.GetProperties(typeof(MyAlgo));
-        settings1.Alternates = new AlternateValues(initValues1); 
-        SaveToFile("./settings.json", settings1);
-        return;
+        //var settings1 = new Settings();
+        //var initValues1 = AlgoBase.GetProperties(typeof(MyAlgo));
+        //settings1.Alternates = new AlternateValues(initValues1); 
+        //SaveToFile("./settings.json", settings1);
+        //return;
 
         Settings settings = new Settings();
 

@@ -97,7 +97,8 @@ namespace Kalitte.Trading.Indicators
 
         protected override List<IQuote> CreateUsedBars()
         {
-            return InputBars.LastItems(Signal + Fast + Slow);
+            return InputBars.LastItems(Math.Min(InputBars.Count, 2 * (Signal + Fast + Slow)));
+            //return InputBars.AsList;
         }
 
         public override decimal NextValue(decimal newVal)

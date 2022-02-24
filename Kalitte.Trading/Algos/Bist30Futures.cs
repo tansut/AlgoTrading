@@ -151,7 +151,7 @@ namespace Kalitte.Trading.Algos
             var atr = new Atrp(oneMinData.Periods, PowerLookback);
             atrTrend.i1k = atr;
 
-            powerSignal.Indicator = new Rsi(oneMinData.Periods, PowerLookback, CandlePart.Volume);
+            powerSignal.Indicator = new Rsi(periodData.Periods, PowerLookback, CandlePart.Volume);
             //powerSignal.Indicator = new Ema(oneMinData.Periods, PowerLookback);
             powerSignal.VolumeCollectionPeriod = PowerVolumeCollectionPeriod;
 
@@ -161,7 +161,7 @@ namespace Kalitte.Trading.Algos
                 //maSignal.i2k = new Ema(PeriodBars, MovPeriod2);
                 maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
                 maSignal.i2k = new Custom((q) => 0, periodData.Periods, MovPeriod + MovPeriod2 + MACDTrigger);
-               
+                maSignal.PowerSignal = powerSignal;
 
 
             }

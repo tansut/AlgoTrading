@@ -84,7 +84,8 @@ namespace Kalitte.Trading.Indicators
 
         protected virtual List<IQuote> CreateUsedBars()
         {
-            return InputBars.LastItems(Lookback);
+            return InputBars.LastItems(Math.Min(InputBars.Count, 2 * (Lookback)));
+            //return InputBars.LastItems(Lookback);
         }
 
         public IndicatorBase(FinanceBars bars, CandlePart candle = CandlePart.Close, FinanceList<R> initialResults = null)

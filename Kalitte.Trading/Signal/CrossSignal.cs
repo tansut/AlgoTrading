@@ -36,6 +36,8 @@ namespace Kalitte.Trading
     public class CrossSignal : Signal
     {
         public bool DynamicCross { get; set; } = false;
+        public PowerSignal PowerSignal { get; set; }
+        public decimal InstantPower { get; set; }
 
         public ITechnicalIndicator i1k;
         public ITechnicalIndicator i2k;
@@ -87,8 +89,15 @@ namespace Kalitte.Trading
             priceBars = new FinanceBars(PriceCollectionPeriod);
             crossBars = new FinanceBars(Periods);
             ResetInternal();
-            if (DynamicCross) CalculateSensitivity();            
+            if (DynamicCross) CalculateSensitivity();
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
+            if (PowerSignal != null) PowerSignal.OnSignal += PowerSignal_OnSignal;
+        }
+
+        private void PowerSignal_OnSignal(Signal signal, SignalEventArgs data)
+        {
+            var rsi = (PowerSignalResult)data.Result;
+            InstantPower = rsi.Value;
         }
 
         protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
@@ -153,17 +162,38 @@ namespace Kalitte.Trading
 
             var dt = Math.Abs((dl - d).Value);
 
-            var max = InitialAvgChange * 5;
+            var max = InitialAvgChange * 1M;
+
+            var powerRatio = 0M;
+
+            var powerNote = "";
+
+            if (PowerSignal != null)
+            {
+                var instantPower = PowerSignal.LastSignalResult as PowerSignalResult;
+                var barPower = PowerSignal.Indicator.Results.Last().Value;
+                if (barPower.HasValue)
+                {
+                    powerRatio = (60 - barPower.Value) / 100;
+                    //if (powerRatio < 0) powerRatio = 0;
+                    //else 
+                    powerRatio = powerRatio > 0 ? powerRatio * 2M: powerRatio;
+                    
+                    powerNote = $"rsiBar: {barPower.Value} rsiInstant: {(instantPower == null ? 0 : instantPower.Value)}";
+                }
+            }
+
+
+            var dtRatio = 0M;
 
             if (dt < max)
             {
-                var ratio = 1 - (max - dt) / max ;                
-                AdjustSensitivity((double)ratio, $"Previous Bars: [{b12.Date} - {b1.Date}] dl: {dl} d:{d} dt:{dt} ratio:{ratio}");
-            } else
-            {
-                Log("no change", LogLevel.Verbose);
+                dtRatio = ((max - dt) / max);
             }
 
+            var average = Math.Max(powerRatio, dtRatio);
+            //average = powerRatio;
+            AdjustSensitivity((double)average, $"Bars: [{b12.Date} - {b1.Date}] power: {powerRatio} [{powerNote}] dt:{dtRatio}  ratio:{average}");
 
         }
 
@@ -200,7 +230,7 @@ namespace Kalitte.Trading
 
                 if (differenceBars.Count >= Periods)
                 {
-                    
+
                     var lastAvg = UseSma ? differenceBars.List.GetSma(Periods).Last().Sma.Value : differenceBars.List.GetEma(Periods).Last().Ema.Value;
 
                     decimal last1 = i1k.Results.Last().Value.Value;

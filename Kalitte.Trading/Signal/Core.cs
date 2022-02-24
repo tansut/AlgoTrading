@@ -62,7 +62,7 @@ namespace Kalitte.Trading
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
         public string Symbol { get; private set; }
-        public BuySell? LastSignalResult { get; protected set; }
+        public SignalResult LastSignalResult { get; protected set; }
         public DateTime? PausedUntil { get; set; }
         protected Task collectorTask = null;
         protected CancellationTokenSource collectorTaskTokenSource;
@@ -161,7 +161,7 @@ namespace Kalitte.Trading
                 {
                     result.SignalTime = t ?? DateTime.Now;
                     raiseSignal(new SignalEventArgs() { Result = result });
-                    LastSignalResult = result.finalResult ?? LastSignalResult;
+                    LastSignalResult = result;
                 }
                 return result;
             }

@@ -30,6 +30,9 @@ namespace Kalitte.Trading.Indicators
         List<IndicatorResult> Results { get; }
         int Lookback { get; set; }
         string Symbol { get;  set; }
+        List<IQuote> UsedInput { get; }
+
+        
         //CandlePart Candle { get; set; }
 
     }
@@ -45,9 +48,10 @@ namespace Kalitte.Trading.Indicators
         public bool Simulation { get; set; }
         public string Symbol { get; set; }
         public CandlePart Candle { get; set; } = CandlePart.Close;
-
         public FinanceBars InputBars { get; }
         public FinanceList<R> ResultList { get; set; } = null;
+
+        private  List<IQuote> usedBars;
 
         public int Lookback { get; set; }
 
@@ -56,6 +60,11 @@ namespace Kalitte.Trading.Indicators
             return $"{this.GetType().Name}[{this.Symbol}]";
         }
 
+        public List<IQuote> UsedInput { get
+            {if (usedBars == null) usedBars = CreateUsedBars();
+                return usedBars;
+            } 
+        }
 
         protected abstract IndicatorResult ToValue(R result);
 
@@ -73,12 +82,30 @@ namespace Kalitte.Trading.Indicators
             }
         }
 
-        public IndicatorBase(FinanceBars bars, CandlePart candle = CandlePart.Close, FinanceList<R> initialResults = null)
+        protected virtual List<IQuote> CreateUsedBars()
         {
-            //this.Algo = Algo;
-            this.Candle = candle;
-            InputBars = bars;
+            return InputBars.LastItems(Lookback);
+        }
+
+        public IndicatorBase(FinanceBars bars, CandlePart candle = CandlePart.Close, FinanceList<R> initialResults = null)
+        {            
+            Candle = candle;
+            InputBars = bars;            
             ResultList = initialResults == null ? new FinanceList<R>(0, null): initialResults;
+            bars.ListEvent += BarsChanged;
+
+        }
+
+        protected virtual void BarsChanged(object sender, ListEventArgs<IQuote> e)
+        {
+            if (e.Action == ListAction.Cleared) usedBars.Clear();
+            else if (e.Action == ListAction.ItemRemoved)
+            {
+               CreateUsedBars();
+            } else if (e.Action == ListAction.ItemAdded)
+            {
+                UsedInput.Add(e.Item);
+            }
         }
 
         public IndicatorBase()

@@ -30,118 +30,118 @@ namespace Kalitte.Trading.Matrix
 
 
         [Parameter(SymbolPeriod.Min10)]
-        public SymbolPeriod SymbolPeriod { get; set; } = SymbolPeriod.Min10;
+        public SymbolPeriod SymbolPeriod { get; set; } 
 
         [Parameter(4)]
-        public decimal OrderQuantity { get; set; } = 2M;
+        public decimal OrderQuantity { get; set; } 
 
 
-        [Parameter(2)]
-        public int CrossPriceCollectionPeriod { get; set; } = 2;
+        [Parameter(10)]
+        public int CrossPriceCollectionPeriod { get; set; } 
 
 
         [Parameter(4)]
-        public int RsiPriceCollectionPeriod { get; set; } = 4;
+        public int RsiPriceCollectionPeriod { get; set; } 
 
         [Parameter(true)]
-        public bool UseSmaForCross { get; set; } = true;
+        public bool UseSmaForCross { get; set; } 
 
         [Parameter(5)]
-        public int MovPeriod { get; set; } = 5;
+        public int MovPeriod { get; set; } 
 
         [Parameter(9)]
-        public int MovPeriod2 { get; set; } = 9;
+        public int MovPeriod2 { get; set; } 
 
 
         [Parameter(0.25)]
-        public decimal MaAvgChange { get; set; } = 0.25M;
+        public decimal MaAvgChange { get; set; } 
 
-        [Parameter(25)]
-        public int MaPeriods { get; set; } = 25;
+        [Parameter(60)]
+        public int MaPeriods { get; set; } 
 
         [Parameter(false)]
-        public bool DynamicCross { get; set; } = false;
+        public bool DynamicCross { get; set; } 
 
 
         [Parameter(0)]
-        public decimal ExpectedNetPl { get; set; } = 0;
+        public decimal ExpectedNetPl { get; set; }
 
 
 
 
         [Parameter(false)]
-        public bool UseVirtualOrders { get; set; } = false;
+        public bool UseVirtualOrders { get; set; } 
 
         [Parameter(false)]
-        public bool AutoCompleteOrders { get; set; } = false;
+        public bool AutoCompleteOrders { get; set; } 
 
         [Parameter(false)]
-        public bool SimulateOrderSignal { get; set; } = false;
+        public bool SimulateOrderSignal { get; set; } 
 
         [Parameter(1)]
-        public decimal ProfitQuantity { get; set; } = 1;
+        public decimal ProfitQuantity { get; set; }
 
         [Parameter(0)]
-        public decimal LossQuantity { get; set; } = 0;
+        public decimal LossQuantity { get; set; } 
 
         [Parameter(16)]
-        public decimal ProfitPuan { get; set; } = 16;
+        public decimal ProfitPuan { get; set; } 
 
         [Parameter(4)]
-        public decimal LossPuan { get; set; } = 4;
+        public decimal LossPuan { get; set; }
 
         [Parameter(60.0)]
-        public decimal RsiHighLimit { get; set; } = 60M;
+        public decimal RsiHighLimit { get; set; } 
 
         [Parameter(40.0)]
-        public decimal RsiLowLimit { get; set; } = 40M;
+        public decimal RsiLowLimit { get; set; } 
 
         [Parameter(2)]
-        public decimal MinRsiChange { get; set; } = 2M;
+        public decimal MinRsiChange { get; set; } 
 
         [Parameter(1)]
-        public decimal RsiProfitQuantity { get; set; } = 1M;
+        public decimal RsiProfitQuantity { get; set; } 
 
         [Parameter(1)]
-        public decimal RsiProfitPuan { get; set; } = 1M;
+        public decimal RsiProfitPuan { get; set; } 
 
         [Parameter(14)]
-        public int Rsi { get; set; } = 14;
+        public int Rsi { get; set; }
 
         [Parameter(60)]
-        public int RsiAnalysisPeriod { get; set; } = 60;
+        public int RsiAnalysisPeriod { get; set; } 
+
+
 
         [Parameter(0)]
-        public int PowerCrossThreshold { get; set; } = 0;
-
-        [Parameter(0)]
-        public int MACDShortPeriod { get; set; } = 0;
+        public int MACDShortPeriod { get; set; } 
 
         [Parameter(9)]
-        public int MACDLongPeriod { get; set; } = 9;
+        public int MACDLongPeriod { get; set; } 
 
         [Parameter(0.05)]
-        public decimal MacdAvgChange { get; set; } = 0.05M;
+        public decimal MacdAvgChange { get; set; } 
 
         [Parameter(15)]
-        public int MacdPeriods { get; set; } = 15;
+        public int MacdPeriods { get; set; } 
 
         [Parameter(9)]
-        public int MACDTrigger { get; set; } = 9;
+        public int MACDTrigger { get; set; } 
 
         [Parameter(false)]
-        public bool AlwaysGetProfit { get; set; } = false;
+        public bool AlwaysGetProfit { get; set; } 
 
         [Parameter(false)]
-        public bool AlwaysStopLoss { get; set; } = false;
+        public bool AlwaysStopLoss { get; set; } 
 
-        [Parameter(60)]
-        public int PowerLookback { get; set; } = 60;
+        [Parameter(9)]
+        public int PowerLookback { get; set; } 
 
+        [Parameter(50)]
+        public int PowerCrossThreshold { get; set; }
 
-
-        [Parameter(15)]
-        public int PowerVolumeCollectionPeriod { get; set; } = 15;
+        [Parameter(10)]
+        public int PowerVolumeCollectionPeriod { get; set; } 
 
         private DateTime? lastSimulationDay = null;
 

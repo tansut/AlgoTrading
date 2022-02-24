@@ -61,6 +61,7 @@ namespace Kalitte.Trading
                 {
                     items.Clear();
                     if (ListEvent != null) ListEvent(this, new Trading.ListEventArgs<T>() { Action = ListAction.Cleared, Item = default(T) });
+
                 }
                 QueSize = newSize;
             }
@@ -250,12 +251,13 @@ namespace Kalitte.Trading
                 try
                 {
                     return items[index];
-                } catch
+                }
+                catch
                 {
                     return default(T);
                 }
-                
-                }
+
+            }
             finally
             {
 
@@ -268,7 +270,7 @@ namespace Kalitte.Trading
 
     public class FinanceBars : FinanceList<IQuote>
     {
-        public CandlePart Ohlc { get; set; } = CandlePart.Close;
+        //public CandlePart Ohlc { get; set; } = CandlePart.Close;
         public BarPeriod Period { get; set; }
 
 
@@ -285,33 +287,32 @@ namespace Kalitte.Trading
 
 
 
-        public decimal[] Values
+        public decimal[] Values(CandlePart candle)
         {
-            get
+
+
+            rwl.AcquireReaderLock(timeOut);
+            try
             {
-
-                rwl.AcquireReaderLock(timeOut);
-                try
+                return items.Select(p =>
                 {
-                    return items.Select(p =>
+                    switch (candle)
                     {
-                        switch (Ohlc)
-                        {
-                            case CandlePart.Close: return p.Close;
-                            case CandlePart.Volume: return p.Volume;
-                            case CandlePart.Open: return p.Open;
-                            case CandlePart.High: return p.High;
-                            case CandlePart.Low: return p.Low;
-                            default: return 0;
-                        }
-                    }).ToArray();
-                }
-                finally
-                {
-                    rwl.ReleaseReaderLock();
-                }
-
+                        case CandlePart.Close: return p.Close;
+                        case CandlePart.Volume: return p.Volume;
+                        case CandlePart.Open: return p.Open;
+                        case CandlePart.High: return p.High;
+                        case CandlePart.Low: return p.Low;
+                        default: return 0;
+                    }
+                }).ToArray();
             }
+            finally
+            {
+                rwl.ReleaseReaderLock();
+            }
+
+
         }
 
 
@@ -333,7 +334,7 @@ namespace Kalitte.Trading
             {
                 var count = this.items.Count;
                 var lastIndex = count - from;
-                var firstIndex = Math.Max(lastIndex - toBack, 0);                                
+                var firstIndex = Math.Max(lastIndex - toBack, 0);
                 return (this.items[lastIndex].Close - this.items[firstIndex].Close) / toBack;
             }
             finally
@@ -345,7 +346,7 @@ namespace Kalitte.Trading
 
         public decimal Cross(decimal baseVal)
         {
-            var list = Values;
+            var list = Values(CandlePart.Close);
             var i = list.Length;
 
             while (--i >= 1)

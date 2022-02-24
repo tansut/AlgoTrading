@@ -62,8 +62,6 @@ namespace Kalitte.Trading.Indicators
         public int Fast { get; set; }
         public int Signal { get; set; }
 
-        int startIndex = 0;
-
         public MacdTrigger Trigger { get; set; }
 
         public override string ToString()
@@ -79,47 +77,27 @@ namespace Kalitte.Trading.Indicators
             this.Fast = fast;
             this.Signal = signal;
             createResult();
-            this.InputBars.ListEvent += InputBars_BarEvent;
             this.Trigger = new MacdTrigger(this);
-            startIndex = 0;
         }
 
         private void createResult()
         {
             ResultList.Clear();
-            var results = LastBars.GetMacd(this.Fast, this.Slow, this.Signal).ToList();
+            var results = UsedInput.GetMacd(this.Fast, this.Slow, this.Signal).ToList();
             results.ForEach(r => ResultList.Push(r));            
         }
 
 
 
-        //public bool HasResult => Results.Count > 0 && Results.Last.FastEma.HasValue && Results.Last.SlowEma.HasValue;
-
-
-        private void InputBars_BarEvent(object sender, ListEventArgs<IQuote> e)
+        protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
-            if (e.Action == ListAction.Cleared)
-            {
-                startIndex = 0;
-            }
-
-            else if (e.Action == ListAction.ItemAdded)
-            {
-                startIndex++;
-            }
-
-            else if (e.Action == ListAction.ItemRemoved)
-            {
-                startIndex--;
-            }
-           createResult();
-
+            base.BarsChanged(sender, e);
+            createResult();
         }
 
-        public IList<IQuote> LastBars
+        protected override List<IQuote> CreateUsedBars()
         {
-            get { return InputBars.LastItems(Signal + Fast + Slow + startIndex); }
-            //get { return InputBars.List; }
+            return InputBars.LastItems(Signal + Fast + Slow);
         }
 
         public override decimal NextValue(decimal newVal)
@@ -135,7 +113,7 @@ namespace Kalitte.Trading.Indicators
 
         public override MacdResult NextResult(IQuote quote)
         {
-            var list = LastBars;
+            var list = UsedInput.ToList();
             list.Add(quote);
             return list.GetMacd(this.Fast, this.Slow, this.Signal).Last();
         }

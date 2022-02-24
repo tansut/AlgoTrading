@@ -14,7 +14,6 @@ namespace Kalitte.Trading.Indicators
     public class Atrp : IndicatorBase<AtrResult>
     {
 
-        int startIndex = 0;
 
         public override string ToString()
         {
@@ -24,18 +23,13 @@ namespace Kalitte.Trading.Indicators
         public Atrp(FinanceBars bars, int periods) : base(bars)
         {
             this.Lookback = periods;              
-            createResult();
-            this.InputBars.ListEvent += InputBars_BarEvent;
-            startIndex = 0;
-            
-            
-            
+            createResult();            
         }
 
         private void createResult()
         {
             ResultList.Clear();
-            var results = LastBars.GetAtr(Lookback).ToList();
+            var results = UsedInput.GetAtr(Lookback).ToList();
             results.ForEach(r => ResultList.Push(r));
         }
 
@@ -46,35 +40,21 @@ namespace Kalitte.Trading.Indicators
         }
 
 
-        private void InputBars_BarEvent(object sender, ListEventArgs<IQuote> e)
+        protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
-            if (e.Action == ListAction.Cleared)
-            {
-                startIndex = 0;
-            }
-
-            else if (e.Action == ListAction.ItemAdded)
-            {
-                startIndex++;
-            }
-
-            else if (e.Action == ListAction.ItemRemoved)
-            {
-                startIndex--;
-            }
-            createResult(); 
-
+            base.BarsChanged(sender, e);
+            createResult();
         }
 
-        public IList<IQuote> LastBars
+        protected override List<IQuote> CreateUsedBars()
         {
-            get { return InputBars.LastItems(startIndex + 5 * Lookback + 1); }
-            //get { return InputBars.LastItems(InputBars.Count); }
+            return  InputBars.LastItems(5 * Lookback + 1);
         }
+
 
         public override decimal NextValue(decimal newVal)
         {
-            var last = InputBars.Last;
+            var last = UsedInput.Last();
             var q = new Quote() { Date = DateTime.Now, Low = last.Low, High = last.High, Close = newVal };
             var r = NextResult(q);
             return (decimal)(r.Atrp ?? 0);
@@ -83,7 +63,7 @@ namespace Kalitte.Trading.Indicators
 
         public override AtrResult NextResult(IQuote quote)
         {
-            var list = LastBars;
+            var list = UsedInput.ToList();
             list.Add(quote);
             return list.GetAtr(Lookback).Last();
         }

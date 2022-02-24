@@ -14,8 +14,7 @@ namespace Kalitte.Trading.Indicators
     public class Ema : IndicatorBase<EmaResult>
     {
 
-        int startIndex = 0;
-
+  
         public override string ToString()
         {
             return $"{base.ToString()}:({Lookback})";
@@ -24,18 +23,17 @@ namespace Kalitte.Trading.Indicators
         public Ema(FinanceBars bars, int periods, CandlePart candle = CandlePart.Close) : base(bars, candle)
         {
             this.Lookback = periods;
-            bars.ListEvent += BarChanged;
             createResult();
         }
 
-        public bool HasResult => ResultList.Count > 0 && ResultList.Last.Ema.HasValue;
+        //public bool HasResult => ResultList.Count > 0 && ResultList.Last.Ema.HasValue;
 
 
 
         private void createResult()
         {
             ResultList.Clear();
-            var result = LastBars.GetEma(Lookback, this.Candle).ToList();
+            var result = UsedInput.GetEma(Lookback, this.Candle).ToList();
             result.ForEach(r => ResultList.Push(r));
         }
 
@@ -44,12 +42,13 @@ namespace Kalitte.Trading.Indicators
             return new IndicatorResult(result.Date, result.Ema);
         }
 
-        public IList<IQuote> LastBars
-        {
-            //get { return InputBars.List; }
-            get { return InputBars.LastItems(startIndex + Lookback); }
-            //get { return InputBars.LastItems(Lookback); }
-        }
+
+        //public IList<IQuote> LastBars
+        //{
+        //    //get { return InputBars.List; }
+        //    get { return InputBars.LastItems(startIndex + Lookback); }
+        //    //get { return InputBars.LastItems(Lookback); }
+        //}
 
 
 
@@ -68,50 +67,17 @@ namespace Kalitte.Trading.Indicators
             //var lastEma = (double)(ResultList.Last.Ema);
             //var ema = (decimal)FinanceBars.EmaNext((double)quote.Close, lastEma, Lookback);
             //return new EmaResult() { Date = quote.Date, Ema = ema };
-            var list = LastBars;
+            var list = UsedInput.ToList();
             list.Add(quote);
             return list.GetEma(this.Lookback, this.Candle).Last();
         }
 
-
-
-        private void BarChanged(object sender, ListEventArgs<IQuote> e)
+        protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
-            if (e.Action == ListAction.Cleared)
-            {
-                startIndex = 0;
-                ResultList.Clear();
-
-            }
-
-            else if (e.Action == ListAction.ItemAdded)
-            {                
-                //List<IQuote> temp = new List<IQuote>(Periods);
-                //for(int i=0; i < Periods;i++)
-                //{
-                //    temp.Add(new Quote() { Date = Results.Last.Date, Close = Results.Last.Ema.Value });
-                //}
-                //temp.Add(e.Item);
-                //var lastResult = temp.GetEma(Periods);
-
-                //var ema = new EmaResult() { Date = e.Item.Date };
-                //var close = (double)(e.Item.Close);
-                //var lastEma = (double)(ResultList.Last.Ema);
-                //ema.Ema = (decimal)FinanceBars.EmaNext(close, lastEma, Lookback);
-                //ResultList.Push(new EmaResult() { Date = ema.Date, Ema = ema.Ema });
-                //Results.Push(lastResult.Last());
-                startIndex++;
-
-            }
-
-            else if (e.Action == ListAction.ItemRemoved)
-            {
-                startIndex--;
-                //createResult();
-            }
-
+            base.BarsChanged(sender, e);
             createResult();
         }
+
 
 
     }

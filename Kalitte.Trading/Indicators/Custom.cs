@@ -17,7 +17,7 @@ namespace Kalitte.Trading.Indicators
     public class Custom: IndicatorBase<CustomResult>
     {
 
-        int startIndex = 0;        
+ 
         Func<IQuote, decimal> Func;
 
         public override string ToString()
@@ -29,15 +29,13 @@ namespace Kalitte.Trading.Indicators
         {
             this.Lookback = periods;
             this.Func = func;
-            createResult();
-            this.InputBars.ListEvent += InputBars_BarEvent;
-            startIndex = 0;            
+            createResult();     
         }
 
         private void createResult()
         {
             ResultList.Clear();
-            foreach (var iten in LastBars)
+            foreach (var iten in UsedInput)
                 ResultList.Push(new CustomResult() { Date = iten.Date, Value = Func(iten) });
 
         }
@@ -49,30 +47,12 @@ namespace Kalitte.Trading.Indicators
         }
 
 
-        private void InputBars_BarEvent(object sender, ListEventArgs<IQuote> e)
+        protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
-            if (e.Action == ListAction.Cleared)
-            {
-                startIndex = 0;
-            }
-
-            else if (e.Action == ListAction.ItemAdded)
-            {
-                startIndex++;
-            }
-
-            else if (e.Action == ListAction.ItemRemoved)
-            {
-                startIndex--;
-            }
-            createResult(); 
-
+            base.BarsChanged(sender, e);
+            createResult();
         }
 
-        public IList<IQuote> LastBars
-        {
-            get { return InputBars.LastItems(startIndex + Lookback ); }
-        }
 
         public override decimal NextValue(decimal newVal)
         {
@@ -81,7 +61,7 @@ namespace Kalitte.Trading.Indicators
 
         public override CustomResult NextResult(IQuote quote)
         {
-            var list = LastBars;
+            var list = UsedInput.ToList();
             list.Add(quote);
             return new CustomResult() { Date = quote.Date, Value = Func(quote) };
         }

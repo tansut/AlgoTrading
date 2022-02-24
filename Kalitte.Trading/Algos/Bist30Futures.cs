@@ -20,11 +20,8 @@ namespace Kalitte.Trading.Algos
         public decimal OrderQuantity { get; set; }
 
 
-        [AlgoParam(2)]
+        [AlgoParam(10)]
         public int CrossPriceCollectionPeriod { get; set; }
-
-
-
 
         [AlgoParam(true)]
         public bool UseSmaForCross { get; set; }
@@ -42,7 +39,7 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(0.25)]
         public decimal MaAvgChange { get; set; }
 
-        [AlgoParam(15)]
+        [AlgoParam(60)]
         public int MaPeriods { get; set; }
 
 
@@ -127,7 +124,7 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(10)]
         public int PowerVolumeCollectionPeriod { get; set; }
 
-        [AlgoParam(0)]
+        [AlgoParam(50)]
         public int PowerCrossThreshold { get; set; } 
 
         public FinanceBars MinBars = null;
@@ -148,15 +145,14 @@ namespace Kalitte.Trading.Algos
 
             var periodData = GetSymbolData(this.Symbol, this.SymbolPeriod);
             var oneMinData = GetSymbolData(this.Symbol, BarPeriod.Min);
-            var price = new Price(periodData.Periods, 9);
+            var price = new Price(periodData.Periods, PowerLookback);
             priceTrend.i1k = price;
 
-            var atr = new Atrp(oneMinData.Periods, 2);
+            var atr = new Atrp(oneMinData.Periods, PowerLookback);
             atrTrend.i1k = atr;
 
-            //var power = new Volume(periodData.Periods, PowerLookback, PowerBarSeconds);
-            //
-            powerSignal.Indicator = new Ema(oneMinData.Periods, PowerLookback);
+            powerSignal.Indicator = new Rsi(oneMinData.Periods, PowerLookback, CandlePart.Volume);
+            //powerSignal.Indicator = new Ema(oneMinData.Periods, PowerLookback);
             powerSignal.VolumeCollectionPeriod = PowerVolumeCollectionPeriod;
 
             if (maSignal != null)
@@ -221,13 +217,13 @@ namespace Kalitte.Trading.Algos
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MaAvgChange, Periods = MaPeriods };
+                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MaAvgChange, Periods = MaPeriods };
                 this.Signals.Add(maSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, Periods = MacdPeriods };
+                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, Periods = MacdPeriods };
                 this.Signals.Add(macSignal);
             }
 
@@ -318,8 +314,19 @@ namespace Kalitte.Trading.Algos
             if ((LastPower == null || LastPower.Power != result.Power) && result.Power != PowerRatio.Unknown)
             {
                 var last = LastPower != null ? LastPower.Power.ToString() : "";
-                if (DynamicCross) Log($"Power changed from {last} -> {result.Power}. Signal: {result} ", LogLevel.Warning, result.SignalTime);
-                LastPower = result;
+                
+                
+            }
+
+            LastPower = result;
+
+            if (LastPower != null && DynamicCross && AlgoTime.Second % 10 == 0)
+            {
+                //Log($"Current ATR volatility level: {result}", LogLevel.Warning);
+                var atrInd = (Atrp)(atrTrend as TrendSignal).i1k;
+                var last = atrInd.ResultList.Last;
+                Log($"ATR last: atr: {last.Atr} tr: {last.Tr} p: {last.Atrp}", LogLevel.Warning);
+                Log($"Power {LastPower.Power}: {LastPower} ", LogLevel.Warning, result.SignalTime);
             }
 
             if (DynamicCross && result.Power != PowerRatio.Unknown)
@@ -331,7 +338,7 @@ namespace Kalitte.Trading.Algos
                 }
                 //if (ratio < 0) ratio = 0;
                 //ratio = (double)(100 - result.Value) / 100D;
-                Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{result.Power}/{result.Value}"));
+                //Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{result.Power}/{result.Value}"));
             }
 
             //if (DynamicCross)
@@ -384,7 +391,13 @@ namespace Kalitte.Trading.Algos
                     //Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})"));
 
 
-                    //Log($"Current ATR volatility level: {result}", LogLevel.Warning);
+                }
+                if (AlgoTime.Second % 10 == 10)
+                {
+                    Log($"Current ATR volatility level: {result}", LogLevel.Warning);
+                    var atrInd = (Atrp)(result.Signal as TrendSignal).i1k;
+                    var last = atrInd.ResultList.Last;
+                    Log($"ATR last: atr: {last.Atr} tr: {last.Tr} p: {last.Atrp}", LogLevel.Warning);
                     //Log($"Current ATR volatility level: {VolatileRatio}. Adjusted cross to {maSignal.AvgChange}, {maSignal.Periods}. Signal: {result}", LogLevel.Critical, result.SignalTime);
                 }
             }
@@ -505,8 +518,8 @@ namespace Kalitte.Trading.Algos
             base.sendOrder(symbol, quantity, side, comment, lprice, icon, t, signalResult);
             //var sep = ",";
             //Log($"ATR: {string.Join(sep, atrTrend.i1k.Results.Select(p => p.Value))}", LogLevel.Critical);
-            //Log($"ART: {atrTrend.i1k.Results.Last().Date} {atrTrend.i1k.Results.Last().Value}", LogLevel.Critical);
-            //Log($"Power: {LastPower}", LogLevel.Critical);
+            Log($"ARTP: {atrTrend.i1k.Results.Last().Date} {atrTrend.i1k.Results.Last().Value}", LogLevel.Critical);
+            Log($"Power: {LastPower}", LogLevel.Critical);
         }
 
         public Bist30Futures(): base()

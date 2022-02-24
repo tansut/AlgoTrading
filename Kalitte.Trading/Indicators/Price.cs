@@ -18,7 +18,6 @@ namespace Kalitte.Trading.Indicators
     public class Price : IndicatorBase<PriceResult>
     {
 
-        int startIndex = 0;
         public override string ToString()
         {
             return $"{base.ToString()}:({Lookback})";
@@ -27,15 +26,13 @@ namespace Kalitte.Trading.Indicators
         public Price(FinanceBars bars, int periods) : base(bars)
         {
             this.Lookback = periods;              
-            createResult();
-            this.InputBars.ListEvent += InputBars_BarEvent;
-            startIndex = 0;                                   
+            createResult();                               
         }
 
         private void createResult()
         {
             ResultList.Clear();
-            var results = LastBars.Select(p=>new PriceResult() { Price = p.Close, Date=p.Date}).ToList();
+            var results = UsedInput.Select(p=>new PriceResult() { Price = p.Close, Date=p.Date}).ToList();
             results.ForEach(r => ResultList.Push(r));
         }
 
@@ -46,30 +43,12 @@ namespace Kalitte.Trading.Indicators
         }
 
 
-        private void InputBars_BarEvent(object sender, ListEventArgs<IQuote> e)
+        protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
-            if (e.Action == ListAction.Cleared)
-            {
-                startIndex = 0;
-            }
-
-            else if (e.Action == ListAction.ItemAdded)
-            {
-                startIndex++;
-            }
-
-            else if (e.Action == ListAction.ItemRemoved)
-            {
-                startIndex--;
-            }
-            createResult(); 
-
+            base.BarsChanged(sender, e);
+            createResult();
         }
 
-        public IList<IQuote> LastBars
-        {
-            get { return InputBars.LastItems(startIndex + Lookback); }
-        }
 
         public override decimal NextValue(decimal newVal)
         {

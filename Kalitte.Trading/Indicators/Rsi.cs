@@ -14,25 +14,21 @@ namespace Kalitte.Trading.Indicators
     public class Rsi : IndicatorBase<RsiResult>
     {
 
-        int startIndex = 0;
-
         public override string ToString()
         {
             return $"{base.ToString()}:({Lookback})";
         }
 
-        public Rsi(FinanceBars bars, int periods) : base(bars)
+        public Rsi(FinanceBars bars, int periods, CandlePart candle = CandlePart.Close) : base(bars, candle)
         {
             this.Lookback = periods;              
-            createResult();
-            this.InputBars.ListEvent += InputBars_BarEvent;
-            startIndex = 0;            
+            createResult();       
         }
 
         private void createResult()
         {
             ResultList.Clear();
-            var results = LastBars.GetRsi(Lookback).ToList();
+            var results = UsedInput.GetRsi(Lookback).ToList();
             results.ForEach(r => ResultList.Push(r));
         }
 
@@ -42,31 +38,42 @@ namespace Kalitte.Trading.Indicators
             return new IndicatorResult(result.Date, (decimal?)result.Rsi);
         }
 
-
-        private void InputBars_BarEvent(object sender, ListEventArgs<IQuote> e)
+        protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
-            if (e.Action == ListAction.Cleared)
-            {
-                startIndex = 0;
-            }
-
-            else if (e.Action == ListAction.ItemAdded)
-            {
-                startIndex++;
-            }
-
+            if (e.Action == ListAction.Cleared) UsedInput.Clear();
             else if (e.Action == ListAction.ItemRemoved)
             {
-                startIndex--;
+                CreateUsedBars();
             }
-            createResult(); 
-
+            else if (e.Action == ListAction.ItemAdded)
+            {
+                if (Candle != CandlePart.Close)
+                {
+                    var item = new MyQuote() { Close = e.Item.Volume, Date = e.Item.Date };
+                    UsedInput.Add(item);
+                }
+                else UsedInput.Add(e.Item);
+            }
+            createResult();
         }
 
-        public IList<IQuote> LastBars
+
+        protected override List<IQuote> CreateUsedBars()
         {
-            get { return InputBars.LastItems(startIndex + 2 * Lookback + 1); }
+            var skip = 2 * Lookback + 1;
+            if (Candle != CandlePart.Close)
+            {
+                var list = InputBars.LastItems(skip);
+                var result = new List<MyQuote>();
+                list.ForEach(p => result.Add(new MyQuote() {  Date = p.Date, Close = p.Volume}));
+                return result.ToList<IQuote>();
+                //var items = InputBars.Values(this.Candle).Skip(Math.Max(0, InputBars.Count - skip));                
+
+            } else return InputBars.LastItems(skip);
         }
+
+        
+
 
         public override decimal NextValue(decimal newVal)
         {
@@ -76,7 +83,7 @@ namespace Kalitte.Trading.Indicators
 
         public override RsiResult NextResult(IQuote quote)
         {
-            var list = LastBars;
+            var list = this.UsedInput.ToList();
             list.Add(quote);
             return list.GetRsi(Lookback).Last();
         }

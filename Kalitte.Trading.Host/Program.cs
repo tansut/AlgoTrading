@@ -56,22 +56,32 @@ public class Program
     public static Settings AppTest()
     {
         var settings = new Settings();
-        settings.sDate = new DateTime(2022, 02, 24, 9, 30, 0);
-        settings.fDate = new DateTime(2022, 02, 24, 23, 0, 0);
+        settings.sDate = new DateTime(2022, 02, 23, 9, 30, 0);
+        settings.fDate = new DateTime(2022, 02, 23, 23, 0, 0);
 
         var initValues = AlgoBase.GetProperties(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
         
-        alternates.Set("LogConsole", true);
-        alternates.Set("LoggingLevel", LogLevel.Warning);
-        //alternates.Set("Rsi", 9, 14);
-        //alternates.Set("MinRsiChange", 1M 2M);
-        alternates.Set("MaAvgChange", 0.25M);
+        //alternates.Set("LogConsole", true);
+        alternates.Set("LoggingLevel", LogLevel.Order);
+        //alternates.Set("Rsi", 14);
+        alternates.Set("PowerLookback", 9);
+        alternates.Set("ProfitQuantity", 0);
+        alternates.Set("RsiHighLimit", 0);
+        alternates.Set("RsiLowLimit", 0);
         alternates.Set("DynamicCross", true);
-        alternates.Set("MaPeriods", 60);
-        alternates.Set("CrossPriceCollectionPeriod", 10);
-        alternates.Set("PowerVolumeCollectionPeriod", 10);
-        alternates.Set("PowerCrossThreshold", 50);
+
+
+
+
+
+
+        //alternates.Set("MinRsiChange", 1M 2M);
+        //alternates.Set("MaAvgChange", 0.25M);
+        //alternates.Set("MaPeriods", 25);
+        //alternates.Set("CrossPriceCollectionPeriod", 2);
+        //alternates.Set("PowerVolumeCollectionPeriod", 10);
+        //alternates.Set("PowerCrossThreshold", 50);
         //alternates.Set("ExpectedNetPl", 10M);
 
         return settings;

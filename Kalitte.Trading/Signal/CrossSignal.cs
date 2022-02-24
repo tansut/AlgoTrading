@@ -35,7 +35,7 @@ namespace Kalitte.Trading
 
     public class CrossSignal : Signal
     {
-
+        public bool DynamicCross { get; set; } = false;
 
         public ITechnicalIndicator i1k;
         public ITechnicalIndicator i2k;
@@ -87,6 +87,7 @@ namespace Kalitte.Trading
             priceBars = new FinanceBars(PriceCollectionPeriod);
             crossBars = new FinanceBars(Periods);
             ResetInternal();
+            if (DynamicCross) CalculateSensitivity();            
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
         }
 
@@ -94,6 +95,7 @@ namespace Kalitte.Trading
         {
             priceBars.Clear();
             differenceBars.Clear();
+            if (DynamicCross) CalculateSensitivity();
         }
 
         protected override void Colllect()
@@ -107,7 +109,7 @@ namespace Kalitte.Trading
             Periods = InitialPeriods + Convert.ToInt32((InitialPeriods * (decimal)ratio));
             differenceBars.Resize(Periods);
             crossBars.Resize(Periods);
-            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {Periods}", LogLevel.Verbose);
+            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {Periods}", LogLevel.Critical);
 
         }
         public void AdjustSensitivity(double ratio, string reason)
@@ -130,7 +132,40 @@ namespace Kalitte.Trading
         }
 
 
+        private void CalculateSensitivity()
+        {
+            //var time = t ?? DateTime.Now;
+            var b12 = i1k.Results[i1k.Results.Count - 2];
+            var b22 = i2k.Results[i2k.Results.Count - 2];
 
+
+            var rl1 = b12.Value.Value;
+            var rl2 = b22.Value.Value;
+
+            var b1 = i1k.Results.Last();
+            var b2 = i2k.Results.Last();
+
+            var r1 = b1.Value;
+            var r2 = b2.Value;
+
+            var dl = rl1 - rl2;
+            var d = r1 - r2;
+
+            var dt = Math.Abs((dl - d).Value);
+
+            var max = InitialAvgChange * 5;
+
+            if (dt < max)
+            {
+                var ratio = 1 - (max - dt) / max ;                
+                AdjustSensitivity((double)ratio, $"Previous Bars: [{b12.Date} - {b1.Date}] dl: {dl} d:{d} dt:{dt} ratio:{ratio}");
+            } else
+            {
+                Log("no change", LogLevel.Verbose);
+            }
+
+
+        }
 
         protected SignalResult CalculateSignal(DateTime? t = null)
         {
@@ -161,9 +196,11 @@ namespace Kalitte.Trading
 
                 }
 
+                //CalculateSensitivity();
+
                 if (differenceBars.Count >= Periods)
                 {
-
+                    
                     var lastAvg = UseSma ? differenceBars.List.GetSma(Periods).Last().Sma.Value : differenceBars.List.GetEma(Periods).Last().Ema.Value;
 
                     decimal last1 = i1k.Results.Last().Value.Value;
@@ -185,7 +222,9 @@ namespace Kalitte.Trading
                         //sensitivityAdjusted = true;
                         differenceBars.Clear();
                     }
-                    else { if (sensitivityAdjusted)
+                    else
+                    {
+                        if (sensitivityAdjusted)
                         {
                             //sensitivityAdjusted = false;
                             //AdjustSensitivityInternal(0.0, "Revert");
@@ -221,6 +260,8 @@ namespace Kalitte.Trading
 
 
         }
+
+
 
 
 

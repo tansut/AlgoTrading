@@ -286,7 +286,7 @@ namespace Kalitte.Trading.Algos
             } else
             {
                 data.Periods.Push(bar);
-                Log($"Pushed new bar for period {period}, last bar is now: {data.Periods.Last}", LogLevel.Debug, data.Periods.Last.Date);
+                Log($"Pushed new bar for period {period}, last bar is now: {data.Periods.Last}", LogLevel.Verbose, data.Periods.Last.Date);
 
             }
         }

@@ -44,8 +44,8 @@ namespace Kalitte.Trading
         }
 
         public double VolumePerSecond { get; internal set; }
-        public double Strenght { get; internal set; }
-        public double LastVolume { get; internal set; }
+        //public double Strenght { get; internal set; }
+        public decimal LastVolume { get; internal set; }
 
         public PowerSignalResult(Signal signal, DateTime t) : base(signal, t)
         {
@@ -54,7 +54,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()} | [{Power}] Rsi:{Value} Rs:{Strenght} Volume/sec: {VolumePerSecond} Volume/slice: {CurrentVolume} Prev:{LastVolume}";
+            return $"{base.ToString()} | [{Power}] Rsi:{Value} Volume/sec: {VolumePerSecond} Volume/period: {CurrentVolume} Prev Volume:{LastVolume}";
         }
 
         public override int GetHashCode()
@@ -96,10 +96,11 @@ namespace Kalitte.Trading
 
         double calculateVolumeBySecond(DateTime t, decimal volume)
         {
-            Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
+            //Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
+            Helper.SymbolSeconds(Algo.SymbolPeriod.ToString(), out int periodSeconds);
             var rounded = Helper.RoundDown(t, TimeSpan.FromSeconds(periodSeconds));
             var elapsedSeconds = Math.Max(1, (t - rounded).TotalSeconds);
-            Log($"Volume Calc: seconds: {elapsedSeconds} volume: {volume}", LogLevel.Verbose);
+            //Log($"Volume Calc: per: {periodSeconds} seconds: {elapsedSeconds} volume: {volume}", LogLevel.Verbose);
             if (elapsedSeconds > 15) return (double)volume / elapsedSeconds;
             else return 0;
         }
@@ -110,13 +111,24 @@ namespace Kalitte.Trading
             var volumePerSecond = (double)volumeAvg;
             Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
             var volume = volumePerSecond * periodSeconds;
-            var last = (double)Indicator.Results.Last().Value.Value;
-            var ratio = (volume / last);
-            s.Strenght = ratio;
-            s.Value = (100 - 100 / (1 +  (decimal)ratio));
+
+            var value = Indicator.NextValue((decimal)volume);
+
+
+            //Log($"volavg : {volumeAvg} vol: {volume} valu: {value}", LogLevel.Debug);
+            var last = Indicator.UsedInput.Last().Close;
+            //Log($"{Indicator.UsedInput.Last()}", LogLevel.Debug);
+            //var ratio = (volume / last);
+            //s.Strenght = rsi.Value;
+            s.Value = value;
+            //s.Value = (100 - 100 / (1 +  (decimal)ratio));
             s.VolumePerSecond = volumePerSecond;
             s.CurrentVolume = volume;
             s.LastVolume = last;
+
+            //var bars = Indicator.InputBars.LastItems(Indicator.Lookback + 1).Select(p => new MyQuote() { Date = p.Date, Close = p.Volume });
+
+
         }
 
         protected override SignalResult CheckInternal(DateTime? t = null)
@@ -135,6 +147,7 @@ namespace Kalitte.Trading
                     var q = new MyQuote() { Date = time, Volume = (decimal)volume };
                     //periodBars.Push(q);
                     volumeBars.Push(q);
+                    //Log($"pushed volume {q}", LogLevel.Debug);
                 }
                 else
                 {

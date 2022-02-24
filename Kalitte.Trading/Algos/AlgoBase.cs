@@ -298,7 +298,7 @@ namespace Kalitte.Trading.Algos
             Log($"Initialized total {periodBars.Count} for {symbol} using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
         }
 
-        public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime? t)
+        public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime? t = null)
         {
             FinanceBars periodBars = null;
             try

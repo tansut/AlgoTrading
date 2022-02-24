@@ -1,4 +1,5 @@
 ﻿using Kalitte.Trading.Algos;
+using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,50 +28,77 @@ namespace Kalitte.Trading
 
         public void Run(DateTime t1, DateTime t2, bool firstRun = false)
         {
-            //var seconds = Algo.GetSymbolPeriodSeconds(Algo.SymbolPeriod.ToString());
-           
-
+                  
             var secDict = new Dictionary<int, BarPeriod>();
             var secondsToStop = Algo.Symbols.Select(p => secDict[Algo.GetSymbolPeriodSeconds(p.Periods.Period.ToString())] = p.Periods.Period).ToList();
+            var periodBarIndexes = new Dictionary<int, int>();
+            var periodBars = new Dictionary<int, FinanceBars>();
             var seconds = 0;
+
+
+            foreach (var symbol in Algo.Symbols)
+            {
+                var bars = Algo.GetPeriodBars(symbol.Symbol, symbol.Periods.Period);
+                var sec = Algo.GetSymbolPeriodSeconds(symbol.Periods.Period.ToString());
+                periodBars.Add(sec, bars);
+            }
+
+            var periodBarsLoaded = true;
+
             for (var p = t1; p < t2;)
             {
                 if (p >= DateTime.Now) break;
-                Algo.AlgoTime = p;
-
-                Func<object, SignalResultX> action = (object stateo) =>
-               {
-                   var state = (Dictionary<string, object>)stateo;
-                   DateTime time = (DateTime)(state["time"]);
-                   return ((Signal)state["signal"]).Check(time);
-               };
-
-                var time = Algo.AlgoTime;
-                var tasks = new List<Task<SignalResultX>>();
-
-                foreach (var signal in Algo.Signals)
+                if (periodBarsLoaded)
                 {
-                    var dict = new Dictionary<string, object>();
-                    dict["time"] = time;
-                    dict["signal"] = signal;
-                    tasks.Add(Task<SignalResultX>.Factory.StartNew(action, dict));
+                    Algo.AlgoTime = p;
+
+                    Func<object, SignalResultX> action = (object stateo) =>
+                    {
+                        var state = (Dictionary<string, object>)stateo;
+                        DateTime time = (DateTime)(state["time"]);
+                        return ((Signal)state["signal"]).Check(time);
+                    };
+
+                    var time = Algo.AlgoTime;
+                    var tasks = new List<Task<SignalResultX>>();
+
+                    foreach (var signal in Algo.Signals)
+                    {
+                        var dict = new Dictionary<string, object>();
+                        dict["time"] = time;
+                        dict["signal"] = signal;
+                        tasks.Add(Task<SignalResultX>.Factory.StartNew(action, dict));
+                    }
+                    Task.WaitAll(tasks.ToArray());
+                    Algo.CheckDelayedOrders(time);
+                    Algo.simulationCount++;
                 }
-                Task.WaitAll(tasks.ToArray());
-                Algo.CheckDelayedOrders(time);
-                Algo.simulationCount++;
+
                 seconds++;                
 
                 foreach (var sec in secDict)
                 {
                     if (seconds % sec.Key == 0)
                     {
-                        var period = Algo.GetPeriodBars(Algo.Symbol, sec.Value, p).Last;
+                        IQuote period = null;
                         var round = Helper.RoundDown(p, TimeSpan.FromSeconds(sec.Key));
+                        if (!periodBarIndexes.ContainsKey(sec.Key)) {                                                                           
+                            var allItems = periodBars[sec.Key].AsList;
+                            periodBarIndexes[sec.Key] = allItems.FindIndex(i => i.Date == round);
+                        }
+                        period = periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]);
+
                         if (period == null || period.Date != round)
                         {
                             Algo.Log($"Error loading period for {period}", LogLevel.Error, p);
+                            periodBarsLoaded = false;
                         }
-                        else Algo.PushNewBar(Algo.Symbol, sec.Value, period);
+                        else
+                        {
+                            Algo.PushNewBar(Algo.Symbol, sec.Value, period);
+                            periodBarIndexes[sec.Key] = periodBarIndexes[sec.Key] + 1;
+                            periodBarsLoaded = true;
+                        }
                     }
                 }
 

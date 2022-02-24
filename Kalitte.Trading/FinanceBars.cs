@@ -242,7 +242,19 @@ namespace Kalitte.Trading
             }
         }
 
+        public T GetItem(int index)
+        {
+            rwl.AcquireReaderLock(timeOut);
+            try
+            {
+                return items[index];
+                }
+            finally
+            {
 
+                rwl.ReleaseLock();
+            }
+        }
 
     }
 

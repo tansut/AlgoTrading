@@ -172,9 +172,10 @@ namespace Kalitte.Trading
             {
                 var instantPower = PowerSignal.LastSignalResult as PowerSignalResult;
                 var barPower = PowerSignal.Indicator.Results.Last().Value;
-                if (barPower.HasValue)
+                if (instantPower != null)
+                //if (barPower.HasValue)
                 {
-                    powerRatio = (60 - barPower.Value) / 100;
+                    powerRatio = (60 - instantPower.Value) / 100;
                     //if (powerRatio < 0) powerRatio = 0;
                     //else 
                     powerRatio = powerRatio > 0 ? powerRatio * 2M: powerRatio;
@@ -192,7 +193,7 @@ namespace Kalitte.Trading
             }
 
             var average = Math.Max(powerRatio, dtRatio);
-            //average = powerRatio;
+            average = powerRatio;
             AdjustSensitivity((double)average, $"Bars: [{b12.Date} - {b1.Date}] power: {powerRatio} [{powerNote}] dt:{dtRatio}  ratio:{average}");
 
         }

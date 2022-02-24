@@ -80,6 +80,38 @@ namespace Kalitte.Trading
             return new DateTime((dt.Ticks + d.Ticks - 1) / d.Ticks * d.Ticks, dt.Kind);
         }
 
+        public static IEnumerable<object> Cartesian(IEnumerable<IEnumerable<object>> items)
+        {
+            var slots = items
+               // initialize enumerators
+               .Select(x => x.GetEnumerator())
+               // get only those that could start in case there is an empty collection
+               .Where(x => x.MoveNext())
+               .ToArray();
+
+            while (true)
+            {
+                // yield current values
+                yield return slots.Select(x => x.Current);
+
+                // increase enumerators
+                foreach (var slot in slots)
+                {
+                    // reset the slot if it couldn't move next
+                    if (!slot.MoveNext())
+                    {
+                        // stop when the last enumerator resets
+                        if (slot == slots.Last()) { yield break; }
+                        slot.Reset();
+                        slot.MoveNext();
+                        // move to the next enumerator if this reseted
+                        continue;
+                    }
+                    // we could increase the current enumerator without reset so stop here
+                    break;
+                }
+            }
+        }
         public static DateTime RoundDown(this DateTime dt, TimeSpan d)
         {
             var delta = dt.Ticks % d.Ticks;

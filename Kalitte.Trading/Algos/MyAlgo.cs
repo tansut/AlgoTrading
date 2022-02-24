@@ -2,6 +2,7 @@
 using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -15,119 +16,119 @@ namespace Kalitte.Trading.Algos
         public PowerSignalResult LastPower { get; set; } = null;
 
 
-        [AlgoParam(4)]
-        public decimal OrderQuantity { get; set; } = 4M;
+        [AlgoParam(4.0)]
+        public decimal OrderQuantity { get; set; }
 
 
         [AlgoParam(2)]
-        public int CrossPriceCollectionPeriod { get; set; } = 2;
+        public int CrossPriceCollectionPeriod { get; set; }
 
 
 
 
         [AlgoParam(true)]
-        public bool UseSmaForCross { get; set; } = true;
+        public bool UseSmaForCross { get; set; }
 
         [AlgoParam(5)]
-        public int MovPeriod { get; set; } = 5;
+        public int MovPeriod { get; set; }
 
         [AlgoParam(9)]
-        public int MovPeriod2 { get; set; } = 9;
+        public int MovPeriod2 { get; set; }
 
         [AlgoParam(false)]
-        public bool DynamicCross { get; set; } = false;
+        public bool DynamicCross { get; set; }
 
 
         [AlgoParam(0.25)]
-        public decimal MaAvgChange { get; set; } = 0.25M;
+        public decimal MaAvgChange { get; set; }
 
         [AlgoParam(15)]
-        public int MaPeriods { get; set; } = 25;
+        public int MaPeriods { get; set; }
 
 
         [AlgoParam(0)]
-        public decimal ExpectedNetPl { get; set; } = 0;
+        public decimal ExpectedNetPl { get; set; }
 
 
 
         [AlgoParam(false)]
-        public bool SimulateOrderSignal { get; set; } = false;
+        public bool SimulateOrderSignal { get; set; }
 
         [AlgoParam(1)]
-        public decimal ProfitQuantity { get; set; } = 1;
+        public decimal ProfitQuantity { get; set; }
 
         [AlgoParam(0)]
-        public decimal LossQuantity { get; set; } = 0;
+        public decimal LossQuantity { get; set; }
 
         [AlgoParam(16)]
-        public decimal ProfitPuan { get; set; } = 16;
+        public decimal ProfitPuan { get; set; }
 
         [AlgoParam(4)]
-        public decimal LossPuan { get; set; } = 4;
+        public decimal LossPuan { get; set; }
 
         [AlgoParam(4)]
-        public int RsiPriceCollectionPeriod { get; set; } = 4;
+        public int RsiPriceCollectionPeriod { get; set; }
 
         [AlgoParam(60)]
-        public decimal RsiHighLimit { get; set; } = 60M;
+        public decimal RsiHighLimit { get; set; }
 
         [AlgoParam(40)]
-        public decimal RsiLowLimit { get; set; } = 40M;
+        public decimal RsiLowLimit { get; set; }
 
         [AlgoParam(2)]
-        public decimal MinRsiChange { get; set; } = 2M;
+        public decimal MinRsiChange { get; set; }
 
 
         [AlgoParam(1)]
-        public decimal RsiProfitQuantity { get; set; } = 1M;
+        public decimal RsiProfitQuantity { get; set; }
 
         [AlgoParam(1)]
-        public decimal RsiProfitPuan { get; set; } = 1M;
+        public decimal RsiProfitPuan { get; set; }
 
 
 
         [AlgoParam(false)]
-        public bool AlwaysGetRsiProfit { get; set; } = false;
+        public bool AlwaysGetRsiProfit { get; set; }
 
 
         [AlgoParam(14)]
-        public int Rsi { get; set; } = 14;
+        public int Rsi { get; set; }
 
         [AlgoParam(60)]
-        public int RsiAnalysisPeriod { get; set; } = 60;
+        public int RsiAnalysisPeriod { get; set; } 
 
         [AlgoParam(0)]
-        public int MACDShortPeriod { get; set; } = 0;
+        public int MACDShortPeriod { get; set; }
 
         [AlgoParam(9)]
-        public int MACDLongPeriod { get; set; } = 9;
+        public int MACDLongPeriod { get; set; }
 
         [AlgoParam(0.05)]
-        public decimal MacdAvgChange { get; set; } = 0.05M;
+        public decimal MacdAvgChange { get; set; }
 
         [AlgoParam(15)]
-        public int MacdPeriods { get; set; } = 15;
+        public int MacdPeriods { get; set; } 
 
         [AlgoParam(9)]
-        public int MACDTrigger { get; set; } = 9;
+        public int MACDTrigger { get; set; }
 
         [AlgoParam(false)]
-        public bool AlwaysGetProfit { get; set; } = false;
+        public bool AlwaysGetProfit { get; set; } 
 
         [AlgoParam(false)]
-        public bool AlwaysStopLoss { get; set; } = false;
+        public bool AlwaysStopLoss { get; set; }
 
         [AlgoParam(9)]
-        public int PowerLookback { get; set; } = 60;
+        public int PowerLookback { get; set; } 
 
         //[AlgoParam(9)]
         //public int PowerBarSeconds { get; set; } = 60;
 
-        [AlgoParam(9)]
-        public int PowerVolumeCollectionPeriod { get; set; } = 15;
+        [AlgoParam(10)]
+        public int PowerVolumeCollectionPeriod { get; set; }
 
         [AlgoParam(0)]
-        public int PowerCrossThreshold { get; set; } = 0;
+        public int PowerCrossThreshold { get; set; } 
 
         public FinanceBars MinBars = null;
 
@@ -507,6 +508,15 @@ namespace Kalitte.Trading.Algos
             Log($"Power: {LastPower}", LogLevel.Critical);
         }
 
+        public MyAlgo(): base()
+        {
+
+        }
+
+        public MyAlgo(Dictionary<string, object> init) : base(init)
+        {
+
+        }
 
         public override string ToString()
         {

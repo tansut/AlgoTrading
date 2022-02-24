@@ -20,6 +20,7 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Kalitte.Trading
 {
@@ -28,18 +29,15 @@ namespace Kalitte.Trading
     public class AlgoParam : Attribute
     {
         public object Value { get; set; } = null;
-        public AlgoParam(object val = null)
+        public AlgoParam(object val)
         {
-
+            this.Value = val;
+  
         }
 
-        public AlgoParam()
-        {
-
-        }
     }
 
-    public class AlgoParameter<T> where T: IEquatable<T>
+    public class AlgoParameter<T> where T : IEquatable<T>
     {
         public string Name { get; set; }
         public T Value { get; set; }
@@ -51,9 +49,9 @@ namespace Kalitte.Trading
         }
     }
 
-    public class StringParameter: AlgoParameter<string>
+    public class StringParameter : AlgoParameter<string>
     {
-        public StringParameter(string name, string value): base(name, value)
+        public StringParameter(string name, string value) : base(name, value)
         {
 
         }
@@ -172,7 +170,7 @@ namespace Kalitte.Trading
         Verbose = 0,
         Debug = 1,
         Info = 2,
-        Warning = 3,        
+        Warning = 3,
         Order = 4,
         Error = 10,
         FinalResult = 15,
@@ -182,6 +180,102 @@ namespace Kalitte.Trading
     public interface ILogProvider
     {
         void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null);
+    }
+
+
+    public class AlternateValues : Dictionary<string, object[]>
+    {
+        public List<Dictionary<string, object>> GenerateTestCases()
+        {
+            var allValues = new List<object[]>();
+            var result = new List<Dictionary<string, object>>();
+
+            foreach (var item in this)
+            {
+                allValues.Add(item.Value);
+            }
+            var cartesian = Helper.Cartesian(allValues);
+
+            var data = cartesian.Select(x => x);
+
+            foreach (var line in data)
+            {
+                var dict = new Dictionary<string, object>();
+                var keys = this.Keys.AsEnumerable().GetEnumerator();
+                foreach (var item in (IEnumerable<object>)line)
+                {
+                    keys.MoveNext();
+                    dict.Add(keys.Current, item);
+
+                }
+                result.Add(dict);
+            }
+
+            return result;
+
+        }
+
+        public void Push(string key, object[] values)
+        {
+            if (this.ContainsKey(key))
+            {
+                var newValues = new List<object>(this[key]);
+                newValues.AddRange(values);
+                var uniquePersons = newValues.GroupBy(p => p)
+                           .Select(grp => grp.First())
+                           .ToArray();
+                this[key] = uniquePersons.ToArray();
+
+            }
+            else this.Add(key, values);
+        }
+
+        public AlternateValues()
+        {
+
+        }
+
+        public void Set(string key, params object[] val)
+        {
+            this[key] = val ;
+        }
+
+
+        public void Push(string key, object value)
+        {
+            Push(key, new object[] { value });
+        }
+
+        public AlternateValues(Dictionary<string, object> initValues = null)
+        {
+            if (initValues != null)
+            {
+                foreach (var item in initValues)
+                {
+                    this.Add(item.Key, new object[] { item.Value });
+                }
+            }
+        }
+
+        //public void SaveToFile(string fileName)
+        //{
+            
+        //    XmlSerializer ser = new XmlSerializer(this.GetType());
+        //    TextWriter writer = new StreamWriter(fileName);
+        //    ser.Serialize(writer, this);
+        //    writer.Close();
+
+        //}
+
+        public Dictionary<string, object> Lean()
+        {
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            foreach (var item in this)
+            {
+                dict.Add(item.Key, item.Value[0]);
+            }
+            return dict;
+        }
     }
 
 }

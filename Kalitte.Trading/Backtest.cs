@@ -11,37 +11,19 @@ namespace Kalitte.Trading
     public class Backtest
     {
 
-        public void ApplyProperties(Dictionary<string, object> values)
-        {
-            var properties = Algo.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
-            foreach (var item in properties)
-            {
-                object val;
-                if (values.TryGetValue(item.Name, out val))
-                {
-                    var propValue = val;
-                    if (val.GetType() != item.PropertyType)
-                    {
-                        var tc = new TypeConverter();
-                        propValue = tc.ConvertTo(val, item.PropertyType);
-                    }
-                    Algo.GetType().GetProperty(item.Name).SetValue(Algo, propValue);
-                }
-            }
-        }
+
 
         public DateTime StartTime { get; set; }
         public DateTime FinishTime { get; set; }
         public AlgoBase Algo { get; set; }
 
-        public Backtest(AlgoBase algo, DateTime start, DateTime end, Dictionary<string, object> initValues = null)
+        public Backtest(AlgoBase algo, DateTime start, DateTime end)
         {
             Algo = algo;
             StartTime = start;
             FinishTime = end;
             Algo.Simulation = true;
-            Algo.UseVirtualOrders = true;
-            if (initValues != null) ApplyProperties(initValues);
+            Algo.UseVirtualOrders = true;            
             Algo.Init();
         }
 
@@ -137,10 +119,6 @@ namespace Kalitte.Trading
                 }
                 else
                 {
-                    //var bd = Algo.GetPeriodBars(Algo.Symbol, prevDayLastBar).Last;
-                    //var newQuote = new MyQuote() { Date = prevDayLastBar, High = bd.High, Close = bd.Close, Low = bd.Low, Open = bd.Open, Volume = bd.Volume };
-                    //Algo.PeriodBars.Push(newQuote);
-                    //Algo.Log($"Pushed new day bar, last bar is now: {Algo.PeriodBars.Last}", LogLevel.Debug);
                     Algo.Signals.ForEach(p => p.Reset());
                 }
                 Run(periods.Item1.Item1, periods.Item1.Item2);
@@ -149,5 +127,37 @@ namespace Kalitte.Trading
             Algo.Stop();
         }
 
+    }
+
+
+    public class Optimizer<T> where T: AlgoBase
+    {
+        public DateTime StartTime { get; set; }
+        public DateTime FinishTime { get; set; }
+
+        Type algoType;
+
+        public Optimizer(DateTime start, DateTime finish, Type algoType)
+        {
+            this.StartTime = start;
+            this.FinishTime = finish;
+            this.algoType = algoType;
+        }
+
+        public void Start(AlternateValues alternates)
+        {
+            var cases = alternates.GenerateTestCases();
+            Parallel.For(0, cases.Count, i =>
+            {
+                var initValues = cases[i];                
+                var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { initValues });
+                Backtest test = new Backtest(algo, this.StartTime, this.FinishTime);
+                Console.WriteLine($"Running test case {i} for {algo.InstanceName}");
+                test.Start();
+                Console.WriteLine($"Completed {algo.InstanceName}");
+
+
+            });
+        }
     }
 }

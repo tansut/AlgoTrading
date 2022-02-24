@@ -16,6 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\third.party\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Skender.Stock.Indicators">
       <HintPath>..\third.party\Skender.Stock.Indicators.dll</HintPath>
     </Reference>

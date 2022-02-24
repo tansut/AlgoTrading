@@ -3,6 +3,7 @@ using Skender.Stock.Indicators;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -78,28 +79,30 @@ namespace Kalitte.Trading.Algos
 
         public IExchange Exchange { get; set; }
 
-        [AlgoParam()]
-        public LogLevel LoggingLevel { get; set; } = LogLevel.Verbose;
+        [AlgoParam(LogLevel.Verbose)]
+        public LogLevel LoggingLevel { get; set; }
 
-        [AlgoParam()]
-        public bool Simulation { get; set; } = false;
+        [AlgoParam(false)]
+        public bool Simulation { get; set; }
 
-        public string LogDir { get; set; } = @"c:\kalitte\log";
+        [AlgoParam(@"c:\kalitte\log")]
+        public string LogDir { get; set; }
+
         public MarketDataFileLogger PriceLogger;
         public string InstanceName { get; set; }
 
         [AlgoParam("F_XU0300222")]
-        public string Symbol { get; set; } = "F_XU0300222";
+        public string Symbol { get; set; }
 
 
         [AlgoParam(BarPeriod.Min10)]
-        public BarPeriod SymbolPeriod { get; set; } = BarPeriod.Min10;
+        public BarPeriod SymbolPeriod { get; set; }
 
 
-        [AlgoParam()]
+        [AlgoParam(false)]
         public bool UseVirtualOrders { get; set; }
 
-        [AlgoParam()]
+        [AlgoParam(false)]
         public bool AutoCompleteOrders { get; set; }
 
 
@@ -318,12 +321,18 @@ namespace Kalitte.Trading.Algos
 
         }
 
-
-        public AlgoBase()
+        public AlgoBase(): this(null)
         {
+
+        }
+
+
+        public AlgoBase(Dictionary<string, object> initValues)
+        {
+            this.ApplyProperties(initValues);
             RandomGenerator random = new RandomGenerator();
-            if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
             this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));
+                        
             Current = this;
         }
 
@@ -359,6 +368,55 @@ namespace Kalitte.Trading.Algos
             }
         }
 
+        public static Dictionary<string, object> GetProperties(Type type)
+        {
+            Dictionary<string, object> result = new Dictionary<string, object>();
+            var properties = type.GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
+            foreach (var prop in properties)
+            {
+                var attr = (AlgoParam)prop.GetCustomAttributes(true).Where(p => p is AlgoParam).First();
+                result.Add(prop.Name, attr.Value);
+            }
+            return result;
+
+        }
+
+        public void ApplyProperties(Dictionary<string, object> init = null)
+        {
+            if (init == null) init = GetProperties(this.GetType());
+            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
+            foreach (var item in properties)
+            {
+                object val;
+                if (init.TryGetValue(item.Name, out val))
+                {
+                    object propValue = val;
+                    if (val != null && val.GetType() != item.PropertyType)
+                    {
+                        if (item.PropertyType == typeof(decimal))
+                        {
+                            propValue = Convert.ToDecimal(val);
+                        }
+                        else if (item.PropertyType == typeof(int))
+                        {
+                            propValue = Convert.ToInt32(val);
+                        } else if(item.PropertyType == typeof(LogLevel))
+                        {
+                            propValue = (LogLevel)Convert.ToInt32(val);
+                        }
+                        else if (item.PropertyType == typeof(BarPeriod))
+                        {
+                            propValue = (BarPeriod)Convert.ToInt32(val);
+                        }
+                        //if (typeof(propValue) != propValue)
+                        //var tc = new TypeConverter();
+                        //propValue = tc.ConvertTo(val, item.PropertyType);
+                    }
+                    this.GetType().GetProperty(item.Name).SetValue(this, propValue);
+                }
+            }
+        }
+
         public StringBuilder PropSummary()
         {
             var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
@@ -381,8 +439,8 @@ namespace Kalitte.Trading.Algos
 
 
         public virtual void Init()
-        {
-
+        {            
+            if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
 
 
         }
@@ -555,7 +613,8 @@ namespace Kalitte.Trading.Algos
         {
             get
             {
-                return Path.Combine(LogDir, $"algologs{(Simulation ? 'B' : 'L')}", $" {InstanceName}.txt");
+                var inner = this.Simulation ? "simulation" : "live";
+                return Path.Combine(LogDir, inner, $"{InstanceName}.txt");
             }
         }
 

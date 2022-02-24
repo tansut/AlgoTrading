@@ -52,7 +52,7 @@ namespace Kalitte.Trading
                 {
                     Algo.AlgoTime = p;
 
-                    Func<object, SignalResultX> action = (object stateo) =>
+                    Func<object, SignalResult> action = (object stateo) =>
                     {
                         var state = (Dictionary<string, object>)stateo;
                         DateTime time = (DateTime)(state["time"]);
@@ -60,14 +60,14 @@ namespace Kalitte.Trading
                     };
 
                     var time = Algo.AlgoTime;
-                    var tasks = new List<Task<SignalResultX>>();
+                    var tasks = new List<Task<SignalResult>>();
 
                     foreach (var signal in Algo.Signals)
                     {
                         var dict = new Dictionary<string, object>();
                         dict["time"] = time;
                         dict["signal"] = signal;
-                        tasks.Add(Task<SignalResultX>.Factory.StartNew(action, dict));
+                        tasks.Add(Task<SignalResult>.Factory.StartNew(action, dict));
                     }
                     Task.WaitAll(tasks.ToArray());
                     Algo.CheckDelayedOrders(time);
@@ -90,7 +90,7 @@ namespace Kalitte.Trading
 
                         if (period == null || period.Date != round)
                         {
-                            Algo.Log($"Error loading period for {period}", LogLevel.Error, p);
+                            Algo.Log($"Error loading period for {round}", LogLevel.Error, p);
                             periodBarsLoaded = false;
                         }
                         else

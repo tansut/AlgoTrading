@@ -17,7 +17,7 @@ namespace Kalitte.Trading
 {
 
 
-    public class CrossSignalResult : SignalResultX
+    public class CrossSignalResult : SignalResult
     {
         public decimal i1Val { get; set; }
         public decimal i2Val { get; set; }
@@ -132,7 +132,7 @@ namespace Kalitte.Trading
 
 
 
-        protected SignalResultX CalculateSignal(DateTime? t = null)
+        protected SignalResult CalculateSignal(DateTime? t = null)
         {
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
             var mp = Algo.GetMarketPrice(Symbol, t);
@@ -297,7 +297,7 @@ namespace Kalitte.Trading
 
         //}
 
-        protected override SignalResultX CheckInternal(DateTime? t = null)
+        protected override SignalResult CheckInternal(DateTime? t = null)
         {
             var current = CalculateSignal(t);
             return current;

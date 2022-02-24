@@ -140,6 +140,13 @@ namespace Kalitte.Trading.Matrix
             {
                 Debug($"{item.Name} -> {item.GetValue(this)}");
                 Algo.GetType().GetProperty(item.Name).SetValue(Algo, item.GetValue(this));
+
+                //try
+                //{
+                    
+                //} catch (Exception exc) {
+                //    Debug($"{item.Name} {} {exc.Message} {exc.StackTrace}");
+                //}
             }
         }
 

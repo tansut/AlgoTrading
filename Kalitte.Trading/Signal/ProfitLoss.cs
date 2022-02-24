@@ -19,7 +19,7 @@ namespace Kalitte.Trading
         Profit
     }
 
-    public class ProfitLossResult: SignalResultX
+    public class ProfitLossResult: SignalResult
     {
         public decimal PL { get; set; }
         public decimal MarketPrice { get; set; }
@@ -56,7 +56,7 @@ namespace Kalitte.Trading
         }
 
 
-        protected override SignalResultX CheckInternal(DateTime? t = null)
+        protected override SignalResult CheckInternal(DateTime? t = null)
         {
 
             BuySell? result = null;

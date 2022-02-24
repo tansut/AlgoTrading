@@ -27,7 +27,7 @@ namespace Kalitte.Trading
         Low
     }
 
-    public class PowerSignalResult : SignalResultX
+    public class PowerSignalResult : SignalResult
     {
         internal double CurrentVolume;
 
@@ -119,7 +119,7 @@ namespace Kalitte.Trading
             s.LastVolume = last;
         }
 
-        protected override SignalResultX CheckInternal(DateTime? t = null)
+        protected override SignalResult CheckInternal(DateTime? t = null)
         {
 
             var time = t ?? DateTime.Now;

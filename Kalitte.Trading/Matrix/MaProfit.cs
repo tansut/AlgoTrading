@@ -22,7 +22,7 @@ namespace Kalitte.Trading.Matrix
 
 
 
-    public class MaProfit : MatrixAlgoBase<MyAlgo>
+    public class MaProfit : MatrixAlgoBase<Bist30Futures>
     {
 
         //[SymbolParameter("F_XU0300222")]
@@ -138,8 +138,7 @@ namespace Kalitte.Trading.Matrix
         [Parameter(60)]
         public int PowerLookback { get; set; } = 60;
 
-        [Parameter(60)]
-        public int PowerBarSeconds { get; set; } = 60;
+
 
         [Parameter(15)]
         public int PowerVolumeCollectionPeriod { get; set; } = 15;
@@ -150,6 +149,7 @@ namespace Kalitte.Trading.Matrix
         public override void OnInit()
         {
             AddSymbol(Symbol, SymbolPeriod);
+            AddSymbol(Symbol, SymbolPeriod.Min);
             WorkWithPermanentSignal(true);
             SendOrderSequential(false);
             if ((ProfitQuantity > 0 || LossQuantity > 0) && !Simulation)
@@ -195,7 +195,7 @@ namespace Kalitte.Trading.Matrix
                     //Algo.Log($"Running backtest for period: {Algo.PeriodBars.Last}", LogLevel.Debug);
 
 
-                    Func<object, SignalResultX> action = (object stateo) =>
+                    Func<object, SignalResult> action = (object stateo) =>
                     {
                         var state = (Dictionary<string, object>)stateo;
                         DateTime time = (DateTime)(state["time"]);
@@ -207,14 +207,14 @@ namespace Kalitte.Trading.Matrix
                     {
                         var time = Algo.AlgoTime;
                         //Algo.Log($"Running signals for {time}", LogLevel.Critical, time);
-                        var tasks = new List<Task<SignalResultX>>();
+                        var tasks = new List<Task<SignalResult>>();
 
                         foreach (var signal in Algo.Signals)
                         {
                             var dict = new Dictionary<string, object>();
                             dict["time"] = time;
                             dict["signal"] = signal;
-                            tasks.Add(Task<SignalResultX>.Factory.StartNew(action, dict));
+                            tasks.Add(Task<SignalResult>.Factory.StartNew(action, dict));
                         }
                         Task.WaitAll(tasks.ToArray());
                         Algo.CheckDelayedOrders(time);
@@ -237,13 +237,14 @@ namespace Kalitte.Trading.Matrix
                 }
             }
             else
-            {                
-                var bd = GetBarData(Symbol, SymbolPeriod);
+            {
+                var period = barDataCurrentValues.LastUpdate.SymbolPeriod;
+                var bd = GetBarData(Symbol, period);                
                 var last = bd.BarDataIndexer.LastBarIndex;
                 try
                 {
                     var newQuote = new MyQuote() { Date = bd.BarDataIndexer[last], High = bd.High[last], Close = bd.Close[last], Low = bd.Low[last], Open = bd.Open[last], Volume = bd.Volume[last] };
-                    Algo.PushNewBar(Symbol, (BarPeriod)Enum.Parse(typeof(BarPeriod), this.SymbolPeriod.ToString()), newQuote);
+                    Algo.PushNewBar(Symbol, (BarPeriod)Enum.Parse(typeof(BarPeriod), period.ToString()), newQuote);
                 }
                 catch (Exception ex)
                 {
@@ -274,9 +275,9 @@ namespace Kalitte.Trading.Matrix
 
 
 
-        protected override MyAlgo createAlgoInstance()
+        protected override Bist30Futures createAlgoInstance()
         {
-            return new MyAlgo();
+            return new Bist30Futures();
         }
     }
 

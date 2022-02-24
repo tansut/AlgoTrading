@@ -22,7 +22,7 @@ namespace Kalitte.Trading
         AboveHigh
     }
 
-    public class RangeSignalResult : SignalResultX
+    public class RangeSignalResult : SignalResult
     {
         public RangeStatus? Status { get; set; }
         public decimal Value { get; set; }
@@ -59,7 +59,7 @@ namespace Kalitte.Trading
             return $"{base.ToString()}: {Min}-{Max} range, period: {AnalysisPeriod}";
         }
 
-        protected override SignalResultX CheckInternal(DateTime? t = null)
+        protected override SignalResult CheckInternal(DateTime? t = null)
         {
             BuySell? result = null;
             RangeStatus? status = null;

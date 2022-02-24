@@ -23,11 +23,11 @@ namespace Kalitte.Trading
         }
 
 
-        protected override SignalResultX CheckInternal(DateTime? t = null)
+        protected override SignalResult CheckInternal(DateTime? t = null)
         {
             var result = this.Side;
             this.Side = result == BuySell.Buy ? BuySell.Sell : BuySell.Buy;
-            return new SignalResultX(this, t ?? DateTime.Now) { finalResult = result };
+            return new SignalResult(this, t ?? DateTime.Now) { finalResult = result };
         }
 
 

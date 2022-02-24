@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace Kalitte.Trading.Algos
 {
-    public class MyAlgo : AlgoBase
+    public class Bist30Futures : AlgoBase
     {
 
         public PowerSignalResult LastPower { get; set; } = null;
@@ -266,6 +266,7 @@ namespace Kalitte.Trading.Algos
             base.Stop();
             var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
 
+
             if (Simulation && ExpectedNetPl != 0 && netPL < ExpectedNetPl) File.Delete(LogFile);
             else if (Simulation) Process.Start(LogFile);
         }
@@ -317,7 +318,7 @@ namespace Kalitte.Trading.Algos
             if ((LastPower == null || LastPower.Power != result.Power) && result.Power != PowerRatio.Unknown)
             {
                 var last = LastPower != null ? LastPower.Power.ToString() : "";
-                //Log($"Power changed from {last} -> {result.Power}. Signal: {result} ", LogLevel.Warning, result.SignalTime);
+                if (DynamicCross) Log($"Power changed from {last} -> {result.Power}. Signal: {result} ", LogLevel.Warning, result.SignalTime);
                 LastPower = result;
             }
 
@@ -499,28 +500,28 @@ namespace Kalitte.Trading.Algos
             //signal.AdjustSensitivity(0.30, "Order Received");
         }
 
-        public override void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResultX signalResult = null)
+        public override void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null)
         {
             base.sendOrder(symbol, quantity, side, comment, lprice, icon, t, signalResult);
             //var sep = ",";
             //Log($"ATR: {string.Join(sep, atrTrend.i1k.Results.Select(p => p.Value))}", LogLevel.Critical);
-            Log($"ART: {atrTrend.i1k.Results.Last().Date} {atrTrend.i1k.Results.Last().Value}", LogLevel.Critical);
-            Log($"Power: {LastPower}", LogLevel.Critical);
+            //Log($"ART: {atrTrend.i1k.Results.Last().Date} {atrTrend.i1k.Results.Last().Value}", LogLevel.Critical);
+            //Log($"Power: {LastPower}", LogLevel.Critical);
         }
 
-        public MyAlgo(): base()
+        public Bist30Futures(): base()
         {
 
         }
 
-        public MyAlgo(Dictionary<string, object> init) : base(init)
+        public Bist30Futures(Dictionary<string, object> init) : base(init)
         {
 
         }
 
         public override string ToString()
         {
-            var assembly = typeof(MyAlgo).Assembly.GetName();
+            var assembly = typeof(Bist30Futures).Assembly.GetName();
             return $"Instance {InstanceName} [{this.Symbol}/{SymbolPeriod}] using assembly {assembly.FullName}";
         }
 

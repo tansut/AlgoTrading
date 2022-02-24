@@ -247,7 +247,14 @@ namespace Kalitte.Trading
             rwl.AcquireReaderLock(timeOut);
             try
             {
-                return items[index];
+                try
+                {
+                    return items[index];
+                } catch
+                {
+                    return default(T);
+                }
+                
                 }
             finally
             {

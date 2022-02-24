@@ -19,17 +19,14 @@ namespace Kalitte.Trading
 
 
 
-    public class SignalResultX
+    public class SignalResult
     {
         public BuySell? finalResult = null;
         public Signal Signal { get; set; }
         public DateTime SignalTime { get; set; }
 
-        //public SignalResultX(Signal signal): this(signal)
-        //{
-        //}
 
-        public SignalResultX(Signal signal, DateTime signalTime)
+        public SignalResult(Signal signal, DateTime signalTime)
         {
             this.Signal = signal;
             this.SignalTime = signalTime;
@@ -49,8 +46,7 @@ namespace Kalitte.Trading
 
     public class SignalEventArgs : EventArgs
     {
-        public SignalResultX Result { get; set; }
-
+        public SignalResult Result { get; set; }
     }
 
     public delegate void SignalEventHandler(Signal signal, SignalEventArgs data);
@@ -126,7 +122,7 @@ namespace Kalitte.Trading
         {
             var hasLock = false;
             var restartTimer = false;
-            SignalResultX result = null;
+            SignalResult result = null;
             try
             {
                 Monitor.TryEnter(_locker, ref hasLock);
@@ -151,9 +147,9 @@ namespace Kalitte.Trading
 
         }
 
-        protected abstract SignalResultX CheckInternal(DateTime? t = null);
+        protected abstract SignalResult CheckInternal(DateTime? t = null);
 
-        public virtual SignalResultX Check(DateTime? t = null)
+        public virtual SignalResult Check(DateTime? t = null)
         {
             if (this.State == StartableState.Paused) return null;
             InOperationLock.WaitOne();
@@ -172,7 +168,7 @@ namespace Kalitte.Trading
             catch (Exception ex)
             {
                 Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
-                return new SignalResultX(this, t ?? DateTime.Now) { finalResult = null };
+                return new SignalResult(this, t ?? DateTime.Now) { finalResult = null };
             }
             finally
             {

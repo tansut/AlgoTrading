@@ -77,7 +77,7 @@ namespace Kalitte.Trading
         }
     }
 
-    public class TrendSignalResult : SignalResultX
+    public class TrendSignalResult : SignalResult
     {
         public TrendResult Trend { get; set; }
 
@@ -196,7 +196,7 @@ namespace Kalitte.Trading
 
         }
 
-        protected override SignalResultX CheckInternal(DateTime? t = null)
+        protected override SignalResult CheckInternal(DateTime? t = null)
         {
             var result = new TrendSignalResult(this, t ?? DateTime.Now);
             result.Trend = new TrendResult();

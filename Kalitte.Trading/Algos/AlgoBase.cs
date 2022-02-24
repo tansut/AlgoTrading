@@ -111,6 +111,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool AutoCompleteOrders { get; set; }
 
+        public StringBuilder LogContent { get; set; } = new StringBuilder(1000);
+
 
         protected DateTime? TimeSet = null;
 
@@ -274,12 +276,19 @@ namespace Kalitte.Trading.Algos
 
         }
 
-        public virtual IQuote PushNewBar(string symbol, BarPeriod period, IQuote bar)
+        public virtual void PushNewBar(string symbol, BarPeriod period, IQuote bar)
         {
             var data = GetSymbolData(symbol, period);
-            data.Periods.Push(bar);
-            Log($"Pushed new bar, last bar is now: {data.Periods.Last}", LogLevel.Debug, data.Periods.Last.Date);
-            return bar;
+            if (data == null)
+            {
+                Log($"Received new bar for period {period}, but algo doesnot use it", LogLevel.Warning);
+
+            } else
+            {
+                data.Periods.Push(bar);
+                Log($"Pushed new bar for period {period}, last bar is now: {data.Periods.Last}", LogLevel.Debug, data.Periods.Last.Date);
+
+            }
         }
 
         public SymbolData GetSymbolData(string symbol, BarPeriod period)
@@ -354,7 +363,7 @@ namespace Kalitte.Trading.Algos
 
         public void SignalReceieved(Signal signal, SignalEventArgs data)
         {
-            SignalResultX existing;
+            SignalResult existing;
             BuySell? oldFinalResult = null;
             int? oldHashCode = null;
             lock (SignalResults)
@@ -535,10 +544,10 @@ namespace Kalitte.Trading.Algos
             Log($"{printPortfolio()}", LogLevel.FinalResult);
             Log($"----------------------", LogLevel.FinalResult);
 
-
+            File.AppendAllText(LogFile, LogContent.ToString());
         }
 
-        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResultX signalResult = null)
+        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null)
         {
             orderWait.Reset();
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
@@ -604,7 +613,7 @@ namespace Kalitte.Trading.Algos
 
 
         public List<Signal> Signals = new List<Signal>();
-        public ConcurrentDictionary<string, SignalResultX> SignalResults = new ConcurrentDictionary<string, SignalResultX>();
+        public ConcurrentDictionary<string, SignalResult> SignalResults = new ConcurrentDictionary<string, SignalResult>();
 
 
         public DateTime AlgoTime
@@ -635,12 +644,9 @@ namespace Kalitte.Trading.Algos
                 var time = t ?? AlgoTime;
                 string opTime = time.ToString("yyyy.MM.dd HH:mm:sss");
                 var content = $"[{level}:{opTime}]: {text}" + Environment.NewLine;
-                lock (this)
-                {
-                    if (LogConsole) Console.WriteLine(content);
-                    File.AppendAllText(LogFile, content + Environment.NewLine);
-                    if (Exchange != null) Exchange.Log(content, level, t);
-                }
+                LogContent.AppendLine(content);
+                if (LogConsole) Console.WriteLine(content);
+                if (Exchange != null) Exchange.Log(content, level, t);
             }
         }
 

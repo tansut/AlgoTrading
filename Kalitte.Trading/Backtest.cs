@@ -173,17 +173,21 @@ namespace Kalitte.Trading
         public void Start(AlternateValues alternates)
         {
             var cases = alternates.GenerateTestCases();
+            Console.WriteLine($" ** WILL RUN {cases.Count} TESTS ** Hit to continue ...");
+            Console.ReadKey();
+            Console.WriteLine("Running tests ...");
+            var completed = 0;
             Parallel.For(0, cases.Count, i =>
             {
                 var initValues = cases[i];                
                 var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { initValues });
                 Backtest test = new Backtest(algo, this.StartTime, this.FinishTime);
-                Console.WriteLine($"Running test case {i} for {algo.InstanceName} using {algo.LogFile}");
+                //Console.WriteLine($"Running test case {i}/{cases.Count} for {algo.InstanceName} using {algo.LogFile}");
                 test.Start();
-                Console.WriteLine($"Completed {algo.InstanceName}");
-
-
+                Console.WriteLine($"Completed case {algo.InstanceName}[{++completed}/{cases.Count}]");
             });
+            Console.WriteLine(" ** COMPLETED ** Hit to close ...");
+            Console.ReadKey();
         }
     }
 }

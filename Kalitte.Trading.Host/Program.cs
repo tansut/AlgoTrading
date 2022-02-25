@@ -59,7 +59,7 @@ public class Program
         alternates.Set("ProfitQuantity", 4);
         alternates.Set("ProfitPuan", 16);
         
-        alternates.Set("RsiProfitQuantity", 1.5);
+        alternates.Set("RsiProfitQuantity", 1);
         alternates.Set("ProgressiveProfitLoss", 2);        
         //alternates.Set("RsiHighLimit", 0);
         //alternates.Set("RsiLowLimit", 0);

@@ -60,7 +60,7 @@ namespace Kalitte.Trading.Indicators
 
         protected override List<IQuote> CreateUsedBars()
         {            
-            var skip = Math.Min(InputBars.Count, 2 * Lookback + 1);
+            var skip = LastItems;
             if (Candle != CandlePart.Close)
             {
                 var list = InputBars.LastItems(skip);

@@ -87,6 +87,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool AlwaysGetRsiProfit { get; set; }
 
+        [AlgoParam(false)]
+        public bool ProgressiveProfitLoss { get; set; }
+
 
         [AlgoParam(14)]
         public int Rsi { get; set; }
@@ -150,7 +153,7 @@ namespace Kalitte.Trading.Algos
         {
 
             var periodData = GetSymbolData(this.Symbol, this.SymbolPeriod);
-            var oneMinData = GetSymbolData(this.Symbol, BarPeriod.Min);
+            //var oneMinData = GetSymbolData(this.Symbol, BarPeriod.Min);
             var price = new Price(periodData.Periods, PowerLookback);
             priceTrend.i1k = price;
 
@@ -198,7 +201,7 @@ namespace Kalitte.Trading.Algos
         {
             //this.MinBars = GetPeriodBars(symbol, period, t);
             //this.oneMinBars = GetPeriodBars(symbol, BarPeriod.Min, t);
-            base.InitializeBars(symbol, BarPeriod.Min, t);
+            //base.InitializeBars(symbol, BarPeriod.Min, t);
             base.InitializeBars(symbol, period, t);
         }
 
@@ -285,14 +288,36 @@ namespace Kalitte.Trading.Algos
             var pq = portfolio.Quantity;
 
             bool doAction = pq == this.OrderQuantity;
+            
 
-            if (result.Direction == ProfitOrLoss.Profit && AlwaysGetProfit && pq > signal.ProfitQuantity) doAction = true;
-            if (result.Direction == ProfitOrLoss.Loss && AlwaysStopLoss && pq > signal.LossQuantity) doAction = true;
+            if (result.Direction == ProfitOrLoss.Profit && AlwaysGetProfit)  doAction = true;
+            if (result.Direction == ProfitOrLoss.Loss && AlwaysStopLoss)  doAction = true;
+
+            var profitQuantity = Math.Min(pq, signal.ProfitQuantity);
+            var lossQuantity = Math.Min(pq, signal.LossQuantity);
+
+            if (ProgressiveProfitLoss && signal.SignalCount == 1)
+            {
+                if (profitQuantity > 1) profitQuantity = profitQuantity / 2;
+                if (lossQuantity > 1) lossQuantity = lossQuantity / 2;
+                signal.AdjustPriceChange(1.25M);
+                doAction = doAction || pq > (result.Direction == ProfitOrLoss.Profit ? profitQuantity : lossQuantity);
+            }
+            else if (ProgressiveProfitLoss && signal.SignalCount == 2)
+            {
+                if (profitQuantity > 1) profitQuantity = profitQuantity / 2;
+                if (lossQuantity > 1) lossQuantity = lossQuantity / 2;
+                doAction = doAction || pq > (result.Direction == ProfitOrLoss.Profit ? profitQuantity : lossQuantity);
+            }
+            else if (ProgressiveProfitLoss && signal.SignalCount > 2)
+            {
+                doAction = false;
+            }
 
             if (doAction)
             {
                 Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Debug, result.SignalTime);
-                sendOrder(Symbol, result.Direction == ProfitOrLoss.Profit ? signal.ProfitQuantity : signal.LossQuantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result.MarketPrice, result.Direction == ProfitOrLoss.Profit ? OrderIcon.TakeProfit : OrderIcon.StopLoss, result.SignalTime, result);
+                sendOrder(Symbol, result.Direction == ProfitOrLoss.Profit ? profitQuantity : LossQuantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result.MarketPrice, result.Direction == ProfitOrLoss.Profit ? OrderIcon.TakeProfit : OrderIcon.StopLoss, result.SignalTime, result);
             }
             //else Log($"[{result.Signal.Name}:{result.Direction}] received but quantity doesnot match. Portfolio: {pq} oq: {this.OrderQuantity}", LogLevel.Verbose, result.SignalTime);
         }
@@ -426,7 +451,7 @@ namespace Kalitte.Trading.Algos
 
             if (!portfolio.IsEmpty)
             {
-                var quantity = portfolio.Quantity <= OrderQuantity && portfolio.Quantity > RsiProfitQuantity ? Math.Min(portfolio.Quantity, RsiProfitQuantity) : 0; // : RsiProfitQuantity;
+                var quantity = portfolio.Quantity <= OrderQuantity && (portfolio.Quantity > RsiProfitQuantity || AlwaysGetRsiProfit) ? Math.Min(portfolio.Quantity, RsiProfitQuantity) : 0; // : RsiProfitQuantity;
                 if (quantity > 0)
                 {
                     var trend = result.Trend;
@@ -435,7 +460,6 @@ namespace Kalitte.Trading.Algos
                     {
                         if (maSignal != null) maSignal.Reset();
                         sendOrder(Symbol, quantity, BuySell.Sell, $"[{result.Signal.Name}:{trend.Direction}]", 0, OrderIcon.PositionClose, result.SignalTime, result);
-
                     }
                     else if ((trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown) && portfolio.IsShort && portfolio.AvgCost >= (marketPrice + RsiProfitPuan))
                     {
@@ -516,6 +540,7 @@ namespace Kalitte.Trading.Algos
 
             var cross = (CrossSignal)signalResult.Signal;
             sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.Periods}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+            Signals.Where(p=>p is TakeProfitOrLossSignal).Select(p=>(TakeProfitOrLossSignal)p).ToList().ForEach(p=>p.ResetPriceChange());
             //signal.AdjustSensitivity(0.30, "Order Received");
         }
 

@@ -84,7 +84,8 @@ namespace Kalitte.Trading.Indicators
 
         protected virtual List<IQuote> CreateUsedBars()
         {
-            return InputBars.LastItems(Math.Min(InputBars.Count, 2 * (Lookback)));
+            return InputBars.LastItems(LastItems);
+            //return InputBars.LastItems(Math.Min(InputBars.Count, 2 * (Lookback)));
             //return InputBars.LastItems(Lookback);
         }
 
@@ -106,6 +107,14 @@ namespace Kalitte.Trading.Indicators
             } else if (e.Action == ListAction.ItemAdded)
             {
                 UsedInput.Add(e.Item);
+            }
+        }
+
+        public virtual int LastItems
+        {
+            get
+            {
+                return Math.Min(InputBars.Count, 96);
             }
         }
 

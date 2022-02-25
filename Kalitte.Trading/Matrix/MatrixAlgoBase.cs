@@ -33,10 +33,10 @@ namespace Kalitte.Trading.Matrix
         public T Algo { get; set; }
 
         //[Parameter(1)]
-        public int LoggingLevel { get; set; } = 1;
+        //public int LoggingLevel { get; set; } = 1;
 
         //[Parameter(false)]
-        public bool Simulation { get; set; } = false;
+        //public bool Simulation { get; set; } = false;
 
 
 
@@ -79,21 +79,21 @@ namespace Kalitte.Trading.Matrix
                 if (Algo.positionRequest != null && Algo.positionRequest.Id == order.CliOrdID)
                 {
                     Algo.positionRequest.Resulted = order.TradeDate;
-                    if (Simulation)
-                    {
-                        if (Algo.positionRequest.UnitPrice > 0 && Algo.positionRequest.UnitPrice != order.Price)
-                        {
-                            var gain = ((order.Price - Algo.positionRequest.UnitPrice) * (Algo.positionRequest.Side == BuySell.Buy ? 1 : -1) * Algo.positionRequest.Quantity);
-                            Algo.simulationPriceDif += gain;
-                            //Algo.Log($"Filled price difference for order {order.CliOrdID}: Potential: {Algo.positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, Algo.positionRequest.Resulted);
-                            //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
-                        }
-                        Algo.FillCurrentOrder(order.Price, Algo.positionRequest.Quantity);
-                    }
-                    else
-                    {
-                        Algo.FillCurrentOrder((order.FilledAmount / order.FilledQty) / 10M, order.FilledQty);
-                    }
+                    //if (Simulation)
+                    //{
+                    //    if (Algo.positionRequest.UnitPrice > 0 && Algo.positionRequest.UnitPrice != order.Price)
+                    //    {
+                    //        var gain = ((order.Price - Algo.positionRequest.UnitPrice) * (Algo.positionRequest.Side == BuySell.Buy ? 1 : -1) * Algo.positionRequest.Quantity);
+                    //        Algo.simulationPriceDif += gain;
+                    //        //Algo.Log($"Filled price difference for order {order.CliOrdID}: Potential: {Algo.positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, Algo.positionRequest.Resulted);
+                    //        //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
+                    //    }
+                    //    Algo.FillCurrentOrder(order.Price, Algo.positionRequest.Quantity);
+                    //}
+                    //else
+                    //{
+                    Algo.FillCurrentOrder((order.FilledAmount / order.FilledQty) / 10M, order.FilledQty);
+                    //}
                 }
             }
             else if (order.OrdStatus.Obj == OrdStatus.Rejected || order.OrdStatus.Obj == OrdStatus.Canceled)
@@ -142,7 +142,7 @@ namespace Kalitte.Trading.Matrix
             //var obj = JsonConvert.DeserializeObject<Dictionary<string, object>>(file);
 
             return;
-            
+
 
             var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(ParameterAttribute), true));
             Debug($"Setting Algo Properties({properties.Count()})");
@@ -205,15 +205,23 @@ namespace Kalitte.Trading.Matrix
 
         public void LoadRealPositions(string symbol)
         {
-            var positions = Simulation ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
+            var positions = GetRealPositions();
             LoadRealPositions(positions, p => p.Symbol == symbol);
-            if (!Simulation)
-            {
-                Algo.Log($"- PORTFOLIO -");
-                if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
-                else Algo.Log("!! Portfolio is empty !!");
-                Algo.Log($"- END PORTFOLIO -");
-            }
+
+            Algo.Log($"- PORTFOLIO -");
+            if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
+            else Algo.Log("!! Portfolio is empty !!");
+            Algo.Log($"- END PORTFOLIO -");
+
+            //var positions = Simulation ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
+            //LoadRealPositions(positions, p => p.Symbol == symbol);
+            //if (!Simulation)
+            //{
+            //    Algo.Log($"- PORTFOLIO -");
+            //    if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
+            //    else Algo.Log("!! Portfolio is empty !!");
+            //    Algo.Log($"- END PORTFOLIO -");
+            //}
         }
 
         public decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null)

@@ -95,11 +95,11 @@ namespace Kalitte.Trading.Indicators
             createResult();
         }
 
-        protected override List<IQuote> CreateUsedBars()
-        {
-            return InputBars.LastItems(Math.Min(InputBars.Count, 2 * (Signal + Fast + Slow)));
-            //return InputBars.AsList;
-        }
+        //protected override List<IQuote> CreateUsedBars()
+        //{
+        //    return InputBars.LastItems(Math.Min(InputBars.Count, 2 * (Signal + Fast + Slow)));
+        //    //return InputBars.AsList;
+        //}
 
         public override decimal NextValue(decimal newVal)
         {

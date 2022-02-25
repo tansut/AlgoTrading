@@ -98,8 +98,8 @@ namespace Kalitte.Trading.Algos
         public MarketDataFileLogger PriceLogger;
         public string InstanceName { get; set; }
 
-        //[AlgoParam("F_XU0300222")]
-        public string Symbol { get; set; } = "F_XU0300222";
+        [AlgoParam("F_XU0300422")]
+        public string Symbol { get; set; } = "F_XU0300422";
 
 
         [AlgoParam(BarPeriod.Min10)]

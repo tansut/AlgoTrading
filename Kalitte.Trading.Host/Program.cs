@@ -45,16 +45,20 @@ public class Program
     {
         var settings = new Settings();
         settings.sDate = new DateTime(2022, 02, 18, 9, 30, 0);
-        settings.fDate = new DateTime(2022, 02, 24, 23, 0, 0);
+        settings.fDate = new DateTime(2022, 02, 23, 23, 0, 0);
 
         var initValues = AlgoBase.GetProperties(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
         
         //alternates.Set("LogConsole", true);
         alternates.Set("LoggingLevel", LogLevel.Order);
+        alternates.Set("Symbol", "F_XU0300222");
         //alternates.Set("Rsi", 14);
-        //alternates.Set("PowerLookback", 5);
-        alternates.Set("ProfitQuantity", 0);
+        alternates.Set("OrderQuantity", 6);
+        alternates.Set("PowerLookback", 5);
+        alternates.Set("ProfitQuantity", 2);
+        alternates.Set("RsiProfitQuantity", 2);
+        alternates.Set("ProgressiveProfitLoss", true);        
         alternates.Set("RsiHighLimit", 0);
         alternates.Set("RsiLowLimit", 0);
         alternates.Set("DynamicCross", true);
@@ -68,9 +72,13 @@ public class Program
 
 
         var file = $"c:\\kalitte\\Bist30Futures-test.json";
-        var val = JsonConvert.SerializeObject(alternates.Lean(), Formatting.Indented);
+        var val = JsonConvert.SerializeObject(alternates, Formatting.Indented);
         File.WriteAllText(file, val);
-        SaveToFile($"c:\\kalitte\\Bist30Futures-alternates.json", settings);
+        //SaveToFile($"c:\\kalitte\\Bist30Futures-alternates.json", settings);
+
+        //var filec = File.ReadAllText(file);
+        //var fileContent = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(filec);
+        //var ainit = new AlternateValues().Lean();
 
         //alternates.Set("MinRsiChange", 1M 2M);
 

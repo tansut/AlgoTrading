@@ -34,10 +34,16 @@ namespace Kalitte.Trading
 
     public class TakeProfitOrLossSignal : Signal
     {
+        public decimal UsedProfitPriceChange { get; set; }
+        public decimal UsedLossPriceChange { get; set; }
+
+
         public decimal ProfitPriceChange { get; set; }
         public decimal ProfitQuantity { get; set; }
         public decimal LossPriceChange { get; set; }
         public decimal LossQuantity { get; set; }
+
+        public int SignalCount { get; set; }
 
         public TakeProfitOrLossSignal(string name, string symbol, AlgoBase owner, 
             decimal profitPriceChange, decimal profitQuantity, decimal lossPriceChange, decimal lossQuantity) : base(name, symbol, owner)
@@ -46,7 +52,22 @@ namespace Kalitte.Trading
             ProfitQuantity = profitQuantity;
             LossPriceChange =lossPriceChange;
             LossQuantity = lossQuantity;
+            UsedProfitPriceChange = profitPriceChange;
+            UsedLossPriceChange = lossPriceChange;
+            SignalCount = 0;
+        }
 
+        public void ResetPriceChange()
+        {
+            UsedProfitPriceChange = ProfitPriceChange;
+            UsedLossPriceChange = LossPriceChange;
+            SignalCount = 0;
+        }
+
+        public void AdjustPriceChange(decimal ratio)
+        {
+            UsedProfitPriceChange = ratio * ProfitPriceChange;
+            UsedLossPriceChange = ratio * LossPriceChange;
         }
 
 
@@ -77,29 +98,30 @@ namespace Kalitte.Trading
                 {
                     //Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Verbose, t);
                 }
-                else if (ProfitQuantity > 0 && portfolio.Side == BuySell.Buy && pl >= this.ProfitPriceChange)
+                else if (ProfitQuantity > 0 && portfolio.Side == BuySell.Buy && pl >= this.UsedProfitPriceChange)
                 {
                     direction = ProfitOrLoss.Profit;
                     result = BuySell.Sell;
+                    
                 }
-                else if (ProfitQuantity > 0 && portfolio.Side == BuySell.Sell && -pl >= this.ProfitPriceChange)
+                else if (ProfitQuantity > 0 && portfolio.Side == BuySell.Sell && -pl >= this.UsedProfitPriceChange)
                 {
                     direction = ProfitOrLoss.Profit;
                     result = BuySell.Buy;
                 }
-                else if (LossQuantity > 0 && portfolio.Side == BuySell.Buy && pl <= -this.LossPriceChange)
+                else if (LossQuantity > 0 && portfolio.Side == BuySell.Buy && pl <= -this.UsedLossPriceChange)
                 {
                     direction = ProfitOrLoss.Loss;
                     result = BuySell.Sell;
                 }
-                else if (LossQuantity > 0 && portfolio.Side == BuySell.Sell && pl >= this.LossPriceChange)
+                else if (LossQuantity > 0 && portfolio.Side == BuySell.Sell && pl >= this.UsedLossPriceChange)
                 {
                     direction = ProfitOrLoss.Loss;
                     result = BuySell.Buy;
                 }
                 //else Algo.Log($"No cation takeprofit: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
             }
-
+            if (result.HasValue) SignalCount++;
             return new ProfitLossResult(this, t ?? DateTime.Now) { Direction= direction, PL=pl, MarketPrice=price,PortfolioCost=avgCost, finalResult = result };
 
 

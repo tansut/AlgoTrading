@@ -235,6 +235,14 @@ namespace Kalitte.Trading
 
         }
 
+        public AlternateValues(Dictionary<string, object []> initValues = null)
+        {
+            foreach (var item in initValues)
+            {
+                this.Add(item.Key, item.Value);
+            }
+        }
+
         public void Set(string key, params object[] val)
         {
             this[key] = val ;

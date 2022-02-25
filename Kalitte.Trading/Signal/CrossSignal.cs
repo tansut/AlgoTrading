@@ -208,7 +208,7 @@ namespace Kalitte.Trading
         {
             var time = t ?? DateTime.Now;
 
-            if (time.Second % 30 == 0) CalculateSensitivity();
+            if (time.Second % 30 == 0 && DynamicCross) CalculateSensitivity();
 
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
             var mp = Algo.GetMarketPrice(Symbol, t);

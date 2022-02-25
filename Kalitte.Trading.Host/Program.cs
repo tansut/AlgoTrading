@@ -45,7 +45,7 @@ public class Program
     {
         var settings = new Settings();
         settings.sDate = new DateTime(2022, 02, 18, 9, 30, 0);
-        settings.fDate = new DateTime(2022, 02, 21, 23, 0, 0);
+        settings.fDate = new DateTime(2022, 02, 24, 23, 0, 0);
 
         var initValues = AlgoBase.GetProperties(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
@@ -59,10 +59,10 @@ public class Program
         alternates.Set("RsiLowLimit", 0);
         alternates.Set("DynamicCross", true);
         //alternates.Set("PowerVolumeCollectionPeriod", 10);
-        alternates.Set("PowerCrossThreshold", 80);
+        alternates.Set("PowerCrossThreshold", 90);
         alternates.Set("MaAvgChange", 0.25M);
-        alternates.Set("MaPeriods", 60);
-        alternates.Set("PowerCrossNegativeMultiplier", 2.5);
+        alternates.Set("MaPeriods", 45);
+        alternates.Set("PowerCrossNegativeMultiplier", 1);
         alternates.Set("PowerCrossPositiveMultiplier", 2.5);
         
 
@@ -70,7 +70,6 @@ public class Program
         var file = $"c:\\kalitte\\Bist30Futures-test.json";
         var val = JsonConvert.SerializeObject(alternates.Lean(), Formatting.Indented);
         File.WriteAllText(file, val);
-
         SaveToFile($"c:\\kalitte\\Bist30Futures-alternates.json", settings);
 
         //alternates.Set("MinRsiChange", 1M 2M);

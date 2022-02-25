@@ -115,7 +115,7 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool AlwaysStopLoss { get; set; }
 
-        [AlgoParam(9)]
+        [AlgoParam(5)]
         public int PowerLookback { get; set; } 
 
         //[AlgoParam(9)]
@@ -124,8 +124,14 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(10)]
         public int PowerVolumeCollectionPeriod { get; set; }
 
-        [AlgoParam(50)]
-        public int PowerCrossThreshold { get; set; } 
+        [AlgoParam(100)]
+        public decimal PowerCrossThreshold { get; set; }
+
+        [AlgoParam(1)]
+        public decimal PowerCrossNegativeMultiplier { get; set; }
+
+        [AlgoParam(2)]
+        public decimal PowerCrossPositiveMultiplier { get; set; }
 
         public FinanceBars MinBars = null;
 
@@ -148,7 +154,7 @@ namespace Kalitte.Trading.Algos
             var price = new Price(periodData.Periods, PowerLookback);
             priceTrend.i1k = price;
 
-            var atr = new Atrp(oneMinData.Periods, PowerLookback);
+            var atr = new Atrp(periodData.Periods, PowerLookback);
             atrTrend.i1k = atr;
 
             powerSignal.Indicator = new Rsi(periodData.Periods, PowerLookback, CandlePart.Volume);
@@ -217,13 +223,13 @@ namespace Kalitte.Trading.Algos
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MaAvgChange, Periods = MaPeriods };
+                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MaAvgChange, Periods = MaPeriods };
                 this.Signals.Add(maSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, Periods = MacdPeriods };
+                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, Periods = MacdPeriods };
                 this.Signals.Add(macSignal);
             }
 
@@ -320,22 +326,22 @@ namespace Kalitte.Trading.Algos
 
             LastPower = result;
 
-            if (LastPower != null && DynamicCross && AlgoTime.Second % 10 == 0)
+            if (LastPower != null && DynamicCross && AlgoTime.Second % 30 == 0)
             {
                 //Log($"Current ATR volatility level: {result}", LogLevel.Warning);
                 var atrInd = (Atrp)(atrTrend as TrendSignal).i1k;
                 var last = atrInd.ResultList.Last;
-                Log($"ATR last: atr: {last.Atr} tr: {last.Tr} p: {last.Atrp}", LogLevel.Warning);
-                Log($"Power {LastPower.Power}: {LastPower} ", LogLevel.Warning, result.SignalTime);
+                Log($"ATR: atr: {last.Atr} tr: {last.Tr} p: {last.Atrp}", LogLevel.Debug);
+                Log($"POWER {LastPower.Power}: {LastPower} ", LogLevel.Debug, result.SignalTime);
             }
 
             if (DynamicCross && result.Power != PowerRatio.Unknown)
             {
                 double ratio = 0;
-                if (result.Value < PowerCrossThreshold || PowerCrossThreshold == 0)
-                {
-                    ratio = 0.25 * (double)(100 - result.Value) / 100D;
-                }
+                //if (result.Value < PowerCrossThreshold || PowerCrossThreshold == 0)
+                //{
+                //    ratio = 0.25 * (double)(100 - result.Value) / 100D;
+                //}
                 //if (ratio < 0) ratio = 0;
                 //ratio = (double)(100 - result.Value) / 100D;
                 //Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{result.Power}/{result.Value}"));

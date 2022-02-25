@@ -32,7 +32,7 @@ namespace Kalitte.Trading.Matrix
         [Parameter(SymbolPeriod.Min10)]
         public SymbolPeriod SymbolPeriod { get; set; } 
 
-        [Parameter(4)]
+        [Parameter(2)]
         public decimal OrderQuantity { get; set; } 
 
 
@@ -134,11 +134,11 @@ namespace Kalitte.Trading.Matrix
         [Parameter(false)]
         public bool AlwaysStopLoss { get; set; } 
 
-        [Parameter(9)]
-        public int PowerLookback { get; set; } 
+        [Parameter(5)]
+        public int PowerLookback { get; set; }
 
-        [Parameter(50)]
-        public int PowerCrossThreshold { get; set; }
+        [Parameter(100)]
+        public decimal PowerCrossThreshold { get; set; }
 
         [Parameter(10)]
         public int PowerVolumeCollectionPeriod { get; set; } 

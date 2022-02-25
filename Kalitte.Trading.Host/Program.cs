@@ -12,7 +12,7 @@ using Kalitte.Trading.Algos;
 using System.Reflection;
 using System.IO;
 using Newtonsoft.Json;
-
+using System.Diagnostics;
 
 public class Settings
 {
@@ -23,8 +23,8 @@ public class Settings
 
 public class Program
 {
-    //public static DateTime sDate = new DateTime(2022, 02, 23, 9, 30, 0);
-    //public static DateTime fDate = new DateTime(2022, 02, 23, 23, 0, 0);
+    //public static DateTime sDate = new DateTime(2022, 02, 24, 9, 30, 0);
+    //public static DateTime fDate = new DateTime(2022, 02, 24, 23, 0, 0);
 
     //public static void DoBacktest(Dictionary<string, object> initValues)
     //{
@@ -65,20 +65,24 @@ public class Program
         //alternates.Set("LogConsole", true);
         alternates.Set("LoggingLevel", LogLevel.Order);
         //alternates.Set("Rsi", 14);
-        alternates.Set("PowerLookback", 5);
+        //alternates.Set("PowerLookback", 5);
         alternates.Set("ProfitQuantity", 0);
         alternates.Set("RsiHighLimit", 0);
         alternates.Set("RsiLowLimit", 0);
         alternates.Set("DynamicCross", true);
+        //alternates.Set("PowerVolumeCollectionPeriod", 10);
+        alternates.Set("PowerCrossThreshold", 80);
+        //alternates.Set("MaAvgChange", 0.3M);
+        //alternates.Set("MaPeriods", 90);
+        alternates.Set("PowerCrossNegativeMultiplier", 1);
+        alternates.Set("PowerCrossPositiveMultiplier", 2);
 
-
-
+        
 
 
 
         //alternates.Set("MinRsiChange", 1M 2M);
-        //alternates.Set("MaAvgChange", 0.25M);
-        //alternates.Set("MaPeriods", 25);
+
         //alternates.Set("CrossPriceCollectionPeriod", 2);
         //alternates.Set("PowerVolumeCollectionPeriod", 10);
         //alternates.Set("PowerCrossThreshold", 50);
@@ -110,10 +114,23 @@ public class Program
         }
         else if (args.Length == 2)
         {
+            if (args[0] == "init")
+            {
 
-            settings = LoadFromFile(args[0]);
-            var firstValues = settings.Alternates.Lean();
-            settings.Alternates = new AlternateValues(firstValues);
+                var initValues = AlgoBase.GetProperties(typeof(Bist30Futures));
+                settings.Alternates = settings.Alternates = new AlternateValues(initValues);
+                SaveToFile(args[0], settings);
+            }
+            else if (args[0] == "backtest")
+            {
+                settings = LoadFromFile(args[0]);
+                var firstValues = settings.Alternates.Lean();
+                settings.Alternates = new AlternateValues(firstValues);
+            } else
+            {
+                Console.WriteLine("Unknown option");
+                return;
+            }
 
         }
 

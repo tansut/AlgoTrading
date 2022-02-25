@@ -37,7 +37,9 @@ namespace Kalitte.Trading
     {
         public bool DynamicCross { get; set; } = false;
         public PowerSignal PowerSignal { get; set; }
-        public decimal InstantPower { get; set; }
+        public decimal PowerCrossThreshold { get; set; }
+        public decimal PowerCrossNegativeMultiplier { get; set; }
+        public decimal PowerCrossPositiveMultiplier { get; set; }
 
         public ITechnicalIndicator i1k;
         public ITechnicalIndicator i2k;
@@ -59,7 +61,7 @@ namespace Kalitte.Trading
         public int NextOrderMultiplier = 1;
         public bool UseSma = true;
 
-        private bool sensitivityAdjusted = false;
+        //private bool sensitivityAdjusted = false;
 
 
         public CrossSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
@@ -89,22 +91,22 @@ namespace Kalitte.Trading
             priceBars = new FinanceBars(PriceCollectionPeriod);
             crossBars = new FinanceBars(Periods);
             ResetInternal();
-            if (DynamicCross) CalculateSensitivity();
+            //if (DynamicCross) CalculateSensitivity();
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
-            if (PowerSignal != null) PowerSignal.OnSignal += PowerSignal_OnSignal;
+            //if (PowerSignal != null) PowerSignal.OnSignal += PowerSignal_OnSignal;
         }
 
         private void PowerSignal_OnSignal(Signal signal, SignalEventArgs data)
         {
             var rsi = (PowerSignalResult)data.Result;
-            InstantPower = rsi.Value;
+            //InstantPower = rsi.Value;
         }
 
         protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
         {
             priceBars.Clear();
             differenceBars.Clear();
-            if (DynamicCross) CalculateSensitivity();
+            //if (DynamicCross) CalculateSensitivity();
         }
 
         protected override void Colllect()
@@ -118,9 +120,9 @@ namespace Kalitte.Trading
             Periods = InitialPeriods + Convert.ToInt32((InitialPeriods * (decimal)ratio));
             differenceBars.Resize(Periods);
             crossBars.Resize(Periods);
-            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {Periods}", LogLevel.Critical);
-
+            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {Periods}", LogLevel.Debug);
         }
+
         public void AdjustSensitivity(double ratio, string reason)
         {
             //InOperationLock.WaitOne();
@@ -143,63 +145,71 @@ namespace Kalitte.Trading
 
         private void CalculateSensitivity()
         {
-            //var time = t ?? DateTime.Now;
-            var b12 = i1k.Results[i1k.Results.Count - 2];
-            var b22 = i2k.Results[i2k.Results.Count - 2];
-
-
-            var rl1 = b12.Value.Value;
-            var rl2 = b22.Value.Value;
-
-            var b1 = i1k.Results.Last();
-            var b2 = i2k.Results.Last();
-
-            var r1 = b1.Value;
-            var r2 = b2.Value;
-
-            var dl = rl1 - rl2;
-            var d = r1 - r2;
-
-            var dt = Math.Abs((dl - d).Value);
-
-            var max = InitialAvgChange * 1M;
-
-            var powerRatio = 0M;
-
-            var powerNote = "";
-
-            if (PowerSignal != null)
+            try
             {
-                var instantPower = PowerSignal.LastSignalResult as PowerSignalResult;
-                var barPower = PowerSignal.Indicator.Results.Last().Value;
-                if (instantPower != null)
-                //if (barPower.HasValue)
+                var b12 = i1k.Results[i1k.Results.Count - 2];
+                var b22 = i2k.Results[i2k.Results.Count - 2];
+
+
+                var rl1 = b12.Value.Value;
+                var rl2 = b22.Value.Value;
+
+                var b1 = i1k.Results.Last();
+                var b2 = i2k.Results.Last();
+
+                var r1 = b1.Value;
+                var r2 = b2.Value;
+
+                var dl = rl1 - rl2;
+                var d = r1 - r2;
+
+                var dt = Math.Abs((dl - d).Value);
+
+                var max = InitialAvgChange * 1M;
+
+                var powerRatio = 0M;
+
+                var powerNote = "";
+
+                if (PowerSignal != null)
                 {
-                    powerRatio = (60 - instantPower.Value) / 100;
-                    //if (powerRatio < 0) powerRatio = 0;
-                    //else 
-                    powerRatio = powerRatio > 0 ? powerRatio * 2M: powerRatio;
-                    
-                    powerNote = $"rsiBar: {barPower.Value} rsiInstant: {(instantPower == null ? 0 : instantPower.Value)}";
+                    var instantPower = PowerSignal.LastSignalResult as PowerSignalResult;
+                    //var rsiIndicator = PowerSignal.Indicator as Rsi;
+                    //var lastBar = rsiIndicator
+                    var barPower = PowerSignal.Indicator.Results.Last();
+                    var usedPower = instantPower != null && instantPower.Value > 0 ? instantPower.Value : barPower.Value.Value;
+                    powerRatio = (PowerCrossThreshold - usedPower) / 100;
+                    powerRatio = powerRatio > 0 ? powerRatio * PowerCrossPositiveMultiplier : powerRatio * PowerCrossNegativeMultiplier;
+                    powerNote = $"bar: {barPower.Date} rsiBar: {barPower.Value} rsiInstant: {(instantPower == null ? 0 : instantPower.Value)}";
                 }
+
+                var dtRatio = 0M;
+
+                if (dt < max)
+                {
+                    dtRatio = ((max - dt) / max);
+                }
+
+                var divide = 0;
+                if (dtRatio != 0) divide++;
+                if (powerRatio != 0) divide++;
+
+                var average = divide > 0 ? (powerRatio + dtRatio) / divide : 0;
+                AdjustSensitivity((double)average, $"Bars: [{b12.Date} - {b1.Date}] power: {powerRatio} [{powerNote}] dt:{dtRatio}  result:{average}");
+
             }
-
-
-            var dtRatio = 0M;
-
-            if (dt < max)
+            catch (Exception exc)
             {
-                dtRatio = ((max - dt) / max);
+                Log($"Error in calculating sensitivity. {exc.Message} {exc.StackTrace}", LogLevel.Error);
             }
-
-            var average = Math.Max(powerRatio, dtRatio);
-            average = powerRatio;
-            AdjustSensitivity((double)average, $"Bars: [{b12.Date} - {b1.Date}] power: {powerRatio} [{powerNote}] dt:{dtRatio}  ratio:{average}");
-
         }
 
         protected SignalResult CalculateSignal(DateTime? t = null)
         {
+            var time = t ?? DateTime.Now;
+
+            if (time.Second % 30 == 0) CalculateSensitivity();
+
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
             var mp = Algo.GetMarketPrice(Symbol, t);
 
@@ -255,11 +265,11 @@ namespace Kalitte.Trading
                     }
                     else
                     {
-                        if (sensitivityAdjusted)
-                        {
-                            //sensitivityAdjusted = false;
-                            //AdjustSensitivityInternal(0.0, "Revert");
-                        }
+                        //if (sensitivityAdjusted)
+                        //{
+                        //    //sensitivityAdjusted = false;
+                        //    //AdjustSensitivityInternal(0.0, "Revert");
+                        //}
                     }
                 }
 

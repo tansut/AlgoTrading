@@ -87,8 +87,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool AlwaysGetRsiProfit { get; set; }
 
-        [AlgoParam(false)]
-        public bool ProgressiveProfitLoss { get; set; }
+        [AlgoParam(0)]
+        public decimal ProgressiveProfitLoss { get; set; }
 
 
         [AlgoParam(14)]
@@ -296,22 +296,22 @@ namespace Kalitte.Trading.Algos
             var profitQuantity = Math.Min(pq, signal.ProfitQuantity);
             var lossQuantity = Math.Min(pq, signal.LossQuantity);
 
-            if (ProgressiveProfitLoss && signal.SignalCount == 1)
+            if (ProgressiveProfitLoss > 0 && signal.SignalCount == 1)
             {
                 if (profitQuantity > 1) profitQuantity = profitQuantity / 2;
                 if (lossQuantity > 1) lossQuantity = lossQuantity / 2;
-                signal.AdjustPriceChange(1.25M);
+                signal.AdjustPriceChange(ProgressiveProfitLoss);
                 doAction = doAction || pq > (result.Direction == ProfitOrLoss.Profit ? profitQuantity : lossQuantity);
             }
-            else if (ProgressiveProfitLoss && signal.SignalCount == 2)
+            else if (ProgressiveProfitLoss > 0 && signal.SignalCount == 2)
             {
                 if (profitQuantity > 1) profitQuantity = profitQuantity / 2;
                 if (lossQuantity > 1) lossQuantity = lossQuantity / 2;
                 doAction = doAction || pq > (result.Direction == ProfitOrLoss.Profit ? profitQuantity : lossQuantity);
             }
-            else if (ProgressiveProfitLoss && signal.SignalCount > 2)
+            else if (ProgressiveProfitLoss > 0 && signal.SignalCount > 2)
             {
-                doAction = false;
+                //doAction = false;
             }
 
             if (doAction)

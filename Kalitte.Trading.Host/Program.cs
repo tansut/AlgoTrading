@@ -57,10 +57,12 @@ public class Program
         alternates.Set("OrderQuantity", 6);
         alternates.Set("PowerLookback", 5);
         alternates.Set("ProfitQuantity", 2);
-        alternates.Set("RsiProfitQuantity", 2);
-        alternates.Set("ProgressiveProfitLoss", true);        
-        alternates.Set("RsiHighLimit", 0);
-        alternates.Set("RsiLowLimit", 0);
+        alternates.Set("ProfitPuan", 16);
+        
+        alternates.Set("RsiProfitQuantity", 1);
+        alternates.Set("ProgressiveProfitLoss", 0);        
+        //alternates.Set("RsiHighLimit", 0);
+        //alternates.Set("RsiLowLimit", 0);
         alternates.Set("DynamicCross", true);
         //alternates.Set("PowerVolumeCollectionPeriod", 10);
         alternates.Set("PowerCrossThreshold", 90);

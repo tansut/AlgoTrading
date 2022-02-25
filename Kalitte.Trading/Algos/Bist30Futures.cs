@@ -522,16 +522,18 @@ namespace Kalitte.Trading.Algos
         public override void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null)
         {
             base.sendOrder(symbol, quantity, side, comment, lprice, icon, t, signalResult);
-            //var sep = ",";
-            //Log($"ATR: {string.Join(sep, atrTrend.i1k.Results.Select(p => p.Value))}", LogLevel.Critical);
-            Log($"ARTP: {atrTrend.i1k.Results.Last().Date} {atrTrend.i1k.Results.Last().Value}", LogLevel.Critical);
-            Log($"Power: {LastPower}", LogLevel.Critical);
+            Log($"Power was during order: {LastPower}", LogLevel.Order);
         }
 
         public Bist30Futures(): base()
         {
 
         }
+
+        //public Bist30Futures(string configFile): base(configFile)
+        //{
+
+        //}
 
         public Bist30Futures(Dictionary<string, object> init) : base(init)
         {

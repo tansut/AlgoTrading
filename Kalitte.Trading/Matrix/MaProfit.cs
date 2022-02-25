@@ -7,6 +7,7 @@ using Matriks.Lean.Algotrader.Models;
 using Matriks.Trader.Core;
 using Matriks.Trader.Core.Fields;
 using Matriks.Trader.Core.TraderModels;
+using Newtonsoft.Json;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
@@ -29,118 +30,118 @@ namespace Kalitte.Trading.Matrix
         public string Symbol { get; set; } = "F_XU0300222";
 
 
-        [Parameter(SymbolPeriod.Min10)]
+        //// [Parameter(SymbolPeriod.Min10)]
         public SymbolPeriod SymbolPeriod { get; set; } 
 
-        [Parameter(2)]
+        //// [Parameter(2)]
         public decimal OrderQuantity { get; set; } 
 
 
-        [Parameter(10)]
+        //// [Parameter(10)]
         public int CrossPriceCollectionPeriod { get; set; } 
 
 
-        [Parameter(4)]
+        //// [Parameter(4)]
         public int RsiPriceCollectionPeriod { get; set; } 
 
-        [Parameter(true)]
+        //// [Parameter(true)]
         public bool UseSmaForCross { get; set; } 
 
-        [Parameter(5)]
+        //// [Parameter(5)]
         public int MovPeriod { get; set; } 
 
-        [Parameter(9)]
+        //// [Parameter(9)]
         public int MovPeriod2 { get; set; } 
 
 
-        [Parameter(0.25)]
+        //// [Parameter(0.25)]
         public decimal MaAvgChange { get; set; } 
 
-        [Parameter(60)]
+        //// [Parameter(60)]
         public int MaPeriods { get; set; } 
 
-        [Parameter(false)]
+        //// [Parameter(false)]
         public bool DynamicCross { get; set; } 
 
 
-        [Parameter(0)]
+        //// [Parameter(0)]
         public decimal ExpectedNetPl { get; set; }
 
 
 
 
-        [Parameter(false)]
+        //// [Parameter(false)]
         public bool UseVirtualOrders { get; set; } 
 
-        [Parameter(false)]
+        //// [Parameter(false)]
         public bool AutoCompleteOrders { get; set; } 
 
-        [Parameter(false)]
+        //// [Parameter(false)]
         public bool SimulateOrderSignal { get; set; } 
 
-        [Parameter(1)]
+        //// [Parameter(1)]
         public decimal ProfitQuantity { get; set; }
 
-        [Parameter(0)]
+        //// [Parameter(0)]
         public decimal LossQuantity { get; set; } 
 
-        [Parameter(16)]
+        ///// [Parameter(16)]
         public decimal ProfitPuan { get; set; } 
 
-        [Parameter(4)]
+        //// [Parameter(4)]
         public decimal LossPuan { get; set; }
 
-        [Parameter(60.0)]
+        //Parameter(60.0)]
         public decimal RsiHighLimit { get; set; } 
 
-        [Parameter(40.0)]
+        // [Parameter(40.0)]
         public decimal RsiLowLimit { get; set; } 
 
-        [Parameter(2)]
+        // [Parameter(2)]
         public decimal MinRsiChange { get; set; } 
 
-        [Parameter(1)]
+        // [Parameter(1)]
         public decimal RsiProfitQuantity { get; set; } 
 
-        [Parameter(1)]
+        // [Parameter(1)]
         public decimal RsiProfitPuan { get; set; } 
 
-        [Parameter(14)]
+        // [Parameter(14)]
         public int Rsi { get; set; }
 
-        [Parameter(60)]
+        // [Parameter(60)]
         public int RsiAnalysisPeriod { get; set; } 
 
 
 
-        [Parameter(0)]
+        // [Parameter(0)]
         public int MACDShortPeriod { get; set; } 
 
-        [Parameter(9)]
+        // [Parameter(9)]
         public int MACDLongPeriod { get; set; } 
 
-        [Parameter(0.05)]
+        // [Parameter(0.05)]
         public decimal MacdAvgChange { get; set; } 
 
-        [Parameter(15)]
+        // [Parameter(15)]
         public int MacdPeriods { get; set; } 
 
-        [Parameter(9)]
+        // [Parameter(9)]
         public int MACDTrigger { get; set; } 
 
-        [Parameter(false)]
+        // [Parameter(false)]
         public bool AlwaysGetProfit { get; set; } 
 
-        [Parameter(false)]
+        // [Parameter(false)]
         public bool AlwaysStopLoss { get; set; } 
 
-        [Parameter(5)]
+        // [Parameter(5)]
         public int PowerLookback { get; set; }
 
-        [Parameter(100)]
+        // [Parameter(100)]
         public decimal PowerCrossThreshold { get; set; }
 
-        [Parameter(10)]
+        // [Parameter(10)]
         public int PowerVolumeCollectionPeriod { get; set; } 
 
         private DateTime? lastSimulationDay = null;
@@ -277,7 +278,17 @@ namespace Kalitte.Trading.Matrix
 
         protected override Bist30Futures createAlgoInstance()
         {
-            return new Bist30Futures();
+            var fileName = @"c:\kalitte\Bist30Futures.json";
+            Dictionary<string, object> init = null ;
+            if (File.Exists(fileName))
+            {
+                var file = File.ReadAllText(fileName);
+                init = JsonConvert.DeserializeObject<Dictionary<string, object>>(file);
+                //Debug(file);
+                //Debug("Config file loaded");
+            }
+       
+            return new Bist30Futures(init);
         }
     }
 

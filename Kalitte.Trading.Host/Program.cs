@@ -16,25 +16,13 @@ using System.Diagnostics;
 
 public class Settings
 {
-    public DateTime sDate { get; set; } = new DateTime(2022, 02, 23, 9, 30, 0);
-    public DateTime fDate { get; set; } = new DateTime(2022, 02, 23, 23, 0, 0);
+    public DateTime sDate { get; set; }
+    public DateTime fDate { get; set; }
     public AlternateValues Alternates { get; set; }
 }
 
 public class Program
 {
-    //public static DateTime sDate = new DateTime(2022, 02, 24, 9, 30, 0);
-    //public static DateTime fDate = new DateTime(2022, 02, 24, 23, 0, 0);
-
-    //public static void DoBacktest(Dictionary<string, object> initValues)
-    //{
-    //    //var initValues = AlgoBase.GetProperties(typeof(MyAlgo));
-    //    var algo = new MyAlgo(initValues);
-    //    var test = new Backtest(algo, sDate, fDate);
-    //    Console.WriteLine("Backtest started for {}");
-    //    test.Start();
-    //}
-
 
     public static Settings LoadFromFile(string fileName)
     {
@@ -56,7 +44,7 @@ public class Program
     public static Settings AppTest()
     {
         var settings = new Settings();
-        settings.sDate = new DateTime(2022, 02, 21, 9, 30, 0);
+        settings.sDate = new DateTime(2022, 02, 18, 9, 30, 0);
         settings.fDate = new DateTime(2022, 02, 21, 23, 0, 0);
 
         var initValues = AlgoBase.GetProperties(typeof(Bist30Futures));
@@ -72,14 +60,18 @@ public class Program
         alternates.Set("DynamicCross", true);
         //alternates.Set("PowerVolumeCollectionPeriod", 10);
         alternates.Set("PowerCrossThreshold", 80);
-        //alternates.Set("MaAvgChange", 0.3M);
-        //alternates.Set("MaPeriods", 90);
-        alternates.Set("PowerCrossNegativeMultiplier", 1);
-        alternates.Set("PowerCrossPositiveMultiplier", 2);
-
+        alternates.Set("MaAvgChange", 0.25M);
+        alternates.Set("MaPeriods", 60);
+        alternates.Set("PowerCrossNegativeMultiplier", 2.5);
+        alternates.Set("PowerCrossPositiveMultiplier", 2.5);
         
 
 
+        var file = $"c:\\kalitte\\Bist30Futures-test.json";
+        var val = JsonConvert.SerializeObject(alternates.Lean(), Formatting.Indented);
+        File.WriteAllText(file, val);
+
+        SaveToFile($"c:\\kalitte\\Bist30Futures-alternates.json", settings);
 
         //alternates.Set("MinRsiChange", 1M 2M);
 
@@ -114,14 +106,15 @@ public class Program
         }
         else if (args.Length == 2)
         {
-            if (args[0] == "init")
+            if (args[1] == "init")
             {
 
                 var initValues = AlgoBase.GetProperties(typeof(Bist30Futures));
                 settings.Alternates = settings.Alternates = new AlternateValues(initValues);
                 SaveToFile(args[0], settings);
+                return;
             }
-            else if (args[0] == "backtest")
+            else if (args[1] == "backtest")
             {
                 settings = LoadFromFile(args[0]);
                 var firstValues = settings.Alternates.Lean();

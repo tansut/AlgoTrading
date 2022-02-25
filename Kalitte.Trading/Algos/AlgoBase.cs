@@ -1,4 +1,5 @@
 ﻿// algo
+using Newtonsoft.Json;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Concurrent;
@@ -97,8 +98,8 @@ namespace Kalitte.Trading.Algos
         public MarketDataFileLogger PriceLogger;
         public string InstanceName { get; set; }
 
-        [AlgoParam("F_XU0300222")]
-        public string Symbol { get; set; }
+        //[AlgoParam("F_XU0300222")]
+        public string Symbol { get; set; } = "F_XU0300222";
 
 
         [AlgoParam(BarPeriod.Min10)]
@@ -341,13 +342,18 @@ namespace Kalitte.Trading.Algos
 
         }
 
+        //public AlgoBase(string configFile)
+        //{
+
+            
+        //}
+
 
         public AlgoBase(Dictionary<string, object> initValues)
         {
             this.ApplyProperties(initValues);
             RandomGenerator random = new RandomGenerator();
-            this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));
-                        
+            this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));                        
             Current = this;
         }
 
@@ -399,7 +405,7 @@ namespace Kalitte.Trading.Algos
         public void ApplyProperties(Dictionary<string, object> init = null)
         {
             if (init == null) init = GetProperties(this.GetType());
-            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
+            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));            
             foreach (var item in properties)
             {
                 object val;
@@ -428,6 +434,10 @@ namespace Kalitte.Trading.Algos
                         //propValue = tc.ConvertTo(val, item.PropertyType);
                     }
                     this.GetType().GetProperty(item.Name).SetValue(this, propValue);
+                } else
+                {
+                    var paramVal = item.GetCustomAttributes(typeof(AlgoParam), true).Cast<AlgoParam>().FirstOrDefault();
+                    if (paramVal != null) item.SetValue(this, paramVal.Value);
                 }
             }
         }

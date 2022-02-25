@@ -21,6 +21,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Kalitte.Trading.Algos;
+using Newtonsoft.Json;
 
 namespace Kalitte.Trading.Matrix
 {
@@ -31,10 +32,10 @@ namespace Kalitte.Trading.Matrix
 
         public T Algo { get; set; }
 
-        [Parameter(1)]
+        //[Parameter(1)]
         public int LoggingLevel { get; set; } = 1;
 
-        [Parameter(false)]
+        //[Parameter(false)]
         public bool Simulation { get; set; } = false;
 
 
@@ -73,7 +74,7 @@ namespace Kalitte.Trading.Matrix
         {
             Algo.Log($"OrderUpdate: status: {order.OrdStatus.Obj} cliD: {order.CliOrdID} oid: {order.OrderID} algoid: {order.AlgoId} fa: {order.FilledAmount}", LogLevel.Debug);
             if (order.OrdStatus.Obj == OrdStatus.Filled)
-            {                
+            {
 
                 if (Algo.positionRequest != null && Algo.positionRequest.Id == order.CliOrdID)
                 {
@@ -115,10 +116,10 @@ namespace Kalitte.Trading.Matrix
         }
 
         public override void OnInit()
-        {            
+        {
             Algo.Init();
             volume = VolumeIndicator(Algo.Symbol, (SymbolPeriod)Enum.Parse(typeof(SymbolPeriod), Algo.SymbolPeriod.ToString()));
-            
+
         }
 
         public void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null)
@@ -134,6 +135,15 @@ namespace Kalitte.Trading.Matrix
 
         public void SetAlgoProperties()
         {
+
+
+
+            //var file = File.ReadAllText(@$"c:\kalitte\{this.GetType().Name}.json");
+            //var obj = JsonConvert.DeserializeObject<Dictionary<string, object>>(file);
+
+            return;
+            
+
             var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(ParameterAttribute), true));
             Debug($"Setting Algo Properties({properties.Count()})");
             foreach (var item in properties)
@@ -143,7 +153,7 @@ namespace Kalitte.Trading.Matrix
 
                 //try
                 //{
-                    
+
                 //} catch (Exception exc) {
                 //    Debug($"{item.Name} {} {exc.Message} {exc.StackTrace}");
                 //}
@@ -203,7 +213,7 @@ namespace Kalitte.Trading.Matrix
                 if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
                 else Algo.Log("!! Portfolio is empty !!");
                 Algo.Log($"- END PORTFOLIO -");
-            }            
+            }
         }
 
         public decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null)

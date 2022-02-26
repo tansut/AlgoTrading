@@ -38,8 +38,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(0.25)]
         public decimal MaAvgChange { get; set; }
 
-        [AlgoParam(60)]
-        public int MaPeriods { get; set; }
+        //[AlgoParam(60)]
+        //public int MaPeriods { get; set; }
 
 
 
@@ -61,8 +61,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(4)]
         public decimal LossPuan { get; set; }
 
-        [AlgoParam(4)]
-        public int RsiPriceCollectionPeriod { get; set; }
+        //[AlgoParam(4)]
+        //public int RsiPriceCollectionPeriod { get; set; }
 
         [AlgoParam(60)]
         public decimal RsiHighLimit { get; set; }
@@ -92,8 +92,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(14)]
         public int Rsi { get; set; }
 
-        [AlgoParam(60)]
-        public int RsiAnalysisPeriod { get; set; } 
+        //[AlgoParam(60)]
+        //public int RsiAnalysisPeriod { get; set; } 
 
         [AlgoParam(0)]
         public int MACDShortPeriod { get; set; }
@@ -104,8 +104,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(0.05)]
         public decimal MacdAvgChange { get; set; }
 
-        [AlgoParam(15)]
-        public int MacdPeriods { get; set; } 
+        //[AlgoParam(15)]
+        //public int MacdPeriods { get; set; } 
 
         [AlgoParam(9)]
         public int MACDTrigger { get; set; }
@@ -117,13 +117,23 @@ namespace Kalitte.Trading.Algos
         public bool AlwaysStopLoss { get; set; }
 
         [AlgoParam(5)]
-        public int PowerLookback { get; set; } 
+        public int PowerLookback { get; set; }
 
-        //[AlgoParam(9)]
-        //public int PowerBarSeconds { get; set; } = 60;
 
         [AlgoParam(10)]
-        public int PowerVolumeCollectionPeriod { get; set; }
+        public int DataCollectSize { get; set; }
+
+        [AlgoParam(10)]
+        public int DataAnalysisSize { get; set; }
+
+        [AlgoParam(false)]
+        public bool DataCollectUseSma { get; set; }
+
+        [AlgoParam(false)]
+        public bool DataAnalysisUseSma { get; set; }
+
+        //[AlgoParam(10)]
+        //public int PowerVolumeCollectionPeriod { get; set; }
 
         [AlgoParam(100)]
         public decimal PowerCrossThreshold { get; set; }
@@ -160,7 +170,7 @@ namespace Kalitte.Trading.Algos
 
             powerSignal.Indicator = new Rsi(periodData.Periods, PowerLookback, CandlePart.Volume);
             //powerSignal.Indicator = new Ema(oneMinData.Periods, PowerLookback);
-            powerSignal.CollectSize = PowerVolumeCollectionPeriod;
+            //powerSignal.CollectSize = PowerVolumeCollectionPeriod;
 
             if (maSignal != null)
             {
@@ -206,13 +216,9 @@ namespace Kalitte.Trading.Algos
         public void InitSignals()
         {
             this.priceTrend = new TrendSignal("price-trend", Symbol, this);
-            priceTrend.AnalyseSize = 2;
-            priceTrend.CollectSize = 1;
             priceTrend.ReferenceType = TrendReference.LastCheck;
 
             this.atrTrend = new TrendSignal("atr-trend", Symbol, this);
-            atrTrend.AnalyseSize = 45;
-            atrTrend.CollectSize = 2;
             atrTrend.HowToReset = ResetList.Always;
 
             this.powerSignal = new PowerSignal("power", Symbol, this);
@@ -224,17 +230,15 @@ namespace Kalitte.Trading.Algos
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, CollectSize = CrossPriceCollectionPeriod, AvgChange = MaAvgChange, AnalyseSize = MaPeriods };
+                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MaAvgChange };
                 this.Signals.Add(maSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, CollectSize = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, AnalyseSize = MacdPeriods };
+                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross,  AvgChange = MacdAvgChange };
                 this.Signals.Add(macSignal);
             }
-
-
 
             if (SimulateOrderSignal) this.Signals.Add(new FlipFlopSignal("flipflop", Symbol, this, BuySell.Buy));
             if (!SimulateOrderSignal && (this.ProfitQuantity > 0 || this.LossQuantity > 0))
@@ -244,7 +248,7 @@ namespace Kalitte.Trading.Algos
             }
             if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0))
             {
-                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { UseSma = this.UseSmaForCross, AnalyseSize = RsiAnalysisPeriod, CollectSize = this.RsiPriceCollectionPeriod };
+                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { };
                 this.Signals.Add(rsiTrendSignal);
             }
 
@@ -253,6 +257,16 @@ namespace Kalitte.Trading.Algos
                 p.TimerEnabled = !Simulation;
                 p.Simulation = Simulation;
                 p.OnSignal += SignalReceieved;
+
+                var analyser = p as AnalyserBase;
+
+                if (p != null)
+                {
+                    analyser.CollectSize = DataCollectSize;
+                    analyser.AnalyseSize = DataAnalysisSize;
+                    analyser.CollectAverage = DataCollectUseSma ? Average.Sma : Average.Ema;
+                    analyser.AnalyseAverage = DataAnalysisUseSma ? Average.Sma : Average.Ema;
+                }
             });
         }
 

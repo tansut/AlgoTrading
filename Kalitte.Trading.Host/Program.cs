@@ -44,15 +44,20 @@ public class Program
     public static Settings AppTest()
     {
         var settings = new Settings();
-        settings.sDate = new DateTime(2022, 02, 25, 9, 30, 0);
-        settings.fDate = new DateTime(2022, 02, 25, 23, 0, 0);
+        settings.sDate = new DateTime(2022, 02, 18, 9, 30, 0);
+        settings.fDate = new DateTime(2022, 02, 18, 23, 0, 0);
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
                 
         // options
         alternates.Set("OrderQuantity", 6);
-        
+
+        alternates.Set("DataCollectSize", 5,15,30);
+        alternates.Set("DataAnalysisSize", 30,45,60);
+        alternates.Set("DataCollectUseSma", false);
+        alternates.Set("DataAnalysisUseSma", true);
+
 
         // profit && loss
         alternates.Set("ProfitQuantity", 0);
@@ -77,15 +82,13 @@ public class Program
 
         // ma cross
         alternates.Set("DynamicCross", true);
-        alternates.Set("MaAvgChange", 0.25M);
-        alternates.Set("MaPeriods", 45);
-        alternates.Set("CrossPriceCollectionPeriod", 30);
+        alternates.Set("MaAvgChange", 0.3M);
         alternates.Set("PowerCrossThreshold", 90);
         alternates.Set("PowerCrossNegativeMultiplier", 1);
         alternates.Set("PowerCrossPositiveMultiplier", 2.5);
 
         // general
-        alternates.Set("ClosePositionsDaily", true);
+        alternates.Set("ClosePositionsDaily", false);
 
         
         // System

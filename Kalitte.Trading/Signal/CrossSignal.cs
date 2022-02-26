@@ -48,7 +48,6 @@ namespace Kalitte.Trading
         public decimal InitialAvgChange;
         public int InitialPeriods;
 
-        //private FinanceList<IQuote> differenceBars;
         private FinanceList<decimal> crossBars;
 
 

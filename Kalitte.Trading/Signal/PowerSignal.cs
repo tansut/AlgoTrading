@@ -69,9 +69,6 @@ namespace Kalitte.Trading
     public class PowerSignal : AnalyserBase
     {
         public ITechnicalIndicator Indicator { get; set; }
-        //private FinanceList<IQuote> volumeBars;
-        
-
 
         public override void Init()
         {
@@ -103,7 +100,7 @@ namespace Kalitte.Trading
 
         void calculatePower(PowerSignalResult s, DateTime t)
         {
-            var volumeAvg = CollectList.LastValue; // volumeBars.List.GetEma(Math.Min(volumeBars.Count, VolumeCollectionPeriod), CandlePart.Volume).Last().Ema.Value;
+            var volumeAvg = CollectList.LastValue; 
             var volumePerSecond = (double)volumeAvg;
             Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
             var volume = volumePerSecond * periodSeconds;
@@ -137,7 +134,7 @@ namespace Kalitte.Trading
                 }
             }
             else return result;
-            if (CollectList.Count > 0) calculatePower(result, time);
+            if (CollectList.Ready) calculatePower(result, time);
             return result;
         }
     }

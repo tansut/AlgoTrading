@@ -45,7 +45,7 @@ public class Program
     {
         var settings = new Settings();
         settings.sDate = new DateTime(2022, 02, 18, 9, 30, 0);
-        settings.fDate = new DateTime(2022, 02, 23, 23, 0, 0);
+        settings.fDate = new DateTime(2022, 02, 28, 23, 0, 0);
 
         var initValues = AlgoBase.GetProperties(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
@@ -53,18 +53,17 @@ public class Program
         //alternates.Set("LogConsole", true);
         alternates.Set("LoggingLevel", LogLevel.Order);
         alternates.Set("Symbol", "F_XU0300222");
+        alternates.Set("LogConsole", false);
         //alternates.Set("Rsi", 14);
         alternates.Set("OrderQuantity", 6);
         alternates.Set("PowerLookback", 5);
         alternates.Set("ProfitQuantity", 2);
         alternates.Set("ProfitPuan", 16, 12, 14);
-        alternates.Set("ClosePositionsDaily", true, false);
-
-        
+        alternates.Set("ClosePositionsDaily", false);        
         alternates.Set("RsiProfitQuantity", 1);
         alternates.Set("ProgressiveProfitLoss", 1.75);        
-        //alternates.Set("RsiHighLimit", 0);
-        //alternates.Set("RsiLowLimit", 0);
+        alternates.Set("RsiHighLimit", 0);
+        alternates.Set("RsiLowLimit", 0);
         alternates.Set("DynamicCross", true);
         //alternates.Set("PowerVolumeCollectionPeriod", 10);
         alternates.Set("PowerCrossThreshold", 90);

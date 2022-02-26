@@ -38,6 +38,10 @@ namespace Kalitte.Trading
             Algo.UseVirtualOrders = true;
             this.RelatedTest = related;
             Algo.Init();
+            if (related != null)
+            {
+                Algo.PriceLogger = related.Algo.PriceLogger;
+            }
         }
 
         private Func<object, SignalResult> signalAction = (object stateo) =>
@@ -240,10 +244,10 @@ namespace Kalitte.Trading
             Parallel.For(1, cases.Count, i =>
             {
                 var initValues = cases[i];
-                run(initValues, i, ++completed, related);    
+                related = run(initValues, i, ++completed, related);    
             });
             Console.WriteLine(" ** COMPLETED ** Hit to close ...");
-            Console.ReadKey();
+            //Console.ReadKey();
         }
 
         private void CreateHeaders(string resultFile)

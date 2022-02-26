@@ -37,6 +37,12 @@ namespace Kalitte.Trading
 
     }
 
+    public enum DataTime
+    {
+        LastBar,
+        Current
+    }
+
     public class AlgoParameter<T> where T : IEquatable<T>
     {
         public string Name { get; set; }

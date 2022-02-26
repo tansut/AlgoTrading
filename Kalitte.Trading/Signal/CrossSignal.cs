@@ -15,7 +15,19 @@ using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
+    public class Sensitivity
+    {
+        public decimal VolumePower { get; set; }
+        public DataTime VolumeTime { get; set; }
+        public decimal VolumeRatio { get; set; }
+        public decimal TrendRatio { get; set; }
+        public decimal Result { get; set; }
 
+        public override string ToString()
+        {
+            return $"ratio: {Result} volumePower: {VolumePower}[{VolumeTime}] ratioByVolume: {VolumeRatio} ratioByTrend: {TrendRatio}";
+        }
+    }
 
     public class CrossSignalResult : SignalResult
     {
@@ -52,7 +64,7 @@ namespace Kalitte.Trading
 
 
         private decimal lastCross = 0;
-
+        public Sensitivity LastCalculatedSensitivity { get; set; }
 
         public CrossSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
         {
@@ -120,9 +132,18 @@ namespace Kalitte.Trading
             return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {AnalyseSize} pricePeriod: {CollectSize}  avgChange: {AvgChange}";
         }
 
-
-        private void CalculateSensitivity()
+        private void applySensitivity(Sensitivity sensitivity)
         {
+            if (sensitivity == null) AdjustSensitivity(0, "reverted");
+            AdjustSensitivity((double)sensitivity.Result, "Calculation");
+            //AdjustSensitivity((double)average, $"Bars: [{b12.Date} - {b1.Date}] power: {powerRatio} [{powerNote}] dt:{dtRatio}  result:{average}");
+            LastCalculatedSensitivity = sensitivity;
+        }
+
+        private Sensitivity CalculateSensitivity()
+        {
+            var result = new Sensitivity();
+
             try
             {
                 var b12 = i1k.Results[i1k.Results.Count - 2];
@@ -155,10 +176,13 @@ namespace Kalitte.Trading
                     //var rsiIndicator = PowerSignal.Indicator as Rsi;
                     //var lastBar = rsiIndicator
                     var barPower = PowerSignal.Indicator.Results.Last();
-                    var usedPower = instantPower != null && instantPower.Value > 0 ? instantPower.Value : barPower.Value.Value;
+                    result.VolumeTime = instantPower != null && instantPower.Value > 0 ? DataTime.Current : DataTime.LastBar;
+                    var usedPower =  result.VolumeTime == DataTime.Current ? instantPower.Value : barPower.Value.Value;
                     powerRatio = (PowerCrossThreshold - usedPower) / 100;
                     powerRatio = powerRatio > 0 ? powerRatio * PowerCrossPositiveMultiplier : powerRatio * PowerCrossNegativeMultiplier;
                     powerNote = $"bar: {barPower.Date} rsiBar: {barPower.Value} rsiInstant: {(instantPower == null ? 0 : instantPower.Value)}";
+                    result.VolumePower = usedPower;
+                    result.VolumeRatio = powerRatio;
                 }
 
                 var dtRatio = 0M;
@@ -171,15 +195,18 @@ namespace Kalitte.Trading
                 var divide = 0;
                 if (dtRatio != 0) divide++;
                 if (powerRatio != 0) divide++;
-
                 var average = divide > 0 ? (powerRatio + dtRatio) / divide : 0;
-                AdjustSensitivity((double)average, $"Bars: [{b12.Date} - {b1.Date}] power: {powerRatio} [{powerNote}] dt:{dtRatio}  result:{average}");
+
+                result.TrendRatio = dtRatio;
+                result.Result = average;                
 
             }
             catch (Exception exc)
             {
                 Log($"Error in calculating sensitivity. {exc.Message} {exc.StackTrace}", LogLevel.Error);
+                return null;
             }
+            return result;
         }
 
 
@@ -187,7 +214,11 @@ namespace Kalitte.Trading
         {
             var time = t ?? DateTime.Now;
 
-            if (DynamicCross) CalculateSensitivity();
+            if (DynamicCross)
+            {
+                var sensitivity = CalculateSensitivity();
+                applySensitivity(sensitivity);                
+            }
 
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
             var mp = Algo.GetMarketPrice(Symbol, t);

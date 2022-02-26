@@ -142,18 +142,12 @@ namespace Kalitte.Trading.Algos
             atrTrend.i1k = atr;
 
             powerSignal.Indicator = new Rsi(periodData.Periods, PowerLookback, CandlePart.Volume);
-            //powerSignal.Indicator = new Ema(oneMinData.Periods, PowerLookback);
-            //powerSignal.CollectSize = PowerVolumeCollectionPeriod;
 
             if (maSignal != null)
             {
-                //maSignal.i1k = new Ema(PeriodBars, MovPeriod);
-                //maSignal.i2k = new Ema(PeriodBars, MovPeriod2);
                 maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
                 maSignal.i2k = new Custom((q) => 0, periodData.Periods, MovPeriod + MovPeriod2 + MACDTrigger);
                 maSignal.PowerSignal = powerSignal;
-
-
             }
 
             if (macSignal != null)
@@ -317,15 +311,10 @@ namespace Kalitte.Trading.Algos
 
         void HandlePowerSignal(PowerSignal signal, PowerSignalResult result)
         {
-
-            if ((LastPower == null || LastPower.Power != result.Power) && result.Power != PowerRatio.Unknown)
+            if (LastPower == null  && result.Power != PowerRatio.Unknown)
             {
-                var last = LastPower != null ? LastPower.Power.ToString() : "";
-                
-                
+                LastPower = result;
             }
-
-            LastPower = result;
 
             if (LastPower != null && DynamicCross && AlgoTime.Second % 30 == 0)
             {
@@ -363,7 +352,7 @@ namespace Kalitte.Trading.Algos
 
         private void HandleAtrTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
-            
+            return;
             if (DynamicCross)
             {
                 var newVal = EstimateVolatility(result.Trend.NewValue);

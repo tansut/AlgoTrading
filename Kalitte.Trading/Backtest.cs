@@ -10,6 +10,15 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
+
+    public class OptimizerSettings
+    {
+        public DateTime Start { get; set; }
+        public DateTime Finish { get; set; }
+        public AlternateValues Alternates { get; set; }
+        public bool AutoClosePositions { get; set; }
+    }
+
     public class Backtest
     {
         internal class SignalData
@@ -28,6 +37,7 @@ namespace Kalitte.Trading
         public AlgoBase Algo { get; set; }
 
         public Backtest RelatedTest { get; set; }
+        public bool AutoClosePositions { get; internal set; }
 
         public Backtest(AlgoBase algo, DateTime start, DateTime end, Backtest related = null)
         {
@@ -37,11 +47,8 @@ namespace Kalitte.Trading
             Algo.Simulation = true;
             Algo.UseVirtualOrders = true;
             this.RelatedTest = related;
+            AutoClosePositions = false;
             Algo.Init();
-            if (related != null)
-            {
-                //Algo.PriceLogger = related.Algo.PriceLogger;
-            }
         }
 
         private Func<object, SignalResult> signalAction = (object stateo) =>
@@ -189,36 +196,35 @@ namespace Kalitte.Trading
                 Run(periods.Item2.Item1, periods.Item2.Item2);
                 if (Algo.ClosePositionsDaily) Algo.ClosePositions(Algo.Symbol);
                 Algo.Signals.ForEach(p => p.Reset());
-
             }
+            if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, Algo.AlgoTime);
             Algo.Stop();
         }
-
     }
 
 
     public class Optimizer<T> where T : AlgoBase
     {
-        public DateTime StartTime { get; set; }
-        public DateTime FinishTime { get; set; }
         public string FileName { get; set; }
+
+        public OptimizerSettings Settings { get; set; }
 
         Type algoType;
 
-        public Optimizer(DateTime start, DateTime finish, Type algoType)
+        public Optimizer(OptimizerSettings settings, Type algoType)
         {
-            this.StartTime = start;
-            this.FinishTime = finish;
+            this.Settings = settings;
             this.algoType = algoType;
             RandomGenerator random = new RandomGenerator();
-            this.FileName = $"c:\\kalitte\\log\\simulation\\results\\br-{StartTime.ToString("yyyy-MM-dd")}-{FinishTime.ToString("yyyy-MM-dd")}-{(random.Next(1000000, 9999999))}.tsv";
+            this.FileName = $"c:\\kalitte\\log\\simulation\\results\\br-{Settings.Start.ToString("yyyy-MM-dd")}-{Settings.Finish.ToString("yyyy-MM-dd")}-{(random.Next(1000000, 9999999))}.tsv";
         }
 
         private Backtest run(Dictionary<string, object> init, int index, int total, Backtest related = null)
         {
             var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { init });
             algo.SimulationFile = this.FileName;
-            Backtest test = new Backtest(algo, this.StartTime, this.FinishTime, related);            
+            Backtest test = new Backtest(algo, Settings.Start, Settings.Finish, related);
+            test.AutoClosePositions = Settings.AutoClosePositions;
             //Console.WriteLine($"Running test case {i}/{cases.Count} for {algo.InstanceName} using {algo.LogFile}");
             try
             {

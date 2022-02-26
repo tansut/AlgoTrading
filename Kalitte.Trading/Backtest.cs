@@ -12,70 +12,94 @@ namespace Kalitte.Trading
 {
     public class Backtest
     {
+        internal class SignalData
+        {
+            public DateTime time;
+            public Signal signal;
 
+            internal SignalData(DateTime time, Signal signal)
+            {
+                this.time = time;
+                this.signal = signal;
+            }
+        }
 
 
         public AlgoBase Algo { get; set; }
 
-        public Backtest(AlgoBase algo, DateTime start, DateTime end)
+        public Backtest RelatedTest { get; set; }
+
+        public Backtest(AlgoBase algo, DateTime start, DateTime end, Backtest related = null)
         {
             Algo = algo;
             algo.TestStart = start;
             algo.TestFinish = end;
             Algo.Simulation = true;
-            Algo.UseVirtualOrders = true;            
+            Algo.UseVirtualOrders = true;
+            this.RelatedTest = related;
             Algo.Init();
         }
 
-        public void Run(DateTime t1, DateTime t2, bool firstRun = false)
+        private Func<object, SignalResult> signalAction = (object stateo) =>
+                    {
+                        var state = (SignalData)stateo;
+                        return state.signal.Check(state.time);
+                    };
+
+
+        private Dictionary<int, BarPeriod> secDict;
+        private List<BarPeriod> secondsToStop;
+        private Dictionary<int, FinanceBars> periodBars;
+
+        void createParameters()
         {
-                  
-            var secDict = new Dictionary<int, BarPeriod>();
-            var secondsToStop = Algo.Symbols.Select(p => secDict[Algo.GetSymbolPeriodSeconds(p.Periods.Period.ToString())] = p.Periods.Period).ToList();
-            var periodBarIndexes = new Dictionary<int, int>();
-            var periodBars = new Dictionary<int, FinanceBars>();
-            var seconds = 0;
-
-
-            foreach (var symbol in Algo.Symbols)
+            if (RelatedTest != null)
             {
-                var bars = Algo.GetPeriodBars(symbol.Symbol, symbol.Periods.Period);
-                var sec = Algo.GetSymbolPeriodSeconds(symbol.Periods.Period.ToString());
-                periodBars.Add(sec, bars);
+                secDict = RelatedTest.secDict;
+                secondsToStop = RelatedTest.secondsToStop;
+                periodBars = RelatedTest.periodBars;
             }
+            else
+            {
+                secDict = new Dictionary<int, BarPeriod>();
+                secondsToStop = Algo.Symbols.Select(p => secDict[Algo.GetSymbolPeriodSeconds(p.Periods.Period.ToString())] = p.Periods.Period).ToList();
+                periodBars = new Dictionary<int, FinanceBars>();
+                foreach (var symbol in Algo.Symbols)
+                {
+                    var bars = Algo.GetPeriodBars(symbol.Symbol, symbol.Periods.Period);
+                    var sec = Algo.GetSymbolPeriodSeconds(symbol.Periods.Period.ToString());
+                    periodBars.Add(sec, bars);
+                }
+            }
+        }
 
+        public void Run(DateTime t1, DateTime t2)
+        {
+
+            var periodBarIndexes = new Dictionary<int, int>();
+            var seconds = 0;
             var periodBarsLoaded = true;
 
-            for (var p = t1; p < t2;)
+            for (var p = t1; p <= t2;)
             {
                 if (p >= DateTime.Now) break;
                 if (periodBarsLoaded)
                 {
                     Algo.AlgoTime = p;
-
-                    Func<object, SignalResult> action = (object stateo) =>
-                    {
-                        var state = (Dictionary<string, object>)stateo;
-                        DateTime time = (DateTime)(state["time"]);
-                        return ((Signal)state["signal"]).Check(time);
-                    };
-
                     var time = Algo.AlgoTime;
                     var tasks = new List<Task<SignalResult>>();
 
                     foreach (var signal in Algo.Signals)
                     {
-                        var dict = new Dictionary<string, object>();
-                        dict["time"] = time;
-                        dict["signal"] = signal;
-                        tasks.Add(Task<SignalResult>.Factory.StartNew(action, dict));
+                        var sd = new SignalData(time, signal);
+                        tasks.Add(Task<SignalResult>.Factory.StartNew(this.signalAction, sd));
                     }
                     Task.WaitAll(tasks.ToArray());
                     Algo.CheckDelayedOrders(time);
                     Algo.simulationCount++;
                 }
 
-                seconds++;                
+                seconds++;
 
                 foreach (var sec in secDict)
                 {
@@ -83,12 +107,11 @@ namespace Kalitte.Trading
                     {
                         IQuote period = null;
                         var round = Helper.RoundDown(p, TimeSpan.FromSeconds(sec.Key));
-                        if (!periodBarIndexes.ContainsKey(sec.Key)) {                                                                           
-                            var allItems = periodBars[sec.Key].AsList;
-                            periodBarIndexes[sec.Key] = allItems.FindIndex(i => i.Date == round);
+                        if (!periodBarIndexes.ContainsKey(sec.Key))
+                        {
+                            periodBarIndexes[sec.Key] = periodBars[sec.Key].FindIndex(i => i.Date == round);
                         }
                         period = periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]);
-
                         if (period == null || period.Date != round)
                         {
                             Algo.Log($"Error loading period for {round}", LogLevel.Error, p);
@@ -106,13 +129,31 @@ namespace Kalitte.Trading
                 p = p.AddSeconds(1);
 
             }
+
+            foreach (var sec in secDict)
+            {
+                var round = Helper.RoundUp(t2, TimeSpan.FromSeconds(sec.Key));
+                var roundDown = Helper.RoundDown(t2, TimeSpan.FromSeconds(sec.Key));
+                if (round != t2)
+                {
+                    var period = periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]);
+                    if (period == null || period.Date != roundDown)
+                    {
+                        Algo.Log($"Error loading period for {round}", LogLevel.Error, round);
+                    }
+                    else
+                    {
+                        Algo.PushNewBar(Algo.Symbol, sec.Value, period);
+                    }
+                }
+            }
         }
 
 
         Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>> GetDates(DateTime t)
         {
             var m1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
-            var m2 = new DateTime(t.Year, t.Month, t.Day, 18, 20, 0);
+            var m2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
 
             var n1 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
             var n2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
@@ -127,29 +168,24 @@ namespace Kalitte.Trading
         {
             var days = Algo.TestFinish.Value - Algo.TestStart.Value;
 
+            var prevDayLastBar = new DateTime(Algo.TestStart.Value.Year, Algo.TestStart.Value.Month, Algo.TestStart.Value.Day).AddDays(-1).AddHours(22).AddMinutes(50);
+            Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod, prevDayLastBar);
+            Algo.InitMySignals(Algo.AlgoTime);
+            Algo.InitCompleted();
+            createParameters();
 
             for (var d = 0; d <= days.Days; d++)
             {
                 var currentDay = Algo.TestStart.Value.AddDays(d);
-
                 if (currentDay.DayOfWeek == DayOfWeek.Saturday || currentDay.DayOfWeek == DayOfWeek.Sunday) continue;
                 if (currentDay >= DateTime.Now) break;
                 var periods = this.GetDates(currentDay);
                 Algo.AlgoTime = periods.Item1.Item1;
-                var prevDayLastBar = new DateTime(currentDay.Year, currentDay.Month, currentDay.Day).AddDays(-1).AddHours(22).AddMinutes(50);
-
-                if (d == 0)
-                {
-                    Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod, prevDayLastBar);
-                    Algo.InitMySignals(Algo.AlgoTime);
-                    Algo.InitCompleted();
-                }
-                else
-                {
-                    Algo.Signals.ForEach(p => p.Reset());
-                }
                 Run(periods.Item1.Item1, periods.Item1.Item2);
                 Run(periods.Item2.Item1, periods.Item2.Item2);
+                if (Algo.ClosePositionsDaily) Algo.ClosePositions(Algo.Symbol);
+                Algo.Signals.ForEach(p => p.Reset());
+
             }
             Algo.Stop();
         }
@@ -157,10 +193,11 @@ namespace Kalitte.Trading
     }
 
 
-    public class Optimizer<T> where T: AlgoBase
+    public class Optimizer<T> where T : AlgoBase
     {
         public DateTime StartTime { get; set; }
         public DateTime FinishTime { get; set; }
+        public string FileName { get; set; }
 
         Type algoType;
 
@@ -169,6 +206,26 @@ namespace Kalitte.Trading
             this.StartTime = start;
             this.FinishTime = finish;
             this.algoType = algoType;
+            RandomGenerator random = new RandomGenerator();
+            this.FileName = $"c:\\kalitte\\log\\simulation\\results\\br-{StartTime.ToString("yyyy-MM-dd")}-{FinishTime.ToString("yyyy-MM-dd")}-{(random.Next(1000000, 9999999))}.tsv";
+        }
+
+        private Backtest run(Dictionary<string, object> init, int index, int total, Backtest related = null)
+        {
+            var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { init });
+            algo.SimulationFile = this.FileName;
+            Backtest test = new Backtest(algo, this.StartTime, this.FinishTime, related);            
+            //Console.WriteLine($"Running test case {i}/{cases.Count} for {algo.InstanceName} using {algo.LogFile}");
+            try
+            {
+                test.Start();
+                Console.WriteLine($"Completed case {algo.InstanceName}[{index}/{total}]");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in instance {algo.InstanceName}. {ex}");
+            }
+            return test;
         }
 
         public void Start(AlternateValues alternates)
@@ -176,28 +233,14 @@ namespace Kalitte.Trading
             var cases = alternates.GenerateTestCases();
             Console.WriteLine($" ** WILL RUN {cases.Count} TESTS ** Hit to continue ...");
             //Console.ReadKey();
-            RandomGenerator random = new RandomGenerator();
-            var resultFile = $"c:\\kalitte\\log\\simulation\\results\\br-{StartTime.ToString("yyyy-MM-dd")}-{FinishTime.ToString("yyyy-MM-dd")}-{(random.Next(1000000, 9999999))}.txt";
-            Console.WriteLine($"Saving tests to {resultFile}");
+            CreateHeaders(this.FileName);
+            Console.WriteLine($"Running tests to file {this.FileName}");
             var completed = 0;
-            CreateHeaders(resultFile);
-            Parallel.For(0, cases.Count, i =>
+            Backtest related = run(cases[0], ++completed, cases.Count);            
+            Parallel.For(1, cases.Count, i =>
             {
-                var initValues = cases[i];                
-                var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { initValues });
-                algo.SimulationFile = resultFile;
-                Backtest test = new Backtest(algo, this.StartTime, this.FinishTime);
-
-                //Console.WriteLine($"Running test case {i}/{cases.Count} for {algo.InstanceName} using {algo.LogFile}");
-                try
-                {
-                    test.Start();
-                    Console.WriteLine($"Completed case {algo.InstanceName}[{++completed}/{cases.Count}]");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in instance {algo.InstanceName}. {ex}");
-                }
+                var initValues = cases[i];
+                run(initValues, i, ++completed, related);    
             });
             Console.WriteLine(" ** COMPLETED ** Hit to close ...");
             Console.ReadKey();
@@ -207,7 +250,7 @@ namespace Kalitte.Trading
         {
             var dictionary = AlgoBase.GetProperties(typeof(T));
             var sb = new StringBuilder();
-            foreach (var key in dictionary.Keys) sb.Append(key +"\t");
+            foreach (var key in dictionary.Keys) sb.Append(key + "\t");
             //F_XU0300222: long/ 1 / Cost: 2250.75 Total: 2250.75 PL: -32.25 Commission: 39.15 NetPL: -71.40
             sb.Append("Pos\tQuantity\tCost\tTotal\tPL\tCommission\tNetPL\tOrdertotal\tLog\t\n");
             File.WriteAllText(resultFile, sb.ToString());

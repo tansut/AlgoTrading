@@ -41,13 +41,13 @@ namespace Kalitte.Trading
 
     public class FinanceList<T>
     {
-        protected IList<T> items;
+        protected List<T> items;
         protected ReaderWriterLock rwl = new ReaderWriterLock();
         protected int timeOut = -1;
         public int QueSize { get; private set; } = 0;
         public event EventHandler<ListEventArgs<T>> ListEvent;
 
-        protected virtual IList<T> createList(IList<T> initial = null)
+        protected virtual List<T> createList(IList<T> initial = null)
         {
             return initial == null ? new List<T>() : new List<T>(initial);
         }
@@ -70,6 +70,20 @@ namespace Kalitte.Trading
 
                 rwl.ReleaseWriterLock();
             }
+        }
+
+        public int FindIndex(Predicate<T> match)
+        {
+            rwl.AcquireWriterLock(timeOut);
+            try
+            {
+                return items.FindIndex(match);  
+            }
+            finally
+            {
+                rwl.ReleaseWriterLock();
+            }
+
         }
 
 

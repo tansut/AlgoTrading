@@ -76,6 +76,11 @@ namespace Kalitte.Trading
             return $"{base.ToString()}: profit:{ProfitQuantity}/{ProfitPriceChange} loss: {LossQuantity}/{LossPriceChange}.";
         }
 
+        protected override void ResetInternal()
+        {
+            ResetPriceChange();
+        }
+
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {

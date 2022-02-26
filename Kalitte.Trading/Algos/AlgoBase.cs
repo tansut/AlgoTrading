@@ -116,6 +116,9 @@ namespace Kalitte.Trading.Algos
         public bool UseVirtualOrders { get; set; }
 
         [AlgoParam(false)]
+        public bool ClosePositionsDaily { get; set; }
+
+        [AlgoParam(false)]
         public bool AutoCompleteOrders { get; set; }
 
         public StringBuilder LogContent { get; set; } = new StringBuilder(1000);
@@ -252,7 +255,7 @@ namespace Kalitte.Trading.Algos
         {
             var t = DateTime.Now;
             var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
-            var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 20, 0);
+            var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
             var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
             var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
@@ -582,9 +585,6 @@ namespace Kalitte.Trading.Algos
                         var ul = UserPortfolioList.First().Value;
                         sb.Append($"{ul.SideStr}\t{ul.Quantity}\t{ul.AvgCost}\t{ul.Total}\t{ul.PL}\t{ul.CommissionPaid}\t{ul.PL - ul.CommissionPaid}\t{orderCounter}\t{LogFile}\t\n");
                     }
-                    //foreach (var key in dictionary.Keys) sb.Append(key + "\t");
-                    ////F_XU0300222: long/ 1 / Cost: 2250.75 Total: 2250.75 PL: -32.25 Commission: 39.15 NetPL: -71.40
-                    //sb.Append("Pos\tQuantity\tCost\tTotal\tPL\tCommission\tNetPL\tOrdertotal\tLog\t\n");
                     File.AppendAllText(SimulationFile, sb.ToString());
                 }
                 finally
@@ -595,7 +595,21 @@ namespace Kalitte.Trading.Algos
 
         }
 
-        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null)
+
+        public virtual void ClosePositions(string symbol, DateTime? t = null)
+        {
+            var time = t ?? AlgoTime;
+            foreach (var item in UserPortfolioList)
+            {
+                if (!item.Value.IsEmpty)
+                {
+                    Log($"Closing positions for {symbol} at {time}", LogLevel.Order, time);
+                    sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", 0, OrderIcon.PositionClose, time, null, true);
+                }
+            }
+        }
+
+        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
         {
             orderWait.Reset();
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
@@ -628,11 +642,11 @@ namespace Kalitte.Trading.Algos
 
             if (this.UseVirtualOrders || this.AutoCompleteOrders)
             {
-                if (this.Simulation)
+                if (this.Simulation && !disableDelay)
                 {
                     var algoTime = AlgoTime;
                     //this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(0.5 + new RandomGenerator().NextDouble() * 2) };
-                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(2.5) };
+                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(2) };
                     Log($"Simulating real environment for {delayedOrder.order.Id} time is: {delayedOrder.created}, schedule to: {delayedOrder.scheduled2}", LogLevel.Debug);
                 }
                 else FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);
@@ -710,7 +724,8 @@ namespace Kalitte.Trading.Algos
 
         public decimal[] GetMarketData(string symbol, BarPeriod period, DateTime? t = null)
         {
-            var values = PriceLogger.GetMarketDataList(t.Value);
+
+            var values = PriceLogger.GetMarketDataList(t ?? DateTime.Now);
             if (values.Length == 0)
             {
                 int toBack = 0, toForward = 0;

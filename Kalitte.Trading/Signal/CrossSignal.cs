@@ -77,6 +77,8 @@ namespace Kalitte.Trading
             differenceBars.Clear();
             crossBars.Clear();
             lastCross = 0;
+            Periods = InitialPeriods;
+            AvgChange = InitialAvgChange;
         }
 
 
@@ -98,13 +100,13 @@ namespace Kalitte.Trading
 
         private void PowerSignal_OnSignal(Signal signal, SignalEventArgs data)
         {
-            var rsi = (PowerSignalResult)data.Result;
+            //var rsi = (PowerSignalResult)data.Result;
             //InstantPower = rsi.Value;
         }
 
         protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
         {
-            priceBars.Clear();
+            //priceBars.Clear();
             differenceBars.Clear();
             //if (DynamicCross) CalculateSensitivity();
         }
@@ -219,7 +221,6 @@ namespace Kalitte.Trading
             {
 
                 decimal mpAverage = priceBars.List.GetEma(priceBars.Count).Last().Ema.Value;
-                //priceBars.Clear();
 
                 var l1 = i1k.NextValue(mpAverage);
                 var l2 = i2k.NextValue(mpAverage);

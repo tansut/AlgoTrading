@@ -127,6 +127,13 @@ namespace Kalitte.Trading
             generateDerivs();
         }
 
+        protected override void ResetInternal()
+        {
+            analysisBars.Clear();
+            priceBars.Clear();
+            generateDerivs();
+        }
+
 
         protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
         {

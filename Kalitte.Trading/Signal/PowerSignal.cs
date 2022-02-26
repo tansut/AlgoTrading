@@ -67,9 +67,6 @@ namespace Kalitte.Trading
     public class PowerSignal : Signal
     {
         public ITechnicalIndicator Indicator { get; set; }
-        
-
-        //private FinanceBars periodBars ;
         private FinanceBars volumeBars;
 
         public int VolumeCollectionPeriod { get; set; } = 5;
@@ -78,7 +75,6 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            //periodBars = new FinanceBars(Indicator.SliceSeconds);
             volumeBars = new FinanceBars(VolumeCollectionPeriod);
             base.Init();
         }
@@ -92,6 +88,11 @@ namespace Kalitte.Trading
         public PowerSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
         {
             
+        }
+
+        protected override void ResetInternal()
+        {
+            volumeBars.Clear();
         }
 
         double calculateVolumeBySecond(DateTime t, decimal volume)
@@ -111,24 +112,12 @@ namespace Kalitte.Trading
             var volumePerSecond = (double)volumeAvg;
             Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
             var volume = volumePerSecond * periodSeconds;
-
             var value = Indicator.NextValue((decimal)volume);
-
-
-            //Log($"volavg : {volumeAvg} vol: {volume} valu: {value}", LogLevel.Debug);
             var last = Indicator.UsedInput.Last().Close;
-            //Log($"{Indicator.UsedInput.Last()}", LogLevel.Debug);
-            //var ratio = (volume / last);
-            //s.Strenght = rsi.Value;
             s.Value = value;
-            //s.Value = (100 - 100 / (1 +  (decimal)ratio));
             s.VolumePerSecond = volumePerSecond;
             s.CurrentVolume = volume;
             s.LastVolume = last;
-
-            //var bars = Indicator.InputBars.LastItems(Indicator.Lookback + 1).Select(p => new MyQuote() { Date = p.Date, Close = p.Volume });
-
-
         }
 
         protected override SignalResult CheckInternal(DateTime? t = null)
@@ -145,9 +134,7 @@ namespace Kalitte.Trading
                 if (volume > 0)
                 {
                     var q = new MyQuote() { Date = time, Volume = (decimal)volume };
-                    //periodBars.Push(q);
                     volumeBars.Push(q);
-                    //Log($"pushed volume {q}", LogLevel.Debug);
                 }
                 else
                 {
@@ -156,16 +143,6 @@ namespace Kalitte.Trading
                 }
             }
             else return result;
-
-            //if (periodBars.IsFull)
-            //{
-            //    var avg = periodBars.List.GetSma(periodBars.Count, CandlePart.Volume).Last().Sma.Value * Indicator.SliceSeconds;    
-            //    periodBars.Clear();
-            //    //Indicator.Bars.Push(new MyQuote() {  Date = time, Volume = avg });
-            //    //Log($"Pushed new volume to bars: {time} {avg}", LogLevel.Verbose);
-
-            //}
-
             if (volumeBars.Count  > 0)  calculatePower(result, time);
             return result;
         }

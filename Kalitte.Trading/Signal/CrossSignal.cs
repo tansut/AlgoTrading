@@ -34,6 +34,7 @@ namespace Kalitte.Trading
         public decimal i1Val { get; set; }
         public decimal i2Val { get; set; }
         public decimal Dif { get; set; }
+        public Sensitivity Sensitivity { get; set; }
 
         public CrossSignalResult(Signal signal, DateTime t) : base(signal, t)
         {
@@ -213,14 +214,15 @@ namespace Kalitte.Trading
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
             var time = t ?? DateTime.Now;
+            var result = new CrossSignalResult(this, t ?? DateTime.Now);
 
             if (DynamicCross)
             {
                 var sensitivity = CalculateSensitivity();
-                applySensitivity(sensitivity);                
+                applySensitivity(sensitivity);     
+                result.Sensitivity = sensitivity;
             }
-
-            var result = new CrossSignalResult(this, t ?? DateTime.Now);
+            
             var mp = Algo.GetMarketPrice(Symbol, t);
 
             if (mp > 0) CollectList.Collect(mp);

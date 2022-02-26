@@ -512,6 +512,13 @@ namespace Kalitte.Trading.Algos
         public override void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
         {
             base.sendOrder(symbol, quantity, side, comment, lprice, icon, t, signalResult, disableDelay);
+            if (signalResult is CrossSignalResult)
+            {
+                var cross = signalResult as CrossSignalResult;
+                Log($"Cross: {cross}", LogLevel.Order);
+                Log($"Sensitivity: {cross.Sensitivity}", LogLevel.Order);
+            }
+            
             //Log($"Power was during order: {LastPower}", LogLevel.Order);
         }
 

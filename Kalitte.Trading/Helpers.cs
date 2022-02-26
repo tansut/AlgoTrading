@@ -18,6 +18,8 @@ namespace Kalitte.Trading
             csp = new RNGCryptoServiceProvider();
         }
 
+
+
         public double NextDouble()
         {            
             var bytes = new Byte[8];
@@ -93,6 +95,56 @@ namespace Kalitte.Trading
             }
             return 0;
         }
+
+        public static void Shuffle<T>(IList<T> list)
+        {
+            RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
+            int n = list.Count;
+            while (n > 1)
+            {
+                byte[] box = new byte[1];
+                do provider.GetBytes(box);
+                while (!(box[0] < n * (Byte.MaxValue / n)));
+                int k = (box[0] % n);
+                n--;
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+
+        public static void ShuffleSimple<T>(IList<T> list)
+        {
+            Random rng = new Random();
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+
+        public static IList<T>[] SliceList<T>(IList<T> list, int slice)
+        {
+            var res = new List<IList<T>>();
+
+            var count = list.Count;
+
+
+            return res.ToArray();
+        }
+
+        public static void ShuffleParallel<T>(IList<T> list, int n)
+        {
+            
+        }
+
+
+        
+
 
         public static IEnumerable<object> Cartesian(IEnumerable<IEnumerable<object>> items)
         {

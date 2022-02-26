@@ -234,7 +234,8 @@ namespace Kalitte.Trading
 
         public void Start(AlternateValues alternates)
         {
-            var cases = alternates.GenerateTestCases();
+            Console.WriteLine("Generating test cases ...");
+            var cases = alternates.GenerateTestCases(true);
             Console.WriteLine($" ** WILL RUN {cases.Count} TESTS ** Hit to continue ...");
             CreateHeaders(this.FileName);
             Console.WriteLine($"Running tests to file {this.FileName}");

@@ -71,7 +71,7 @@ public class Program
 
 
         // volume power
-        alternates.Set("PowerVolumeCollectionPeriod", 10);
+        alternates.Set("PowerVolumeCollectionPeriod", 30);
         alternates.Set("PowerLookback", 5);
 
 
@@ -79,7 +79,7 @@ public class Program
         alternates.Set("DynamicCross", true);
         alternates.Set("MaAvgChange", 0.25M);
         alternates.Set("MaPeriods", 45);
-        alternates.Set("CrossPriceCollectionPeriod", 2);
+        alternates.Set("CrossPriceCollectionPeriod", 30);
         alternates.Set("PowerCrossThreshold", 90);
         alternates.Set("PowerCrossNegativeMultiplier", 1);
         alternates.Set("PowerCrossPositiveMultiplier", 2.5);
@@ -93,35 +93,14 @@ public class Program
         alternates.Set("Symbol", "F_XU0300222");
         alternates.Set("LogConsole", true);
 
-
-
         var file = $"c:\\kalitte\\Bist30Futures-test.json";
         var val = JsonConvert.SerializeObject(alternates, Formatting.Indented);
         File.WriteAllText(file, val);
-        //SaveToFile($"c:\\kalitte\\Bist30Futures-alternates.json", settings);
-
-        //var filec = File.ReadAllText(file);
-        //var fileContent = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(filec);
-        //var ainit = new AlternateValues().Lean();
-
-        //alternates.Set("MinRsiChange", 1M 2M);
-
-        
-
-
         return settings;
     }
 
     public static void Main(string[] args)
     {
-        //string execPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-        ////var alternates2 = LoadFromFile(Path.Combine(execPath, "alternates.json"));
-
-        //var settings1 = new Settings();
-        //var initValues1 = AlgoBase.GetProperties(typeof(MyAlgo));
-        //settings1.Alternates = new AlternateValues(initValues1); 
-        //SaveToFile("./settings.json", settings1);
-        //return;
 
         Settings settings = new Settings();
 
@@ -155,14 +134,8 @@ public class Program
             }
 
         }
-
-
         var optimize = new Optimizer<Bist30Futures>(settings.sDate, settings.fDate, typeof(Bist30Futures));
-
         optimize.Start(settings.Alternates);
-
-
-
     }
 
 }

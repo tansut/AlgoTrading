@@ -36,6 +36,18 @@ namespace Kalitte.Trading
         {
             return $"d: {Date} o: {Open} h: {High} l: {Low} c:{Close} v:{Volume}";
         }
+
+        public void Set(decimal value, CandlePart candle)
+        {
+            switch (candle)
+            {
+                case CandlePart.Close: { this.Close = value; break; }
+                case CandlePart.Volume: { this.Volume = value; break; }
+                case CandlePart.Open: { this.Open = value; break; }
+                case CandlePart.High: { this.High = value; break; }
+                case CandlePart.Low: { this.Low = value; break; }                
+            }
+        }
     }
 
 

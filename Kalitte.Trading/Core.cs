@@ -185,7 +185,7 @@ namespace Kalitte.Trading
 
     public class AlternateValues : Dictionary<string, object[]>
     {
-        public List<Dictionary<string, object>> GenerateTestCases()
+        public List<Dictionary<string, object>> GenerateTestCases(bool shuffle)
         {
             var allValues = new List<object[]>();
             var result = new List<Dictionary<string, object>>();
@@ -211,6 +211,7 @@ namespace Kalitte.Trading
                 result.Add(dict);
             }
 
+            if (shuffle) Helper.ShuffleSimple<Dictionary<string, object>>(result);
             return result;
 
         }

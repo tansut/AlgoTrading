@@ -64,10 +64,10 @@ namespace Kalitte.Trading
 
     }
 
-    public class PowerSignal : Signal
+    public class PowerSignal : AnalyserBase
     {
         public ITechnicalIndicator Indicator { get; set; }
-        private FinanceList<IQuote> volumeBars;
+        //private FinanceList<IQuote> volumeBars;
 
         public int VolumeCollectionPeriod { get; set; } = 5;
 
@@ -75,7 +75,6 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            volumeBars = new FinanceList<IQuote>(VolumeCollectionPeriod);
             this.Indicators.Add(Indicator);            
             base.Init();
         }
@@ -91,25 +90,20 @@ namespace Kalitte.Trading
             
         }
 
-        protected override void ResetInternal()
-        {
-            volumeBars.Clear();
-        }
+
 
         double calculateVolumeBySecond(DateTime t, decimal volume)
         {
-            //Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
             Helper.SymbolSeconds(Algo.SymbolPeriod.ToString(), out int periodSeconds);
             var rounded = Helper.RoundDown(t, TimeSpan.FromSeconds(periodSeconds));
             var elapsedSeconds = Math.Max(1, (t - rounded).TotalSeconds);
-            //Log($"Volume Calc: per: {periodSeconds} seconds: {elapsedSeconds} volume: {volume}", LogLevel.Verbose);
             if (elapsedSeconds > 15) return (double)volume / elapsedSeconds;
             else return 0;
         }
 
         void calculatePower(PowerSignalResult s, DateTime t)
         {
-            var volumeAvg = volumeBars.List.GetEma(Math.Min(volumeBars.Count, VolumeCollectionPeriod), CandlePart.Volume).Last().Ema.Value;
+            var volumeAvg = CollectList.LastValue; // volumeBars.List.GetEma(Math.Min(volumeBars.Count, VolumeCollectionPeriod), CandlePart.Volume).Last().Ema.Value;
             var volumePerSecond = (double)volumeAvg;
             Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
             var volume = volumePerSecond * periodSeconds;
@@ -133,9 +127,8 @@ namespace Kalitte.Trading
             {
                 var volume = calculateVolumeBySecond(time, mp);
                 if (volume > 0)
-                {
-                    var q = new MyQuote() { Date = time, Volume = (decimal)volume };
-                    volumeBars.Push(q);
+                {                    
+                    CollectList.Collect((decimal)volume);
                 }
                 else
                 {
@@ -144,13 +137,8 @@ namespace Kalitte.Trading
                 }
             }
             else return result;
-            if (volumeBars.Count  > 0)  calculatePower(result, time);
+            if (CollectList.Count > 0)  calculatePower(result, time);
             return result;
         }
-
-
-
     }
-
-
 }

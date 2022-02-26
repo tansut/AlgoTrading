@@ -33,7 +33,7 @@ namespace Kalitte.Trading
         }
     }
 
-    public class CrossSignal : Signal
+    public class CrossSignal : AnalyserBase
     {
         public bool DynamicCross { get; set; } = false;
         public PowerSignal PowerSignal { get; set; }
@@ -45,23 +45,15 @@ namespace Kalitte.Trading
         public ITechnicalIndicator i2k;
 
         public decimal AvgChange = 0.3M;
-        public int Periods = 5;
-
-
         public decimal InitialAvgChange;
         public int InitialPeriods;
 
-        public int PriceCollectionPeriod = 5;
-        private FinanceList<IQuote> differenceBars;
-        private FinanceList<IQuote> priceBars;
+        //private FinanceList<IQuote> differenceBars;
         private FinanceList<decimal> crossBars;
 
 
         private decimal lastCross = 0;
-        public int NextOrderMultiplier = 1;
         public bool UseSma = true;
-
-        //private bool sensitivityAdjusted = false;
 
 
         public CrossSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
@@ -73,12 +65,11 @@ namespace Kalitte.Trading
 
         protected override void ResetInternal()
         {
-            priceBars.Clear();
-            differenceBars.Clear();
             crossBars.Clear();
             lastCross = 0;
-            Periods = InitialPeriods;
+            AnalyseSize = InitialPeriods;
             AvgChange = InitialAvgChange;
+            base.ResetInternal();
         }
 
 
@@ -87,44 +78,29 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            this.InitialPeriods = Periods;
+            this.InitialPeriods = AnalyseSize;
             this.InitialAvgChange = AvgChange;
-            differenceBars = new FinanceList<IQuote>(Periods);
-            priceBars = new FinanceList<IQuote>(PriceCollectionPeriod);
-            crossBars = new FinanceList<decimal>(Periods);
-            ResetInternal();
+            crossBars = new FinanceList<decimal>(AnalyseSize);            
             this.Indicators.Add(i1k);
             this.Indicators.Add(i2k);
-            //if (DynamicCross) CalculateSensitivity();
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
-            //if (PowerSignal != null) PowerSignal.OnSignal += PowerSignal_OnSignal;
+            base.Init();
         }
 
-        private void PowerSignal_OnSignal(Signal signal, SignalEventArgs data)
-        {
-            //var rsi = (PowerSignalResult)data.Result;
-            //InstantPower = rsi.Value;
-        }
 
         protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
         {
-            //priceBars.Clear();
-            differenceBars.Clear();
-            //if (DynamicCross) CalculateSensitivity();
+            AnalyseList.Clear();
         }
 
-        protected override void Colllect()
-        {
-
-        }
 
         protected void AdjustSensitivityInternal(double ratio, string reason)
         {
             AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
-            Periods = InitialPeriods + Convert.ToInt32((InitialPeriods * (decimal)ratio));
-            differenceBars.Resize(Periods);
-            crossBars.Resize(Periods);
-            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {Periods}", LogLevel.Debug);
+            AnalyseSize = InitialPeriods + Convert.ToInt32((InitialPeriods * (decimal)ratio));
+            AnalyseList.Resize(AnalyseSize);
+            crossBars.Resize(AnalyseSize);
+            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {AnalyseSize}", LogLevel.Debug);
         }
 
         public void AdjustSensitivity(double ratio, string reason)
@@ -143,7 +119,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {Periods} pricePeriod: {PriceCollectionPeriod} useSma: {UseSma} avgChange: {AvgChange}";
+            return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {AnalyseSize} pricePeriod: {CollectSize} useSma: {UseSma} avgChange: {AvgChange}";
         }
 
 
@@ -208,27 +184,27 @@ namespace Kalitte.Trading
             }
         }
 
-        protected SignalResult CalculateSignal(DateTime? t = null)
+
+        protected override SignalResult CheckInternal(DateTime? t = null)
         {
             var time = t ?? DateTime.Now;
 
-            if (time.Second % 30 == 0 && DynamicCross) CalculateSensitivity();
+            if (DynamicCross) CalculateSensitivity();
 
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
             var mp = Algo.GetMarketPrice(Symbol, t);
 
-            if (mp > 0) priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
+            if (mp > 0) CollectList.Collect(mp);
 
-            if (priceBars.IsFull && mp >= 0)
+            if (CollectList.Ready() && mp >= 0)
             {
 
-                decimal mpAverage = priceBars.List.GetEma(priceBars.Count).Last().Ema.Value;
+                decimal mpAverage = CollectList.LastValue;
 
                 var l1 = i1k.NextValue(mpAverage);
                 var l2 = i2k.NextValue(mpAverage);
 
-                var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 - l2 };
-                differenceBars.Push(newResultBar);
+                AnalyseList.Collect(l1 - l2);
                 crossBars.Push(l1 - l2);
                 var cross = Helper.Cross(crossBars.ToArray, 0);
 
@@ -236,16 +212,13 @@ namespace Kalitte.Trading
                 {
                     lastCross = cross;
                     Log($"Cross identified: {cross}", LogLevel.Debug, t);
-                    differenceBars.Clear();
-
+                    AnalyseList.Clear();
                 }
 
-                //CalculateSensitivity();
-
-                if (differenceBars.Count >= Periods)
+                if (AnalyseList.Ready())
                 {
 
-                    var lastAvg = UseSma ? differenceBars.List.GetSma(Periods).Last().Sma.Value : differenceBars.List.GetEma(Periods).Last().Ema.Value;
+                    var lastAvg = AnalyseList.LastValue; // UseSma ? differenceBars.List.GetSma(AnalyseSize).Last().Sma.Value : differenceBars.List.GetEma(AnalyseSize).Last().Ema.Value;
 
                     decimal last1 = i1k.Results.Last().Value.Value;
                     decimal last2 = i2k.Results.Last().Value.Value;
@@ -257,23 +230,11 @@ namespace Kalitte.Trading
                     if (lastCross != 0 && lastAvg > AvgChange) result.finalResult = BuySell.Buy;
                     else if (lastCross != 0 && lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
 
-
-                    //Log($"Status: order:{result.finalResult}, lastAvg: {lastAvg} i1Last: {last1} i2Last:{last2} mpNow:{mp}, mpAvg: {mpAverage}, lastCross:{lastCross}, cross:{cross}", LogLevel.Critical, t);
-
                     if (result.finalResult.HasValue)
                     {
-                        //if (!sensitivityAdjusted) AdjustSensitivityInternal(0.30, "Cross Received");
-                        //sensitivityAdjusted = true;
-                        differenceBars.Clear();
+                        AnalyseList.Clear();
                     }
-                    else
-                    {
-                        //if (sensitivityAdjusted)
-                        //{
-                        //    //sensitivityAdjusted = false;
-                        //    //AdjustSensitivityInternal(0.0, "Revert");
-                        //}
-                    }
+
                 }
 
             }
@@ -283,109 +244,6 @@ namespace Kalitte.Trading
 
 
             return result;
-
-            //if (lastCross == 0 && cross !=  0) lastCrossValue = cross;
-
-            //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
-            //if (lastCross > 0 && ema > AvgChange) finalResult = OrderSide.Buy;
-            //else if (lastCross < 0 && ema < -AvgChange) finalResult = OrderSide.Sell;
-
-            //lastCross = finalResult.HasValue ? 0 : lastCross;
-
-
-
-            //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
-            //var changedDirection = lastEma * 
-
-
-
-
-
-
-
-        }
-
-
-
-
-
-        //protected SignalResultX CalculateSignal(DateTime? t = null)
-        //{
-
-        //    OrderSide? finalResult = null;
-
-        //    var mp = Algo.GetMarketPrice(Symbol, t);
-
-        //    if (mp == 0 && useLastPriceIfMissing)
-        //    {
-        //        Log($"No price was found, used last price {lastMarketPrice}", LogLevel.Warning, t);
-        //        mp = lastMarketPrice;
-        //    }
-        //    else lastMarketPrice = mp;
-
-        //    if (mp > 0)
-        //    {
-        //        var val =  useMyIndicators ?
-        //            bars.Count == 0 ?  i1k.Values.Last() - i2k.Values.Last() :
-        //            i1k.LastValue(mp) - i2k.LastValue(mp) 
-        //            : i1.CurrentValue - i2.CurrentValue;
-        //        //var val = useMyIndicators ? i1k.Values.Last() - i2k.Values.Last() : i1.CurrentValue - i2.CurrentValue;
-
-        //        bars.Push(new Quote(val));
-        //        if (useMyIndicators)
-        //        {
-        //            Log($"i1k: {i1k.LastValue(mp)} i1:{i1.CurrentValue} mp: {mp}", LogLevel.Debug, t);
-        //            Log($"i2k: {i2k.LastValue(mp)} i2:{i2.CurrentValue} mp: {mp}", LogLevel.Debug, t);
-        //        }
-
-        //        var cross = bars.Cross(0);
-        //        var ema = bars.Ema().Last();
-
-
-        //        if (lastEma < 0 && ema > AvgChange) finalResult = OrderSide.Buy;
-        //        else if (lastEma > 0 && ema < -AvgChange) finalResult = OrderSide.Sell;
-
-        //        if (lastEma == 0) lastEma = ema;
-
-        //        lastEma = finalResult.HasValue ? 0 : lastEma;
-
-        //        Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
-
-        //        //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
-        //    }
-        //    else Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} no market price for {t}", LogLevel.Debug, t);
-
-
-
-
-        //    //if (lastCrossValue == 0 && cross !=  0) lastCrossValue = cross;
-
-        //    //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, ema: {ema}", LogLevel.Debug, t);
-        //    //if (lastCrossValue > 0 && ema > AvgChange) finalResult = OrderSide.Buy;
-        //    //else if (lastCrossValue < 0 && ema < -AvgChange) finalResult = OrderSide.Sell;
-
-        //    //lastCrossValue = finalResult.HasValue ? 0 : lastCrossValue;
-
-
-
-        //    //Log($"{this.Name}/{Thread.CurrentThread.ManagedThreadId} cross: {cross}, lastEma: {lastEma}, ema: {ema} period: {bars.Count} split: {AvgChange}", LogLevel.Debug, t);
-        //    //var changedDirection = lastEma * 
-
-
-
-
-        //    return new SignalResultX(this)
-        //    {
-        //        finalResult = finalResult
-        //    };
-
-
-        //}
-
-        protected override SignalResult CheckInternal(DateTime? t = null)
-        {
-            var current = CalculateSignal(t);
-            return current;
         }
     }
 }

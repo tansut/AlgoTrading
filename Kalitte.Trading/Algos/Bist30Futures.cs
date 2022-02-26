@@ -225,13 +225,13 @@ namespace Kalitte.Trading.Algos
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MaAvgChange, Periods = MaPeriods };
+                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, CollectSize = CrossPriceCollectionPeriod, AvgChange = MaAvgChange, AnalyseSize = MaPeriods };
                 this.Signals.Add(maSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, PriceCollectionPeriod = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, Periods = MacdPeriods };
+                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, CollectSize = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, AnalyseSize = MacdPeriods };
                 this.Signals.Add(macSignal);
             }
 
@@ -529,7 +529,7 @@ namespace Kalitte.Trading.Algos
             var orderQuantity = portfolio.Quantity + OrderQuantity;
 
             var cross = (CrossSignal)signalResult.Signal;
-            sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.Periods}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+            sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             Signals.Where(p=>p is TakeProfitOrLossSignal).Select(p=>(TakeProfitOrLossSignal)p).ToList().ForEach(p=>p.ResetPriceChange());
             //signal.AdjustSensitivity(0.30, "Order Received");
         }

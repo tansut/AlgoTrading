@@ -578,13 +578,14 @@ namespace Kalitte.Trading.Algos
                 try
                 {
                     var dictionary = AlgoBase.GetProperties(this.GetType());
-                    var sb = new StringBuilder();
-                    foreach (var v in dictionary.Values) sb.Append(v + "\t");
+                    var sb = new StringBuilder();                    
                     if (UserPortfolioList.Count > 0)
                     {
                         var ul = UserPortfolioList.First().Value;
-                        sb.Append($"{ul.SideStr}\t{ul.Quantity}\t{ul.AvgCost}\t{ul.Total}\t{ul.PL}\t{ul.CommissionPaid}\t{ul.PL - ul.CommissionPaid}\t{orderCounter}\t{LogFile}\t\n");
+                        sb.Append($"{ul.SideStr}\t{ul.Quantity}\t{ul.AvgCost}\t{ul.Total}\t{ul.PL}\t{ul.CommissionPaid}\t{ul.PL - ul.CommissionPaid}\t{orderCounter}\t{LogFile}\t");
                     }
+                    foreach (var v in dictionary.Values) sb.Append(v + "\t");
+                    sb.Append(Environment.NewLine);
                     File.AppendAllText(SimulationFile, sb.ToString());
                 }
                 finally

@@ -250,9 +250,11 @@ namespace Kalitte.Trading
         {
             var dictionary = AlgoBase.GetProperties(typeof(T));
             var sb = new StringBuilder();
-            foreach (var key in dictionary.Keys) sb.Append(key + "\t");
+            
             //F_XU0300222: long/ 1 / Cost: 2250.75 Total: 2250.75 PL: -32.25 Commission: 39.15 NetPL: -71.40
-            sb.Append("Pos\tQuantity\tCost\tTotal\tPL\tCommission\tNetPL\tOrdertotal\tLog\t\n");
+            sb.Append("Pos\tQuantity\tCost\tTotal\tPL\tCommission\tNetPL\tOrdertotal\tLog\t");
+            foreach (var key in dictionary.Keys) sb.Append(key + "\t");
+            sb.Append(Environment.NewLine);
             File.WriteAllText(resultFile, sb.ToString());
         }
     }

@@ -263,7 +263,7 @@ namespace Kalitte.Trading
 
                     if (result.finalResult.HasValue)
                     {
-                        AnalyseList.Clear();
+                        //AnalyseList.Clear();
                     }
 
                 }

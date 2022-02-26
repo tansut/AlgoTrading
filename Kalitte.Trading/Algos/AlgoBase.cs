@@ -180,7 +180,7 @@ namespace Kalitte.Trading.Algos
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
             var port = UserPortfolioList.Where(p=>p.Key == positionRequest.Symbol).First().Value;
-            Log($"Filled[{port.SideStr}/{port.Quantity} PL:{port.NetPL}]: {this.positionRequest.ToString()}", LogLevel.Order);
+            Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost} PL:{port.NetPL}]: {this.positionRequest.ToString()}", LogLevel.Order);
             if (this.positionRequest.SignalResult != null) CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
             this.positionRequest = null;
             orderCounter++;

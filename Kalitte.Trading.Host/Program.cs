@@ -39,8 +39,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 02, 23, 9, 30, 0);
-        settings.Finish = new DateTime(2022, 02, 23, 23, 0, 0);
+        settings.Start = new DateTime(2022, 02, 22, 9, 30, 0);
+        settings.Finish = new DateTime(2022, 02, 22, 23, 0, 0);
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
@@ -51,9 +51,9 @@ public class Program
         // options
         alternates.Set("OrderQuantity", 6);
 
-        alternates.Set("DataCollectSize", 15);
-        alternates.Set("DataAnalysisSize", 45);
-        alternates.Set("DataCollectUseSma", false);
+        alternates.Set("DataCollectSize", 12);
+        alternates.Set("DataAnalysisSize", 48);
+        alternates.Set("DataCollectUseSma", true);
         alternates.Set("DataAnalysisUseSma", true);
 
 
@@ -74,16 +74,15 @@ public class Program
 
 
         // volume power
-        alternates.Set("PowerVolumeCollectionPeriod", 30);
         alternates.Set("PowerLookback", 5);
 
 
         // ma cross
         alternates.Set("DynamicCross", true);
-        alternates.Set("MaAvgChange", 0.25M);
-        alternates.Set("PowerCrossThreshold", 90);
+        alternates.Set("MaAvgChange", 0.32M);
+        alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1);
-        alternates.Set("PowerCrossPositiveMultiplier", 2.5);
+        alternates.Set("PowerCrossPositiveMultiplier", 3);
 
         // general
         alternates.Set("ClosePositionsDaily", false);

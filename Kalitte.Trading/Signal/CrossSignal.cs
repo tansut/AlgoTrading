@@ -53,7 +53,6 @@ namespace Kalitte.Trading
 
 
         private decimal lastCross = 0;
-        public bool UseSma = true;
 
 
         public CrossSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
@@ -80,7 +79,7 @@ namespace Kalitte.Trading
         {
             this.InitialPeriods = AnalyseSize;
             this.InitialAvgChange = AvgChange;
-            crossBars = new FinanceList<decimal>(AnalyseSize);            
+            crossBars = new FinanceList<decimal>(AnalyseSize);
             this.Indicators.Add(i1k);
             this.Indicators.Add(i2k);
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
@@ -119,7 +118,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {AnalyseSize} pricePeriod: {CollectSize} useSma: {UseSma} avgChange: {AvgChange}";
+            return $"{base.ToString()}: {i1k.ToString()}/{i2k.ToString()}] period: {AnalyseSize} pricePeriod: {CollectSize}  avgChange: {AvgChange}";
         }
 
 

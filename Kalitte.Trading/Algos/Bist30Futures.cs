@@ -15,7 +15,6 @@ namespace Kalitte.Trading.Algos
 
         public PowerSignalResult LastPower { get; set; } = null;
 
-
         [AlgoParam(4.0)]
         public decimal OrderQuantity { get; set; }
 
@@ -161,7 +160,7 @@ namespace Kalitte.Trading.Algos
 
             powerSignal.Indicator = new Rsi(periodData.Periods, PowerLookback, CandlePart.Volume);
             //powerSignal.Indicator = new Ema(oneMinData.Periods, PowerLookback);
-            powerSignal.VolumeCollectionPeriod = PowerVolumeCollectionPeriod;
+            powerSignal.CollectSize = PowerVolumeCollectionPeriod;
 
             if (maSignal != null)
             {
@@ -207,13 +206,13 @@ namespace Kalitte.Trading.Algos
         public void InitSignals()
         {
             this.priceTrend = new TrendSignal("price-trend", Symbol, this);
-            priceTrend.Periods = 2;
-            priceTrend.PriceCollectionPeriod = 1;
+            priceTrend.AnalyseSize = 2;
+            priceTrend.CollectSize = 1;
             priceTrend.ReferenceType = TrendReference.LastCheck;
 
             this.atrTrend = new TrendSignal("atr-trend", Symbol, this);
-            atrTrend.Periods = 45;
-            atrTrend.PriceCollectionPeriod = 2;
+            atrTrend.AnalyseSize = 45;
+            atrTrend.CollectSize = 2;
             atrTrend.HowToReset = ResetList.Always;
 
             this.powerSignal = new PowerSignal("power", Symbol, this);
@@ -225,13 +224,13 @@ namespace Kalitte.Trading.Algos
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
             {
-                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, CollectSize = CrossPriceCollectionPeriod, AvgChange = MaAvgChange, AnalyseSize = MaPeriods };
+                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, CollectSize = CrossPriceCollectionPeriod, AvgChange = MaAvgChange, AnalyseSize = MaPeriods };
                 this.Signals.Add(maSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
             {
-                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, UseSma = UseSmaForCross, CollectSize = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, AnalyseSize = MacdPeriods };
+                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, CollectSize = CrossPriceCollectionPeriod, AvgChange = MacdAvgChange, AnalyseSize = MacdPeriods };
                 this.Signals.Add(macSignal);
             }
 
@@ -245,7 +244,7 @@ namespace Kalitte.Trading.Algos
             }
             if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0))
             {
-                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { UseSma = this.UseSmaForCross, Periods = RsiAnalysisPeriod, PriceCollectionPeriod = this.RsiPriceCollectionPeriod };
+                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { UseSma = this.UseSmaForCross, AnalyseSize = RsiAnalysisPeriod, CollectSize = this.RsiPriceCollectionPeriod };
                 this.Signals.Add(rsiTrendSignal);
             }
 

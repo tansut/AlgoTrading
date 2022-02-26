@@ -96,15 +96,15 @@ namespace Kalitte.Trading
         }
     }
 
-    public class TrendSignal : Signal
+    public class TrendSignal : AnalyserBase
     {
         public ITechnicalIndicator i1k;
-        public int PriceCollectionPeriod = 5;
-        public int Periods = 5;
+        //public int PriceCollectionPeriod = 5;
+        //public int Periods = 5;
         public decimal? Min { get; set; }
         public decimal? Max { get; set; }
-        private FinanceList<IQuote> analysisBars;
-        private FinanceList<IQuote> priceBars;
+        //private FinanceList<IQuote> analysisBars;
+        //private FinanceList<IQuote> priceBars;
         private List<TrendResult> BarTrendResults;
         public TrendReference ReferenceType { get; set; } = TrendReference.LastBar;
         private decimal? lastValue = null;
@@ -120,8 +120,8 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            analysisBars = new FinanceList<IQuote>(Periods);
-            priceBars = new FinanceList<IQuote>(PriceCollectionPeriod);
+            //analysisBars = new FinanceList<IQuote>(Periods);
+            //priceBars = new FinanceList<IQuote>(PriceCollectionPeriod);
             BarTrendResults = new List<TrendResult>();
             Indicators.Add(i1k);
             i1k.InputBars.ListEvent += base.InputbarsChanged;
@@ -131,9 +131,9 @@ namespace Kalitte.Trading
 
         protected override void ResetInternal()
         {
-            analysisBars.Clear();
-            priceBars.Clear();
+            base.ResetInternal();
             generateDerivs();
+            
         }
 
 
@@ -145,7 +145,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()}: Range: {Min}-{Max} Period: {Periods} PriceCollection: {PriceCollectionPeriod} useSma: {UseSma}";
+            return $"{base.ToString()}: Range: {Min}-{Max} Period: {AnalyseSize} PriceCollection: {CollectSize} useSma: {UseSma}";
         }
 
 
@@ -212,22 +212,20 @@ namespace Kalitte.Trading
 
             var mp = Algo.GetMarketPrice(Symbol, t);
 
-            if (mp > 0) priceBars.Push(new Quote() { Date = t ?? DateTime.Now, Close = mp });
+            if (mp > 0) CollectList.Collect(mp);
 
-
-            if (priceBars.IsFull && mp >= 0)
+            if (CollectList.Ready && mp >= 0)
             {
-                decimal mpAverage = priceBars.List.GetSma(priceBars.Count).Last().Sma.Value;
-                priceBars.Clear();
+                decimal mpAverage = CollectList.LastValue; 
+                CollectList.Clear();
 
                 var l1 = i1k.NextValue(mpAverage);
 
-                var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 };
-                analysisBars.Push(newResultBar);
+                AnalyseList.Collect(l1);
 
-                if (analysisBars.Count >= Periods && BarTrendResults.Count > 0)
+                if (AnalyseList.Ready && BarTrendResults.Count > 0)
                 {
-                    var currentVal = UseSma ? analysisBars.List.GetSma(Periods).Last().Sma.Value : analysisBars.List.GetEma(Periods).Last().Ema.Value;
+                    var currentVal = AnalyseList.LastValue; 
                     var lastReference = i1k.Results.Last().Value.Value;
 
                     if (this.ReferenceType == TrendReference.LastCheck && lastValue.HasValue)
@@ -257,10 +255,10 @@ namespace Kalitte.Trading
                     if (result.Trend.Direction != TrendDirection.None)
                     {
                         result.finalResult = BuySell.Sell;
-                        if (HowToReset == ResetList.AfterTrend || HowToReset == ResetList.Always) analysisBars.Clear();
+                        if (HowToReset == ResetList.AfterTrend || HowToReset == ResetList.Always) AnalyseList.Clear();
                     } else
                     {
-                        if (HowToReset == ResetList.Always) analysisBars.Clear();
+                        if (HowToReset == ResetList.Always) AnalyseList.Clear();
                     }
 
                     lastValue = currentVal;

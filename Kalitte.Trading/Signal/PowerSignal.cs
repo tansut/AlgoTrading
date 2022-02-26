@@ -32,7 +32,9 @@ namespace Kalitte.Trading
         internal double CurrentVolume;
 
         public decimal Value { get; set; }
-        public PowerRatio Power { get
+        public PowerRatio Power
+        {
+            get
             {
                 if (Value == 0) return PowerRatio.Unknown;
                 if (Value < 20) return PowerRatio.Low;
@@ -68,26 +70,24 @@ namespace Kalitte.Trading
     {
         public ITechnicalIndicator Indicator { get; set; }
         //private FinanceList<IQuote> volumeBars;
-
-        public int VolumeCollectionPeriod { get; set; } = 5;
-
+        
 
 
         public override void Init()
         {
-            this.Indicators.Add(Indicator);            
+            this.Indicators.Add(Indicator);
             base.Init();
         }
 
         protected override void LoadNewBars(object sender, ListEventArgs<Skender.Stock.Indicators.IQuote> e)
         {
-            
+
         }
 
 
         public PowerSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
         {
-            
+
         }
 
 
@@ -121,13 +121,13 @@ namespace Kalitte.Trading
             var time = t ?? DateTime.Now;
 
             var result = new PowerSignalResult(this, time);
-            
+
             var mp = Algo.GetVolume(Symbol, Indicator.InputBars.Period, t);
             if (mp > 0)
             {
                 var volume = calculateVolumeBySecond(time, mp);
                 if (volume > 0)
-                {                    
+                {
                     CollectList.Collect((decimal)volume);
                 }
                 else
@@ -137,7 +137,7 @@ namespace Kalitte.Trading
                 }
             }
             else return result;
-            if (CollectList.Count > 0)  calculatePower(result, time);
+            if (CollectList.Count > 0) calculatePower(result, time);
             return result;
         }
     }

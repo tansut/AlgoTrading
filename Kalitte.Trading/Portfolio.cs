@@ -28,7 +28,7 @@ namespace Kalitte.Trading
 
 
 
-        public decimal CommissionPaid { get; set; } = 0M;
+        public decimal Commission { get; set; } = 0M;
 
         public string Symbol
         {
@@ -37,6 +37,14 @@ namespace Kalitte.Trading
         public decimal PL
         {
             get;  set;
+        }
+
+        public decimal NetPL
+        {
+            get
+            {
+                return PL - Commission;
+            }
         }
         public decimal AvgCost
         {
@@ -93,7 +101,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL} Commission: {CommissionPaid} NetPL: {PL - CommissionPaid}";
+            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL} Commission: {Commission} NetPL: {PL - Commission}";
         }
 
         public PortfolioItem(string symbol, BuySell side, decimal quantity, decimal unitPrice)
@@ -111,7 +119,7 @@ namespace Kalitte.Trading
 
         public void OrderCompleted(ExchangeOrder position)
         {
-            this.CommissionPaid += position.CommissionPaid;
+            this.Commission += position.CommissionPaid;
             if (this.IsEmpty)
             {
                 this.Side = position.Side;
@@ -179,7 +187,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return this.Sum(p => p.Value.CommissionPaid);
+                return this.Sum(p => p.Value.Commission);
             }
         }
 

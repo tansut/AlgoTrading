@@ -44,8 +44,8 @@ public class Program
     public static Settings AppTest()
     {
         var settings = new Settings();
-        settings.sDate = new DateTime(2022, 02, 24, 9, 30, 0);
-        settings.fDate = new DateTime(2022, 02, 24, 23, 0, 0);
+        settings.sDate = new DateTime(2022, 02, 25, 9, 30, 0);
+        settings.fDate = new DateTime(2022, 02, 25, 23, 0, 0);
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
@@ -55,8 +55,10 @@ public class Program
         
 
         // profit && loss
-        alternates.Set("ProfitQuantity", 2);
+        alternates.Set("ProfitQuantity", 0);
         alternates.Set("ProfitPuan", 16);
+        alternates.Set("LossQuantity", 0);
+        alternates.Set("LossPuan", 0);
         alternates.Set("RsiProfitQuantity", 1);
         alternates.Set("RsiProfitPuan", 2);
         alternates.Set("ProgressiveProfitLoss", 1.75);
@@ -83,7 +85,7 @@ public class Program
         alternates.Set("PowerCrossPositiveMultiplier", 2.5);
 
         // general
-        alternates.Set("ClosePositionsDaily", false);
+        alternates.Set("ClosePositionsDaily", true);
 
         
         // System

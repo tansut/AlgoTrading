@@ -537,7 +537,7 @@ namespace Kalitte.Trading.Algos
         public override void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
         {
             base.sendOrder(symbol, quantity, side, comment, lprice, icon, t, signalResult, disableDelay);
-            Log($"Power was during order: {LastPower}", LogLevel.Order);
+            //Log($"Power was during order: {LastPower}", LogLevel.Order);
         }
 
         public Bist30Futures(): base()

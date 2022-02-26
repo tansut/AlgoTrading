@@ -179,7 +179,8 @@ namespace Kalitte.Trading.Algos
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-            Log($"Completed order {this.positionRequest.Id} created/resulted at {this.positionRequest.Created}/{this.positionRequest.Resulted}: {this.positionRequest.ToString()}\n{printPortfolio()}", LogLevel.Order);
+            var port = UserPortfolioList.Where(p=>p.Key == positionRequest.Symbol).First().Value;
+            Log($"Filled[{port.SideStr}/{port.Quantity} PL:{port.NetPL}]: {this.positionRequest.ToString()}", LogLevel.Order);
             if (this.positionRequest.SignalResult != null) CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
             this.positionRequest = null;
             orderCounter++;
@@ -614,7 +615,7 @@ namespace Kalitte.Trading.Algos
             {
                 saveLog = false;
             }
-            if (saveLog) File.AppendAllText(LogFile, LogContent.ToString());
+            if (Simulation && saveLog) File.AppendAllText(LogFile, LogContent.ToString());
             if (Simulation && string.IsNullOrEmpty(SimulationFile) && saveLog) Process.Start(LogFile);
             if (!string.IsNullOrEmpty(SimulationFile))
             {
@@ -626,7 +627,7 @@ namespace Kalitte.Trading.Algos
                     if (UserPortfolioList.Count > 0)
                     {
                         var ul = UserPortfolioList.First().Value;
-                        sb.Append($"{ul.SideStr}\t{ul.Quantity}\t{ul.AvgCost}\t{ul.Total}\t{ul.PL}\t{ul.CommissionPaid}\t{ul.PL - ul.CommissionPaid}\t{orderCounter}\t{LogFile}\t");
+                        sb.Append($"{ul.SideStr}\t{ul.Quantity}\t{ul.AvgCost}\t{ul.Total}\t{ul.PL}\t{ul.Commission}\t{ul.PL - ul.Commission}\t{orderCounter}\t{LogFile}\t");
                     }
                     foreach (var v in dictionary.Values) sb.Append(v + "\t");
                     sb.Append(Environment.NewLine);
@@ -648,7 +649,7 @@ namespace Kalitte.Trading.Algos
             {
                 if (!item.Value.IsEmpty)
                 {
-                    Log($"Closing positions for {symbol} at {time}", LogLevel.Order, time);
+                    Log($"Closing positions for {symbol} at {time}", LogLevel.Info, time);
                     sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", 0, OrderIcon.PositionClose, time, null, true);
                 }
             }
@@ -680,10 +681,10 @@ namespace Kalitte.Trading.Algos
             order.SignalResult = signalResult;
             order.Sent = t ?? DateTime.Now;
 
-            Log($"New order submitted. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Order, t);
+            Log($"New order submitted. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info, t);
             if (order.SignalResult != null)
-                Log($"Signal [{order.SignalResult.Signal.Name}] result: {order.SignalResult}", LogLevel.Order, t);
-            Log($"Used bar: {symbolData.Periods.Last}", LogLevel.Order, t);
+                Log($"Signal [{order.SignalResult.Signal.Name}] result: {order.SignalResult}", LogLevel.Info, t);
+            Log($"Used bar: {symbolData.Periods.Last}", LogLevel.Debug, t);
 
             if (this.UseVirtualOrders || this.AutoCompleteOrders)
             {
@@ -750,8 +751,12 @@ namespace Kalitte.Trading.Algos
             {
                 var time = t ?? AlgoTime;
                 string opTime = time.ToString("yyyy.MM.dd HH:mm:sss");
-                var content = $"[{level}:{opTime}]: {text}" + Environment.NewLine;
-                LogContent.AppendLine(content);
+                var content = $"[{level}:{opTime}]: {text}";
+                if (Simulation) LogContent.AppendLine(content);
+                else
+                {
+                    File.AppendAllText(LogFile, content + Environment.NewLine);
+                }
                 if (LogConsole) Console.WriteLine(content);
                 if (Exchange != null) Exchange.Log(content, level, t);
             }

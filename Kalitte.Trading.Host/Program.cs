@@ -39,8 +39,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 02, 18, 9, 30, 0);
-        settings.Finish = new DateTime(2022, 02, 23, 23, 0, 0);
+        settings.Start = new DateTime(2022, 02, 14, 9, 30, 0);
+        settings.Finish = new DateTime(2022, 02, 26, 23, 0, 0);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -80,7 +80,7 @@ public class Program
 
 
         // ma cross
-        alternates.Set("DynamicCross", false);
+        alternates.Set("DynamicCross", true);
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1);

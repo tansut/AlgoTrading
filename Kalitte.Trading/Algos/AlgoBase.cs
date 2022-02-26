@@ -70,6 +70,9 @@ namespace Kalitte.Trading.Algos
 
     public abstract class AlgoBase
     {
+
+        Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");
+
         Dictionary<string, MarketDataFileLogger> dataProviders = new Dictionary<string, MarketDataFileLogger>();
 
         public static AlgoBase Current;
@@ -82,6 +85,7 @@ namespace Kalitte.Trading.Algos
 
         public DateTime? TestStart { get; set; }
         public DateTime? TestFinish { get; set; }
+        public string SimulationFile { get; set; } = "";
 
         [AlgoParam(LogLevel.Verbose)]
         public LogLevel LoggingLevel { get; set; }
@@ -101,6 +105,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam("F_XU0300422")]
         public string Symbol { get; set; } = "F_XU0300422";
 
+        [AlgoParam(0)]
+        public decimal ExpectedNetPl { get; set; }
 
         [AlgoParam(BarPeriod.Min10)]
         public BarPeriod SymbolPeriod { get; set; }
@@ -554,7 +560,39 @@ namespace Kalitte.Trading.Algos
             Log($"{printPortfolio()}", LogLevel.FinalResult);
             Log($"----------------------", LogLevel.FinalResult);
 
-            File.AppendAllText(LogFile, LogContent.ToString());
+            var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
+
+            var saveLog = true;
+            if (Simulation && ExpectedNetPl != 0 && netPL < ExpectedNetPl)
+            {
+                saveLog = false;
+            } 
+            if (saveLog) File.AppendAllText(LogFile, LogContent.ToString());
+            if (Simulation && string.IsNullOrEmpty(SimulationFile) && saveLog) Process.Start(LogFile);
+            if (!string.IsNullOrEmpty(SimulationFile))
+            {
+                simulationFileMutext.WaitOne();
+                try
+                {
+                    var dictionary = AlgoBase.GetProperties(this.GetType());
+                    var sb = new StringBuilder();
+                    foreach (var v in dictionary.Values) sb.Append(v + "\t");
+                    if (UserPortfolioList.Count > 0)
+                    {
+                        var ul = UserPortfolioList.First().Value;
+                        sb.Append($"{ul.SideStr}\t{ul.Quantity}\t{ul.AvgCost}\t{ul.Total}\t{ul.PL}\t{ul.CommissionPaid}\t{ul.PL - ul.CommissionPaid}\t{orderCounter}\t{LogFile}\t\n");
+                    }
+                    //foreach (var key in dictionary.Keys) sb.Append(key + "\t");
+                    ////F_XU0300222: long/ 1 / Cost: 2250.75 Total: 2250.75 PL: -32.25 Commission: 39.15 NetPL: -71.40
+                    //sb.Append("Pos\tQuantity\tCost\tTotal\tPL\tCommission\tNetPL\tOrdertotal\tLog\t\n");
+                    File.AppendAllText(SimulationFile, sb.ToString());
+                }
+                finally
+                {
+                    simulationFileMutext.ReleaseMutex();
+                }
+            }
+
         }
 
         public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null)

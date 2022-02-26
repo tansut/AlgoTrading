@@ -43,8 +43,7 @@ namespace Kalitte.Trading.Algos
         public int MaPeriods { get; set; }
 
 
-        [AlgoParam(0)]
-        public decimal ExpectedNetPl { get; set; }
+
 
 
 
@@ -266,15 +265,6 @@ namespace Kalitte.Trading.Algos
             base.Init();
         }
 
-        public override void Stop()
-        {
-            base.Stop();
-            var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
-
-
-            if (Simulation && ExpectedNetPl != 0 && netPL < ExpectedNetPl) File.Delete(LogFile);
-            else if (Simulation) Process.Start(LogFile);
-        }
 
 
 

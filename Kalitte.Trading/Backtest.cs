@@ -3,6 +3,7 @@ using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -174,20 +175,42 @@ namespace Kalitte.Trading
         {
             var cases = alternates.GenerateTestCases();
             Console.WriteLine($" ** WILL RUN {cases.Count} TESTS ** Hit to continue ...");
-            Console.ReadKey();
-            Console.WriteLine("Running tests ...");
+            //Console.ReadKey();
+            RandomGenerator random = new RandomGenerator();
+            var resultFile = $"c:\\kalitte\\log\\simulation\\results\\br-{StartTime.ToString("yyyy-MM-dd")}-{FinishTime.ToString("yyyy-MM-dd")}-{(random.Next(1000000, 9999999))}.txt";
+            Console.WriteLine($"Saving tests to {resultFile}");
             var completed = 0;
+            CreateHeaders(resultFile);
             Parallel.For(0, cases.Count, i =>
             {
                 var initValues = cases[i];                
                 var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { initValues });
+                algo.SimulationFile = resultFile;
                 Backtest test = new Backtest(algo, this.StartTime, this.FinishTime);
+
                 //Console.WriteLine($"Running test case {i}/{cases.Count} for {algo.InstanceName} using {algo.LogFile}");
-                test.Start();
-                Console.WriteLine($"Completed case {algo.InstanceName}[{++completed}/{cases.Count}]");
+                try
+                {
+                    test.Start();
+                    Console.WriteLine($"Completed case {algo.InstanceName}[{++completed}/{cases.Count}]");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in instance {algo.InstanceName}. {ex}");
+                }
             });
             Console.WriteLine(" ** COMPLETED ** Hit to close ...");
             Console.ReadKey();
+        }
+
+        private void CreateHeaders(string resultFile)
+        {
+            var dictionary = AlgoBase.GetProperties(typeof(T));
+            var sb = new StringBuilder();
+            foreach (var key in dictionary.Keys) sb.Append(key +"\t");
+            //F_XU0300222: long/ 1 / Cost: 2250.75 Total: 2250.75 PL: -32.25 Commission: 39.15 NetPL: -71.40
+            sb.Append("Pos\tQuantity\tCost\tTotal\tPL\tCommission\tNetPL\tOrdertotal\tLog\t\n");
+            File.WriteAllText(resultFile, sb.ToString());
         }
     }
 }

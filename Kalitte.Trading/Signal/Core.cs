@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Matriks.Lean.Algotrader.Models;
 using Kalitte.Trading.Algos;
 using Skender.Stock.Indicators;
+using Kalitte.Trading.Indicators;
 
 namespace Kalitte.Trading
 {
@@ -67,6 +68,7 @@ namespace Kalitte.Trading
         protected Task collectorTask = null;
         protected CancellationTokenSource collectorTaskTokenSource;
 
+        public List<ITechnicalIndicator> Indicators { get; set; } = new List<ITechnicalIndicator>();
 
         public ManualResetEvent InOperationLock = new ManualResetEvent(true);
 
@@ -152,6 +154,11 @@ namespace Kalitte.Trading
         public virtual SignalResult Check(DateTime? t = null)
         {
             if (this.State == StartableState.Paused) return null;
+            if (!EnsureUsingRightBars(t ??DateTime.Now))
+            {
+                Log($"IMPORTANT: Detected wrong bars for indicators.Time is: {t}", LogLevel.Error, t);
+                return null;
+            }
             InOperationLock.WaitOne();
             InOperationLock.Reset();
             try
@@ -205,6 +212,17 @@ namespace Kalitte.Trading
         public virtual void Init()
         {
 
+        }
+
+        protected virtual bool EnsureUsingRightBars(DateTime t)
+        {
+            var result = true;
+            foreach (var indicator in Indicators)
+            {
+                var expected = Algo.GetExpectedBarPeriod(t, indicator.InputBars.Period);
+                if (expected != indicator.InputBars.Last.Date) return false;
+            }
+            return result;
         }
 
         protected virtual void LoadNewBars(object sender, ListEventArgs<IQuote> e)

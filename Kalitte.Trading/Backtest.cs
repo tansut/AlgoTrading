@@ -40,7 +40,7 @@ namespace Kalitte.Trading
             Algo.Init();
             if (related != null)
             {
-                Algo.PriceLogger = related.Algo.PriceLogger;
+                //Algo.PriceLogger = related.Algo.PriceLogger;
             }
         }
 
@@ -236,7 +236,6 @@ namespace Kalitte.Trading
         {
             var cases = alternates.GenerateTestCases();
             Console.WriteLine($" ** WILL RUN {cases.Count} TESTS ** Hit to continue ...");
-            //Console.ReadKey();
             CreateHeaders(this.FileName);
             Console.WriteLine($"Running tests to file {this.FileName}");
             var completed = 0;
@@ -244,7 +243,7 @@ namespace Kalitte.Trading
             Parallel.For(1, cases.Count, i =>
             {
                 var initValues = cases[i];
-                related = run(initValues, i, ++completed, related);    
+                related = run(initValues, ++completed, cases.Count, related);    
             });
             Console.WriteLine(" ** COMPLETED ** Hit to close ...");
             //Console.ReadKey();
@@ -252,7 +251,7 @@ namespace Kalitte.Trading
 
         private void CreateHeaders(string resultFile)
         {
-            var dictionary = AlgoBase.GetProperties(typeof(T));
+            var dictionary = AlgoBase.GetConfigValues(typeof(T));
             var sb = new StringBuilder();
             
             //F_XU0300222: long/ 1 / Cost: 2250.75 Total: 2250.75 PL: -32.25 Commission: 39.15 NetPL: -71.40

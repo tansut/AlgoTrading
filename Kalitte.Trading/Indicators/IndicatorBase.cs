@@ -29,7 +29,8 @@ namespace Kalitte.Trading.Indicators
         decimal? CurrentValue { get; }
         List<IndicatorResult> Results { get; }
         int Lookback { get; set; }
-        string Symbol { get;  set; }
+        //string Symbol { get;  set; }
+        BarPeriod Period { get; set; }
         List<IQuote> UsedInput { get; }
 
         
@@ -46,7 +47,8 @@ namespace Kalitte.Trading.Indicators
         public bool Enabled { get; set; }
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
-        public string Symbol { get; set; }
+        //public string Symbol { get; set; }
+        public BarPeriod Period { get; set; }
         public CandlePart Candle { get; set; } = CandlePart.Close;
         public FinanceBars InputBars { get; }
         public FinanceList<R> ResultList { get; set; } = null;
@@ -55,10 +57,10 @@ namespace Kalitte.Trading.Indicators
 
         public int Lookback { get; set; }
 
-        public override string ToString()
-        {
-            return $"{this.GetType().Name}[{this.Symbol}]";
-        }
+        //public override string ToString()
+        //{
+        //    return $"{this.GetType().Name}[{this.Symbol}]";
+        //}
 
         public List<IQuote> UsedInput { get
             {if (usedBars == null) usedBars = CreateUsedBars();
@@ -84,16 +86,16 @@ namespace Kalitte.Trading.Indicators
 
         protected virtual List<IQuote> CreateUsedBars()
         {
-            return InputBars.LastItems(LastItems);
+            return InputBars.RecommendedItems;
             //return InputBars.LastItems(Math.Min(InputBars.Count, 2 * (Lookback)));
             //return InputBars.LastItems(Lookback);
         }
 
-        public IndicatorBase(FinanceBars bars, CandlePart candle = CandlePart.Close, FinanceList<R> initialResults = null)
+        public IndicatorBase(FinanceBars bars, CandlePart candle = CandlePart.Close)
         {            
             Candle = candle;
             InputBars = bars;            
-            ResultList = initialResults == null ? new FinanceList<R>(0, null): initialResults;
+            ResultList = new FinanceList<R>(0, null);
             bars.ListEvent += BarsChanged;
 
         }

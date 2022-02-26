@@ -52,9 +52,9 @@ namespace Kalitte.Trading
         public int InitialPeriods;
 
         public int PriceCollectionPeriod = 5;
-        private FinanceBars differenceBars;
-        private FinanceBars priceBars;
-        private FinanceBars crossBars;
+        private FinanceList<IQuote> differenceBars;
+        private FinanceList<IQuote> priceBars;
+        private FinanceList<decimal> crossBars;
 
 
         private decimal lastCross = 0;
@@ -89,10 +89,12 @@ namespace Kalitte.Trading
         {
             this.InitialPeriods = Periods;
             this.InitialAvgChange = AvgChange;
-            differenceBars = new FinanceBars(Periods);
-            priceBars = new FinanceBars(PriceCollectionPeriod);
-            crossBars = new FinanceBars(Periods);
+            differenceBars = new FinanceList<IQuote>(Periods);
+            priceBars = new FinanceList<IQuote>(PriceCollectionPeriod);
+            crossBars = new FinanceList<decimal>(Periods);
             ResetInternal();
+            this.Indicators.Add(i1k);
+            this.Indicators.Add(i2k);
             //if (DynamicCross) CalculateSensitivity();
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
             //if (PowerSignal != null) PowerSignal.OnSignal += PowerSignal_OnSignal;
@@ -227,8 +229,8 @@ namespace Kalitte.Trading
 
                 var newResultBar = new Quote() { Date = t ?? DateTime.Now, Close = l1 - l2 };
                 differenceBars.Push(newResultBar);
-                crossBars.Push(newResultBar);
-                var cross = crossBars.Cross(0);
+                crossBars.Push(l1 - l2);
+                var cross = Helper.Cross(crossBars.ToArray, 0);
 
                 if (lastCross == 0 && cross != 0)
                 {

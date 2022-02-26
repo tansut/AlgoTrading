@@ -67,7 +67,7 @@ namespace Kalitte.Trading
     public class PowerSignal : Signal
     {
         public ITechnicalIndicator Indicator { get; set; }
-        private FinanceBars volumeBars;
+        private FinanceList<IQuote> volumeBars;
 
         public int VolumeCollectionPeriod { get; set; } = 5;
 
@@ -75,7 +75,8 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            volumeBars = new FinanceBars(VolumeCollectionPeriod);
+            volumeBars = new FinanceList<IQuote>(VolumeCollectionPeriod);
+            this.Indicators.Add(Indicator);            
             base.Init();
         }
 

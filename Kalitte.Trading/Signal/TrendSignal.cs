@@ -103,8 +103,8 @@ namespace Kalitte.Trading
         public int Periods = 5;
         public decimal? Min { get; set; }
         public decimal? Max { get; set; }
-        private FinanceBars analysisBars;
-        private FinanceBars priceBars;
+        private FinanceList<IQuote> analysisBars;
+        private FinanceList<IQuote> priceBars;
         private List<TrendResult> BarTrendResults;
         public TrendReference ReferenceType { get; set; } = TrendReference.LastBar;
         private decimal? lastValue = null;
@@ -120,11 +120,13 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            analysisBars = new FinanceBars(Periods);
-            priceBars = new FinanceBars(PriceCollectionPeriod);
+            analysisBars = new FinanceList<IQuote>(Periods);
+            priceBars = new FinanceList<IQuote>(PriceCollectionPeriod);
             BarTrendResults = new List<TrendResult>();
+            Indicators.Add(i1k);
             i1k.InputBars.ListEvent += base.InputbarsChanged;
             generateDerivs();
+            base.Init();
         }
 
         protected override void ResetInternal()

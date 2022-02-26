@@ -80,6 +80,20 @@ namespace Kalitte.Trading
             return new DateTime((dt.Ticks + d.Ticks - 1) / d.Ticks * d.Ticks, dt.Kind);
         }
 
+        public static decimal Cross(decimal[] list, decimal baseVal)
+        {            
+            var i = list.Length;
+
+            while (--i >= 1)
+            {
+                decimal cdif = list[i] - baseVal;
+                decimal pdif = list[i - 1] - baseVal;
+                if (cdif > 0 && pdif < 0) return cdif;
+                else if (cdif < 0 && pdif > 0) return cdif;
+            }
+            return 0;
+        }
+
         public static IEnumerable<object> Cartesian(IEnumerable<IEnumerable<object>> items)
         {
             var slots = items

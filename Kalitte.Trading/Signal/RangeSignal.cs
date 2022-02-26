@@ -51,7 +51,7 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            bars = new FinanceBars(AnalysisPeriod);
+            //bars = new FinanceBars(AnalysisPeriod);
         }
 
         public override string ToString()

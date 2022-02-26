@@ -194,8 +194,37 @@ namespace Kalitte.Trading.Algos
         }
 
 
+        public DateTime GetExpectedBarPeriod(DateTime t, BarPeriod period)
+        {
+            Helper.SymbolSeconds(period.ToString(), out int seconds);
+            var shouldBe = Helper.RoundDown(t, TimeSpan.FromSeconds(seconds)).AddSeconds(-seconds);
+            var mMax = 30 + TimeSpan.FromSeconds(seconds).Minutes;
+            var nMax = TimeSpan.FromSeconds(seconds).Minutes;
+            if (t.Hour == 9 && t.Minute < mMax)
+            {
+                var last = t.Date.AddDays(-1).AddHours(23).AddSeconds(-seconds);
+                while (last.DayOfWeek == DayOfWeek.Sunday || last.DayOfWeek == DayOfWeek.Saturday)
+                {
+                    last = last.AddDays(-1);
+                }
+                shouldBe = last;
+            } else if (t.Hour == 19 && t.Minute < nMax)
+            {
+                shouldBe = t.Date.AddHours(18).AddMinutes(10);
+            }
+            return shouldBe;
+        }
 
-
+        //internal bool EnsureRightBar(DateTime t, BarPeriod period)
+        //{
+        //    var sholdBe
+        //    if (t.Hour == 9 && t.Minute < 10)
+        //    {
+        //        var last = new DateTime(). AddDays(-1).AddHours()
+        //        shouldBe = 
+        //    }
+        //    throw new NotImplementedException();
+        //}
 
         public void CountOrder(string signal, decimal quantity)
         {
@@ -293,7 +322,8 @@ namespace Kalitte.Trading.Algos
             {
                 Log($"Received new bar for period {period}, but algo doesnot use it", LogLevel.Warning);
 
-            } else
+            }
+            else
             {
                 data.Periods.Push(bar);
                 Log($"Pushed new bar for period {period}, last bar is now: {data.Periods.Last}", LogLevel.Verbose, data.Periods.Last.Date);
@@ -309,7 +339,7 @@ namespace Kalitte.Trading.Algos
 
 
         public virtual void InitializeBars(string symbol, BarPeriod period, DateTime? t)
-        {                        
+        {
             var periodBars = GetPeriodBars(symbol, period, t);
             //var existing = this.Symbols.Select(p => p.Symbol == symbol).FirstOrDefault();
             //if (existing)
@@ -333,9 +363,10 @@ namespace Kalitte.Trading.Algos
                         mdp.SaveDaily = true;
                         dataProviders[symbol + period.ToString()] = mdp;
                     }                    
-                    periodBars = mdp.GetContentAsQuote(t ?? DateTime.Now);                    
+                    periodBars = mdp.GetContentAsQuote(symbol, period, t ?? DateTime.Now);
+                    var total = periodBars.Count;
+                    periodBars.RecommendedSkip = total - 50;
                 }
-                periodBars.Period = period;
             }
             catch (Exception ex)
             {
@@ -346,7 +377,7 @@ namespace Kalitte.Trading.Algos
 
         }
 
-        public AlgoBase(): this(null)
+        public AlgoBase() : this(null)
         {
 
         }
@@ -354,7 +385,7 @@ namespace Kalitte.Trading.Algos
         //public AlgoBase(string configFile)
         //{
 
-            
+
         //}
 
 
@@ -362,7 +393,7 @@ namespace Kalitte.Trading.Algos
         {
             this.ApplyProperties(initValues);
             RandomGenerator random = new RandomGenerator();
-            this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));                        
+            this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));
             Current = this;
         }
 
@@ -398,7 +429,19 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-        public static Dictionary<string, object> GetProperties(Type type)
+        public Dictionary<string, object> GetConfigValues()
+        {
+            Dictionary<string, object> result = new Dictionary<string, object>();
+            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
+            foreach (var prop in properties)
+            {
+                var attr = (AlgoParam)prop.GetCustomAttributes(true).Where(p => p is AlgoParam).First();
+                result.Add(prop.Name, prop.GetValue(this));
+            }
+            return result;
+        }
+
+        public static Dictionary<string, object> GetConfigValues(Type type)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
             var properties = type.GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
@@ -408,13 +451,12 @@ namespace Kalitte.Trading.Algos
                 result.Add(prop.Name, attr.Value);
             }
             return result;
-
         }
 
         public void ApplyProperties(Dictionary<string, object> init = null)
         {
-            if (init == null) init = GetProperties(this.GetType());
-            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));            
+            if (init == null) init = GetConfigValues(this.GetType());
+            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
             foreach (var item in properties)
             {
                 object val;
@@ -430,7 +472,8 @@ namespace Kalitte.Trading.Algos
                         else if (item.PropertyType == typeof(int))
                         {
                             propValue = Convert.ToInt32(val);
-                        } else if(item.PropertyType == typeof(LogLevel))
+                        }
+                        else if (item.PropertyType == typeof(LogLevel))
                         {
                             propValue = (LogLevel)Convert.ToInt32(val);
                         }
@@ -443,7 +486,8 @@ namespace Kalitte.Trading.Algos
                         //propValue = tc.ConvertTo(val, item.PropertyType);
                     }
                     this.GetType().GetProperty(item.Name).SetValue(this, propValue);
-                } else
+                }
+                else
                 {
                     var paramVal = item.GetCustomAttributes(typeof(AlgoParam), true).Cast<AlgoParam>().FirstOrDefault();
                     if (paramVal != null) item.SetValue(this, paramVal.Value);
@@ -473,7 +517,7 @@ namespace Kalitte.Trading.Algos
 
 
         public virtual void Init()
-        {            
+        {
             if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
 
 
@@ -569,7 +613,7 @@ namespace Kalitte.Trading.Algos
             if (Simulation && ExpectedNetPl != 0 && netPL < ExpectedNetPl)
             {
                 saveLog = false;
-            } 
+            }
             if (saveLog) File.AppendAllText(LogFile, LogContent.ToString());
             if (Simulation && string.IsNullOrEmpty(SimulationFile) && saveLog) Process.Start(LogFile);
             if (!string.IsNullOrEmpty(SimulationFile))
@@ -577,8 +621,8 @@ namespace Kalitte.Trading.Algos
                 simulationFileMutext.WaitOne();
                 try
                 {
-                    var dictionary = AlgoBase.GetProperties(this.GetType());
-                    var sb = new StringBuilder();                    
+                    var dictionary = this.GetConfigValues();
+                    var sb = new StringBuilder();
                     if (UserPortfolioList.Count > 0)
                     {
                         var ul = UserPortfolioList.First().Value;
@@ -759,7 +803,7 @@ namespace Kalitte.Trading.Algos
             if (Simulation)
             {
                 var list = GetMarketData(symbol, SymbolPeriod, t);
-                var price = list.Length > 0 ? list[0]: 0;
+                var price = list.Length > 0 ? list[0] : 0;
                 return price;
             }
             else return Exchange.GetMarketPrice(symbol, t);

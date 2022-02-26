@@ -77,7 +77,7 @@ namespace Kalitte.Trading
             rwl.AcquireWriterLock(timeOut);
             try
             {
-                return items.FindIndex(match);  
+                return items.FindIndex(match);
             }
             finally
             {
@@ -100,7 +100,29 @@ namespace Kalitte.Trading
 
         public List<T> LastItems(int n)
         {
-            return items.Skip(Math.Max(0, Count - n)).ToList();
+            rwl.AcquireReaderLock(timeOut);
+            try
+            {
+                return items.Skip(Math.Max(0, Count - n)).ToList();
+            }
+            finally
+            {
+                rwl.ReleaseReaderLock();
+            }           
+        }
+
+
+        public List<T> Skip(int n)
+        {
+            rwl.AcquireReaderLock(timeOut);
+            try
+            {
+                return items.Skip(n).ToList();
+            }
+            finally
+            {
+                rwl.ReleaseReaderLock();
+            }
         }
 
 
@@ -130,6 +152,23 @@ namespace Kalitte.Trading
                 try
                 {
                     return new List<T>(items);
+                }
+                finally
+                {
+                    rwl.ReleaseReaderLock();
+                }
+            }
+        }
+
+        public T[] ToArray
+        {
+            get
+            {
+
+                rwl.AcquireReaderLock(timeOut);
+                try
+                {
+                    return items.ToArray();
                 }
                 finally
                 {
@@ -284,21 +323,30 @@ namespace Kalitte.Trading
 
     public class FinanceBars : FinanceList<IQuote>
     {
-        //public CandlePart Ohlc { get; set; } = CandlePart.Close;
-        public BarPeriod Period { get; set; }
+        public string Symbol { get; private set; }
+        public BarPeriod Period { get; private set; }
+
+        public int RecommendedSkip { get; set; } = 0;
 
 
-        public FinanceBars(int size) : base(size)
+        public FinanceBars(string symbol, BarPeriod period, int maxSize = 0) : base(maxSize)
+        {
+            this.Symbol = symbol;
+            this.Period = period;
+        }
+
+        public FinanceBars(string symbol, BarPeriod period) : this(symbol, period, 0)
         {
 
         }
 
-        public FinanceBars() : this(0)
+        public List<IQuote> RecommendedItems
         {
-
+            get
+            {
+                return this.Skip(RecommendedSkip);
+            }
         }
-
-
 
 
         public decimal[] Values(CandlePart candle)
@@ -358,20 +406,7 @@ namespace Kalitte.Trading
         }
 
 
-        public decimal Cross(decimal baseVal)
-        {
-            var list = Values(CandlePart.Close);
-            var i = list.Length;
 
-            while (--i >= 1)
-            {
-                decimal cdif = list[i] - baseVal;
-                decimal pdif = list[i - 1] - baseVal;
-                if (cdif > 0 && pdif < 0) return cdif;
-                else if (cdif < 0 && pdif > 0) return cdif;
-            }
-            return 0;
-        }
 
     }
 }

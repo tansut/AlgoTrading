@@ -44,37 +44,53 @@ public class Program
     public static Settings AppTest()
     {
         var settings = new Settings();
-        settings.sDate = new DateTime(2022, 02, 18, 9, 30, 0);
-        settings.fDate = new DateTime(2022, 02, 28, 23, 0, 0);
+        settings.sDate = new DateTime(2022, 02, 24, 9, 30, 0);
+        settings.fDate = new DateTime(2022, 02, 24, 23, 0, 0);
 
-        var initValues = AlgoBase.GetProperties(typeof(Bist30Futures));
+        var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
-        
-        //alternates.Set("LogConsole", true);
-        alternates.Set("LoggingLevel", LogLevel.Order);
-        alternates.Set("Symbol", "F_XU0300222");
-        alternates.Set("LogConsole", false);
-        //alternates.Set("Rsi", 14);
+                
+        // options
         alternates.Set("OrderQuantity", 6);
-        alternates.Set("PowerLookback", 5);
+        
+
+        // profit && loss
         alternates.Set("ProfitQuantity", 2);
-        alternates.Set("ProfitPuan", 16, 12, 14);
-        alternates.Set("ClosePositionsDaily", false);        
+        alternates.Set("ProfitPuan", 16);
         alternates.Set("RsiProfitQuantity", 1);
-        alternates.Set("ProgressiveProfitLoss", 1.75);        
+        alternates.Set("RsiProfitPuan", 2);
+        alternates.Set("ProgressiveProfitLoss", 1.75);
+        
+        // rsi
         alternates.Set("RsiHighLimit", 0);
         alternates.Set("RsiLowLimit", 0);
+        alternates.Set("Rsi", 14);
+        alternates.Set("MinRsiChange", 1M);
+
+
+        // volume power
+        alternates.Set("PowerVolumeCollectionPeriod", 10);
+        alternates.Set("PowerLookback", 5);
+
+
+        // ma cross
         alternates.Set("DynamicCross", true);
-        //alternates.Set("PowerVolumeCollectionPeriod", 10);
-        alternates.Set("PowerCrossThreshold", 90);
         alternates.Set("MaAvgChange", 0.25M);
         alternates.Set("MaPeriods", 45);
+        alternates.Set("CrossPriceCollectionPeriod", 2);
+        alternates.Set("PowerCrossThreshold", 90);
         alternates.Set("PowerCrossNegativeMultiplier", 1);
         alternates.Set("PowerCrossPositiveMultiplier", 2.5);
-        alternates.Set("RsiProfitPuan", 2);
+
+        // general
+        alternates.Set("ClosePositionsDaily", false);
 
         
-        
+        // System
+        alternates.Set("LoggingLevel", LogLevel.Order);
+        alternates.Set("Symbol", "F_XU0300222");
+        alternates.Set("LogConsole", true);
+
 
 
         var file = $"c:\\kalitte\\Bist30Futures-test.json";
@@ -88,10 +104,8 @@ public class Program
 
         //alternates.Set("MinRsiChange", 1M 2M);
 
-        //alternates.Set("CrossPriceCollectionPeriod", 2);
-        //alternates.Set("PowerVolumeCollectionPeriod", 10);
-        //alternates.Set("PowerCrossThreshold", 50);
-        //alternates.Set("ExpectedNetPl", 10M);
+        
+
 
         return settings;
     }
@@ -122,7 +136,7 @@ public class Program
             if (args[1] == "init")
             {
 
-                var initValues = AlgoBase.GetProperties(typeof(Bist30Futures));
+                var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
                 settings.Alternates = settings.Alternates = new AlternateValues(initValues);
                 SaveToFile(args[0], settings);
                 return;

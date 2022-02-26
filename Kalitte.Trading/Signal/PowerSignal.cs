@@ -100,7 +100,7 @@ namespace Kalitte.Trading
 
         void calculatePower(PowerSignalResult s, DateTime t)
         {
-            var volumeAvg = CollectList.LastValue; 
+            var volumeAvg = AnalyseList.LastValue; 
             var volumePerSecond = (double)volumeAvg;
             Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
             var volume = volumePerSecond * periodSeconds;
@@ -125,16 +125,22 @@ namespace Kalitte.Trading
                 var volume = calculateVolumeBySecond(time, mp);
                 if (volume > 0)
                 {
-                    CollectList.Collect((decimal)volume);
+                    CollectList.Collect((decimal)volume);                    
                 }
                 else
                 {
                     Log($"Volume is zero", LogLevel.Verbose, time);
                     return result;
                 }
+
+                if (CollectList.Ready)
+                {
+                    var collectValue = CollectList.LastValue;
+                    AnalyseList.Collect(collectValue);
+                }
             }
             else return result;
-            if (CollectList.Ready) calculatePower(result, time);
+            if (AnalyseList.Ready) calculatePower(result, time);
             return result;
         }
     }

@@ -18,13 +18,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(4.0)]
         public decimal OrderQuantity { get; set; }
 
-
-        [AlgoParam(10)]
-        public int CrossPriceCollectionPeriod { get; set; }
-
-        [AlgoParam(true)]
-        public bool UseSmaForCross { get; set; }
-
         [AlgoParam(5)]
         public int MovPeriod { get; set; }
 
@@ -37,14 +30,6 @@ namespace Kalitte.Trading.Algos
 
         [AlgoParam(0.25)]
         public decimal MaAvgChange { get; set; }
-
-        //[AlgoParam(60)]
-        //public int MaPeriods { get; set; }
-
-
-
-
-
 
         [AlgoParam(false)]
         public bool SimulateOrderSignal { get; set; }
@@ -61,9 +46,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(4)]
         public decimal LossPuan { get; set; }
 
-        //[AlgoParam(4)]
-        //public int RsiPriceCollectionPeriod { get; set; }
-
         [AlgoParam(60)]
         public decimal RsiHighLimit { get; set; }
 
@@ -71,7 +53,7 @@ namespace Kalitte.Trading.Algos
         public decimal RsiLowLimit { get; set; }
 
         [AlgoParam(2)]
-        public decimal MinRsiChange { get; set; }
+        public decimal RsiTrendThreshold { get; set; }
 
 
         [AlgoParam(1)]
@@ -92,9 +74,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(14)]
         public int Rsi { get; set; }
 
-        //[AlgoParam(60)]
-        //public int RsiAnalysisPeriod { get; set; } 
-
         [AlgoParam(0)]
         public int MACDShortPeriod { get; set; }
 
@@ -103,9 +82,6 @@ namespace Kalitte.Trading.Algos
 
         [AlgoParam(0.05)]
         public decimal MacdAvgChange { get; set; }
-
-        //[AlgoParam(15)]
-        //public int MacdPeriods { get; set; } 
 
         [AlgoParam(9)]
         public int MACDTrigger { get; set; }
@@ -131,9 +107,6 @@ namespace Kalitte.Trading.Algos
 
         [AlgoParam(false)]
         public bool DataAnalysisUseSma { get; set; }
-
-        //[AlgoParam(10)]
-        //public int PowerVolumeCollectionPeriod { get; set; }
 
         [AlgoParam(100)]
         public decimal PowerCrossThreshold { get; set; }
@@ -458,7 +431,7 @@ namespace Kalitte.Trading.Algos
                 if (quantity > 0)
                 {
                     var trend = result.Trend;
-                    if (Math.Abs(trend.Change) < MinRsiChange) return;
+                    if (Math.Abs(trend.Change) < RsiTrendThreshold) return;
                     if ((trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp) && portfolio.IsLong && (portfolio.AvgCost + RsiProfitPuan) <= marketPrice)
                     {
                         if (maSignal != null) maSignal.Reset();

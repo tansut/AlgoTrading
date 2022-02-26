@@ -19,6 +19,7 @@ public class Settings
     public DateTime sDate { get; set; }
     public DateTime fDate { get; set; }
     public AlternateValues Alternates { get; set; }
+    //public string [] Monitor { get; set; }
 }
 
 public class Program
@@ -49,12 +50,15 @@ public class Program
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
-                
+
+        //settings.Monitor = new string[] { "DataCollectSize", "DataAnalysisSize", "DataCollectUseSma",  }
+
+
         // options
         alternates.Set("OrderQuantity", 6);
 
-        alternates.Set("DataCollectSize", 5,15,30);
-        alternates.Set("DataAnalysisSize", 30,45,60);
+        alternates.Set("DataCollectSize", 15);
+        alternates.Set("DataAnalysisSize", 45);
         alternates.Set("DataCollectUseSma", false);
         alternates.Set("DataAnalysisUseSma", true);
 
@@ -81,7 +85,7 @@ public class Program
 
 
         // ma cross
-        alternates.Set("DynamicCross", true);
+        alternates.Set("DynamicCross", false);
         alternates.Set("MaAvgChange", 0.3M);
         alternates.Set("PowerCrossThreshold", 90);
         alternates.Set("PowerCrossNegativeMultiplier", 1);
@@ -95,6 +99,8 @@ public class Program
         alternates.Set("LoggingLevel", LogLevel.Order);
         alternates.Set("Symbol", "F_XU0300222");
         alternates.Set("LogConsole", true);
+
+
 
         var file = $"c:\\kalitte\\Bist30Futures-test.json";
         var val = JsonConvert.SerializeObject(alternates, Formatting.Indented);

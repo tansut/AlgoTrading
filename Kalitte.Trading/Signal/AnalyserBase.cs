@@ -25,14 +25,14 @@ namespace Kalitte.Trading
         public int Size { get; set; }
         public Average Average { get; set; }
         public FinanceList<IQuote> List { get; private set; }
-        //public CandlePart Candle { get; private set; }
+        public CandlePart Candle { get; private set; }
 
         public AnalyseList(int size, Average average, CandlePart candle = CandlePart.Close)
         {
             this.Size = size;
             this.Average = average;
             this.List = new FinanceList<IQuote>(Size);
-            //this.Candle = candle;
+            this.Candle = candle;
         }
 
         public void Collect(decimal val)
@@ -42,7 +42,8 @@ namespace Kalitte.Trading
 
         public void Collect(DateTime date, decimal value)
         {
-            var q = new MyQuote() { Date = date, Close=value };            
+            var q = new MyQuote() { Date = date };
+            q.Set(value, Candle);
             this.List.Push(q);
         }
 
@@ -51,9 +52,13 @@ namespace Kalitte.Trading
             List.Clear();
         }
 
-        public virtual bool Ready()
+        public virtual bool Ready
         {
-            return List.IsFull;
+            get
+            {
+                return List.IsFull;
+            }
+            
         }
 
         public void Resize(int newSize)
@@ -68,10 +73,10 @@ namespace Kalitte.Trading
             {
                 if (this.Average == Average.Ema)
                 {
-                    return List.List.GetEma(List.Count).Last().Ema.Value;
+                    return List.List.GetEma(List.Count, Candle).Last().Ema.Value;
                 } else
                 {
-                    return List.List.GetSma(List.Count).Last().Sma.Value;
+                    return List.List.GetSma(List.Count, Candle).Last().Sma.Value;
                 }                
             }
         }

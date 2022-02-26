@@ -196,7 +196,7 @@ namespace Kalitte.Trading
 
             if (mp > 0) CollectList.Collect(mp);
 
-            if (CollectList.Ready() && mp >= 0)
+            if (CollectList.Ready && mp >= 0)
             {
 
                 decimal mpAverage = CollectList.LastValue;
@@ -215,7 +215,7 @@ namespace Kalitte.Trading
                     AnalyseList.Clear();
                 }
 
-                if (AnalyseList.Ready())
+                if (AnalyseList.Ready)
                 {
 
                     var lastAvg = AnalyseList.LastValue; // UseSma ? differenceBars.List.GetSma(AnalyseSize).Last().Sma.Value : differenceBars.List.GetEma(AnalyseSize).Last().Ema.Value;

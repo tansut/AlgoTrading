@@ -25,6 +25,7 @@ namespace Kalitte.Trading
         public decimal MarketPrice { get; set; }
         public decimal PortfolioCost { get; set; }
         public ProfitOrLoss Direction { get; set; }
+        public int SignalCount = 0;
 
         public ProfitLossResult(Signal signal, DateTime t): base(signal, t)
         {
@@ -43,7 +44,7 @@ namespace Kalitte.Trading
         public decimal LossPriceChange { get; set; }
         public decimal LossQuantity { get; set; }
 
-        public int SignalCount { get; set; }
+        public volatile int SignalCount = 0;
 
         public TakeProfitOrLossSignal(string name, string symbol, AlgoBase owner, 
             decimal profitPriceChange, decimal profitQuantity, decimal lossPriceChange, decimal lossQuantity) : base(name, symbol, owner)
@@ -60,7 +61,7 @@ namespace Kalitte.Trading
         public void ResetPriceChange()
         {
             UsedProfitPriceChange = ProfitPriceChange;
-            UsedLossPriceChange = LossPriceChange;
+            UsedLossPriceChange = LossPriceChange;            
             SignalCount = 0;
         }
 
@@ -68,6 +69,11 @@ namespace Kalitte.Trading
         {
             UsedProfitPriceChange = ratio * ProfitPriceChange;
             UsedLossPriceChange = ratio * LossPriceChange;
+        }
+
+        public void IncrementSignal()
+        {
+            Interlocked.Increment(ref SignalCount);
         }
 
 
@@ -126,10 +132,8 @@ namespace Kalitte.Trading
                 }
                 //else Algo.Log($"No cation takeprofit: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
             }
-            if (result.HasValue) SignalCount++;
-            return new ProfitLossResult(this, t ?? DateTime.Now) { Direction= direction, PL=pl, MarketPrice=price,PortfolioCost=avgCost, finalResult = result };
-
-
+            //if (result.HasValue) SignalCount++;
+            return new ProfitLossResult(this, t ?? DateTime.Now) { SignalCount = SignalCount, Direction= direction, PL=pl, MarketPrice=price,PortfolioCost=avgCost, finalResult = result };
         }
 
     }

@@ -252,12 +252,12 @@ namespace Kalitte.Trading.Algos
         {
 
             if (maSignal != null) {
-                this.Monitor.AddFilter($"{maSignal.Name}/sensitivity", 50);
+                //this.Monitor.AddFilter($"{maSignal.Name}/sensitivity", 50);
             }
             if (powerSignal != null)
             {
-                this.Monitor.AddFilter($"{powerSignal.Name}/volume", 50);
-                this.Monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond",50);
+                //this.Monitor.AddFilter($"{powerSignal.Name}/volume", 50);
+                //this.Monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond",50);
             }
             //if (rsiTrendSignal != null)
             //{
@@ -299,20 +299,20 @@ namespace Kalitte.Trading.Algos
             var profitQuantity = Math.Min(pq, signal.ProfitQuantity);
             var lossQuantity = Math.Min(pq, signal.LossQuantity);
 
-            if (ProgressiveProfitLoss > 0 && signal.SignalCount == 1)
+            if (ProgressiveProfitLoss > 0 && signal.SignalCount == 0)
             {
                 if (profitQuantity > 1) profitQuantity = profitQuantity / 2;
                 if (lossQuantity > 1) lossQuantity = lossQuantity / 2;
                 signal.AdjustPriceChange(ProgressiveProfitLoss);
                 doAction = doAction || pq > (result.Direction == ProfitOrLoss.Profit ? profitQuantity : lossQuantity);
             }
-            else if (ProgressiveProfitLoss > 0 && signal.SignalCount == 2)
+            else if (ProgressiveProfitLoss > 0 && signal.SignalCount == 1)
             {
                 if (profitQuantity > 1) profitQuantity = profitQuantity / 2;
                 if (lossQuantity > 1) lossQuantity = lossQuantity / 2;
                 doAction = doAction || pq > (result.Direction == ProfitOrLoss.Profit ? profitQuantity : lossQuantity);
             }
-            else if (ProgressiveProfitLoss > 0 && signal.SignalCount > 2)
+            else if (ProgressiveProfitLoss > 0 && signal.SignalCount >= 2)
             {
                 //doAction = false;
             }
@@ -321,6 +321,7 @@ namespace Kalitte.Trading.Algos
             {
                 Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Debug, result.SignalTime);
                 sendOrder(Symbol, result.Direction == ProfitOrLoss.Profit ? profitQuantity : LossQuantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result.MarketPrice, result.Direction == ProfitOrLoss.Profit ? OrderIcon.TakeProfit : OrderIcon.StopLoss, result.SignalTime, result);
+                
             }
             //else Log($"[{result.Signal.Name}:{result.Direction}] received but quantity doesnot match. Portfolio: {pq} oq: {this.OrderQuantity}", LogLevel.Verbose, result.SignalTime);
         }
@@ -526,7 +527,6 @@ namespace Kalitte.Trading.Algos
                     var signalResult = (CrossSignalResult)result;
                     HandleCrossSignal(tpSignal, signalResult);
                 }
-
             }
             finally
             {
@@ -547,9 +547,24 @@ namespace Kalitte.Trading.Algos
 
             var cross = (CrossSignal)signalResult.Signal;
             sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
-            Signals.Where(p=>p is TakeProfitOrLossSignal).Select(p=>(TakeProfitOrLossSignal)p).ToList().ForEach(p=>p.ResetPriceChange());
+            
             rsiOrderEnabled = true;
             //signal.AdjustSensitivity(0.30, "Order Received");
+        }
+
+        public override void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
+        {
+            var tp = this.positionRequest.SignalResult as ProfitLossResult;
+            var cross = this.positionRequest.SignalResult as CrossSignalResult;
+            if (tp != null)
+            {
+                ((TakeProfitOrLossSignal)tp.Signal).IncrementSignal();
+            }                       
+            if (cross != null)
+            {
+                Signals.Where(p => p is TakeProfitOrLossSignal).Select(p => (TakeProfitOrLossSignal)p).ToList().ForEach(p => p.ResetPriceChange());
+            }
+            base.FillCurrentOrder(filledUnitPrice, filledQuantity);
         }
 
         public override void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)

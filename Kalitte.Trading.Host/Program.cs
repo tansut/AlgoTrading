@@ -39,15 +39,15 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 02, 25, 9, 30, 0);
-        settings.Finish = new DateTime(2022, 02, 25, 23, 0, 0);
+        settings.Start = new DateTime(2022, 02, 21, 9, 30, 0);
+        settings.Finish = new DateTime(2022, 02, 23, 23, 0, 0);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("OrderQuantity", 6);
+        alternates.Set("OrderQuantity", 4);
 
         alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 48);
@@ -62,7 +62,7 @@ public class Program
         alternates.Set("LossPuan", 0);
         alternates.Set("RsiProfitQuantity", 0);
         alternates.Set("RsiProfitPuan", 16);
-        alternates.Set("ProgressiveProfitLoss", 1.5);
+        alternates.Set("ProgressiveProfitLoss", 2);
         
         // rsi
         alternates.Set("RsiHighLimit", 40);
@@ -80,7 +80,7 @@ public class Program
         alternates.Set("PowerLookback", 5);
 
         // ma cross
-        alternates.Set("DynamicCross", true);
+        alternates.Set("DynamicCross", false);
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);

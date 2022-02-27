@@ -189,7 +189,7 @@ namespace Kalitte.Trading.Algos
                 Log($"{e}", LogLevel.Warning);
         }
 
-        public void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
+        public virtual void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
         {
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
@@ -197,8 +197,10 @@ namespace Kalitte.Trading.Algos
             var port = UserPortfolioList.Where(p=>p.Key == positionRequest.Symbol).First().Value;
             Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost} NetPL:{port.NetPL}]: {this.positionRequest.ToString()}", LogLevel.Order);
             if (this.positionRequest.SignalResult != null) CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
+
             this.positionRequest = null;
             orderCounter++;
+            
             orderWait.Set();
         }
 
@@ -436,9 +438,9 @@ namespace Kalitte.Trading.Algos
                     oldHashCode = existing.GetHashCode();
                 }
                 SignalResults[signal.Name] = data.Result;
+
             }
             if (oldHashCode != data.Result.GetHashCode())
-            //if (oldFinalResult != data.Result.finalResult)
             {
                 Log($"Signal {signal.Name} changed from {existing} -> {data.Result }", LogLevel.Verbose, data.Result.SignalTime);
                 if (data.Result.finalResult.HasValue) Decide(signal, data);
@@ -675,9 +677,9 @@ namespace Kalitte.Trading.Algos
 
         public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
         {
-            var monitored = this.Monitor.Dump(true).ToString();
-            if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Order, t);
             orderWait.Reset();
+            var monitored = this.Monitor.Dump(true).ToString();
+            if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Order, t);            
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
             var price = lprice > 0 ? lprice : this.GetMarketPrice(symbol, t);
             if (price == 0)

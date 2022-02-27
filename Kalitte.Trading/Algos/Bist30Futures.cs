@@ -59,6 +59,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(1)]
         public decimal RsiTrendSensitivity { get; set; }
 
+        [AlgoParam(1)]
+        public decimal PriceTrendSensitivity { get; set; }
+
 
         [AlgoParam(1)]
         public decimal RsiProfitQuantity { get; set; }
@@ -188,6 +191,7 @@ namespace Kalitte.Trading.Algos
         {
             this.priceTrend = new TrendSignal("price-trend", Symbol, this);
             priceTrend.ReferenceType = TrendReference.LastCheck;
+            priceTrend.SignalSensitivity = PriceTrendSensitivity;
 
             this.atrTrend = new TrendSignal("atr-trend", Symbol, this);
             atrTrend.HowToReset = ResetList.Always;
@@ -248,20 +252,20 @@ namespace Kalitte.Trading.Algos
         {
 
             if (maSignal != null) {
-                this.Monitor.AddFilter($"{maSignal.Name}/sensitivity", 25);
+                this.Monitor.AddFilter($"{maSignal.Name}/sensitivity", 50);
             }
             if (powerSignal != null)
             {
-                this.Monitor.AddFilter($"{powerSignal.Name}/volume", 25);
-                this.Monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond",25);
+                this.Monitor.AddFilter($"{powerSignal.Name}/volume", 50);
+                this.Monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond",50);
             }
-            if (rsiTrendSignal != null)
-            {
-                this.Monitor.AddFilter($"{rsiTrendSignal.Name}/value", 25);
-            }
+            //if (rsiTrendSignal != null)
+            //{
+            //    this.Monitor.AddFilter($"{rsiTrendSignal.Name}/value", 25);
+            //}
             if (priceTrend != null)
             {
-                this.Monitor.AddFilter($"{priceTrend.Name}/value", 2);
+                this.Monitor.AddFilter($"{priceTrend.Name}/value", 0.5M);
             }
             base.ConfigureMonitor();
         }
@@ -325,7 +329,7 @@ namespace Kalitte.Trading.Algos
 
         private void HandlePriceTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
-
+                //Log($"[price-trend]: {result.Trend.Direction} {result.Trend.NewValue} ", LogLevel.Critical, result.SignalTime);
         }
 
 

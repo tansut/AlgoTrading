@@ -57,12 +57,12 @@ public class Program
 
         // profit && loss
         alternates.Set("ProfitQuantity", 2);
-        alternates.Set("ProfitPuan", 20);
+        alternates.Set("ProfitPuan", 16);
         alternates.Set("LossQuantity", 0);
         alternates.Set("LossPuan", 0);
-        alternates.Set("RsiProfitQuantity", 1);
+        alternates.Set("RsiProfitQuantity", 0);
         alternates.Set("RsiProfitPuan", 16);
-        alternates.Set("ProgressiveProfitLoss", 2);
+        alternates.Set("ProgressiveProfitLoss", 1.5);
         
         // rsi
         alternates.Set("RsiHighLimit", 40);
@@ -70,6 +70,10 @@ public class Program
         alternates.Set("Rsi", 14);        
         alternates.Set("RsiTrendSensitivity", 1.5M);
         alternates.Set("RsiTrendThreshold", 2M);
+
+        // price
+
+        alternates.Set("PriceTrendSensitivity", 2.5M);
 
 
         // volume power

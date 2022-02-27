@@ -127,7 +127,7 @@ namespace Kalitte.Trading.Algos
         TrendSignal priceTrend = null;
         TrendSignal atrTrend = null;
         PowerSignal powerSignal = null;
-
+        PerformanceMonitor monitor = new PerformanceMonitor();
         
 
         public override void InitMySignals(DateTime t)
@@ -224,10 +224,11 @@ namespace Kalitte.Trading.Algos
                 p.TimerEnabled = !Simulation;
                 p.Simulation = Simulation;
                 p.OnSignal += SignalReceieved;
+                p.PerfMon = this.monitor;
 
                 var analyser = p as AnalyserBase;
 
-                if (p != null)
+                if (analyser != null)
                 {
                     analyser.CollectSize = DataCollectSize;
                     analyser.AnalyseSize = DataAnalysisSize;
@@ -242,11 +243,18 @@ namespace Kalitte.Trading.Algos
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
             //this.AddSymbol(this.Symbol)
             InitSignals();
+            this.monitor.DefaultChange = 25.0M;
+            this.monitor.MonitorEvent += Monitor_MonitorEvent;
+            if (maSignal != null) this.monitor.Filters.Add($"{maSignal.Name}/sensitivity");
+            if (powerSignal != null) this.monitor.Filters.Add($"{powerSignal.Name}");
             base.Init();
         }
 
-
-
+        private void Monitor_MonitorEvent(object sender, MonitorEventArgs e)
+        {
+            if (e.EventType == MonitorEventType.Updated)
+                Log($"{e}", LogLevel.Warning);  
+        }
 
         private void HandleProfitLossSignal(TakeProfitOrLossSignal signal, ProfitLossResult result)
         {
@@ -416,7 +424,7 @@ namespace Kalitte.Trading.Algos
 
             if (!portfolio.IsEmpty)
             {
-                var quantity = portfolio.Quantity <= OrderQuantity && (portfolio.Quantity > RsiProfitQuantity || AlwaysGetRsiProfit) ? Math.Min(portfolio.Quantity, RsiProfitQuantity) : 0; // : RsiProfitQuantity;
+                var quantity = portfolio.Quantity <= OrderQuantity && (portfolio.Quantity > RsiProfitQuantity || AlwaysGetRsiProfit) ? Math.Min(portfolio.Quantity, RsiProfitQuantity) : 0; 
                 if (quantity > 0)
                 {
                     var trend = result.Trend;

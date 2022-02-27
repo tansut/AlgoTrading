@@ -89,6 +89,11 @@ namespace Kalitte.Trading
     {
         public int CollectSize { get; set; }
         public int AnalyseSize { get; set; }
+        
+        public int InitialAnalyseSize { get; set; }
+        public int InitialCollectSize { get; set; }
+
+
         public Average CollectAverage { get; set; }
         public Average AnalyseAverage { get; set; }
 
@@ -101,16 +106,42 @@ namespace Kalitte.Trading
             
         }
 
+        public override void MonitorValues()
+        {            
+            Monitor("sensitivity/collectsize", (decimal)CollectSize);
+            Monitor("sensitivity/analysesize", (decimal)AnalyseSize);
+        }
+
+        protected virtual void AdjustSensitivityInternal(double ratio, string reason)
+        {
+
+
+            AnalyseSize = InitialAnalyseSize + Convert.ToInt32((InitialAnalyseSize * (decimal)ratio));
+            AnalyseList.Resize(AnalyseSize);
+
+            CollectSize = InitialCollectSize + Convert.ToInt32((InitialCollectSize * (decimal)ratio));
+            CollectList.Resize(CollectSize);
+
+            //Monitor("sensitivity/ra", (decimal)ratio);
+            MonitorValues();
+            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): c:{CollectSize} a:{AnalyseSize}", LogLevel.Debug);
+        }
+
+
         public override void Init()
         {
             CollectList = new AnalyseList(CollectSize, CollectAverage);
             AnalyseList = new AnalyseList(AnalyseSize, AnalyseAverage);
-            ResetInternal();
+            ResetInternal();           
             base.Init();
         }
 
         protected override void ResetInternal()
         {
+            InitialAnalyseSize = AnalyseSize;
+            InitialCollectSize = CollectSize;
+            CollectList.Resize(CollectSize);
+            AnalyseList.Resize(AnalyseSize);
             CollectList.Clear();
             AnalyseList.Clear();
             base.ResetInternal();

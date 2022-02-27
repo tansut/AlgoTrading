@@ -59,7 +59,6 @@ namespace Kalitte.Trading
 
         public decimal AvgChange = 0.3M;
         public decimal InitialAvgChange;
-        public int InitialPeriods;
 
         private FinanceList<decimal> crossBars;
 
@@ -78,18 +77,18 @@ namespace Kalitte.Trading
         {
             crossBars.Clear();
             lastCross = 0;
-            AnalyseSize = InitialPeriods;
             AvgChange = InitialAvgChange;
             base.ResetInternal();
         }
 
-
-
-
+        public override void MonitorValues()
+        {
+            Monitor("sensitivity/avgchange", AvgChange);
+            base.MonitorValues();
+        }
 
         public override void Init()
         {
-            this.InitialPeriods = AnalyseSize;
             this.InitialAvgChange = AvgChange;
             crossBars = new FinanceList<decimal>(AnalyseSize);
             this.Indicators.Add(i1k);
@@ -105,18 +104,17 @@ namespace Kalitte.Trading
         }
 
 
-        protected void AdjustSensitivityInternal(double ratio, string reason)
+        protected override void AdjustSensitivityInternal(double ratio, string reason)
         {
             AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
-            AnalyseSize = InitialPeriods + Convert.ToInt32((InitialPeriods * (decimal)ratio));
-            AnalyseList.Resize(AnalyseSize);
+            Monitor("sensitivity/avgchange", AvgChange);
             crossBars.Resize(AnalyseSize);
-            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): {AvgChange}, {AnalyseSize}", LogLevel.Debug);
+            base.AdjustSensitivityInternal(ratio, reason);
         }
 
         public void AdjustSensitivity(double ratio, string reason)
         {
-            //InOperationLock.WaitOne();
+            InOperationLock.WaitOne();
             InOperationLock.Reset();
             try
             {
@@ -136,7 +134,7 @@ namespace Kalitte.Trading
         private void applySensitivity(Sensitivity sensitivity)
         {
             if (sensitivity == null) AdjustSensitivity(0, "reverted");
-            AdjustSensitivity((double)sensitivity.Result, "Calculation");
+            AdjustSensitivityInternal((double)sensitivity.Result, "Calculation");
             //AdjustSensitivity((double)average, $"Bars: [{b12.Date} - {b1.Date}] power: {powerRatio} [{powerNote}] dt:{dtRatio}  result:{average}");
             LastCalculatedSensitivity = sensitivity;
         }
@@ -260,11 +258,6 @@ namespace Kalitte.Trading
 
                     if (lastCross != 0 && lastAvg > AvgChange) result.finalResult = BuySell.Buy;
                     else if (lastCross != 0 && lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
-
-                    if (result.finalResult.HasValue)
-                    {
-                        //AnalyseList.Clear();
-                    }
 
                 }
 

@@ -68,6 +68,8 @@ namespace Kalitte.Trading
         protected Task collectorTask = null;
         protected CancellationTokenSource collectorTaskTokenSource;
 
+        public PerformanceMonitor PerfMon { get; set; }
+
         public List<ITechnicalIndicator> Indicators { get; set; } = new List<ITechnicalIndicator>();
 
         public ManualResetEvent InOperationLock = new ManualResetEvent(true);
@@ -89,6 +91,18 @@ namespace Kalitte.Trading
             }
         }
 
+        public virtual void MonitorValues()
+        {
+
+        }
+
+        public void Monitor(string name, decimal value)
+        {
+            if (PerfMon != null)
+            {
+                PerfMon.Set($"{this.Name}/{name}", value);
+            }
+        }
 
         private void CheckPause(DateTime? t)
         {
@@ -127,7 +141,7 @@ namespace Kalitte.Trading
             SignalResult result = null;
             try
             {
-                Monitor.TryEnter(_locker, ref hasLock);
+                System.Threading.Monitor.TryEnter(_locker, ref hasLock);
                 if (!hasLock)
                 {
                     return;
@@ -142,27 +156,27 @@ namespace Kalitte.Trading
             {
                 if (hasLock)
                 {
-                    Monitor.Exit(_locker);
+                    System.Threading.Monitor.Exit(_locker);
                     if (restartTimer) _timer.Start();
                 }
             }
-
         }
 
         protected abstract SignalResult CheckInternal(DateTime? t = null);
 
         public virtual SignalResult Check(DateTime? t = null)
         {
-            if (this.State == StartableState.Paused) return null;
-            if (!EnsureUsingRightBars(t ??DateTime.Now))
-            {
-                Log($"IMPORTANT: Detected wrong bars for indicators.Time is: {t}", LogLevel.Error, t);
-                return null;
-            }
-            InOperationLock.WaitOne();
+            if (!InOperationLock.WaitOne()) return null;            
             InOperationLock.Reset();
             try
             {
+                if (this.State == StartableState.Paused) return null;
+                if (!EnsureUsingRightBars(t ?? DateTime.Now))
+                {
+                    Log($"IMPORTANT: Detected wrong bars for indicators.Time is: {t}", LogLevel.Error, t);
+                    return null;
+                }
+
                 var result = CheckInternal(t);
                 if (result != null)
                 {
@@ -211,7 +225,7 @@ namespace Kalitte.Trading
 
         public virtual void Init()
         {
-
+            MonitorValues();
         }
 
         protected virtual bool EnsureUsingRightBars(DateTime t)

@@ -98,7 +98,7 @@ namespace Kalitte.Trading
             else return 0;
         }
 
-        void calculatePower(PowerSignalResult s, DateTime t)
+        void SetPower(PowerSignalResult s, DateTime t)
         {
             var volumeAvg = AnalyseList.LastValue; 
             var volumePerSecond = (double)volumeAvg;
@@ -110,7 +110,12 @@ namespace Kalitte.Trading
             s.VolumePerSecond = volumePerSecond;
             s.CurrentVolume = volume;
             s.LastVolume = last;
+
+            Monitor("value", value);
+            Monitor("VolumePerSecond", (decimal)volumePerSecond);
         }
+
+
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
@@ -140,7 +145,12 @@ namespace Kalitte.Trading
                 }
             }
             else return result;
-            if (AnalyseList.Ready) calculatePower(result, time);
+            if (AnalyseList.Count > 0)
+            {
+                SetPower(result, time);
+            }
+            
+            
             return result;
         }
     }

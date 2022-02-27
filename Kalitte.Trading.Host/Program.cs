@@ -60,20 +60,20 @@ public class Program
         alternates.Set("ProfitPuan", 20);
         alternates.Set("LossQuantity", 0);
         alternates.Set("LossPuan", 0);
-        alternates.Set("RsiProfitQuantity", 0);
-        alternates.Set("RsiProfitPuan", 1);
+        alternates.Set("RsiProfitQuantity", 1);
+        alternates.Set("RsiProfitPuan", 16);
         alternates.Set("ProgressiveProfitLoss", 2);
         
         // rsi
         alternates.Set("RsiHighLimit", 40);
         alternates.Set("RsiLowLimit", 60);
-        alternates.Set("Rsi", 14);
-        alternates.Set("RsiTrendThreshold", 1M);
+        alternates.Set("Rsi", 14);        
+        alternates.Set("RsiTrendSensitivity", 1.5M);
+        alternates.Set("RsiTrendThreshold", 2M);
 
 
         // volume power
         alternates.Set("PowerLookback", 5);
-
 
         // ma cross
         alternates.Set("DynamicCross", true);

@@ -99,12 +99,8 @@ namespace Kalitte.Trading
     public class TrendSignal : AnalyserBase
     {
         public ITechnicalIndicator i1k;
-        //public int PriceCollectionPeriod = 5;
-        //public int Periods = 5;
         public decimal? Min { get; set; }
         public decimal? Max { get; set; }
-        //private FinanceList<IQuote> analysisBars;
-        //private FinanceList<IQuote> priceBars;
         private List<TrendResult> BarTrendResults;
         public TrendReference ReferenceType { get; set; } = TrendReference.LastBar;
         private decimal? lastValue = null;
@@ -120,20 +116,18 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            //analysisBars = new FinanceList<IQuote>(Periods);
-            //priceBars = new FinanceList<IQuote>(PriceCollectionPeriod);
             BarTrendResults = new List<TrendResult>();
             Indicators.Add(i1k);
             i1k.InputBars.ListEvent += base.InputbarsChanged;
             generateDerivs();
+            MonitorInit("value", 0);
             base.Init();
         }
 
         protected override void ResetInternal()
         {
             base.ResetInternal();
-            generateDerivs();
-            
+            generateDerivs();            
         }
 
 
@@ -141,6 +135,7 @@ namespace Kalitte.Trading
         {
             generateDerivs();
         }
+
 
 
         public override string ToString()
@@ -235,6 +230,8 @@ namespace Kalitte.Trading
 
                     result.Trend = getTrendDirection(lastReference, currentVal, this.ReferenceType == TrendReference.LastCheck ? null:  BarTrendResults.LastOrDefault());
                     result.Trend.Date = t ?? DateTime.Now;
+
+                    Monitor("value", result.Trend.NewValue);
 
                     var checkedLimits = !Min.HasValue && !Max.HasValue;
 

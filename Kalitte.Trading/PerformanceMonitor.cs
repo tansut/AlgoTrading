@@ -17,7 +17,8 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{Name} [{OldValue}->{CurrentValue}]";
+            var oldVal = OldValue.HasValue ? OldValue.Value.ToString("0.00") : "null";
+            return $"{Name} [{oldVal}->{CurrentValue.ToString("0.00")}]";
         }
     }
 
@@ -77,7 +78,7 @@ namespace Kalitte.Trading
             try
             {
 
-                _timer = new System.Timers.Timer(5000);
+                _timer = new System.Timers.Timer(1000);
                 _timer.Elapsed += _timer_Elapsed; ;
                 _timer.Start();
 

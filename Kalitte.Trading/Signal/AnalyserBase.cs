@@ -102,6 +102,8 @@ namespace Kalitte.Trading
         public AnalyseList CollectList { get; set; }
         public AnalyseList AnalyseList { get; set; }
 
+        public decimal SignalSensitivity { get; set; } = 1.0M;
+
         public AnalyserBase(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
         {
 
@@ -111,8 +113,6 @@ namespace Kalitte.Trading
 
         protected virtual void AdjustSensitivityInternal(double ratio, string reason)
         {
-
-
             AnalyseSize = InitialAnalyseSize + Convert.ToInt32((InitialAnalyseSize * (decimal)ratio));
             AnalyseList.Resize(AnalyseSize);
 
@@ -127,6 +127,9 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
+            CollectSize = Convert.ToInt32(CollectSize * SignalSensitivity);
+            AnalyseSize = Convert.ToInt32(AnalyseSize * SignalSensitivity);
+
             CollectList = new AnalyseList(CollectSize, CollectAverage);
             AnalyseList = new AnalyseList(AnalyseSize, AnalyseAverage);
             ResetInternal();

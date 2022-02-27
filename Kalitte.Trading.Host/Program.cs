@@ -56,13 +56,13 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitQuantity", 0);
+        alternates.Set("ProfitQuantity", 2);
         alternates.Set("ProfitPuan", 16);
         alternates.Set("LossQuantity", 0);
         alternates.Set("LossPuan", 0);
         alternates.Set("RsiProfitQuantity", 0);
         alternates.Set("RsiProfitPuan", 1);
-        alternates.Set("ProgressiveProfitLoss", 1);
+        alternates.Set("ProgressiveProfitLoss", 2);
         
         // rsi
         alternates.Set("RsiHighLimit", 40);
@@ -79,8 +79,8 @@ public class Program
         alternates.Set("DynamicCross", true);
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("PowerCrossThreshold", 88);
-        alternates.Set("PowerCrossNegativeMultiplier", 1.4);
-        alternates.Set("PowerCrossPositiveMultiplier", 2.4);
+        alternates.Set("PowerCrossNegativeMultiplier", 1.3);
+        alternates.Set("PowerCrossPositiveMultiplier", 2.8);
 
         // general
         alternates.Set("ClosePositionsDaily", false);

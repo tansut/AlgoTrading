@@ -138,7 +138,7 @@ public class Program
 
         }
         var optimize = new Optimizer<Bist30Futures>(settings, typeof(Bist30Futures));
-        optimize.Start(settings.Alternates);
+        optimize.Start();
     }
 
 }

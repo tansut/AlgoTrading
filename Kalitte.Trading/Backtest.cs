@@ -17,6 +17,7 @@ namespace Kalitte.Trading
         public DateTime Finish { get; set; }
         public AlternateValues Alternates { get; set; }
         public bool AutoClosePositions { get; set; }
+        public int SamplingPerc { get; set; } = 0;
     }
 
     public class Backtest
@@ -238,11 +239,26 @@ namespace Kalitte.Trading
             return test;
         }
 
-        public void Start(AlternateValues alternates)
+        public void Start( )
         {
+            var alternates = Settings.Alternates;
             Console.WriteLine("Generating test cases ...");
-            var cases = alternates.GenerateTestCases(true);
-            Console.WriteLine($" ** WILL RUN {cases.Count} TESTS ** Hit to continue ...");
+            var allCase = alternates.GenerateTestCases(Settings.SamplingPerc == 0);
+            List<Dictionary<string, object>> cases;
+            if (Settings.SamplingPerc == 0) cases = allCase;
+            else
+            {
+                cases = new List<Dictionary<string, object>>();
+                int total = allCase.Count * Settings.SamplingPerc / 100;
+                var random = new RandomGenerator();
+                Console.WriteLine($"Sampling {total} items ...");
+                for (int i = 0; i < total; i++)
+                {
+                    var r = random.Next(0, allCase.Count);
+                    cases.Add(allCase[r]);
+                }
+            }
+            Console.WriteLine($" ** WILL RUN {cases.Count}/{allCase.Count} TESTS ** Hit to continue ...");
             CreateHeaders(this.FileName);
             Console.WriteLine($"Running tests to file {this.FileName}");
             var completed = 0;

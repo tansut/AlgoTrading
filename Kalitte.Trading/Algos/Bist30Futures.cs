@@ -75,7 +75,10 @@ namespace Kalitte.Trading.Algos
         public bool AlwaysGetRsiProfit { get; set; }
 
         [AlgoParam(0)]
-        public decimal ProgressiveProfitLoss { get; set; }
+        public decimal ProfitQuantityStep { get; set; }
+
+        [AlgoParam(0)]
+        public decimal ProfitPuanStep { get; set; }
 
 
         [AlgoParam(14)]
@@ -299,23 +302,11 @@ namespace Kalitte.Trading.Algos
             var profitQuantity = Math.Min(pq, signal.ProfitQuantity);
             var lossQuantity = Math.Min(pq, signal.LossQuantity);
 
-            if (ProgressiveProfitLoss > 0 && signal.SignalCount == 0)
-            {
-                if (profitQuantity > 1) profitQuantity = profitQuantity / 2;
-                if (lossQuantity > 1) lossQuantity = lossQuantity / 2;
-                signal.AdjustPriceChange(ProgressiveProfitLoss);
-                doAction = doAction || pq > (result.Direction == ProfitOrLoss.Profit ? profitQuantity : lossQuantity);
-            }
-            else if (ProgressiveProfitLoss > 0 && signal.SignalCount == 1)
-            {
-                if (profitQuantity > 1) profitQuantity = profitQuantity / 2;
-                if (lossQuantity > 1) lossQuantity = lossQuantity / 2;
-                doAction = doAction || pq > (result.Direction == ProfitOrLoss.Profit ? profitQuantity : lossQuantity);
-            }
-            else if (ProgressiveProfitLoss > 0 && signal.SignalCount >= 2)
-            {
-                //doAction = false;
-            }
+            signal.AdjustPriceChange(ProfitPuanStep);
+            profitQuantity = ProfitQuantityStep > 0 ? ProfitQuantityStep: ProfitQuantity;
+            doAction = doAction || pq > (result.Direction == ProfitOrLoss.Profit ? profitQuantity : lossQuantity);
+
+            doAction = doAction && ProfitQuantity > signal.CompletedQuantity;
 
             if (doAction)
             {
@@ -558,7 +549,7 @@ namespace Kalitte.Trading.Algos
             var cross = this.positionRequest.SignalResult as CrossSignalResult;
             if (tp != null)
             {
-                ((TakeProfitOrLossSignal)tp.Signal).IncrementSignal();
+                ((TakeProfitOrLossSignal)tp.Signal).IncrementSignal(1, positionRequest.Quantity);
             }                       
             if (cross != null)
             {

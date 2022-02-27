@@ -44,7 +44,8 @@ namespace Kalitte.Trading
         public decimal LossPriceChange { get; set; }
         public decimal LossQuantity { get; set; }
 
-        public volatile int SignalCount = 0;
+        public int CompletedOrder = 0;
+        public decimal CompletedQuantity = 0;
 
         public TakeProfitOrLossSignal(string name, string symbol, AlgoBase owner, 
             decimal profitPriceChange, decimal profitQuantity, decimal lossPriceChange, decimal lossQuantity) : base(name, symbol, owner)
@@ -55,25 +56,29 @@ namespace Kalitte.Trading
             LossQuantity = lossQuantity;
             UsedProfitPriceChange = profitPriceChange;
             UsedLossPriceChange = lossPriceChange;
-            SignalCount = 0;
+            CompletedOrder = 0;
+            CompletedQuantity = 0;
         }
 
         public void ResetPriceChange()
         {
             UsedProfitPriceChange = ProfitPriceChange;
             UsedLossPriceChange = LossPriceChange;            
-            SignalCount = 0;
+            CompletedOrder = 0;
+            CompletedQuantity = 0;
         }
 
-        public void AdjustPriceChange(decimal ratio)
+        public void AdjustPriceChange(decimal increment)
         {
-            UsedProfitPriceChange = ratio * ProfitPriceChange;
-            UsedLossPriceChange = ratio * LossPriceChange;
+            UsedProfitPriceChange +=  increment;
+            UsedLossPriceChange += increment;
         }
 
-        public void IncrementSignal()
+        public void IncrementSignal(int orderInc, decimal quantityInc)
         {
-            Interlocked.Increment(ref SignalCount);
+            CompletedOrder += orderInc;
+            CompletedQuantity += quantityInc;
+            //Interlocked.Increment(ref CompletedOrder);
         }
 
 
@@ -133,7 +138,7 @@ namespace Kalitte.Trading
                 //else Algo.Log($"No cation takeprofit: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);
             }
             //if (result.HasValue) SignalCount++;
-            return new ProfitLossResult(this, t ?? DateTime.Now) { SignalCount = SignalCount, Direction= direction, PL=pl, MarketPrice=price,PortfolioCost=avgCost, finalResult = result };
+            return new ProfitLossResult(this, t ?? DateTime.Now) { SignalCount = CompletedOrder, Direction= direction, PL=pl, MarketPrice=price,PortfolioCost=avgCost, finalResult = result };
         }
 
     }

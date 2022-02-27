@@ -49,10 +49,7 @@ namespace Kalitte.Trading
             Max = max;
         }
 
-        public override void Init()
-        {
-            //bars = new FinanceBars(AnalysisPeriod);
-        }
+
 
         public override string ToString()
         {

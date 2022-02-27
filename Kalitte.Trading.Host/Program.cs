@@ -49,7 +49,7 @@ public class Program
         // options
         alternates.Set("OrderQuantity", 6);
 
-        alternates.Set("DataCollectSize", 6);
+        alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
         alternates.Set("DataAnalysisUseSma", true);

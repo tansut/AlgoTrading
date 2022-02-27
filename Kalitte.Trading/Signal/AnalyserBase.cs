@@ -58,7 +58,7 @@ namespace Kalitte.Trading
             {
                 return List.IsFull;
             }
-            
+
         }
 
         public void Resize(int newSize)
@@ -74,10 +74,11 @@ namespace Kalitte.Trading
                 if (this.Average == Average.Ema)
                 {
                     return List.List.GetEma(List.Count, Candle).Last().Ema.Value;
-                } else
+                }
+                else
                 {
                     return List.List.GetSma(List.Count, Candle).Last().Sma.Value;
-                }                
+                }
             }
         }
 
@@ -89,7 +90,7 @@ namespace Kalitte.Trading
     {
         public int CollectSize { get; set; }
         public int AnalyseSize { get; set; }
-        
+
         public int InitialAnalyseSize { get; set; }
         public int InitialCollectSize { get; set; }
 
@@ -103,14 +104,10 @@ namespace Kalitte.Trading
 
         public AnalyserBase(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
         {
-            
+
         }
 
-        public override void MonitorValues()
-        {            
-            Monitor("sensitivity/collectsize", (decimal)CollectSize);
-            Monitor("sensitivity/analysesize", (decimal)AnalyseSize);
-        }
+
 
         protected virtual void AdjustSensitivityInternal(double ratio, string reason)
         {
@@ -121,9 +118,9 @@ namespace Kalitte.Trading
 
             CollectSize = InitialCollectSize + Convert.ToInt32((InitialCollectSize * (decimal)ratio));
             CollectList.Resize(CollectSize);
-
-            //Monitor("sensitivity/ra", (decimal)ratio);
-            MonitorValues();
+            Monitor("sensitivity/collectsize", (decimal)CollectSize);
+            Monitor("sensitivity/analysesize", (decimal)AnalyseSize);
+            Monitor("sensitivity/ratio", (decimal)ratio);
             Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): c:{CollectSize} a:{AnalyseSize}", LogLevel.Debug);
         }
 
@@ -132,7 +129,10 @@ namespace Kalitte.Trading
         {
             CollectList = new AnalyseList(CollectSize, CollectAverage);
             AnalyseList = new AnalyseList(AnalyseSize, AnalyseAverage);
-            ResetInternal();           
+            ResetInternal();
+            MonitorInit("sensitivity/collectsize", (decimal)CollectSize);
+            MonitorInit("sensitivity/analysesize", (decimal)AnalyseSize);
+            MonitorInit("sensitivity/ratio", 0);
             base.Init();
         }
 

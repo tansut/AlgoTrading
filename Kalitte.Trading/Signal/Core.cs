@@ -91,9 +91,14 @@ namespace Kalitte.Trading
             }
         }
 
-        public virtual void MonitorValues()
-        {
 
+
+        public void MonitorInit(string name, decimal value)
+        {
+            if (PerfMon != null)
+            {
+                PerfMon.Init($"{this.Name}/{name}", value);
+            }
         }
 
         public void Monitor(string name, decimal value)
@@ -225,7 +230,7 @@ namespace Kalitte.Trading
 
         public virtual void Init()
         {
-            MonitorValues();
+            
         }
 
         protected virtual bool EnsureUsingRightBars(DateTime t)

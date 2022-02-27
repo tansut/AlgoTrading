@@ -238,15 +238,27 @@ namespace Kalitte.Trading.Algos
             });
         }
 
+
+        public void ConfigureMonitor()
+        {
+            this.monitor.DefaultChange = 25.0M;
+            if (maSignal != null) {
+                this.monitor.AddFilter($"{maSignal.Name}/sensitivity", 25);
+            }
+            if (powerSignal != null)
+            {
+                this.monitor.AddFilter($"{powerSignal.Name}/volume", 10);
+                this.monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond",10);
+            }
+            this.monitor.MonitorEvent += Monitor_MonitorEvent;
+        }
+
         public override void Init()
         {
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
             //this.AddSymbol(this.Symbol)
             InitSignals();
-            this.monitor.DefaultChange = 25.0M;
-            this.monitor.MonitorEvent += Monitor_MonitorEvent;
-            if (maSignal != null) this.monitor.Filters.Add($"{maSignal.Name}/sensitivity");
-            if (powerSignal != null) this.monitor.Filters.Add($"{powerSignal.Name}");
+            ConfigureMonitor();
             base.Init();
         }
 
@@ -520,12 +532,12 @@ namespace Kalitte.Trading.Algos
         public override void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
         {
             base.sendOrder(symbol, quantity, side, comment, lprice, icon, t, signalResult, disableDelay);
-            if (signalResult is CrossSignalResult)
-            {
-                var cross = signalResult as CrossSignalResult;
-                Log($"Cross: {cross}", LogLevel.Order);
-                Log($"Sensitivity: {cross.Sensitivity}", LogLevel.Order);
-            }
+            //if (signalResult is CrossSignalResult)
+            //{
+            //    var cross = signalResult as CrossSignalResult;
+            //    Log($"Cross: {cross}", LogLevel.Order);
+            //    Log($"Sensitivity: {cross.Sensitivity}", LogLevel.Order);
+            //}
             
             //Log($"Power was during order: {LastPower}", LogLevel.Order);
         }

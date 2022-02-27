@@ -73,6 +73,8 @@ namespace Kalitte.Trading
         public override void Init()
         {
             this.Indicators.Add(Indicator);
+            MonitorInit("value", 0);
+            MonitorInit("VolumePerSecond", 0);
             base.Init();
         }
 

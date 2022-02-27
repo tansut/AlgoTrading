@@ -81,11 +81,6 @@ namespace Kalitte.Trading
             base.ResetInternal();
         }
 
-        public override void MonitorValues()
-        {
-            Monitor("sensitivity/avgchange", AvgChange);
-            base.MonitorValues();
-        }
 
         public override void Init()
         {
@@ -94,6 +89,9 @@ namespace Kalitte.Trading
             this.Indicators.Add(i1k);
             this.Indicators.Add(i2k);
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
+            MonitorInit("sensitivity/volumePower", 0);
+            MonitorInit("sensitivity/avgchange", AvgChange);
+            MonitorInit("sensitivity/trendRatio", 0);            
             base.Init();
         }
 
@@ -182,6 +180,7 @@ namespace Kalitte.Trading
                     powerNote = $"bar: {barPower.Date} rsiBar: {barPower.Value} rsiInstant: {(instantPower == null ? 0 : instantPower.Value)}";
                     result.VolumePower = usedPower;
                     result.VolumeRatio = powerRatio;
+                    Monitor("sensitivity/volumePower", usedPower);
                 }
 
                 var dtRatio = 0M;
@@ -190,6 +189,8 @@ namespace Kalitte.Trading
                 {
                     dtRatio = ((max - dt) / max);
                 }
+
+                Monitor("sensitivity/trendRatio", dtRatio);
 
                 var divide = 0;
                 if (dtRatio != 0) divide++;

@@ -97,8 +97,8 @@ namespace Kalitte.Trading
                 if (p >= DateTime.Now) break;
                 if (periodBarsLoaded)
                 {
-                    Algo.AlgoTime = p;
-                    var time = Algo.AlgoTime;
+                    SystemTime.Set(p);
+                    var time = SystemTime.Now;
                     var tasks = new List<Task<SignalResult>>();
 
                     foreach (var signal in Algo.Signals)
@@ -108,6 +108,7 @@ namespace Kalitte.Trading
                     }
                     Task.WaitAll(tasks.ToArray());
                     Algo.CheckDelayedOrders(time);
+                    Algo.Monitor.CheckMonitor();
                     Algo.simulationCount++;
                 }
 
@@ -182,7 +183,7 @@ namespace Kalitte.Trading
 
             var prevDayLastBar = new DateTime(Algo.TestStart.Value.Year, Algo.TestStart.Value.Month, Algo.TestStart.Value.Day).AddDays(-1).AddHours(22).AddMinutes(50);
             Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod, prevDayLastBar);
-            Algo.InitMySignals(Algo.AlgoTime);
+            Algo.InitMySignals(SystemTime.Now);
             Algo.InitCompleted();
             createParameters();
 
@@ -192,13 +193,13 @@ namespace Kalitte.Trading
                 if (currentDay.DayOfWeek == DayOfWeek.Saturday || currentDay.DayOfWeek == DayOfWeek.Sunday) continue;
                 if (currentDay >= DateTime.Now) break;
                 var periods = this.GetDates(currentDay);
-                Algo.AlgoTime = periods.Item1.Item1;
+                SystemTime.Set(periods.Item1.Item1);
                 Run(periods.Item1.Item1, periods.Item1.Item2);
                 Run(periods.Item2.Item1, periods.Item2.Item2);
                 if (Algo.ClosePositionsDaily) Algo.ClosePositions(Algo.Symbol);
                 Algo.Signals.ForEach(p => p.Reset());
             }
-            if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, Algo.AlgoTime);
+            if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, SystemTime.Now);
             Algo.Stop();
         }
     }

@@ -120,7 +120,7 @@ namespace Kalitte.Trading
             CollectList.Resize(CollectSize);
             Monitor("sensitivity/collectsize", (decimal)CollectSize);
             Monitor("sensitivity/analysesize", (decimal)AnalyseSize);
-            Monitor("sensitivity/ratio", (decimal)ratio);
+            //Monitor("sensitivity/ratio", (decimal)ratio);
             Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): c:{CollectSize} a:{AnalyseSize}", LogLevel.Debug);
         }
 
@@ -132,7 +132,7 @@ namespace Kalitte.Trading
             ResetInternal();
             MonitorInit("sensitivity/collectsize", (decimal)CollectSize);
             MonitorInit("sensitivity/analysesize", (decimal)AnalyseSize);
-            MonitorInit("sensitivity/ratio", 0);
+            //MonitorInit("sensitivity/ratio", 0);
             base.Init();
         }
 

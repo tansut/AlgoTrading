@@ -122,6 +122,17 @@ namespace Kalitte.Trading.Matrix
 
         }
 
+
+        public override void OnInitComplated()
+        {
+            var config = Algo.GetConfigValues();
+            foreach (var item in config)
+            {
+                Debug($"{item.Key}:{item.Value}");
+            }
+            base.OnInitComplated();
+        }
+
         public void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null)
         {
             Debug(text);

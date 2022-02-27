@@ -57,7 +57,7 @@ public class Program
 
         // profit && loss
         alternates.Set("ProfitQuantity", 2);
-        alternates.Set("ProfitPuan", 16);
+        alternates.Set("ProfitPuan", 20);
         alternates.Set("LossQuantity", 0);
         alternates.Set("LossPuan", 0);
         alternates.Set("RsiProfitQuantity", 0);
@@ -68,7 +68,7 @@ public class Program
         alternates.Set("RsiHighLimit", 40);
         alternates.Set("RsiLowLimit", 60);
         alternates.Set("Rsi", 14);
-        alternates.Set("MinRsiChange", 1M);
+        alternates.Set("RsiTrendThreshold", 1M);
 
 
         // volume power
@@ -88,7 +88,7 @@ public class Program
         
         // System
         alternates.Set("LoggingLevel", LogLevel.Warning);
-        alternates.Set("Symbol", "F_XU0300422");
+        alternates.Set("Symbol", "F_XU0300222");
         alternates.Set("LogConsole", true);
 
         var file = $"c:\\kalitte\\Bist30Futures-test.json";

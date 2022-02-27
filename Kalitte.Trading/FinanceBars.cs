@@ -86,14 +86,14 @@ namespace Kalitte.Trading
 
         public int FindIndex(Predicate<T> match)
         {
-            // rwl.AcquireWriterLock(timeOut);
+            // rwl.AcquireReaderLock(timeOut);
             try
             {
                 return items.FindIndex(match);
             }
             finally
             {
-                // rwl.ReleaseWriterLock();
+                // rwl.ReleaseReaderLock();
             }
 
         }

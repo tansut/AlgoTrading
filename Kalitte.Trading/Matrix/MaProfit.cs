@@ -204,19 +204,20 @@ namespace Kalitte.Trading.Matrix
         protected override Bist30Futures createAlgoInstance()
         {
             var fileName = @"c:\kalitte\Bist30Futures.json";
+            Bist30Futures algo;
             Dictionary<string, object> init = null ;
             if (File.Exists(fileName))
             {
                 var file = File.ReadAllText(fileName);
                 var fileContent = JsonConvert.DeserializeObject<Dictionary<string, object [] >>(file);
                 init = new AlternateValues(fileContent).Lean();
-                //Debug(file);
-                //Debug("Config file loaded");
             }
-       
-            return new Bist30Futures(init);
+            init["Symbol"] = "F_XU0300422";
+            algo = new Bist30Futures(init);             
+            var content =new AlternateValues(algo.GetConfigValues());
+            File.WriteAllText(fileName, JsonConvert.SerializeObject(content, Formatting.Indented));
+            return algo;
         }
     }
-
 }
 

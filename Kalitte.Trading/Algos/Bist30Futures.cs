@@ -15,7 +15,7 @@ namespace Kalitte.Trading.Algos
 
         public PowerSignalResult LastPower { get; set; } = null;
 
-        [AlgoParam(4.0)]
+        [AlgoParam(6.0)]
         public decimal OrderQuantity { get; set; }
 
         [AlgoParam(5)]
@@ -24,23 +24,23 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(9)]
         public int MovPeriod2 { get; set; }
 
-        [AlgoParam(false)]
+        [AlgoParam(true)]
         public bool DynamicCross { get; set; }
 
 
-        [AlgoParam(0.25)]
+        [AlgoParam(0.32)]
         public decimal MaAvgChange { get; set; }
 
         [AlgoParam(false)]
         public bool SimulateOrderSignal { get; set; }
 
-        [AlgoParam(1)]
+        [AlgoParam(2)]
         public decimal ProfitQuantity { get; set; }
 
         [AlgoParam(0)]
         public decimal LossQuantity { get; set; }
 
-        [AlgoParam(16)]
+        [AlgoParam(20)]
         public decimal ProfitPuan { get; set; }
 
         [AlgoParam(4)]
@@ -96,25 +96,25 @@ namespace Kalitte.Trading.Algos
         public int PowerLookback { get; set; }
 
 
-        [AlgoParam(10)]
+        [AlgoParam(12)]
         public int DataCollectSize { get; set; }
 
-        [AlgoParam(10)]
+        [AlgoParam(48)]
         public int DataAnalysisSize { get; set; }
 
-        [AlgoParam(false)]
+        [AlgoParam(true)]
         public bool DataCollectUseSma { get; set; }
 
         [AlgoParam(false)]
         public bool DataAnalysisUseSma { get; set; }
 
-        [AlgoParam(100)]
+        [AlgoParam(88)]
         public decimal PowerCrossThreshold { get; set; }
 
-        [AlgoParam(1)]
+        [AlgoParam(1.3)]
         public decimal PowerCrossNegativeMultiplier { get; set; }
 
-        [AlgoParam(2)]
+        [AlgoParam(2.8)]
         public decimal PowerCrossPositiveMultiplier { get; set; }
 
         public FinanceBars MinBars = null;
@@ -127,7 +127,6 @@ namespace Kalitte.Trading.Algos
         TrendSignal priceTrend = null;
         TrendSignal atrTrend = null;
         PowerSignal powerSignal = null;
-        PerformanceMonitor monitor = new PerformanceMonitor();
         
 
         public override void InitMySignals(DateTime t)
@@ -147,8 +146,7 @@ namespace Kalitte.Trading.Algos
             {
                 maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
                 maSignal.i2k = new Custom((q) => 0, periodData.Periods, MovPeriod + MovPeriod2 + MACDTrigger);
-                maSignal.PowerSignal = powerSignal;
-            }
+                maSignal.PowerSignal = powerSignal;}
 
             if (macSignal != null)
             {
@@ -224,7 +222,7 @@ namespace Kalitte.Trading.Algos
                 p.TimerEnabled = !Simulation;
                 p.Simulation = Simulation;
                 p.OnSignal += SignalReceieved;
-                p.PerfMon = this.monitor;
+                p.PerfMon = this.Monitor;
 
                 var analyser = p as AnalyserBase;
 
@@ -239,18 +237,18 @@ namespace Kalitte.Trading.Algos
         }
 
 
-        public void ConfigureMonitor()
+        public override void ConfigureMonitor()
         {
-            this.monitor.DefaultChange = 25.0M;
+
             if (maSignal != null) {
-                this.monitor.AddFilter($"{maSignal.Name}/sensitivity", 25);
+                this.Monitor.AddFilter($"{maSignal.Name}/sensitivity", 25);
             }
             if (powerSignal != null)
             {
-                this.monitor.AddFilter($"{powerSignal.Name}/volume", 10);
-                this.monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond",10);
+                this.Monitor.AddFilter($"{powerSignal.Name}/volume", 25);
+                this.Monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond",25);
             }
-            this.monitor.MonitorEvent += Monitor_MonitorEvent;
+            base.ConfigureMonitor();
         }
 
         public override void Init()
@@ -258,15 +256,11 @@ namespace Kalitte.Trading.Algos
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
             //this.AddSymbol(this.Symbol)
             InitSignals();
-            ConfigureMonitor();
+            
             base.Init();
         }
 
-        private void Monitor_MonitorEvent(object sender, MonitorEventArgs e)
-        {
-            if (e.EventType == MonitorEventType.Updated)
-                Log($"{e}", LogLevel.Warning);  
-        }
+
 
         private void HandleProfitLossSignal(TakeProfitOrLossSignal signal, ProfitLossResult result)
         {
@@ -331,12 +325,13 @@ namespace Kalitte.Trading.Algos
 
         void HandlePowerSignal(PowerSignal signal, PowerSignalResult result)
         {
+            return;
             if (LastPower == null  && result.Power != PowerRatio.Unknown)
             {
                 LastPower = result;
             }
 
-            if (LastPower != null && DynamicCross && AlgoTime.Second % 30 == 0)
+            if (LastPower != null && DynamicCross && SystemTime.Now.Second % 30 == 0)
             {
                 //Log($"Current ATR volatility level: {result}", LogLevel.Warning);
                 var atrInd = (Atrp)(atrTrend as TrendSignal).i1k;
@@ -408,7 +403,7 @@ namespace Kalitte.Trading.Algos
 
 
                 }
-                if (AlgoTime.Second % 10 == 10)
+                if (SystemTime.Now.Second % 10 == 10)
                 {
                     Log($"Current ATR volatility level: {result}", LogLevel.Warning);
                     var atrInd = (Atrp)(result.Signal as TrendSignal).i1k;

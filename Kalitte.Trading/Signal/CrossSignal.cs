@@ -91,7 +91,7 @@ namespace Kalitte.Trading
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
             MonitorInit("sensitivity/volumePower", 0);
             MonitorInit("sensitivity/avgchange", AvgChange);
-            MonitorInit("sensitivity/trendRatio", 0);            
+            MonitorInit("sensitivity/trendRatio", 0);
             base.Init();
         }
 
@@ -160,6 +160,7 @@ namespace Kalitte.Trading
                 var d = r1 - r2;
 
                 var dt = Math.Abs((dl - d).Value);
+                var da = Math.Abs(((dl + d) / 2).Value);
 
                 var max = InitialAvgChange * 1M;
 
@@ -174,7 +175,7 @@ namespace Kalitte.Trading
                     //var lastBar = rsiIndicator
                     var barPower = PowerSignal.Indicator.Results.Last();
                     result.VolumeTime = instantPower != null && instantPower.Value > 0 ? DataTime.Current : DataTime.LastBar;
-                    var usedPower =  result.VolumeTime == DataTime.Current ? instantPower.Value : barPower.Value.Value;
+                    var usedPower = result.VolumeTime == DataTime.Current ? instantPower.Value : barPower.Value.Value;
                     powerRatio = (PowerCrossThreshold - usedPower) / 100;
                     powerRatio = powerRatio > 0 ? powerRatio * PowerCrossPositiveMultiplier : powerRatio * PowerCrossNegativeMultiplier;
                     powerNote = $"bar: {barPower.Date} rsiBar: {barPower.Value} rsiInstant: {(instantPower == null ? 0 : instantPower.Value)}";
@@ -185,7 +186,7 @@ namespace Kalitte.Trading
 
                 var dtRatio = 0M;
 
-                if (dt < max)
+                if (dt < max && da < max)
                 {
                     dtRatio = ((max - dt) / max);
                 }
@@ -198,7 +199,7 @@ namespace Kalitte.Trading
                 var average = divide > 0 ? (powerRatio + dtRatio) / divide : 0;
 
                 result.TrendRatio = dtRatio;
-                result.Result = average;                
+                result.Result = average;
 
             }
             catch (Exception exc)
@@ -218,10 +219,10 @@ namespace Kalitte.Trading
             if (DynamicCross)
             {
                 var sensitivity = CalculateSensitivity();
-                applySensitivity(sensitivity);     
+                applySensitivity(sensitivity);
                 result.Sensitivity = sensitivity;
             }
-            
+
             var mp = Algo.GetMarketPrice(Symbol, t);
 
             if (mp > 0) CollectList.Collect(mp);

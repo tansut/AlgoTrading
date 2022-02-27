@@ -136,7 +136,7 @@ namespace Kalitte.Trading
         public void Log(string message, LogLevel level, DateTime? t = null)
         {
             var th = Algo.Simulation ? "x" : Thread.CurrentThread.ManagedThreadId.ToString();
-            Algo.Log($"{this.Name}[{th}]: {message}", level, t ?? Algo.AlgoTime);
+            Algo.Log($"{this.Name}[{th}]: {message}", level, t ?? SystemTime.Now);
         }
 
         protected virtual void onTick(Object source, ElapsedEventArgs e)
@@ -173,12 +173,13 @@ namespace Kalitte.Trading
         {
             if (!InOperationLock.WaitOne()) return null;            
             InOperationLock.Reset();
+            var time = t ?? DateTime.Now;
             try
             {
                 if (this.State == StartableState.Paused) return null;
-                if (!EnsureUsingRightBars(t ?? DateTime.Now))
+                if (!EnsureUsingRightBars(time))
                 {
-                    Log($"IMPORTANT: Detected wrong bars for indicators.Time is: {t}", LogLevel.Error, t);
+                    Log($"IMPORTANT: Detected wrong bars for indicators.", LogLevel.Error, t);
                     return null;
                 }
 
@@ -239,7 +240,11 @@ namespace Kalitte.Trading
             foreach (var indicator in Indicators)
             {
                 var expected = Algo.GetExpectedBarPeriod(t, indicator.InputBars.Period);
-                if (expected != indicator.InputBars.Last.Date) return false;
+                if (expected != indicator.InputBars.Last.Date)
+                {
+                    Log($"Wrong bar: expected:{expected} using:{indicator.InputBars.Last.Date}", LogLevel.Error, t);
+                    return false;
+                }
             }
             return result;
         }

@@ -114,14 +114,14 @@ namespace Kalitte.Trading
         protected virtual void AdjustSensitivityInternal(double ratio, string reason)
         {
             AnalyseSize = InitialAnalyseSize + Convert.ToInt32((InitialAnalyseSize * (decimal)ratio));
-            AnalyseList.Resize(AnalyseSize);
-
+            
             CollectSize = InitialCollectSize + Convert.ToInt32((InitialCollectSize * (decimal)ratio));
             CollectList.Resize(CollectSize);
+            AnalyseList.Resize(AnalyseSize);
             Monitor("sensitivity/collectsize", (decimal)CollectSize);
             Monitor("sensitivity/analysesize", (decimal)AnalyseSize);
             //Monitor("sensitivity/ratio", (decimal)ratio);
-            Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): c:{CollectSize} a:{AnalyseSize}", LogLevel.Debug);
+            //Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): c:{CollectSize} a:{AnalyseSize}", LogLevel.Debug);
         }
 
 

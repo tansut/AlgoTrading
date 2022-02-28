@@ -57,8 +57,6 @@ namespace Kalitte.Trading.Algos
 
 
 
-        [AlgoParam(false)]
-        public bool AlwaysGetRsiProfit { get; set; }
 
         [AlgoParam(0)]
         public decimal ProfitQuantity { get; set; }
@@ -108,11 +106,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(9)]
         public int MACDTrigger { get; set; }
 
-        [AlgoParam(false)]
-        public bool AlwaysGetProfit { get; set; }
-
-        [AlgoParam(false)]
-        public bool AlwaysStopLoss { get; set; }
 
         [AlgoParam(5)]
         public int PowerLookback { get; set; }
@@ -269,21 +262,21 @@ namespace Kalitte.Trading.Algos
 
             if (maSignal != null)
             {
-                //this.Monitor.AddFilter($"{maSignal.Name}/sensitivity", 50);
+                this.Monitor.AddFilter($"{maSignal.Name}/sensitivity", 10);
             }
             if (powerSignal != null)
             {
-                //this.Monitor.AddFilter($"{powerSignal.Name}/volume", 50);
-                //this.Monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond",50);
+                this.Monitor.AddFilter($"{powerSignal.Name}/volume", 10);
+                this.Monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond", 10);
             }
             //if (rsiTrendSignal != null)
             //{
             //    this.Monitor.AddFilter($"{rsiTrendSignal.Name}/value", 25);
             //}
-            if (priceTrend != null)
-            {
-                this.Monitor.AddFilter($"{priceTrend.Name}/value", 0.5M);
-            }
+            //if (priceTrend != null)
+            //{
+            //    this.Monitor.AddFilter($"{priceTrend.Name}/value", 0.5M);
+            //}
             base.ConfigureMonitor();
         }
 
@@ -452,7 +445,7 @@ namespace Kalitte.Trading.Algos
 
             if (!portfolio.IsEmpty)
             {
-                var quantity = portfolio.Quantity <= OrderQuantity && (portfolio.Quantity > RsiProfitQuantity || AlwaysGetRsiProfit) ? Math.Min(portfolio.Quantity, RsiProfitQuantity) : 0;
+                var quantity = portfolio.Quantity <= OrderQuantity && (portfolio.Quantity > RsiProfitQuantity) ? Math.Min(portfolio.Quantity, RsiProfitQuantity) : 0;
                 if (quantity > 0)
                 {
                     var trend = result.Trend;

@@ -55,7 +55,7 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitQuantity", 1);
+        alternates.Set("ProfitQuantity", 0);
         alternates.Set("ProfitKeep", 1);
         alternates.Set("MinProfit", 12);        
         alternates.Set("ProfitIncrement", 8);
@@ -87,7 +87,7 @@ public class Program
         alternates.Set("PowerLookback", 5);
 
         // ma cross
-        alternates.Set("DynamicCross", true);
+        alternates.Set("DynamicCross", false);
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);

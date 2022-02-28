@@ -186,7 +186,7 @@ namespace Kalitte.Trading.Algos
         protected virtual void Monitor_MonitorEvent(object sender, MonitorEventArgs e)
         {
             if (e.EventType == MonitorEventType.Updated)
-                Log($"{e}", LogLevel.Warning);
+                Log($"{e}", LogLevel.Debug);
         }
 
         public virtual void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)

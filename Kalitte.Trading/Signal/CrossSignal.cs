@@ -85,7 +85,7 @@ namespace Kalitte.Trading
         public override void Init()
         {
             this.InitialAvgChange = AvgChange;
-            crossBars = new FinanceList<decimal>(AnalyseSize);
+            crossBars = new FinanceList<decimal>(100);
             this.Indicators.Add(i1k);
             this.Indicators.Add(i2k);
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
@@ -106,7 +106,7 @@ namespace Kalitte.Trading
         {
             AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
             Monitor("sensitivity/avgchange", AvgChange);
-            crossBars.Resize(AnalyseSize);
+            //crossBars.Resize(AnalyseSize);
             base.AdjustSensitivityInternal(ratio, reason);
         }
 
@@ -131,10 +131,13 @@ namespace Kalitte.Trading
 
         private void applySensitivity(Sensitivity sensitivity)
         {
-            if (sensitivity == null) AdjustSensitivity(0, "reverted");
-            AdjustSensitivityInternal((double)sensitivity.Result, "Calculation");
-            //AdjustSensitivity((double)average, $"Bars: [{b12.Date} - {b1.Date}] power: {powerRatio} [{powerNote}] dt:{dtRatio}  result:{average}");
-            LastCalculatedSensitivity = sensitivity;
+            if (sensitivity != null)
+            {
+                //if (sensitivity == null) AdjustSensitivity(0, "reverted");
+                AdjustSensitivityInternal((double)sensitivity.Result, "Calculation");
+                LastCalculatedSensitivity = sensitivity;
+            }
+
         }
 
         private Sensitivity CalculateSensitivity()
@@ -165,8 +168,8 @@ namespace Kalitte.Trading
                 var max = InitialAvgChange * 1M;
 
                 var powerRatio = 0M;
-
                 var powerNote = "";
+                decimal usedPower = 0;
 
                 if (PowerSignal != null)
                 {
@@ -175,13 +178,12 @@ namespace Kalitte.Trading
                     //var lastBar = rsiIndicator
                     var barPower = PowerSignal.Indicator.Results.Last();
                     result.VolumeTime = instantPower != null && instantPower.Value > 0 ? DataTime.Current : DataTime.LastBar;
-                    var usedPower = result.VolumeTime == DataTime.Current ? instantPower.Value : barPower.Value.Value;
+                    usedPower = result.VolumeTime == DataTime.Current ? instantPower.Value : barPower.Value.Value;
                     powerRatio = (PowerCrossThreshold - usedPower) / 100;
                     powerRatio = powerRatio > 0 ? powerRatio * PowerCrossPositiveMultiplier : powerRatio * PowerCrossNegativeMultiplier;
                     powerNote = $"bar: {barPower.Date} rsiBar: {barPower.Value} rsiInstant: {(instantPower == null ? 0 : instantPower.Value)}";
                     result.VolumePower = usedPower;
-                    result.VolumeRatio = powerRatio;
-                    Monitor("sensitivity/volumePower", usedPower);
+                    result.VolumeRatio = powerRatio;                    
                 }
 
                 var dtRatio = 0M;
@@ -191,16 +193,19 @@ namespace Kalitte.Trading
                     dtRatio = ((max - dt) / max);
                 }
 
-                Monitor("sensitivity/trendRatio", dtRatio);
 
                 var divide = 0;
                 if (dtRatio != 0) divide++;
                 if (powerRatio != 0) divide++;
                 var average = divide > 0 ? (powerRatio + dtRatio) / divide : 0;
-
-                result.TrendRatio = dtRatio;
-                result.Result = average;
-
+                if (Math.Abs(average) > 0.01M)
+                {
+                    Monitor("sensitivity/trendRatio", dtRatio);
+                    Monitor("sensitivity/volumePower", usedPower);
+                    result.TrendRatio = dtRatio;
+                    result.Result = average;
+                }
+                else return null;
             }
             catch (Exception exc)
             {

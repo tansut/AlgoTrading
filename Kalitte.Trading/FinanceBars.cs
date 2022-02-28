@@ -54,7 +54,7 @@ namespace Kalitte.Trading
     public class FinanceList<T>
     {
         protected List<T> items;
-        protected ReaderWriterLock rwl = new ReaderWriterLock();
+        protected ReaderWriterLock rvl = new ReaderWriterLock();
         protected int timeOut = -1;
         public int QueSize { get; private set; } = 0;
         public event EventHandler<ListEventArgs<T>> ListEvent;
@@ -66,34 +66,36 @@ namespace Kalitte.Trading
 
         public void Resize(int newSize)
         {
-            // rwl.AcquireWriterLock(timeOut);
+            rvl.AcquireWriterLock(timeOut);
             try
             {
+                if (items.Count == newSize) return;
                 if (this.items.Count > newSize)
                 {
+                    var oldItems = this.items.GetRange(0, newSize);
                     items.Clear();
-                    if (ListEvent != null) ListEvent(this, new Trading.ListEventArgs<T>() { Action = ListAction.Cleared, Item = default(T) });
-
+                    //if (ListEvent != null) ListEvent(this, new Trading.ListEventArgs<T>() { Action = ListAction.Cleared, Item = default(T) });
+                    this.items.AddRange(oldItems);
                 }
                 QueSize = newSize;
             }
             finally
             {
 
-                // rwl.ReleaseWriterLock();
+                rvl.ReleaseWriterLock();
             }
         }
 
         public int FindIndex(Predicate<T> match)
         {
-            // rwl.AcquireReaderLock(timeOut);
+            rvl.AcquireReaderLock(timeOut);
             try
             {
                 return items.FindIndex(match);
             }
             finally
             {
-                // rwl.ReleaseReaderLock();
+                rvl.ReleaseReaderLock();
             }
 
         }
@@ -112,28 +114,28 @@ namespace Kalitte.Trading
 
         public List<T> LastItems(int n)
         {
-            // rwl.AcquireReaderLock(timeOut);
+            rvl.AcquireReaderLock(timeOut);
             try
             {
                 return items.Skip(Math.Max(0, Count - n)).ToList();
             }
             finally
             {
-                // rwl.ReleaseReaderLock();
+                rvl.ReleaseReaderLock();
             }           
         }
 
 
         public List<T> Skip(int n)
         {
-            // rwl.AcquireReaderLock(timeOut);
+            rvl.AcquireReaderLock(timeOut);
             try
             {
                 return items.Skip(n).ToList();
             }
             finally
             {
-                // rwl.ReleaseReaderLock();
+                rvl.ReleaseReaderLock();
             }
         }
 
@@ -143,14 +145,14 @@ namespace Kalitte.Trading
             get
             {
 
-                // rwl.AcquireReaderLock(timeOut);
+                rvl.AcquireReaderLock(timeOut);
                 try
                 {
                     return items;
                 }
                 finally
                 {
-                    // rwl.ReleaseReaderLock();
+                    rvl.ReleaseReaderLock();
                 }
             }
         }
@@ -160,14 +162,14 @@ namespace Kalitte.Trading
         //    get
         //    {
 
-        //        // rwl.AcquireReaderLock(timeOut);
+        //        rvl.AcquireReaderLock(timeOut);
         //        try
         //        {
         //            return new List<T>(items);
         //        }
         //        finally
         //        {
-        //            // rwl.ReleaseReaderLock();
+        //            rvl.ReleaseReaderLock();
         //        }
         //    }
         //}
@@ -177,14 +179,14 @@ namespace Kalitte.Trading
             get
             {
 
-                // rwl.AcquireReaderLock(timeOut);
+                rvl.AcquireReaderLock(timeOut);
                 try
                 {
                     return items.ToArray();
                 }
                 finally
                 {
-                    // rwl.ReleaseReaderLock();
+                    rvl.ReleaseReaderLock();
                 }
             }
         }
@@ -194,14 +196,14 @@ namespace Kalitte.Trading
             get
             {
 
-                // rwl.AcquireReaderLock(timeOut);
+                rvl.AcquireReaderLock(timeOut);
                 try
                 {
                     return items[0];
                 }
                 finally
                 {
-                    // rwl.ReleaseReaderLock();
+                    rvl.ReleaseReaderLock();
                 }
             }
         }
@@ -213,14 +215,14 @@ namespace Kalitte.Trading
             get
             {
 
-                // rwl.AcquireReaderLock(timeOut);
+                rvl.AcquireReaderLock(timeOut);
                 try
                 {
                     return new Tuple<T, T>(items[0], items[items.Count - 1]);
                 }
                 finally
                 {
-                    // rwl.ReleaseReaderLock();
+                    rvl.ReleaseReaderLock();
                 }
             }
         }
@@ -230,14 +232,14 @@ namespace Kalitte.Trading
             get
             {
 
-                // rwl.AcquireReaderLock(timeOut);
+                rvl.AcquireReaderLock(timeOut);
                 try
                 {
                     return items[items.Count - 1];
                 }
                 finally
                 {
-                    // rwl.ReleaseReaderLock();
+                    rvl.ReleaseReaderLock();
                 }
             }
         }
@@ -246,14 +248,14 @@ namespace Kalitte.Trading
         {
             get
             {
-                // rwl.AcquireReaderLock(timeOut);
+                rvl.AcquireReaderLock(timeOut);
                 try
                 {
                     return items.Count;
                 }
                 finally
                 {
-                    // rwl.ReleaseReaderLock();
+                    rvl.ReleaseReaderLock();
                 }
             }
         }
@@ -262,7 +264,7 @@ namespace Kalitte.Trading
 
         public void Push(T item)
         {
-            // rwl.AcquireWriterLock(timeOut);
+            rvl.AcquireWriterLock(timeOut);
             try
             {
                 if (QueSize > 0 && items.Count == QueSize)
@@ -281,7 +283,7 @@ namespace Kalitte.Trading
             finally
             {
 
-                // rwl.ReleaseWriterLock();
+                rvl.ReleaseWriterLock();
             }
         }
 
@@ -295,7 +297,7 @@ namespace Kalitte.Trading
 
         public void Clear()
         {
-            // rwl.AcquireWriterLock(timeOut);
+            rvl.AcquireWriterLock(timeOut);
             try
             {
                 items.Clear();
@@ -304,13 +306,13 @@ namespace Kalitte.Trading
             finally
             {
 
-                // rwl.ReleaseWriterLock();
+                rvl.ReleaseWriterLock();
             }
         }
 
         public T GetItem(int index)
         {
-            // rwl.AcquireReaderLock(timeOut);
+            rvl.AcquireReaderLock(timeOut);
             try
             {
                 try
@@ -326,7 +328,7 @@ namespace Kalitte.Trading
             finally
             {
 
-                // rwl.ReleaseLock();
+                rvl.ReleaseLock();
             }
         }
 
@@ -365,7 +367,7 @@ namespace Kalitte.Trading
         {
 
 
-            // rwl.AcquireReaderLock(timeOut);
+            rvl.AcquireReaderLock(timeOut);
             try
             {
                 return items.Select(p =>
@@ -383,7 +385,7 @@ namespace Kalitte.Trading
             }
             finally
             {
-                // rwl.ReleaseReaderLock();
+                rvl.ReleaseReaderLock();
             }
 
 
@@ -403,7 +405,7 @@ namespace Kalitte.Trading
 
         public decimal derivative(int toBack, int from = 0)
         {
-            // rwl.AcquireReaderLock(timeOut);
+            rvl.AcquireReaderLock(timeOut);
             try
             {
                 var count = this.items.Count;
@@ -413,7 +415,7 @@ namespace Kalitte.Trading
             }
             finally
             {
-                // rwl.ReleaseReaderLock();
+                rvl.ReleaseReaderLock();
             }
         }
 

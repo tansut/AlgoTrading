@@ -39,8 +39,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 02, 18, 9, 30, 0);
-        settings.Finish = new DateTime(2022, 02, 18, 23, 0, 0);
+        settings.Start = new DateTime(2022, 02, 21, 9, 30, 0);
+        settings.Finish = new DateTime(2022, 02, 21, 23, 0, 0);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));

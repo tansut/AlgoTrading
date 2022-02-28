@@ -49,6 +49,9 @@ namespace Kalitte.Trading
         public int CompletedOrder = 0;
         public decimal CompletedQuantity = 0;
 
+        public decimal ProfitSlice { get; set; }
+        public decimal LossSlice { get; set; }
+
         public TakeProfitOrLossSignal(string name, string symbol, AlgoBase owner, 
             decimal profitPriceChange, decimal profitQuantity, decimal lossPriceChange, decimal lossQuantity) : base(name, symbol, owner)
         {
@@ -58,6 +61,8 @@ namespace Kalitte.Trading
             LossQuantity = lossQuantity;
             UsedProfitPriceChange = profitPriceChange;
             UsedLossPriceChange = lossPriceChange;
+            UsedLossQuantity = lossQuantity;
+            UsedProfitQuantity = profitQuantity;
             CompletedOrder = 0;
             CompletedQuantity = 0;
         }
@@ -113,7 +118,6 @@ namespace Kalitte.Trading
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
-
             BuySell? result = null;
             decimal price = 0M;
             decimal pl = 0M;
@@ -130,12 +134,14 @@ namespace Kalitte.Trading
                 pl = price - avgCost;
                 
                
+
                 if (price == 0 || avgCost == 0)
                 {
                     //Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Verbose, t);
                 }
                 else if (UsedProfitQuantity > 0 && portfolio.Side == BuySell.Buy && pl >= this.UsedProfitPriceChange)
                 {
+                    Log($"profit: {UsedProfitQuantity} {UsedProfitPriceChange}", LogLevel.Debug);
                     direction = ProfitOrLoss.Profit;
                     result = BuySell.Sell;
                     quantity = UsedProfitQuantity;

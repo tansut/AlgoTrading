@@ -55,7 +55,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(1)]
         public decimal RsiProfitPuan { get; set; }
 
-
+        [AlgoParam(0)]
+        public decimal ProfitSlice { get; set; }
 
 
         [AlgoParam(0)]
@@ -228,6 +229,7 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && (this.ProfitQuantity > 0 || this.LossQuantity > 0))
             {
                 this.takeProfitSignal = new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.MinProfit, this.ProfitQuantity, this.MinLoss, this.LossQuantity);
+                this.takeProfitSignal.ProfitSlice = this.ProfitSlice;
                 this.Signals.Add(takeProfitSignal);
             }
             if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0))
@@ -302,15 +304,10 @@ namespace Kalitte.Trading.Algos
             decimal keep = result.Direction == ProfitOrLoss.Profit ? ProfitKeep : LossKeep;
             decimal quantity = result.Quantity;
             decimal remaining = portfolio.Quantity - quantity;
-
             quantity = Math.Min(portfolio.Quantity, remaining >= keep ? quantity : portfolio.Quantity - keep);
-            //if (quantity == 0 && portfolio.Quantity > keep) quantity = result.Quantity - keep;
-
+            
             if (quantity > 0)
             {
-                if (result.Direction == ProfitOrLoss.Profit)
-                    signal.AdjustChanges(ProfitQuantityIncrement, ProfitIncrement, ProfitOrLoss.Profit);
-                else signal.AdjustChanges(LossQuantityIncrement, LossIncrement, ProfitOrLoss.Loss);
                 Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Debug, result.SignalTime);
                 sendOrder(Symbol, quantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result.MarketPrice, result.Direction == ProfitOrLoss.Profit ? OrderIcon.TakeProfit : OrderIcon.StopLoss, result.SignalTime, result);
             }
@@ -548,6 +545,9 @@ namespace Kalitte.Trading.Algos
             var cross = this.positionRequest.SignalResult as CrossSignalResult;
             if (tp != null)
             {
+                if (tp.Direction == ProfitOrLoss.Profit)
+                    ((TakeProfitOrLossSignal)tp.Signal).AdjustChanges(ProfitQuantityIncrement, ProfitIncrement, ProfitOrLoss.Profit);
+                else ((TakeProfitOrLossSignal)tp.Signal).AdjustChanges(LossQuantityIncrement, LossIncrement, ProfitOrLoss.Loss);
                 ((TakeProfitOrLossSignal)tp.Signal).IncrementSignal(1, positionRequest.Quantity);
             }
             if (cross != null)

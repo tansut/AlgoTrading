@@ -56,14 +56,19 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitQuantity", 4);
-        alternates.Set("ProfitPuan", 12);
+        alternates.Set("ProfitKeep", 2);
+        alternates.Set("MinProfit", 2);
+        alternates.Set("ProfitQuantity", 1);
+        alternates.Set("ProfitNext", 2);
+
+        alternates.Set("LossKeep", 2);
+        alternates.Set("MinLoss", 8);
         alternates.Set("LossQuantity", 0);
-        alternates.Set("LossPuan", 0);
+        alternates.Set("LossNext", 8);
+
         alternates.Set("RsiProfitQuantity", 0);
         alternates.Set("RsiProfitPuan", 16);
-        alternates.Set("ProfitQuantityStep", 1);
-        alternates.Set("ProfitPuanStep", 8);
+
 
         // rsi
         alternates.Set("RsiHighLimit", 40);

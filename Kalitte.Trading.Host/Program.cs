@@ -40,7 +40,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 02, 18, 9, 30, 0);
-        settings.Finish = new DateTime(2022, 02, 21, 23, 0, 0);
+        settings.Finish = new DateTime(2022, 02, 18, 23, 0, 0);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -48,7 +48,6 @@ public class Program
 
         // options
         alternates.Set("OrderQuantity", 6);
-
         alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
@@ -88,7 +87,7 @@ public class Program
         alternates.Set("PowerLookback", 5);
 
         // ma cross
-        alternates.Set("DynamicCross", false);
+        alternates.Set("DynamicCross", true);
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);

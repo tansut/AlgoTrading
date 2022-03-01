@@ -173,8 +173,6 @@ namespace Kalitte.Trading
                 if (PowerSignal != null)
                 {
                     var instantPower = PowerSignal.LastSignalResult as PowerSignalResult;
-                    //var rsiIndicator = PowerSignal.Indicator as Rsi;
-                    //var lastBar = rsiIndicator
                     var barPower = PowerSignal.Indicator.Results.Last();
                     result.VolumeTime = instantPower != null && instantPower.Value > 0 ? DataTime.Current : DataTime.LastBar;
                     usedPower = result.VolumeTime == DataTime.Current ? instantPower.Value : barPower.Value.Value;
@@ -227,7 +225,12 @@ namespace Kalitte.Trading
                 var last = i1k.Results.Last().Date;
 
                 if (last.Hour == 22 && last.Minute == 50)
-                    crossBars.Push(i1k.Results.Last().Value.Value - i2k.Results.Last().Value.Value);
+                {
+                    var l1 = i1k.Results.Last();
+                    var l2 = i2k.Results.Last();
+                    crossBars.Push(l1.Value.Value - l2.Value.Value);
+                    Log($"Morning cross inserted: {l1.Date}", LogLevel.Debug);
+                }
             }
         }
 

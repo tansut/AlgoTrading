@@ -129,10 +129,8 @@ namespace Kalitte.Trading
         {
             CollectSize = Convert.ToInt32(CollectSize * SignalSensitivity);
             AnalyseSize = Convert.ToInt32(AnalyseSize * SignalSensitivity);
-            
             InitialAnalyseSize = AnalyseSize;
             InitialCollectSize = CollectSize;
-            
             CollectList = new AnalyseList(CollectSize, CollectAverage);
             AnalyseList = new AnalyseList(AnalyseSize, AnalyseAverage);
             ResetInternal();

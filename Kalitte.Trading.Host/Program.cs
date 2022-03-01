@@ -40,14 +40,14 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 2, 28);
+        settings.Finish = new DateTime(2022, 3, 1);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("OrderQuantity", 6);
+        alternates.Set("OrderQuantity", 8);
         alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
@@ -55,7 +55,7 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 2);
+        alternates.Set("ProfitInitialQuantity", 3);
         alternates.Set("ProfitKeepQuantity", 1);
         alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
@@ -69,7 +69,7 @@ public class Program
         alternates.Set("LossStart", 12);
         alternates.Set("LossPriceStep", 4);
 
-        alternates.Set("RsiProfitInitialQuantity", 2);
+        alternates.Set("RsiProfitInitialQuantity", 3);
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitQuantityStep", 1);
         alternates.Set("RsiProfitQuantityStepMultiplier", 0);

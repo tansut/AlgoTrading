@@ -39,8 +39,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 02, 28, 9, 30, 0);
-        settings.Finish = new DateTime(2022, 02, 28, 23, 0, 0);
+        settings.Start = new DateTime(2022, 02, 28);
+        settings.Finish = new DateTime(2022, 03, 01);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -55,13 +55,13 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 3.0);
+        alternates.Set("ProfitInitialQuantity", 2.0);
         alternates.Set("ProfitKeepQuantity", 1.0);
-        alternates.Set("ProfitQuantityStep", 1.0);
+        alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 1);
 
         alternates.Set("ProfitStart", 10.0);        
-        alternates.Set("ProfitIncrement", 3.0);
+        alternates.Set("ProfitIncrement", 2.0);
         
         
 

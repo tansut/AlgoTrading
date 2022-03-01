@@ -182,7 +182,7 @@ namespace Kalitte.Trading
                     powerRatio = powerRatio > 0 ? powerRatio * PowerCrossPositiveMultiplier : powerRatio * PowerCrossNegativeMultiplier;
                     powerNote = $"bar: {barPower.Date} rsiBar: {barPower.Value} rsiInstant: {(instantPower == null ? 0 : instantPower.Value)}";
                     result.VolumePower = usedPower;
-                    result.VolumeRatio = powerRatio;                    
+                    result.VolumeRatio = powerRatio;
                 }
 
                 var dtRatio = 0M;
@@ -197,14 +197,20 @@ namespace Kalitte.Trading
                 if (dtRatio != 0) divide++;
                 if (powerRatio != 0) divide++;
                 var average = divide > 0 ? (powerRatio + dtRatio) / divide : 0;
-                if (Math.Abs(average) > 0.01M)
+
+                if (Algo.IsMorningStart() && lastCross != 0)
                 {
-                    Monitor("sensitivity/trendRatio", dtRatio);
-                    Monitor("sensitivity/volumePower", usedPower);
-                    result.TrendRatio = dtRatio;
-                    result.Result = average;
+                    var difRatio =  (double)(Math.Abs(lastCross) / InitialAvgChange);
+                    if (difRatio > 2.0)
+                    {
+                        average = -(decimal)(1 / (1 + Math.Pow(Math.E, -(1*difRatio))));
+                    }
                 }
-                else return null;
+
+                Monitor("sensitivity/trendRatio", dtRatio);
+                Monitor("sensitivity/volumePower", usedPower);
+                result.TrendRatio = dtRatio;
+                result.Result = average;
             }
             catch (Exception exc)
             {
@@ -214,11 +220,24 @@ namespace Kalitte.Trading
             return result;
         }
 
+        private void FillMorningCross(DateTime time)
+        {
+            if (crossBars.Count == 0)
+            {
+                var last = i1k.Results.Last().Date;
+
+                if (last.Hour == 22 && last.Minute == 50)
+                    crossBars.Push(i1k.Results.Last().Value.Value - i2k.Results.Last().Value.Value);
+            }
+        }
+
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
             var time = t ?? DateTime.Now;
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
+
+            if (Algo.IsMorningStart(time)) FillMorningCross(time);
 
             if (DynamicCross)
             {
@@ -233,7 +252,6 @@ namespace Kalitte.Trading
 
             if (CollectList.Ready && mp >= 0)
             {
-
                 decimal mpAverage = CollectList.LastValue;
 
                 var l1 = i1k.NextValue(mpAverage);
@@ -246,13 +264,12 @@ namespace Kalitte.Trading
                 if (lastCross == 0 && cross != 0)
                 {
                     lastCross = cross;
-                    Log($"Cross identified: {cross}", LogLevel.Debug, t);
+                    Log($"Cross identified: {lastCross}", LogLevel.Debug, t);
                     AnalyseList.Clear();
                 }
 
                 if (AnalyseList.Ready)
                 {
-
                     var lastAvg = AnalyseList.LastValue; // UseSma ? differenceBars.List.GetSma(AnalyseSize).Last().Sma.Value : differenceBars.List.GetEma(AnalyseSize).Last().Ema.Value;
 
                     decimal last1 = i1k.Results.Last().Value.Value;
@@ -275,5 +292,7 @@ namespace Kalitte.Trading
 
             return result;
         }
+
+
     }
 }

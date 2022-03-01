@@ -92,11 +92,15 @@ namespace Kalitte.Trading
             var seconds = 0;
             var periodBarsLoaded = true;
 
-            for (var p = t1; p <= t2;)
+            for (var p = t1; p <= t2; p = p.AddSeconds(1))
             {
-                if (p >= DateTime.Now) break;
+
                 if (periodBarsLoaded)
                 {
+                    if (p > DateTime.Now) break;
+                    //if (p < Algo.TestStart) continue;
+                    //if (p > Algo.TestFinish) break;
+
                     SystemTime.Set(p);
                     var time = SystemTime.Now;
                     var tasks = new List<Task<SignalResult>>();
@@ -124,7 +128,7 @@ namespace Kalitte.Trading
                         {
                             periodBarIndexes[sec.Key] = periodBars[sec.Key].FindIndex(i => i.Date == round);
                         }
-                        period = periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]);
+                        period = periodBars.ContainsKey(sec.Key) ? periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]): null;
                         if (period == null || period.Date != round)
                         {
                             Algo.Log($"Error loading period for {round}", LogLevel.Error, p);
@@ -139,7 +143,7 @@ namespace Kalitte.Trading
                     }
                 }
 
-                p = p.AddSeconds(1);
+                
 
             }
 
@@ -149,7 +153,7 @@ namespace Kalitte.Trading
                 var roundDown = Helper.RoundDown(t2, TimeSpan.FromSeconds(sec.Key));
                 if (round != t2)
                 {
-                    var period = periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]);
+                    var period = periodBars.ContainsKey(sec.Key) && periodBarIndexes.ContainsKey(sec.Key) ? periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]): null;
                     if (period == null || period.Date != roundDown)
                     {
                         Algo.Log($"Error loading period for {round}", LogLevel.Error, round);
@@ -163,13 +167,18 @@ namespace Kalitte.Trading
         }
 
 
-        Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>> GetDates(DateTime t)
+        Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>> GetDates(DateTime t, DateTime s, DateTime f)
         {
             var m1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
             var m2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
 
             var n1 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
             var n2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
+
+            //if (m1 < s) m1 = s;
+            //if (m2 > f) m2 = f;
+            ////if (n1 < s) n1 = s;
+            //if (n2 > f) n2 = f;
 
             return new Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>>(
                    new Tuple<DateTime, DateTime>(m1, m2), new Tuple<DateTime, DateTime>(n1, n2)
@@ -191,8 +200,8 @@ namespace Kalitte.Trading
             {
                 var currentDay = Algo.TestStart.Value.AddDays(d);
                 if (currentDay.DayOfWeek == DayOfWeek.Saturday || currentDay.DayOfWeek == DayOfWeek.Sunday) continue;
-                if (currentDay >= DateTime.Now) break;
-                var periods = this.GetDates(currentDay);
+                if (currentDay > DateTime.Now) break;
+                var periods = this.GetDates(currentDay, Algo.TestStart.Value, Algo.TestFinish.Value);
                 SystemTime.Set(periods.Item1.Item1);
                 Run(periods.Item1.Item1, periods.Item1.Item2);
                 Run(periods.Item2.Item1, periods.Item2.Item2);
@@ -221,10 +230,11 @@ namespace Kalitte.Trading
             this.FileName = $"c:\\kalitte\\log\\simulation\\results\\br-{Settings.Start.ToString("yyyy-MM-dd")}-{Settings.Finish.ToString("yyyy-MM-dd")}-{(random.Next(1000000, 9999999))}.tsv";
         }
 
-        private Backtest run(Dictionary<string, object> init, int index, int total, Backtest related = null)
+        private Backtest run(Dictionary<string, object> init, int index, int total, string [] configs, Backtest related = null)
         {
             var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { init });
             algo.SimulationFile = this.FileName;
+            algo.SimulationFileFields = configs;
             Backtest test = new Backtest(algo, Settings.Start, Settings.Finish, related);
             test.AutoClosePositions = Settings.AutoClosePositions;
             //Console.WriteLine($"Running test case {i}/{cases.Count} for {algo.InstanceName} using {algo.LogFile}");
@@ -260,29 +270,31 @@ namespace Kalitte.Trading
                 }
             }
             Console.WriteLine($" ** WILL RUN {cases.Count}/{allCase.Count} TESTS ** Hit to continue ...");
-            CreateHeaders(this.FileName);
+            var headers = CreateHeaders(this.FileName);
             Console.WriteLine($"Running tests to file {this.FileName}");
             var completed = 0;
-            Backtest related = run(cases[0], ++completed, cases.Count);            
+            Backtest related = run(cases[0], ++completed, cases.Count, headers);            
             Parallel.For(1, cases.Count, i =>
             {
                 var initValues = cases[i];
-                related = run(initValues, ++completed, cases.Count, related);    
+                related = run(initValues, ++completed, cases.Count, headers, related);    
             });
             Console.WriteLine(" ** COMPLETED ** Hit to close ...");
             //Console.ReadKey();
         }
 
-        private void CreateHeaders(string resultFile)
+        private string [] CreateHeaders(string resultFile)
         {
-            var dictionary = AlgoBase.GetConfigValues(typeof(T));
+            var multiple = Settings.Alternates.Where(p => p.Value.Length > 1);
+            var dictionary = multiple.Any() ? multiple.Select(p=>p.Key).ToArray() : AlgoBase.GetConfigValues(typeof(T)).Select(p=>p.Key).ToArray();
             var sb = new StringBuilder();
             
             //F_XU0300222: long/ 1 / Cost: 2250.75 Total: 2250.75 PL: -32.25 Commission: 39.15 NetPL: -71.40
             sb.Append("Pos\tQuantity\tCost\tTotal\tPL\tCommission\tNetPL\tOrdertotal\tLog\t");
-            foreach (var key in dictionary.Keys) sb.Append(key + "\t");
+            foreach (var key in dictionary) sb.Append(key + "\t");
             sb.Append(Environment.NewLine);
             File.WriteAllText(resultFile, sb.ToString());
+            return dictionary;
         }
     }
 }

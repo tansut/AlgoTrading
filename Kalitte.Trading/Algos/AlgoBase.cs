@@ -86,6 +86,7 @@ namespace Kalitte.Trading.Algos
         public DateTime? TestStart { get; set; }
         public DateTime? TestFinish { get; set; }
         public string SimulationFile { get; set; } = "";
+        public string [] SimulationFileFields { get; set; } = new string [] {};
 
         [AlgoParam(LogLevel.Verbose)]
         public LogLevel LoggingLevel { get; set; }
@@ -298,6 +299,12 @@ namespace Kalitte.Trading.Algos
 
         }
 
+        public bool IsMorningStart(DateTime? t = null)
+        {
+            var time = t ?? SystemTime.Now;
+            return time.Hour == 9 && time.Minute == 30;
+        }
+
         private void SeansTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             var t = DateTime.Now;
@@ -314,6 +321,7 @@ namespace Kalitte.Trading.Algos
                     if (SignalsState == StartableState.Stopped)
                     {
                         Log($"Time seems OK, starting signals ...");
+                        if (IsMorningStart(t)) Signals.ForEach(p => p.Reset());
                         StartSignals();
                     }
                 }
@@ -642,14 +650,14 @@ namespace Kalitte.Trading.Algos
                 simulationFileMutext.WaitOne();
                 try
                 {
-                    var dictionary = this.GetConfigValues();
+                    var dictionary = SimulationFileFields.Length == 0? this.GetConfigValues(): this.GetConfigValues().Where(p=>SimulationFileFields.Contains(p.Key)).Select(p=>p);
                     var sb = new StringBuilder();
                     if (UserPortfolioList.Count > 0)
                     {
                         var ul = UserPortfolioList.First().Value;
                         sb.Append($"{ul.SideStr}\t{ul.Quantity}\t{ul.AvgCost}\t{ul.Total}\t{ul.PL}\t{ul.Commission}\t{ul.PL - ul.Commission}\t{orderCounter}\t{LogFile}\t");
                     }
-                    foreach (var v in dictionary.Values) sb.Append(v + "\t");
+                    foreach (var v in dictionary) sb.Append(v.Value + "\t");
                     sb.Append(Environment.NewLine);
                     File.AppendAllText(SimulationFile, sb.ToString());
                 }

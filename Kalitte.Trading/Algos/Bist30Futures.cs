@@ -189,6 +189,11 @@ namespace Kalitte.Trading.Algos
                 maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
                 maSignal.i2k = new Custom((q) => 0, periodData.Periods, MovPeriod + MovPeriod2 + MACDTrigger);
                 maSignal.PowerSignal = powerSignal;
+
+                if (maTrendSignal != null)
+                {
+                    maTrendSignal.i1k = maSignal.i1k;
+                }
             }
 
             if (macSignal != null)
@@ -241,6 +246,8 @@ namespace Kalitte.Trading.Algos
             {
                 this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MaAvgChange };
                 this.Signals.Add(maSignal);
+                this.maTrendSignal = new TrendSignal("ma-trend", Symbol, this);
+                Signals.Add(maTrendSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
@@ -352,6 +359,12 @@ namespace Kalitte.Trading.Algos
         }
 
 
+        
+
+        private void HandleMaTrendSignal(TrendSignal signal, TrendSignalResult result)
+        {
+                       
+        }
 
         private void HandlePriceTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
@@ -539,6 +552,12 @@ namespace Kalitte.Trading.Algos
                     var tpSignal = (TrendSignal)(result.Signal);
                     var signalResult = (TrendSignalResult)result;
                     HandlePriceTrendSignal(tpSignal, signalResult);
+                }
+                else if (result.Signal.Name == "ma-trend")
+                {
+                    var tpSignal = (TrendSignal)(result.Signal);
+                    var signalResult = (TrendSignalResult)result;
+                    HandleMaTrendSignal(tpSignal, signalResult);
                 }
                 else if (result.Signal.Name == "atr-trend")
                 {

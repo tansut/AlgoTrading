@@ -703,7 +703,7 @@ namespace Kalitte.Trading.Algos
         {
             orderWait.Reset();
             var monitored = this.Monitor.Dump(true).ToString();
-            if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Order, t);            
+            if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, t);            
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
             var price = lprice > 0 ? lprice : this.GetMarketPrice(symbol, t);
             if (price == 0)

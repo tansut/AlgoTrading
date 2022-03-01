@@ -527,8 +527,11 @@ namespace Kalitte.Trading.Algos
                 {
                     var tpSignal = (TrendSignal)(result.Signal);
                     var signalResult = (TrendSignalResult)result;
-                    var profitResult = rsiProfitSignal.HandleTrendSignal(tpSignal, signalResult);
-                    if (profitResult != null) HandleProfitLossSignal(rsiProfitSignal, profitResult);
+                    if (rsiProfitSignal != null)
+                    {
+                        var profitResult = rsiProfitSignal.HandleTrendSignal(tpSignal, signalResult);
+                        if (profitResult != null) HandleProfitLossSignal(rsiProfitSignal, profitResult);
+                    }
                 }
                 else if (result.Signal.Name == "price-trend")
                 {

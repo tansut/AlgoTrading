@@ -39,8 +39,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 01);
-        settings.Finish = new DateTime(2022, 3, 01);
+        settings.Start = new DateTime(2022, 2, 28);
+        settings.Finish = new DateTime(2022, 2, 28);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -59,23 +59,20 @@ public class Program
         alternates.Set("ProfitKeepQuantity", 1);
         alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
-
         alternates.Set("ProfitStart", 10.0);        
-        alternates.Set("ProfitPriceStep", 3.0);        
+        alternates.Set("ProfitPriceStep", 3.0);
 
         alternates.Set("LossInitialQuantity", 0);
-        alternates.Set("LossKeepQuantity", 1);
+        alternates.Set("LossKeepQuantity", 3);
         alternates.Set("LossQuantityStep", 1);
-        alternates.Set("LossQuantityStepMultiplier", 2);        
-        
-        alternates.Set("LossStart", 4);        
-        alternates.Set("LossPriceStep", 12);
+        alternates.Set("LossQuantityStepMultiplier", 2);                
+        alternates.Set("LossStart", 12);
+        alternates.Set("LossPriceStep", 4);
 
-        alternates.Set("RsiProfitInitialQuantity", 1);
+        alternates.Set("RsiProfitInitialQuantity", 2);
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitQuantityStep", 1);
         alternates.Set("RsiProfitQuantityStepMultiplier", 0);
-
         alternates.Set("RsiProfitStart", 10.0);
         alternates.Set("RsiProfitPriceStep", 3.0);
 

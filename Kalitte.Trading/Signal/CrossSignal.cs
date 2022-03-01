@@ -106,7 +106,6 @@ namespace Kalitte.Trading
         {
             AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
             Monitor("sensitivity/avgchange", AvgChange);
-            //crossBars.Resize(AnalyseSize);
             base.AdjustSensitivityInternal(ratio, reason);
         }
 

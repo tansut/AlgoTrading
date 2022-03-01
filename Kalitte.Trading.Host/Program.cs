@@ -39,8 +39,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 02, 21, 9, 30, 0);
-        settings.Finish = new DateTime(2022, 02, 21, 23, 0, 0);
+        settings.Start = new DateTime(2022, 02, 28, 9, 30, 0);
+        settings.Finish = new DateTime(2022, 02, 28, 23, 0, 0);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -55,17 +55,25 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitQuantity", 1.0);
-        alternates.Set("ProfitKeep", 2.0);
-        alternates.Set("MinProfit", 9.0);        
-        alternates.Set("ProfitIncrement", 3.0);
-        alternates.Set("ProfitQuantityIncrement", 1.0);
+        alternates.Set("ProfitInitialQuantity", 3.0);
+        alternates.Set("ProfitKeepQuantity", 1.0);
+        alternates.Set("ProfitQuantityStep", 1.0);
+        alternates.Set("ProfitQuantityStepMultiplier", 1);
 
-        alternates.Set("LossQuantity", 0);
-        alternates.Set("LossKeep", 2);
-        alternates.Set("MinLoss", 8);        
+        alternates.Set("ProfitStart", 10.0);        
+        alternates.Set("ProfitIncrement", 3.0);
+        
+        
+
+        alternates.Set("LossInitialQuantity", 0);
+        alternates.Set("LossKeepQuantity", 2);
+        alternates.Set("LossQuantityStep", 0);
+        alternates.Set("LossQuantityStepMultiplier", 0);
+        
+        
+        alternates.Set("LossStart", 8);        
         alternates.Set("LossIncrement", 8);
-        alternates.Set("LossQuantityIncrement", 8);
+        
 
         alternates.Set("RsiProfitQuantity", 0);
         alternates.Set("RsiProfitPuan", 16);
@@ -99,7 +107,7 @@ public class Program
         
         // System
         alternates.Set("LoggingLevel", LogLevel.Warning);
-        alternates.Set("Symbol", "F_XU0300222");
+        alternates.Set("Symbol", "F_XU0300422");
         alternates.Set("LogConsole", true);
 
         var file = $"c:\\kalitte\\Bist30Futures-test.json";

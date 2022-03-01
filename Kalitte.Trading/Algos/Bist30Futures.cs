@@ -60,13 +60,18 @@ namespace Kalitte.Trading.Algos
 
 
         [AlgoParam(0)]
-        public decimal ProfitQuantity { get; set; }
+        public decimal ProfitInitialQuantity { get; set; }
 
         [AlgoParam(0)]
         public decimal ProfitIncrement { get; set; }
 
+        [AlgoParam(1)]
+        public decimal ProfitQuantityStep { get; set; }
+
+        
+
         [AlgoParam(0)]
-        public decimal ProfitQuantityIncrement { get; set; }
+        public decimal ProfitQuantityStepMultiplier { get; set; }
 
 
 
@@ -74,22 +79,25 @@ namespace Kalitte.Trading.Algos
         public decimal LossIncrement { get; set; }
 
         [AlgoParam(0)]
-        public decimal LossQuantityIncrement { get; set; }
+        public decimal LossQuantityStepMultiplier { get; set; }
+
+        [AlgoParam(1)]
+        public decimal LossQuantityStep { get; set; }
 
         [AlgoParam(0)]
-        public decimal LossQuantity { get; set; }
+        public decimal LossInitialQuantity { get; set; }
 
         [AlgoParam(0)]
-        public decimal ProfitKeep { get; set; }
+        public decimal ProfitKeepQuantity { get; set; }
 
         [AlgoParam(0)]
-        public decimal LossKeep { get; set; }
+        public decimal LossKeepQuantity { get; set; }
 
         [AlgoParam(20)]
-        public decimal MinProfit { get; set; }
+        public decimal ProfitStart { get; set; }
 
         [AlgoParam(4)]
-        public decimal MinLoss { get; set; }
+        public decimal LossStart { get; set; }
 
 
         [AlgoParam(14)]
@@ -226,9 +234,9 @@ namespace Kalitte.Trading.Algos
             }
 
             if (SimulateOrderSignal) this.Signals.Add(new FlipFlopSignal("flipflop", Symbol, this, BuySell.Buy));
-            if (!SimulateOrderSignal && (this.ProfitQuantity > 0 || this.LossQuantity > 0))
+            if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0 || this.LossInitialQuantity > 0))
             {
-                this.takeProfitSignal = new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.MinProfit, this.ProfitQuantity, this.MinLoss, this.LossQuantity);
+                this.takeProfitSignal = new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, this.LossStart, this.LossInitialQuantity, this.LossQuantityStep, this.LossQuantityStepMultiplier);
                 this.takeProfitSignal.ProfitSlice = this.ProfitSlice;
                 this.Signals.Add(takeProfitSignal);
             }
@@ -301,7 +309,7 @@ namespace Kalitte.Trading.Algos
             if (result.finalResult == BuySell.Buy && portfolio.IsLong) return;
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
-            decimal keep = result.Direction == ProfitOrLoss.Profit ? ProfitKeep : LossKeep;
+            decimal keep = result.Direction == ProfitOrLoss.Profit ? ProfitKeepQuantity : LossKeepQuantity;
             decimal quantity = result.Quantity;
             decimal remaining = portfolio.Quantity - quantity;
             quantity = Math.Min(portfolio.Quantity, remaining >= keep ? quantity : portfolio.Quantity - keep);
@@ -545,10 +553,11 @@ namespace Kalitte.Trading.Algos
             var cross = this.positionRequest.SignalResult as CrossSignalResult;
             if (tp != null)
             {
+                var tps = ((TakeProfitOrLossSignal)tp.Signal);
+                tps.IncrementSignal(1, positionRequest.Quantity);
                 if (tp.Direction == ProfitOrLoss.Profit)
-                    ((TakeProfitOrLossSignal)tp.Signal).AdjustChanges(ProfitQuantityIncrement, ProfitIncrement, ProfitOrLoss.Profit);
-                else ((TakeProfitOrLossSignal)tp.Signal).AdjustChanges(LossQuantityIncrement, LossIncrement, ProfitOrLoss.Loss);
-                ((TakeProfitOrLossSignal)tp.Signal).IncrementSignal(1, positionRequest.Quantity);
+                    tps.AdjustChanges(0, ProfitIncrement, ProfitOrLoss.Profit);
+                else tps.AdjustChanges(0, LossIncrement, ProfitOrLoss.Loss);
             }
             if (cross != null)
             {

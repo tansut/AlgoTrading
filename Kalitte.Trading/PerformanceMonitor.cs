@@ -112,6 +112,7 @@ namespace Kalitte.Trading
             {
                 foreach (var item in Items)
                 {
+                    if (this.State == StartableState.StopInProgress || this.State == StartableState.Stopped) break;
                     decimal change = 0M;
                     var oldVal = item.Value.OldValue;
                     var newValue = item.Value.CurrentValue;
@@ -152,7 +153,6 @@ namespace Kalitte.Trading
                 _timer.Stop();
                 _timer.Dispose();
                 _timer = null;
-
                 this.State = StartableState.Stopped;
             }
             finally

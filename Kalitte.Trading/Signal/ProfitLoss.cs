@@ -37,14 +37,17 @@ namespace Kalitte.Trading
     {
         public decimal UsedProfitPriceChange { get; set; }
         public decimal UsedLossPriceChange { get; set; }
-        public decimal UsedProfitQuantity { get; set; }
-        public decimal UsedLossQuantity { get; set; }
+        public decimal ProfitQuantityStepMultiplier { get; set; }
+        public decimal LossQuantityStepMultiplier { get; set; }
 
 
+        public decimal ProfitQuantityStep { get; set; }
         public decimal ProfitPriceChange { get; set; }
-        public decimal ProfitQuantity { get; set; }
+        public decimal ProfitInitialQuantity { get; set; }
+
+        public decimal LossQuantityStep { get; set; }
         public decimal LossPriceChange { get; set; }
-        public decimal LossQuantity { get; set; }
+        public decimal LossInitialQuantity { get; set; }
 
         public int CompletedOrder = 0;
         public decimal CompletedQuantity = 0;
@@ -53,16 +56,22 @@ namespace Kalitte.Trading
         public decimal LossSlice { get; set; }
 
         public TakeProfitOrLossSignal(string name, string symbol, AlgoBase owner, 
-            decimal profitPriceChange, decimal profitQuantity, decimal lossPriceChange, decimal lossQuantity) : base(name, symbol, owner)
+            decimal profitPriceChange, decimal profitInitialQuantity, decimal profitQuantityStep, decimal profitStepMultiplier, decimal lossPriceChange, decimal lossInitialQuantity, decimal lossQuantityStep, decimal lossStepMultiplier) : base(name, symbol, owner)
         {
             ProfitPriceChange = profitPriceChange;
-            ProfitQuantity = profitQuantity;
+            ProfitInitialQuantity = profitInitialQuantity;
+            ProfitQuantityStep = profitQuantityStep;
+            ProfitQuantityStepMultiplier = profitStepMultiplier;
+
             LossPriceChange =lossPriceChange;
-            LossQuantity = lossQuantity;
+            LossInitialQuantity = lossInitialQuantity;
+            LossQuantityStep = lossQuantityStep;
+            LossQuantityStepMultiplier = lossStepMultiplier;
+
+
             UsedProfitPriceChange = profitPriceChange;
             UsedLossPriceChange = lossPriceChange;
-            UsedLossQuantity = lossQuantity;
-            UsedProfitQuantity = profitQuantity;
+            
             CompletedOrder = 0;
             CompletedQuantity = 0;
         }
@@ -71,8 +80,6 @@ namespace Kalitte.Trading
         {
             UsedProfitPriceChange = ProfitPriceChange;
             UsedLossPriceChange = LossPriceChange;       
-            UsedProfitQuantity = ProfitQuantity;
-            UsedLossQuantity = LossQuantity;
             CompletedOrder = 0;
             CompletedQuantity = 0;
         }
@@ -80,7 +87,7 @@ namespace Kalitte.Trading
         public void AdjustChanges(decimal quantity, decimal price, ProfitOrLoss p)
         {
             AdjustPriceChange(price, p);
-            AdjustQuantity(quantity, p);
+            //AdjustQuantity(quantity, p);
         }
 
         public void AdjustPriceChange(decimal increment, ProfitOrLoss p)
@@ -89,11 +96,12 @@ namespace Kalitte.Trading
             UsedLossPriceChange += ( p == ProfitOrLoss.Loss ? increment:0);
         }
 
-        public void AdjustQuantity(decimal increment, ProfitOrLoss p)
-        {
-            UsedProfitQuantity += (p == ProfitOrLoss.Profit ? increment : 0);
-            UsedLossQuantity += (p == ProfitOrLoss.Loss ? increment : 0);
-        }
+        //public void AdjustQuantity(decimal increment, ProfitOrLoss p)
+        //{
+            
+        //    UsedProfitQuantity += (p == ProfitOrLoss.Profit ? increment : 0);
+        //    UsedLossQuantity += (p == ProfitOrLoss.Loss ? increment : 0);
+        //}
 
         
 
@@ -101,13 +109,12 @@ namespace Kalitte.Trading
         {
             CompletedOrder += orderInc;
             CompletedQuantity += quantityInc;
-            //Interlocked.Increment(ref CompletedOrder);
         }
 
 
         public override string ToString()
         {
-            return $"{base.ToString()}: profit:{ProfitQuantity}/{ProfitPriceChange} loss: {LossQuantity}/{LossPriceChange}.";
+            return $"{base.ToString()}: profit:{ProfitInitialQuantity}/{ProfitPriceChange} loss: {LossInitialQuantity}/{LossPriceChange}.";
         }
 
         protected override void ResetInternal()
@@ -125,44 +132,42 @@ namespace Kalitte.Trading
             
             var portfolio = Algo.UserPortfolioList.GetPortfolio(this.Symbol);
             var direction = ProfitOrLoss.Profit;
-            var quantity = 0M;
+            var quantity = 0M; // Profit =  * this ;
 
             if (!portfolio.IsEmpty)
             {
                 price = Algo.GetMarketPrice(Symbol, t);                   
                 avgCost = portfolio.AvgCost;
-                pl = price - avgCost;
-                
-               
+                pl = price - avgCost;                               
 
                 if (price == 0 || avgCost == 0)
                 {
                     //Log($"ProfitLoss/Portfolio Cost price is zero: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Verbose, t);
                 }
-                else if (UsedProfitQuantity > 0 && portfolio.Side == BuySell.Buy && pl >= this.UsedProfitPriceChange)
-                {
-                    Log($"profit: {UsedProfitQuantity} {UsedProfitPriceChange}", LogLevel.Debug);
+                else if (ProfitInitialQuantity > 0 && portfolio.Side == BuySell.Buy && pl >= this.UsedProfitPriceChange)
+                {                    
                     direction = ProfitOrLoss.Profit;
                     result = BuySell.Sell;
-                    quantity = UsedProfitQuantity;
+                    quantity = this.CompletedOrder == 0 ? ProfitInitialQuantity : this.ProfitQuantityStep + (this.CompletedOrder-1) * ProfitQuantityStepMultiplier;
                 }
-                else if (UsedProfitQuantity > 0 && portfolio.Side == BuySell.Sell && -pl >= this.UsedProfitPriceChange)
+                else if (ProfitInitialQuantity > 0 && portfolio.Side == BuySell.Sell && -pl >= this.UsedProfitPriceChange)
                 {
                     direction = ProfitOrLoss.Profit;
                     result = BuySell.Buy;
-                    quantity = UsedProfitQuantity;
+                    quantity = this.CompletedOrder == 0 ? ProfitInitialQuantity : this.ProfitQuantityStep + (this.CompletedOrder - 1) * ProfitQuantityStepMultiplier;
                 }
-                else if (UsedLossQuantity > 0 && portfolio.Side == BuySell.Buy && pl <= -this.UsedLossPriceChange)
+                else if (LossInitialQuantity > 0 && portfolio.Side == BuySell.Buy && pl <= -this.UsedLossPriceChange)
                 {
                     direction = ProfitOrLoss.Loss;
                     result = BuySell.Sell;
-                    quantity = UsedLossQuantity;
+                    quantity = this.CompletedOrder == 0 ? LossInitialQuantity : this.LossQuantityStep + (this.CompletedOrder - 1) * LossQuantityStepMultiplier;
+
                 }
-                else if (UsedLossQuantity > 0 && portfolio.Side == BuySell.Sell && pl >= this.UsedLossPriceChange)
+                else if (LossInitialQuantity > 0 && portfolio.Side == BuySell.Sell && pl >= this.UsedLossPriceChange)
                 {
                     direction = ProfitOrLoss.Loss;
                     result = BuySell.Buy;
-                    quantity = UsedLossQuantity;
+                    quantity = this.CompletedOrder == 0 ? LossInitialQuantity : this.LossQuantityStep + (this.CompletedOrder - 1) * LossQuantityStepMultiplier;
 
                 }
                 //else Algo.Log($"No cation takeprofit: PL: {pl}, price: {price}, cost: {portfolio.AvgCost}", LogLevel.Debug);

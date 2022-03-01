@@ -576,7 +576,7 @@ namespace Kalitte.Trading.Algos
         public virtual void InitCompleted()
         {
             ConfigureMonitor();
-            if (!Simulation) this.Monitor.Start();
+            this.Monitor.Start();
             //CreatePerformanceCounters();
             if (!Simulation)
             {
@@ -633,7 +633,7 @@ namespace Kalitte.Trading.Algos
                 seansTimer.Dispose();
             }
             StopSignals();
-            if (!Simulation) this.Monitor.Stop();            
+            this.Monitor.Stop();            
 
             Log($"Completed {this}", LogLevel.FinalResult);
             if (TestStart.HasValue)

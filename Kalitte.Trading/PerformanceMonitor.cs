@@ -17,8 +17,8 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            var oldVal = OldValue.HasValue ? OldValue.Value.ToString("0.00") : "null";
-            return $"{Name} [{oldVal}->{CurrentValue.ToString("0.00")}]";
+            var oldVal = OldValue.HasValue ? OldValue.Value.ToString("0.000000") : "null";
+            return $"{Name} [{oldVal}->{CurrentValue.ToString("0.0000")}]";
         }
     }
 
@@ -121,7 +121,9 @@ namespace Kalitte.Trading
                     {                        
                         if (newValue != oldVal)
                         {
-                            change = oldVal.Value > 0 ? 100M * (newValue - oldVal.Value) / oldVal.Value : 100;
+                            
+                            var r = oldVal.Value != 0 ? ((newValue - oldVal.Value) / oldVal.Value) : 1;
+                            change = 100M * r;
                             var f = Filters.Where(p => item.Value.Name.StartsWith(p.Filter)).FirstOrDefault();
                             var raise = f != null && Math.Abs(change) > f.ChangePercent; ;
                             if (raise)

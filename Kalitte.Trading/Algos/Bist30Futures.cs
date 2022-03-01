@@ -308,14 +308,15 @@ namespace Kalitte.Trading.Algos
                 this.Monitor.AddFilter($"{powerSignal.Name}/volume", 10);
                 this.Monitor.AddFilter($"{powerSignal.Name}/VolumePerSecond", 10);
             }
-            //if (rsiTrendSignal != null)
-            //{
-            //    this.Monitor.AddFilter($"{rsiTrendSignal.Name}/value", 25);
-            //}
-            //if (priceTrend != null)
-            //{
-            //    this.Monitor.AddFilter($"{priceTrend.Name}/value", 0.5M);
-            //}
+            if (rsiTrendSignal != null)
+            {
+                this.Monitor.AddFilter($"{rsiTrendSignal.Name}/value", 10);
+                this.Monitor.AddFilter($"{rsiTrendSignal.Name}/speed", 10);
+            }
+            if (priceTrend != null)
+            {
+                this.Monitor.AddFilter($"{priceTrend.Name}/value", 0.5M);
+            }
             base.ConfigureMonitor();
         }
 

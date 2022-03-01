@@ -62,7 +62,7 @@ namespace Kalitte.Trading
                 if (Reference == null) return null;
                 var seconds = (this.Date - this.Reference.Date).TotalSeconds;
                 if (seconds == 0) return null;
-                return ((this.NewValue - this.Reference.NewValue) / (decimal)seconds);
+                return (Math.Abs(this.NewValue - this.Reference.NewValue) / (decimal)seconds);
             }
         }
 
@@ -132,6 +132,7 @@ namespace Kalitte.Trading
             i1k.InputBars.ListEvent += base.InputbarsChanged;
             generateDerivs();
             MonitorInit("value", 0);
+            MonitorInit("speed", 0);
             base.Init();
         }
 
@@ -223,7 +224,7 @@ namespace Kalitte.Trading
             if (CollectList.Ready && mp >= 0)
             {
                 decimal mpAverage = CollectList.LastValue; 
-                CollectList.Clear();
+                //CollectList.Clear();
 
                 var l1 = i1k.NextValue(mpAverage);
 
@@ -243,6 +244,8 @@ namespace Kalitte.Trading
                     result.Trend.Date = t ?? DateTime.Now;
 
                     Monitor("value", result.Trend.NewValue);
+                    var speed = result.Trend.SpeedPerSecond;
+                    if (speed.HasValue) Monitor("speed", speed.Value);
 
                     var checkedLimits = !Min.HasValue && !Max.HasValue;
 

@@ -47,7 +47,7 @@ public class Program
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("OrderQuantity", 8);
+        alternates.Set("OrderQuantity", 6);
         alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
@@ -69,6 +69,8 @@ public class Program
         alternates.Set("LossStart", 12);
         alternates.Set("LossPriceStep", 4);
 
+
+        // rsi profit
         alternates.Set("RsiProfitInitialQuantity", 3);
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitQuantityStep", 1);
@@ -76,20 +78,14 @@ public class Program
         alternates.Set("RsiProfitStart", 10.0);
         alternates.Set("RsiProfitPriceStep", 3.0);
 
-
-        
-        
-
-
         // rsi
         alternates.Set("RsiHighLimit", 60);
         alternates.Set("RsiLowLimit", 40);
         alternates.Set("Rsi", 14);        
-        alternates.Set("RsiTrendSensitivity", 1.5M);
-        alternates.Set("RsiTrendThreshold", 1M);
+        alternates.Set("RsiTrendSensitivity", 2M);
+        alternates.Set("RsiTrendThreshold", 0M);
 
         // price
-
         alternates.Set("PriceTrendSensitivity", 2.5M);
 
 

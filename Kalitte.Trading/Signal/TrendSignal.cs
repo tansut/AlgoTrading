@@ -55,6 +55,17 @@ namespace Kalitte.Trading
             }
         }
 
+        public decimal? SpeedPerSecond
+        {
+            get
+            {
+                if (Reference == null) return null;
+                var seconds = (this.Date - this.Reference.Date).TotalSeconds;
+                if (seconds == 0) return null;
+                return ((this.NewValue - this.Reference.NewValue) / (decimal)seconds);
+            }
+        }
+
         public TrendResult()
         {
             Direction = TrendDirection.None;
@@ -228,7 +239,7 @@ namespace Kalitte.Trading
                         lastReference = lastValue.Value;
                     }
 
-                    result.Trend = getTrendDirection(lastReference, currentVal, this.ReferenceType == TrendReference.LastCheck ? null:  BarTrendResults.LastOrDefault());
+                    result.Trend =  getTrendDirection(lastReference, currentVal, this.ReferenceType == TrendReference.LastCheck ? null:  BarTrendResults.LastOrDefault());
                     result.Trend.Date = t ?? DateTime.Now;
 
                     Monitor("value", result.Trend.NewValue);

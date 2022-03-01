@@ -15,17 +15,17 @@ namespace Kalitte.Trading
             BuySell? bs = null;
             var pl = marketPrice - portfolio.AvgCost;            
 
-            if (InitialQuantity > 0 && portfolio.Side == BuySell.Buy && pl >= this.UsedPriceChange)
+            if (InitialQuantity > 0 && portfolio.IsLong && pl >= this.UsedPriceChange)
             {
                 bs = BuySell.Sell;
             }
-            else if (InitialQuantity > 0 && portfolio.Side == BuySell.Sell && -pl >= this.UsedPriceChange)
+            else if (InitialQuantity > 0 && portfolio.IsShort && -pl >= this.UsedPriceChange)
             {
                 bs = BuySell.Buy;
             }
             else return null;
 
-            var result = new ProfitLossResult(this, SystemTime.Now);
+            var result = new ProfitLossResult(this, Algo.Now);
             result.finalResult = bs;
             result.Quantity = quantity;
             result.MarketPrice = marketPrice;
@@ -34,7 +34,7 @@ namespace Kalitte.Trading
             return result;
         }
 
-        public ProfitSignal(string name, string symbol, AlgoBase owner, decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier) : base(name, symbol, owner, priceChange, initialQuantity, quantityStep, stepMultiplier)
+        public ProfitSignal(string name, string symbol, AlgoBase owner, decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep) : base(name, symbol, owner, priceChange, initialQuantity, quantityStep, stepMultiplier,  priceStep)
         {
 
         }

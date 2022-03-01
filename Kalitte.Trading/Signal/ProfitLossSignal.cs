@@ -47,6 +47,7 @@ namespace Kalitte.Trading
         public decimal QuantityStepMultiplier { get; set; }
 
         public decimal QuantityStep { get; set; }
+        public decimal PriceStep { get; set; }
         public decimal PriceChange { get; set; }
         public decimal InitialQuantity { get; set; }
 
@@ -54,13 +55,14 @@ namespace Kalitte.Trading
         public decimal CompletedQuantity = 0;
 
         public ProfitLossSignal(string name, string symbol, AlgoBase owner,
-            decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier) : base(name, symbol, owner)
+            decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep) : base(name, symbol, owner)
         {
             PriceChange = priceChange;
             InitialQuantity = initialQuantity;
             QuantityStep = quantityStep;
             QuantityStepMultiplier = stepMultiplier;
             UsedPriceChange = priceChange;
+            PriceStep = priceStep;
             CompletedOrder = 0;
             CompletedQuantity = 0;
         }
@@ -72,9 +74,9 @@ namespace Kalitte.Trading
             CompletedQuantity = 0;
         }
 
-        public void AdjustParams(decimal priceDelta)
+        public void IncrementParams()
         {
-            UsedPriceChange += priceDelta;            
+            UsedPriceChange += PriceStep;
         }
 
 
@@ -97,6 +99,10 @@ namespace Kalitte.Trading
             ResetChanges();
         }
 
+        public virtual decimal GetQuantity()
+        {
+            return this.CompletedOrder == 0 ? InitialQuantity : this.QuantityStep + (this.CompletedOrder) * QuantityStepMultiplier;
+        }
 
         protected abstract ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity);
 

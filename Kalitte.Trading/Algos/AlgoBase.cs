@@ -89,6 +89,10 @@ namespace Kalitte.Trading.Algos
         public string SimulationFile { get; set; } = "";
         public string [] SimulationFileFields { get; set; } = new string [] {};
 
+        private DateTime? time { get; set; } = null;
+
+
+
         [AlgoParam(LogLevel.Verbose)]
         public LogLevel LoggingLevel { get; set; }
 
@@ -124,8 +128,7 @@ namespace Kalitte.Trading.Algos
 
         public StringBuilder LogContent { get; set; } = new StringBuilder(1000);
 
-
-        protected DateTime? TimeSet = null;
+        
 
         public PortfolioList UserPortfolioList = new PortfolioList();
         public decimal simulationPriceDif = 0;
@@ -138,6 +141,18 @@ namespace Kalitte.Trading.Algos
         private DelayedOrder delayedOrder = null;
         System.Timers.Timer seansTimer;
 
+        internal DateTime SetTime(DateTime t)
+        {
+            return (DateTime)(time = t);
+        }
+
+        public DateTime Now
+        {
+            get
+            {
+                return time ?? DateTime.Now;
+            }
+        }
 
         public PerformanceMonitor Monitor = new PerformanceMonitor();
 
@@ -169,7 +184,7 @@ namespace Kalitte.Trading.Algos
         {
             if (this.delayedOrder != null)
             {
-                var dif = SystemTime.Now - delayedOrder.scheduled2;
+                var dif = Now - delayedOrder.scheduled2;
                 if (dif.Seconds >= 0)
                 {
                     Log($"Simulation completed at {t}  for {delayedOrder.order.Id}", LogLevel.Debug);
@@ -302,7 +317,7 @@ namespace Kalitte.Trading.Algos
 
         public bool IsMorningStart(DateTime? t = null)
         {
-            var time = t ?? SystemTime.Now;
+            var time = t ?? Now;
             return time.Hour == 9 && time.Minute == 30;
         }
 
@@ -673,7 +688,7 @@ namespace Kalitte.Trading.Algos
 
         public virtual void ClosePositions(string symbol, DateTime? t = null)
         {
-            var time = t ?? SystemTime.Now;
+            var time = t ?? Now;
             foreach (var item in UserPortfolioList)
             {
                 if (!item.Value.IsEmpty)
@@ -721,9 +736,9 @@ namespace Kalitte.Trading.Algos
             {
                 if (this.Simulation && !disableDelay)
                 {
-                    var algoTime = SystemTime.Now;
+                    var algoTime = Now;
                     //this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = AlgoTime.AddSeconds(0.5 + new RandomGenerator().NextDouble() * 2) };
-                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = SystemTime.Now.AddSeconds(2) };
+                    this.delayedOrder = new DelayedOrder() { created = algoTime, order = positionRequest, scheduled2 = Now.AddSeconds(2) };
                     Log($"Simulating real environment for {delayedOrder.order.Id} time is: {delayedOrder.created}, schedule to: {delayedOrder.scheduled2}", LogLevel.Debug);
                 }
                 else FillCurrentOrder(positionRequest.UnitPrice, positionRequest.Quantity);
@@ -780,7 +795,7 @@ namespace Kalitte.Trading.Algos
         {
             if ((int)level >= (int)this.LoggingLevel)
             {
-                var time = t ?? SystemTime.Now;
+                var time = t ?? Now;
                 string opTime = time.ToString("yyyy.MM.dd HH:mm:sss");
                 var content = $"[{level}:{opTime}]: {text}";
                 if (Simulation) LogContent.AppendLine(content);

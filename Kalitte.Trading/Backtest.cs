@@ -1,4 +1,5 @@
 ﻿using Kalitte.Trading.Algos;
+using Kalitte.Trading.Algos;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
@@ -101,8 +102,8 @@ namespace Kalitte.Trading
                     //if (p < Algo.TestStart) continue;
                     //if (p > Algo.TestFinish) break;
 
-                    SystemTime.Set(p);
-                    var time = SystemTime.Now;
+                    Algo.SetTime(p);
+                    var time = Algo.Now;
                     var tasks = new List<Task<SignalResult>>();
 
                     foreach (var signal in Algo.Signals)
@@ -192,7 +193,7 @@ namespace Kalitte.Trading
 
             var prevDayLastBar = new DateTime(Algo.TestStart.Value.Year, Algo.TestStart.Value.Month, Algo.TestStart.Value.Day).AddDays(-1).AddHours(22).AddMinutes(50);
             Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod, prevDayLastBar);
-            Algo.InitMySignals(SystemTime.Now);
+            Algo.InitMySignals(Algo.Now);
             Algo.InitCompleted();
             createParameters();
 
@@ -202,13 +203,13 @@ namespace Kalitte.Trading
                 if (currentDay.DayOfWeek == DayOfWeek.Saturday || currentDay.DayOfWeek == DayOfWeek.Sunday) continue;
                 if (currentDay > DateTime.Now) break;
                 var periods = this.GetDates(currentDay, Algo.TestStart.Value, Algo.TestFinish.Value);
-                SystemTime.Set(periods.Item1.Item1);
+
                 Run(periods.Item1.Item1, periods.Item1.Item2);
                 Run(periods.Item2.Item1, periods.Item2.Item2);
                 if (Algo.ClosePositionsDaily) Algo.ClosePositions(Algo.Symbol);
                 Algo.Signals.ForEach(p => p.Reset());
             }
-            if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, SystemTime.Now);
+            if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, Algo.Now);
             Algo.Stop();
         }
     }
@@ -255,6 +256,11 @@ namespace Kalitte.Trading
             return test;
         }
 
+        public void clearAlternates()
+        {
+
+        }
+
         public void Start( )
         {
             var alternates = Settings.Alternates;
@@ -278,11 +284,11 @@ namespace Kalitte.Trading
             var headers = CreateHeaders(this.FileName);
             Console.WriteLine($"Running tests to file {this.FileName}");
             var completed = 0;
-            Backtest related = run(cases[0], ++completed, cases.Count, headers);            
-            Parallel.For(1, cases.Count, i =>
+            //Backtest related = run(cases[0], ++completed, cases.Count, headers);            
+            Parallel.For(0, cases.Count, i =>
             {
                 var initValues = cases[i];
-                related = run(initValues, ++completed, cases.Count, headers, related);    
+                run(initValues, ++completed, cases.Count, headers);    
             });
             Console.WriteLine(" ** COMPLETED ** Hit to close ...");
             //Console.ReadKey();

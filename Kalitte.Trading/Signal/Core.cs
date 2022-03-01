@@ -136,7 +136,7 @@ namespace Kalitte.Trading
         public void Log(string message, LogLevel level, DateTime? t = null)
         {
             var th = Algo.Simulation ? "x" : Thread.CurrentThread.ManagedThreadId.ToString();
-            Algo.Log($"{this.Name}[{th}]: {message}", level, t ?? SystemTime.Now);
+            Algo.Log($"{this.Name}[{th}]: {message}", level, t ?? Algo.Now);
         }
 
         protected virtual void onTick(Object source, ElapsedEventArgs e)

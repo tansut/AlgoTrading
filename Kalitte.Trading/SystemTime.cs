@@ -12,7 +12,7 @@ namespace Kalitte.Trading
         private static SystemTime Instance { get; set; }
         private DateTime? Time { get; set; } = null;
 
-        internal static DateTime Set(DateTime t)
+        internal static DateTime Set2(DateTime t)
         {
             return (DateTime)(Instance.Time = t);
         }
@@ -27,7 +27,7 @@ namespace Kalitte.Trading
             Instance = new SystemTime();
         }
 
-        public static DateTime Now
+        public static DateTime Now2
         {
             get
             {

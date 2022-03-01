@@ -39,8 +39,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 3, 1);
+        settings.Start = new DateTime(2022, 3, 01);
+        settings.Finish = new DateTime(2022, 3, 01);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -61,27 +61,35 @@ public class Program
         alternates.Set("ProfitQuantityStepMultiplier", 0);
 
         alternates.Set("ProfitStart", 10.0);        
-        alternates.Set("ProfitIncrement", 3.0);        
+        alternates.Set("ProfitPriceStep", 3.0);        
 
         alternates.Set("LossInitialQuantity", 0);
         alternates.Set("LossKeepQuantity", 1);
         alternates.Set("LossQuantityStep", 1);
-        alternates.Set("LossQuantityStepMultiplier", 2);
+        alternates.Set("LossQuantityStepMultiplier", 2);        
         
-        
-        alternates.Set("LossStart", 12);        
-        alternates.Set("LossIncrement", 6);        
+        alternates.Set("LossStart", 4);        
+        alternates.Set("LossPriceStep", 12);
 
-        alternates.Set("RsiProfitQuantity", 0);
-        alternates.Set("RsiProfitPuan", 16);
+        alternates.Set("RsiProfitInitialQuantity", 1);
+        alternates.Set("RsiProfitKeepQuantity", 1);
+        alternates.Set("RsiProfitQuantityStep", 1);
+        alternates.Set("RsiProfitQuantityStepMultiplier", 0);
+
+        alternates.Set("RsiProfitStart", 10.0);
+        alternates.Set("RsiProfitPriceStep", 3.0);
+
+
+        
+        
 
 
         // rsi
-        alternates.Set("RsiHighLimit", 0);
-        alternates.Set("RsiLowLimit", 0);
+        alternates.Set("RsiHighLimit", 60);
+        alternates.Set("RsiLowLimit", 40);
         alternates.Set("Rsi", 14);        
         alternates.Set("RsiTrendSensitivity", 1.5M);
-        alternates.Set("RsiTrendThreshold", 2M);
+        alternates.Set("RsiTrendThreshold", 1M);
 
         // price
 
@@ -149,8 +157,14 @@ public class Program
             }
 
         }
+        clearAlternates(settings.Alternates);
         var optimize = new Optimizer<Bist30Futures>(settings, typeof(Bist30Futures));
         optimize.Start();
+    }
+
+    public static void clearAlternates(AlternateValues values)
+    {
+        
     }
 
 }

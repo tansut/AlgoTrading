@@ -55,19 +55,18 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 1.0);
-        alternates.Set("ProfitKeepQuantity", 0.0);
-        alternates.Set("ProfitQuantityStep", 1);
+        alternates.Set("ProfitInitialQuantity", 1);
+        alternates.Set("ProfitKeepQuantity", 1);
+        alternates.Set("ProfitQuantityStep", 2);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
 
-        alternates.Set("ProfitStart", 1.0);        
-        alternates.Set("ProfitIncrement", 2.0);
-        
+        alternates.Set("ProfitStart", 9.0);        
+        alternates.Set("ProfitIncrement", 3.0);
         
 
         alternates.Set("LossInitialQuantity", 0);
-        alternates.Set("LossKeepQuantity", 2);
-        alternates.Set("LossQuantityStep", 0);
+        alternates.Set("LossKeepQuantity", 0);
+        alternates.Set("LossQuantityStep", 1);
         alternates.Set("LossQuantityStepMultiplier", 0);
         
         

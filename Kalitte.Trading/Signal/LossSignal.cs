@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
-    internal class LossSignal : ProfitLossSignalBase
+    internal class LossSignal : ProfitLossSignal
     {
         protected override ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice)
         {

@@ -41,7 +41,7 @@ namespace Kalitte.Trading
     }
 
 
-    public abstract class ProfitLossSignalBase : Signal
+    public abstract class ProfitLossSignal : Signal
     {
         public decimal UsedPriceChange { get; set; }
         public decimal QuantityStepMultiplier { get; set; }
@@ -53,7 +53,7 @@ namespace Kalitte.Trading
         public int CompletedOrder = 0;
         public decimal CompletedQuantity = 0;
 
-        public ProfitLossSignalBase(string name, string symbol, AlgoBase owner,
+        public ProfitLossSignal(string name, string symbol, AlgoBase owner,
             decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier) : base(name, symbol, owner)
         {
             PriceChange = priceChange;
@@ -82,7 +82,6 @@ namespace Kalitte.Trading
         {
             UsedPriceChange += (p == ProfitOrLoss.Profit ? increment : 0);
         }
-
 
 
         public void IncrementSignal(int orderInc, decimal quantityInc)

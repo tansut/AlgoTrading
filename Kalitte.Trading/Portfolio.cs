@@ -164,8 +164,11 @@ namespace Kalitte.Trading
 
         public PortfolioItem GetPortfolio(string symbol)
         {
-            if (!this.ContainsKey(symbol)) this.Add(symbol, new PortfolioItem(symbol));
-            return this[symbol];
+            lock(this)
+            {
+                if (!this.ContainsKey(symbol)) this.Add(symbol, new PortfolioItem(symbol));
+                return this[symbol];
+            }
         }
 
         public PortfolioList()

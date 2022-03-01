@@ -219,9 +219,9 @@ namespace Kalitte.Trading.Algos
 
             this.powerSignal = new PowerSignal("power", Symbol, this);
 
-            //this.Signals.Add(this.priceTrend);
-            //this.Signals.Add(this.atrTrend);
-            //this.Signals.Add(this.powerSignal);
+            this.Signals.Add(this.priceTrend);
+            this.Signals.Add(this.atrTrend);
+            this.Signals.Add(this.powerSignal);
 
 
             if (MovPeriod > 0 && !SimulateOrderSignal)
@@ -238,17 +238,10 @@ namespace Kalitte.Trading.Algos
 
             if (SimulateOrderSignal) this.Signals.Add(new FlipFlopSignal("flipflop", Symbol, this, BuySell.Buy));
 
-            //if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0 || this.LossInitialQuantity > 0))
-            //{
-            //    this.takeProfitSignal = new TakeProfitOrLossSignal("profitOrLoss", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, this.LossStart, this.LossInitialQuantity, this.LossQuantityStep, this.LossQuantityStepMultiplier);
-            //    this.takeProfitSignal.ProfitSlice = this.ProfitSlice;
-            //    this.Signals.Add(takeProfitSignal);
-            //}
 
             if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0))
             {
-                this.profitSignal = new ProfitSignal("profit", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier);
-                //this.takeProfitSignal.ProfitSlice = this.ProfitSlice;
+                this.profitSignal = new ProfitSignal("profit", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier);                
                 this.Signals.Add(profitSignal);
             }
 
@@ -318,7 +311,7 @@ namespace Kalitte.Trading.Algos
 
 
 
-        private void HandleProfitLossSignal(ProfitLossSignalBase signal, ProfitLossResult result)
+        private void HandleProfitLossSignal(ProfitLossSignal signal, ProfitLossResult result)
         {
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
 
@@ -503,9 +496,9 @@ namespace Kalitte.Trading.Algos
             try
             {
                 //Log($"Processing signal as {result.finalResult} from {result.Signal.Name}", LogLevel.Debug);
-                if (result.Signal is ProfitLossSignalBase)
+                if (result.Signal is ProfitLossSignal)
                 {
-                    var tpSignal = (ProfitLossSignalBase)(result.Signal);
+                    var tpSignal = (ProfitLossSignal)(result.Signal);
                     var signalResult = (ProfitLossResult)result;
                     HandleProfitLossSignal(tpSignal, signalResult);
                 }
@@ -570,7 +563,7 @@ namespace Kalitte.Trading.Algos
             var cross = this.positionRequest.SignalResult as CrossSignalResult;
             if (tp != null)
             {
-                var tps = ((ProfitLossSignalBase)tp.Signal);
+                var tps = ((ProfitLossSignal)tp.Signal);
                 tps.IncrementSignal(1, positionRequest.Quantity);
                 if (tp.Direction == ProfitOrLoss.Profit)
                     tps.AdjustChanges(0, ProfitIncrement, ProfitOrLoss.Profit);
@@ -578,7 +571,7 @@ namespace Kalitte.Trading.Algos
             }
             if (cross != null)
             {
-                Signals.Where(p => p is ProfitLossSignalBase).Select(p => (ProfitLossSignalBase)p).ToList().ForEach(p => p.ResetChanges());
+                Signals.Where(p => p is ProfitLossSignal).Select(p => (ProfitLossSignal)p).ToList().ForEach(p => p.ResetChanges());
             }
             base.FillCurrentOrder(filledUnitPrice, filledQuantity);
         }

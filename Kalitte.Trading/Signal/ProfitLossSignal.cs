@@ -72,16 +72,12 @@ namespace Kalitte.Trading
             CompletedQuantity = 0;
         }
 
-        public void AdjustChanges(decimal quantity, decimal price, ProfitOrLoss p)
+        public void AdjustParams(decimal priceDelta)
         {
-            AdjustPriceChange(price, p);
-            UsedPriceChange += (p == ProfitOrLoss.Profit ? price : 0);
+            UsedPriceChange += priceDelta;            
         }
 
-        public void AdjustPriceChange(decimal increment, ProfitOrLoss p)
-        {
-            UsedPriceChange += (p == ProfitOrLoss.Profit ? increment : 0);
-        }
+
 
 
         public void IncrementSignal(int orderInc, decimal quantityInc)
@@ -102,7 +98,7 @@ namespace Kalitte.Trading
         }
 
 
-        protected abstract ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice);
+        protected abstract ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity);
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
@@ -117,7 +113,8 @@ namespace Kalitte.Trading
                 }
                 else
                 {
-                    return this.getResult(portfolio, price);
+                    var quantity = this.CompletedOrder == 0 ? InitialQuantity : this.QuantityStep + (this.CompletedOrder) * QuantityStepMultiplier;
+                    return this.getResult(portfolio, price, quantity);
                 }
             }
             else return null;

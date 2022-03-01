@@ -46,6 +46,7 @@ namespace Kalitte.Trading.Algos
         public DateTime created;
     }
 
+    [Serializable]
     public class SymbolData
     {
         public string Symbol { get; private set; }
@@ -68,7 +69,7 @@ namespace Kalitte.Trading.Algos
         }
     }
 
-    public abstract class AlgoBase
+    public abstract class AlgoBase: MarshalByRefObject
     {
 
         Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");

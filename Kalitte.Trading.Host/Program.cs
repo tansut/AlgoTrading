@@ -39,8 +39,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 02, 28);
-        settings.Finish = new DateTime(2022, 02, 28);
+        settings.Start = new DateTime(2022, 2, 28);
+        settings.Finish = new DateTime(2022, 3, 1);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -57,21 +57,20 @@ public class Program
         // profit && loss
         alternates.Set("ProfitInitialQuantity", 2);
         alternates.Set("ProfitKeepQuantity", 1);
-        alternates.Set("ProfitQuantityStep", 2);
+        alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
 
         alternates.Set("ProfitStart", 10.0);        
-        alternates.Set("ProfitIncrement", 2.0);
-        
+        alternates.Set("ProfitIncrement", 3.0);        
 
-        alternates.Set("LossInitialQuantity", 1);
-        alternates.Set("LossKeepQuantity", 0);
-        alternates.Set("LossQuantityStep", 2);
-        alternates.Set("LossQuantityStepMultiplier", 1);        
+        alternates.Set("LossInitialQuantity", 0);
+        alternates.Set("LossKeepQuantity", 1);
+        alternates.Set("LossQuantityStep", 1);
+        alternates.Set("LossQuantityStepMultiplier", 2);
         
-        alternates.Set("LossStart", 6);        
-        alternates.Set("LossIncrement", 2);
         
+        alternates.Set("LossStart", 12);        
+        alternates.Set("LossIncrement", 6);        
 
         alternates.Set("RsiProfitQuantity", 0);
         alternates.Set("RsiProfitPuan", 16);
@@ -92,9 +91,9 @@ public class Program
         // volume power
         alternates.Set("PowerLookback", 5);
 
-        // ma cross
-        alternates.Set("DynamicCross", true);
+        // ma cross        
         alternates.Set("MaAvgChange", 0.32M);
+        alternates.Set("DynamicCross", true);
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);
         alternates.Set("PowerCrossPositiveMultiplier", 2.8);

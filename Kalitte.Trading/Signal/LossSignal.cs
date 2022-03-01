@@ -1,4 +1,5 @@
-﻿using Kalitte.Trading.Algos;
+﻿// algo
+using Kalitte.Trading.Algos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace Kalitte.Trading
 {
     internal class LossSignal : ProfitLossSignal
     {
-        protected override ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice)
+        protected override ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
         {
             BuySell? bs = null;
             var pl = marketPrice - portfolio.AvgCost;
-            var quantity = this.CompletedOrder == 0 ? InitialQuantity : this.QuantityStep + (this.CompletedOrder - 1) * QuantityStepMultiplier;
+            //var quantity = this.CompletedOrder == 0 ? InitialQuantity : this.QuantityStep + (this.CompletedOrder - 1) * QuantityStepMultiplier;
 
             if (InitialQuantity > 0 && portfolio.Side == BuySell.Buy && pl <= -this.UsedPriceChange)
             {

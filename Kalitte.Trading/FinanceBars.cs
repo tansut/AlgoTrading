@@ -27,7 +27,7 @@ namespace Kalitte.Trading
         decimal? Value { get; set; }
     }
 
-
+    [Serializable]
     public class MyQuote : Quote, IValue
     {
         public decimal? Value { get => Close; set { Close = value.Value; } }
@@ -50,7 +50,7 @@ namespace Kalitte.Trading
         }
     }
 
-
+    [Serializable]
     public class FinanceList<T>
     {
         protected List<T> items;
@@ -334,7 +334,7 @@ namespace Kalitte.Trading
 
     }
 
-
+    [Serializable]
     public class FinanceBars : FinanceList<IQuote>
     {
         public string Symbol { get; private set; }

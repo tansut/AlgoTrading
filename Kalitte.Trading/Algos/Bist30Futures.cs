@@ -565,9 +565,7 @@ namespace Kalitte.Trading.Algos
             {
                 var tps = ((ProfitLossSignal)tp.Signal);
                 tps.IncrementSignal(1, positionRequest.Quantity);
-                if (tp.Direction == ProfitOrLoss.Profit)
-                    tps.AdjustChanges(0, ProfitIncrement, ProfitOrLoss.Profit);
-                else tps.AdjustChanges(0, LossIncrement, ProfitOrLoss.Loss);
+                tps.AdjustParams(tp.Direction == ProfitOrLoss.Profit ? ProfitIncrement: LossIncrement);
             }
             if (cross != null)
             {

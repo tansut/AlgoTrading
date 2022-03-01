@@ -15,7 +15,6 @@ namespace Kalitte.Trading
         internal static DateTime Set(DateTime t)
         {
             return (DateTime)(Instance.Time = t);
-
         }
 
         private SystemTime()

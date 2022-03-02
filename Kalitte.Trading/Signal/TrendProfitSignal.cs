@@ -25,7 +25,6 @@ namespace Kalitte.Trading
                 return result;
             }
             else return null;
-
         }
 
         public override decimal KeepQuantity { get
@@ -69,6 +68,7 @@ namespace Kalitte.Trading
                     result.MarketPrice = price;
                     result.PL = pl;
                     result.Direction = ProfitOrLoss.Profit;
+                    result.KeepQuantity = this.KeepQuantity;
                     return result;
                 }
             }

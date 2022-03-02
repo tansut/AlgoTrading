@@ -372,7 +372,7 @@ namespace Kalitte.Trading.Algos
             if (result.finalResult == BuySell.Buy && portfolio.IsLong) return;
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
-            decimal keep = result.KeepQuantity;
+            decimal keep = portfolio.IsLastOrderInstanceOf(typeof(TrendSignal)) ? 0: result.KeepQuantity;
             decimal quantity = result.Quantity;
             decimal remaining = portfolio.Quantity - quantity;
             quantity = Math.Min(portfolio.Quantity, remaining >= signal.KeepQuantity ? quantity : portfolio.Quantity - keep);
@@ -598,20 +598,21 @@ namespace Kalitte.Trading.Algos
 
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)
         {
-            //var incrementPosition = lastSignalResult == null ? false: (lastSignalResult is )
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
-            var lastPositionSignal = portfolio.LastPositionOrder;
-            var quantityCheck = lastPositionSignal != null && (lastPositionSignal.SignalResult.Signal as CrossSignal) == null ? CrossOrderQuantity : 0;
+            var keepPosition = portfolio.LastPositionOrder == null || portfolio.IsLastOrderInstanceOf(typeof(CrossSignal), typeof(ProfitSignal));
 
-            if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && portfolio.Quantity >= quantityCheck) return;
-            if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && portfolio.Quantity >= quantityCheck) return;
+            if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
+            if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-            var orderQuantity = portfolio.Quantity + CrossOrderQuantity;
+            var orderQuantity = 0M; 
 
-            if (portfolio.IsLong && signalResult.finalResult == BuySell.Buy)
-                orderQuantity = CrossOrderQuantity - portfolio.Quantity;
-            else if (portfolio.IsShort && signalResult.finalResult == BuySell.Sell)
-                orderQuantity = CrossOrderQuantity - portfolio.Quantity;
+            if (!keepPosition)
+            {
+                if (portfolio.IsLong && signalResult.finalResult == BuySell.Buy)
+                    orderQuantity = CrossOrderQuantity - portfolio.Quantity;
+                else if (portfolio.IsShort && signalResult.finalResult == BuySell.Sell)
+                    orderQuantity = CrossOrderQuantity - portfolio.Quantity;
+            } else orderQuantity = portfolio.Quantity + CrossOrderQuantity;
 
             if (orderQuantity > 0)
             {

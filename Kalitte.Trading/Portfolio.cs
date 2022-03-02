@@ -168,6 +168,18 @@ namespace Kalitte.Trading
             this.CompletedOrders.Add(position);
         }
 
+        
+        public bool IsLastOrderInstanceOf(params Type [] signalTypes)
+        {
+            var last = this.LastPositionOrder;
+            if (last == null) return false;
+            foreach (var type in signalTypes)
+            {
+                if (last.SignalResult.Signal.GetType().IsAssignableFrom(type)) return true;
+            }
+            return false;  
+        }
+
 
         public ExchangeOrder LastPositionOrder
         {

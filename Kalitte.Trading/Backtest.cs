@@ -1,5 +1,6 @@
 ﻿using Kalitte.Trading.Algos;
 using Kalitte.Trading.Algos;
+using Newtonsoft.Json;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,23 @@ namespace Kalitte.Trading
         public AlternateValues Alternates { get; set; }
         public bool AutoClosePositions { get; set; }
         public int SamplingPerc { get; set; } = 0;
+
+        public static OptimizerSettings LoadFromFile(string fileName)
+        {
+            var file = File.ReadAllText(fileName);
+            var obj = JsonConvert.DeserializeObject<OptimizerSettings>(file);
+            return obj;
+        }
+
+        public void SaveToFile(string fileName)
+        {
+            var json = JsonConvert.SerializeObject(this, new JsonSerializerSettings()
+            {
+                Formatting = Formatting.Indented
+
+            });
+            File.WriteAllText(fileName, json);
+        }
     }
 
     public class Backtest

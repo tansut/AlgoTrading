@@ -19,28 +19,12 @@ using System.Diagnostics;
 public class Program
 {
 
-    public static OptimizerSettings LoadFromFile(string fileName)
-    {
-        var file = File.ReadAllText(fileName);
-        var obj = JsonConvert.DeserializeObject<OptimizerSettings>(file);
-        return obj;
-    }
-
-    public static void SaveToFile(string fileName, OptimizerSettings values)
-    {
-        var json = JsonConvert.SerializeObject(values, new JsonSerializerSettings()
-        {
-            Formatting = Formatting.Indented
-
-        });
-        File.WriteAllText(fileName, json);
-    }
 
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 3, 1);
+        settings.Finish = new DateTime(2022, 2, 28);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -55,12 +39,12 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 2);
+        alternates.Set("ProfitInitialQuantity", 3);
         alternates.Set("ProfitKeepQuantity", 1);
         alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
         alternates.Set("ProfitStart", 10.0);        
-        alternates.Set("ProfitPriceStep", 2.0);
+        alternates.Set("ProfitPriceStep", 3.0);
 
         alternates.Set("LossInitialQuantity", 0);
         alternates.Set("LossKeepQuantity", 3);
@@ -71,12 +55,12 @@ public class Program
 
 
         // rsi profit
-        alternates.Set("RsiProfitInitialQuantity", 2);
+        alternates.Set("RsiProfitInitialQuantity", 3);
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitQuantityStep", 1);
         alternates.Set("RsiProfitQuantityStepMultiplier", 0);
         alternates.Set("RsiProfitStart", 10.0);
-        alternates.Set("RsiProfitPriceStep", 2.0);
+        alternates.Set("RsiProfitPriceStep", 3.0);
 
         // rsi
         alternates.Set("RsiHighLimit", 60);
@@ -102,16 +86,16 @@ public class Program
         // general
         alternates.Set("ClosePositionsDaily", false);
 
-        
+
         // System
-        alternates.Set("LoggingLevel", LogLevel.Warning);
+        alternates.Set("LoggingLevel", LogLevel.Debug);        
         alternates.Set("Symbol", "F_XU0300422");
         alternates.Set("LogConsole", true);
 
-        var file = $"c:\\kalitte\\Bist30Futures-test.json";
-        var val = JsonConvert.SerializeObject(alternates, Formatting.Indented);
-        File.WriteAllText(file, val);
-        SaveToFile("c:\\kalitte\\lastrun.json", settings);
+        alternates.SaveToFile($"c:\\kalitte\\Bist30Futures-test.json");
+        alternates.Set("LoggingLevel", LogLevel.Warning);
+
+        settings.SaveToFile("c:\\kalitte\\lastrun.json");
         return settings;
     }
 
@@ -126,7 +110,7 @@ public class Program
         }
         else if (args.Length == 1)
         {
-            settings = LoadFromFile(args[0]);
+            settings = OptimizerSettings.LoadFromFile(args[0]);
         }
         else if (args.Length == 2)
         {
@@ -135,12 +119,12 @@ public class Program
 
                 var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
                 settings.Alternates = settings.Alternates = new AlternateValues(initValues);
-                SaveToFile(args[0], settings);
+                settings.SaveToFile(args[0]);
                 return;
             }
             else if (args[1] == "backtest")
             {
-                settings = LoadFromFile(args[0]);
+                settings = OptimizerSettings.LoadFromFile(args[0]);
                 var firstValues = settings.Alternates.Lean();
                 settings.Alternates = new AlternateValues(firstValues);
             } else
@@ -150,14 +134,9 @@ public class Program
             }
 
         }
-        clearAlternates(settings.Alternates);
+        
         var optimize = new Optimizer<Bist30Futures>(settings, typeof(Bist30Futures));
         optimize.Start();
-    }
-
-    public static void clearAlternates(AlternateValues values)
-    {
-        
     }
 
 }

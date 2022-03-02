@@ -21,6 +21,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
 
 namespace Kalitte.Trading
 {
@@ -272,15 +273,11 @@ namespace Kalitte.Trading
             }
         }
 
-        //public void SaveToFile(string fileName)
-        //{
-            
-        //    XmlSerializer ser = new XmlSerializer(this.GetType());
-        //    TextWriter writer = new StreamWriter(fileName);
-        //    ser.Serialize(writer, this);
-        //    writer.Close();
-
-        //}
+        public void SaveToFile(string fileName)
+        {
+            var val = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(fileName, val);
+        }
 
         public Dictionary<string, object> Lean()
         {

@@ -253,7 +253,7 @@ namespace Kalitte.Trading.Algos
             this.Signals.Add(this.powerSignal);
 
 
-            if (MovPeriod > 0 && !SimulateOrderSignal)
+            if (MovPeriod > 0 && CrossOrderQuantity > 0 && !SimulateOrderSignal)
             {
                 this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MaAvgChange };
                 this.Signals.Add(maSignal);
@@ -292,9 +292,9 @@ namespace Kalitte.Trading.Algos
                     this.rsiProfitSignal = new TrendProfitSignal("rsi-profit", Symbol, this, rsiTrendSignal, RsiTrendThreshold, RsiProfitStart, RsiProfitInitialQuantity, RsiProfitQuantityStep, RsiProfitQuantityStepMultiplier, RsiProfitStep, RsiProfitKeepQuantity);
                     Signals.Add(rsiProfitSignal);
                 }
-                if (RsiTrendOrderQuantity > 0)
+                if (RsiTrendOrderQuantity > 0 && RsiLossStart > 0)
                 {
-                    trendStopLossSignal = new LossSignal("trend-loss", Symbol, this, RsiLossStart, 1, 1, 1, RsiLossStart/2 , 0);
+                    trendStopLossSignal = new LossSignal("trend-loss", Symbol, this, RsiLossStart, 1, 1, 1, RsiLossStart/3 , 0);
                     trendStopLossSignal.LimitingSignals.Add(typeof(TrendSignal));
                     this.Signals.Add(trendStopLossSignal);
                 }

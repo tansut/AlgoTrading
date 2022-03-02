@@ -44,7 +44,6 @@ namespace Kalitte.Trading
     {
         public virtual decimal UsedPriceChange { get; set; }
         public virtual decimal QuantityStepMultiplier { get; set; }
-
         public virtual decimal QuantityStep { get; set; }
         public virtual decimal PriceStep { get; set; }
         public virtual decimal PriceChange { get; set; }
@@ -52,6 +51,8 @@ namespace Kalitte.Trading
         public virtual decimal KeepQuantity { get; set; }
 
         public abstract ProfitOrLoss SignalType { get;  }
+
+        public List<Type> LimitingSignals { get; set; } = new List<Type>();
 
         public int CompletedOrder = 0;
         public decimal CompletedQuantity = 0;
@@ -107,10 +108,18 @@ namespace Kalitte.Trading
             return this.CompletedOrder == 0 ? InitialQuantity : this.QuantityStep + (this.CompletedOrder) * QuantityStepMultiplier;
         }
 
+
+
         protected virtual ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
         {
             BuySell? bs = null;
             var pl = marketPrice - portfolio.AvgCost;
+
+            if (this.LimitingSignals.Any())
+            {
+                var valid = portfolio.IsLastOrderInstanceOf(this.LimitingSignals.ToArray());
+                if (!valid) return null;
+            }
 
             if (this.SignalType == ProfitOrLoss.Profit)
             {

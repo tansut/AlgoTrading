@@ -268,6 +268,7 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0))
             {
                 this.profitSignal = new ProfitSignal("profit", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, ProfitPriceStep, ProfitKeepQuantity);
+                this.profitSignal.LimitingSignals.Add(typeof(CrossSignal));
                 this.Signals.Add(profitSignal);
             }
 
@@ -372,7 +373,7 @@ namespace Kalitte.Trading.Algos
             if (result.finalResult == BuySell.Buy && portfolio.IsLong) return;
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
-            decimal keep = portfolio.IsLastOrderInstanceOf(typeof(TrendSignal)) ? 0: result.KeepQuantity;
+            decimal keep = result.KeepQuantity; // portfolio.IsLastOrderInstanceOf(typeof(TrendSignal)) ? 0: result.KeepQuantity;
             decimal quantity = result.Quantity;
             decimal remaining = portfolio.Quantity - quantity;
             quantity = Math.Min(portfolio.Quantity, remaining >= signal.KeepQuantity ? quantity : portfolio.Quantity - keep);

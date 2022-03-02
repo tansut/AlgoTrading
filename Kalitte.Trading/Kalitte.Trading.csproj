@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>1.1.1.10</AssemblyVersion>
-    <FileVersion>1.1.1.10</FileVersion>
+    <AssemblyVersion>1.1.1.11</AssemblyVersion>
+    <FileVersion>1.1.1.11</FileVersion>
 	  <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 

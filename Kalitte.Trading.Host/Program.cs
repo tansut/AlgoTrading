@@ -24,14 +24,15 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 2, 28);
+        settings.Finish = new DateTime(2022, 3, 2);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("OrderQuantity", 6);
+        alternates.Set("CrossOrderQuantity", 6);
+        alternates.Set("RsiTrendOrderQuantity", 0);
         alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
@@ -47,11 +48,11 @@ public class Program
         alternates.Set("ProfitPriceStep", 3.0);
 
         alternates.Set("LossInitialQuantity", 0);
-        alternates.Set("LossKeepQuantity", 3);
+        alternates.Set("LossKeepQuantity", 0);
         alternates.Set("LossQuantityStep", 1);
-        alternates.Set("LossQuantityStepMultiplier", 2);                
-        alternates.Set("LossStart", 12);
-        alternates.Set("LossPriceStep", 4);
+        alternates.Set("LossQuantityStepMultiplier", 0);                
+        alternates.Set("LossStart", 16);
+        alternates.Set("LossPriceStep", 2);
 
 
         // rsi profit

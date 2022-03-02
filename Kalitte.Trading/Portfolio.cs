@@ -117,6 +117,14 @@ namespace Kalitte.Trading
 
         }
 
+        public List<ExchangeOrder> RequestedOrders { get; private set; } = new List<ExchangeOrder>();
+        public List<ExchangeOrder> CompletedOrders { get; private set; } = new List<ExchangeOrder>();
+        
+        public void AddRequestedOrder(ExchangeOrder o)
+        {
+            this.RequestedOrders.Add(o);
+        }
+
         public void OrderCompleted(ExchangeOrder position)
         {
             this.Commission += position.CommissionPaid;
@@ -157,6 +165,16 @@ namespace Kalitte.Trading
                     this.AvgCost = position.FilledUnitPrice;
                 }
             }
+            this.CompletedOrders.Add(position);
+        }
+
+
+        public ExchangeOrder LastPositionOrder
+        {
+            get
+            {
+                return this.CompletedOrders.LastOrDefault(p => (!(p.SignalResult.Signal is ProfitLossSignal)));
+            }
         }
     }
     public class PortfolioList : Dictionary<string, PortfolioItem>
@@ -175,6 +193,9 @@ namespace Kalitte.Trading
         {
 
         }
+
+
+
 
 
         public decimal PL
@@ -198,11 +219,11 @@ namespace Kalitte.Trading
 
 
 
-
         public PortfolioItem Add(ExchangeOrder position)
         {
             var portfolio = this.GetPortfolio(position.Symbol);
             portfolio.OrderCompleted(position);
+            //this.CompletedOrders.Add(position);
             return portfolio;
         }
 

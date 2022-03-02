@@ -13,12 +13,26 @@ namespace Kalitte.Trading
         public TrendSignal TrendSignal { get; set; }
         public decimal TrendThreshold { get; private set; }
 
+        public override ProfitOrLoss SignalType => ProfitOrLoss.Profit;
+
         protected override ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
         {
-            return null;
+            var lastIsMe = portfolio.LastPositionOrder != null & portfolio.LastPositionOrder.SignalResult.Signal == this.TrendSignal;
+            if (lastIsMe)
+            {
+                var result = base.getResult(portfolio, marketPrice, quantity);
+                if (result != null) result.KeepQuantity = 0;
+                return result;
+            }
+            else return null;
+
         }
 
-
+        public override decimal KeepQuantity { get
+            {
+                return base.KeepQuantity;
+            } 
+            set => base.KeepQuantity = value; }
 
         public ProfitLossResult HandleTrendSignal(TrendSignal signal, TrendSignalResult signalResult)
         {
@@ -67,7 +81,7 @@ namespace Kalitte.Trading
 
 
 
-        public TrendProfitSignal(string name, string symbol, AlgoBase owner, TrendSignal signal, decimal trendThreshold, decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep) : base(name, symbol, owner, priceChange, initialQuantity, quantityStep, stepMultiplier, priceStep)
+        public TrendProfitSignal(string name, string symbol, AlgoBase owner, TrendSignal signal, decimal trendThreshold, decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep, decimal keepQuantity) : base(name, symbol, owner, priceChange, initialQuantity, quantityStep, stepMultiplier, priceStep, keepQuantity)
         {
             this.TrendSignal = signal;
             TrendThreshold = trendThreshold;

@@ -13,7 +13,6 @@ using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
-
     public enum ProfitOrLoss
     {
         Loss,
@@ -27,6 +26,7 @@ namespace Kalitte.Trading
         public decimal PortfolioCost { get; set; }
         public ProfitOrLoss Direction { get; set; }
         public decimal Quantity { get; set; }
+        public decimal KeepQuantity { get; set; }
 
         public ProfitLossResult(Signal signal, DateTime t) : base(signal, t)
         {
@@ -37,25 +37,27 @@ namespace Kalitte.Trading
         {
             return this.SignalTime.GetHashCode();
         }
-
     }
 
 
     public abstract class ProfitLossSignal : Signal
     {
-        public decimal UsedPriceChange { get; set; }
-        public decimal QuantityStepMultiplier { get; set; }
+        public virtual decimal UsedPriceChange { get; set; }
+        public virtual decimal QuantityStepMultiplier { get; set; }
 
-        public decimal QuantityStep { get; set; }
-        public decimal PriceStep { get; set; }
-        public decimal PriceChange { get; set; }
-        public decimal InitialQuantity { get; set; }
+        public virtual decimal QuantityStep { get; set; }
+        public virtual decimal PriceStep { get; set; }
+        public virtual decimal PriceChange { get; set; }
+        public virtual decimal InitialQuantity { get; set; }
+        public virtual decimal KeepQuantity { get; set; }
+
+        public abstract ProfitOrLoss SignalType { get;  }
 
         public int CompletedOrder = 0;
         public decimal CompletedQuantity = 0;
 
         public ProfitLossSignal(string name, string symbol, AlgoBase owner,
-            decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep) : base(name, symbol, owner)
+            decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep, decimal keepQuantity) : base(name, symbol, owner)
         {
             PriceChange = priceChange;
             InitialQuantity = initialQuantity;
@@ -65,6 +67,7 @@ namespace Kalitte.Trading
             PriceStep = priceStep;
             CompletedOrder = 0;
             CompletedQuantity = 0;
+            KeepQuantity = keepQuantity;
         }
 
         public void ResetChanges()
@@ -104,7 +107,45 @@ namespace Kalitte.Trading
             return this.CompletedOrder == 0 ? InitialQuantity : this.QuantityStep + (this.CompletedOrder) * QuantityStepMultiplier;
         }
 
-        protected abstract ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity);
+        protected virtual ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
+        {
+            BuySell? bs = null;
+            var pl = marketPrice - portfolio.AvgCost;
+
+            if (this.SignalType == ProfitOrLoss.Profit)
+            {
+                if (InitialQuantity > 0 && portfolio.IsLong && pl >= this.UsedPriceChange)
+                {
+                    bs = BuySell.Sell;
+                }
+                else if (InitialQuantity > 0 && portfolio.IsShort && -pl >= this.UsedPriceChange)
+                {
+                    bs = BuySell.Buy;
+                }
+            }
+            else if (this.SignalType == ProfitOrLoss.Loss)
+            {
+                if (InitialQuantity > 0 && portfolio.IsLong && pl <= -this.UsedPriceChange)
+                {
+
+                    bs = BuySell.Sell;
+                }
+                else if (InitialQuantity > 0 && portfolio.IsShort && pl >= this.UsedPriceChange)
+                {
+                    bs = BuySell.Buy;
+                }
+            }
+            else return null;
+
+            var result = new ProfitLossResult(this, Algo.Now);
+            result.finalResult = bs;
+            result.Quantity = quantity;
+            result.MarketPrice = marketPrice;
+            result.PL = pl;
+            result.Direction = SignalType;
+            result.KeepQuantity = this.KeepQuantity;
+            return result;
+        }
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {

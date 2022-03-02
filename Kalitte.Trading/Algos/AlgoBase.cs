@@ -164,6 +164,7 @@ namespace Kalitte.Trading.Algos
 
         public Dictionary<string, PerformanceCounter> perfCounters = new Dictionary<string, PerformanceCounter>();
 
+
         int virtualOrderCounter = 0;
         public ExchangeOrder positionRequest = null;
         public int simulationCount = 0;
@@ -178,6 +179,9 @@ namespace Kalitte.Trading.Algos
         {
             return ManualResetEvent.WaitAll(Signals.Select(p => p.InOperationLock).ToArray(), timeOut);
         }
+
+
+
 
 
         public void CheckDelayedOrders(DateTime t)
@@ -213,11 +217,9 @@ namespace Kalitte.Trading.Algos
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
             var port = UserPortfolioList.Where(p=>p.Key == positionRequest.Symbol).First().Value;
             Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost} NetPL:{port.NetPL}]: {this.positionRequest.ToString()}", LogLevel.Order);
-            if (this.positionRequest.SignalResult != null) CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
-
+            CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
             this.positionRequest = null;
-            orderCounter++;
-            
+            orderCounter++;            
             orderWait.Set();
         }
 
@@ -686,17 +688,9 @@ namespace Kalitte.Trading.Algos
         }
 
 
-        public virtual void ClosePositions(string symbol, DateTime? t = null)
+        public virtual void ClosePositions(string symbol, SignalResult signalResult)
         {
-            var time = t ?? Now;
-            foreach (var item in UserPortfolioList)
-            {
-                if (!item.Value.IsEmpty)
-                {
-                    Log($"Closing positions for {symbol} at {time}", LogLevel.Info, time);
-                    sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", 0, OrderIcon.PositionClose, time, null, true);
-                }
-            }
+
         }
 
         public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
@@ -705,6 +699,7 @@ namespace Kalitte.Trading.Algos
             var monitored = this.Monitor.Dump(true).ToString();
             if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, t);            
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
+            var portfolio = UserPortfolioList.GetPortfolio(symbol);
             var price = lprice > 0 ? lprice : this.GetMarketPrice(symbol, t);
             if (price == 0)
             {
@@ -726,7 +721,7 @@ namespace Kalitte.Trading.Algos
             var order = this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
             order.SignalResult = signalResult;
             order.Sent = t ?? DateTime.Now;
-
+            portfolio.AddRequestedOrder(order);
             Log($"New order submitted. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info, t);
             if (order.SignalResult != null)
                 Log($"Signal [{order.SignalResult.Signal.Name}] result: {order.SignalResult}", LogLevel.Info, t);

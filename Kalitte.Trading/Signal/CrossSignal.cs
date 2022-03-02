@@ -81,6 +81,20 @@ namespace Kalitte.Trading
             base.ResetInternal();
         }
 
+        public void ResetCross()
+        {
+            InOperationLock.WaitOne();
+            InOperationLock.Reset();
+            try
+            {
+                crossBars.Clear();
+                lastCross = 0;
+            }
+            finally
+            {
+                InOperationLock.Set();
+            }
+        }
 
         public override void Init()
         {

@@ -98,7 +98,6 @@ namespace Kalitte.Trading
         public Average CollectAverage { get; set; }
         public Average AnalyseAverage { get; set; }
 
-
         public AnalyseList CollectList { get; set; }
         public AnalyseList AnalyseList { get; set; }
 

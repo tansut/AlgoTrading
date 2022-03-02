@@ -10,33 +10,34 @@ namespace Kalitte.Trading
 {
     internal class LossSignal : ProfitLossSignal
     {
-        protected override ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
-        {
-            BuySell? bs = null;
-            var pl = marketPrice - portfolio.AvgCost;
-            if (InitialQuantity > 0 && portfolio.IsLong && pl <= -this.UsedPriceChange)
-            {
+        public override ProfitOrLoss SignalType => ProfitOrLoss.Loss;
 
-                bs = BuySell.Sell;
+        //protected override ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
+        //{
+        //    BuySell? bs = null;
+        //    var pl = marketPrice - portfolio.AvgCost;
+        //    if (InitialQuantity > 0 && portfolio.IsLong && pl <= -this.UsedPriceChange)
+        //    {
 
-            }
-            else if (InitialQuantity > 0 && portfolio.IsShort && pl >= this.UsedPriceChange)
-            {
-                bs = BuySell.Buy;
+        //        bs = BuySell.Sell;
+        //    }
+        //    else if (InitialQuantity > 0 && portfolio.IsShort && pl >= this.UsedPriceChange)
+        //    {
+        //        bs = BuySell.Buy;
 
-            }
-            else return null;
+        //    }
+        //    else return null;
 
-            var result = new ProfitLossResult(this, Algo.Now);
-            result.finalResult = bs;
-            result.Quantity = quantity;
-            result.MarketPrice = marketPrice;
-            result.PL = pl;
-            result.Direction = ProfitOrLoss.Loss;
-            return result;
-        }
+        //    var result = new ProfitLossResult(this, Algo.Now);
+        //    result.finalResult = bs;
+        //    result.Quantity = quantity;
+        //    result.MarketPrice = marketPrice;
+        //    result.PL = pl;
+        //    result.Direction = ProfitOrLoss.Loss;
+        //    return result;
+        //}
 
-        public LossSignal(string name, string symbol, AlgoBase owner, decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep) : base(name, symbol, owner, priceChange, initialQuantity, quantityStep, stepMultiplier, priceStep)
+        public LossSignal(string name, string symbol, AlgoBase owner, decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep, decimal keepQuantity) : base(name, symbol, owner, priceChange, initialQuantity, quantityStep, stepMultiplier, priceStep, keepQuantity)
         {
 
         }

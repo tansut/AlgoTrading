@@ -23,7 +23,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
+        settings.Start = new DateTime(2022, 3, 2);
         settings.Finish = new DateTime(2022, 3, 2);
         settings.AutoClosePositions = true;
 
@@ -32,7 +32,7 @@ public class Program
 
         // options
         alternates.Set("CrossOrderQuantity", 6);
-        alternates.Set("RsiTrendOrderQuantity", 0);
+        alternates.Set("RsiTrendOrderQuantity", 3);
         alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
@@ -40,7 +40,7 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 3);
+        alternates.Set("ProfitInitialQuantity", 0);
         alternates.Set("ProfitKeepQuantity", 1);
         alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
@@ -51,7 +51,7 @@ public class Program
         alternates.Set("LossKeepQuantity", 0);
         alternates.Set("LossQuantityStep", 1);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 16);
+        alternates.Set("LossStart", 12);
         alternates.Set("LossPriceStep", 2);
 
 

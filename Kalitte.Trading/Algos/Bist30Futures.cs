@@ -82,7 +82,7 @@ namespace Kalitte.Trading.Algos
 
         [AlgoParam(1)]
         public decimal ProfitQuantityStep { get; set; }
-        
+
 
         [AlgoParam(0)]
         public decimal ProfitQuantityStepMultiplier { get; set; }
@@ -171,6 +171,9 @@ namespace Kalitte.Trading.Algos
         TrendSignal priceTrend = null;
         TrendSignal atrTrend = null;
         PowerSignal powerSignal = null;
+        ClosePositionsSignal closePositionsSignal = null;
+
+
 
 
 
@@ -264,13 +267,13 @@ namespace Kalitte.Trading.Algos
 
             if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0))
             {
-                this.profitSignal = new ProfitSignal("profit", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, ProfitPriceStep);                
+                this.profitSignal = new ProfitSignal("profit", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, ProfitPriceStep, ProfitKeepQuantity);
                 this.Signals.Add(profitSignal);
             }
 
             if (!SimulateOrderSignal && (this.LossInitialQuantity > 0))
             {
-                this.lossSignal = new LossSignal("loss", Symbol, this, this.LossStart, this.LossInitialQuantity, this.LossQuantityStep, this.LossQuantityStepMultiplier, LossPriceStep);                
+                this.lossSignal = new LossSignal("loss", Symbol, this, this.LossStart, this.LossInitialQuantity, this.LossQuantityStep, this.LossQuantityStepMultiplier, LossPriceStep, this.LossKeepQuantity);
                 this.Signals.Add(lossSignal);
             }
             if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0))
@@ -280,11 +283,15 @@ namespace Kalitte.Trading.Algos
 
                 if (RsiProfitInitialQuantity > 0)
                 {
-                    this.rsiProfitSignal = new TrendProfitSignal("rsi-profit", Symbol, this, rsiTrendSignal, RsiTrendThreshold, RsiProfitStart, RsiProfitInitialQuantity, RsiProfitQuantityStep, RsiProfitQuantityStepMultiplier, RsiProfitStep);
+                    this.rsiProfitSignal = new TrendProfitSignal("rsi-profit", Symbol, this, rsiTrendSignal, RsiTrendThreshold, RsiProfitStart, RsiProfitInitialQuantity, RsiProfitQuantityStep, RsiProfitQuantityStepMultiplier, RsiProfitStep, RsiProfitKeepQuantity);
                     Signals.Add(rsiProfitSignal);
                 }
                 this.Signals.Add(rsiTrendSignal);
             }
+
+
+            closePositionsSignal = new ClosePositionsSignal("daily-close", Symbol, this, ClosePositionsDaily);
+
 
             Signals.ForEach(p =>
             {
@@ -304,6 +311,22 @@ namespace Kalitte.Trading.Algos
                 }
             });
         }
+
+
+        public override void ClosePositions(string symbol, SignalResult signalResult)
+        {
+            if (signalResult == null) signalResult = new SignalResult(closePositionsSignal, Now);
+            var time = signalResult.SignalTime;
+            foreach (var item in UserPortfolioList)
+            {
+                if (!item.Value.IsEmpty)
+                {
+                    Log($"Closing positions for {symbol} at {time}", LogLevel.Info, time);
+                    sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", 0, OrderIcon.PositionClose, time, signalResult , true);
+                }
+            }
+        }
+    
 
 
         public override void ConfigureMonitor()
@@ -349,11 +372,11 @@ namespace Kalitte.Trading.Algos
             if (result.finalResult == BuySell.Buy && portfolio.IsLong) return;
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
-            decimal keep = result.Direction == ProfitOrLoss.Profit ? ProfitKeepQuantity : LossKeepQuantity;
+            decimal keep = result.KeepQuantity;
             decimal quantity = result.Quantity;
             decimal remaining = portfolio.Quantity - quantity;
-            quantity = Math.Min(portfolio.Quantity, remaining >= keep ? quantity : portfolio.Quantity - keep);
-            
+            quantity = Math.Min(portfolio.Quantity, remaining >= signal.KeepQuantity ? quantity : portfolio.Quantity - keep);
+
             if (quantity > 0)
             {
                 Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Debug, result.SignalTime);
@@ -362,11 +385,11 @@ namespace Kalitte.Trading.Algos
         }
 
 
-        
+
 
         private void HandleMaTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
-                       
+
         }
 
         private void HandlePriceTrendSignal(TrendSignal signal, TrendSignalResult result)
@@ -496,7 +519,7 @@ namespace Kalitte.Trading.Algos
                     var tpSignal = (TrendSignal)(result.Signal);
                     var signalResult = (TrendSignalResult)result;
                     if (rsiProfitSignal != null)
-                    {                         
+                    {
                         var profitResult = rsiProfitSignal.HandleTrendSignal(tpSignal, signalResult);
                         if (profitResult != null) HandleProfitLossSignal(rsiProfitSignal, profitResult);
                         else HandleRsiTrendSignal(tpSignal, signalResult);
@@ -532,11 +555,24 @@ namespace Kalitte.Trading.Algos
                     var signalResult = (CrossSignalResult)result;
                     HandleCrossSignal(tpSignal, signalResult);
                 }
+                else if (result.Signal.Name == "daily-close")
+                {
+                    HandleDailyCloseSignal(result);
+                }
+
+
+
             }
             finally
             {
                 operationWait.Set();
             }
+        }
+
+        public void HandleDailyCloseSignal(SignalResult result)
+        {
+            var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
+            if (!portfolio.IsEmpty) ClosePositions(Symbol, result);
         }
 
         public void HandleRsiTrendSignal(TrendSignal signal, TrendSignalResult signalResult)
@@ -552,7 +588,7 @@ namespace Kalitte.Trading.Algos
             {
                 bs = BuySell.Sell;
             }
-            else if (trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown) 
+            else if (trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown)
             {
                 bs = BuySell.Buy;
             }
@@ -562,32 +598,46 @@ namespace Kalitte.Trading.Algos
 
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)
         {
+            //var incrementPosition = lastSignalResult == null ? false: (lastSignalResult is )
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
+            var lastPositionSignal = portfolio.LastPositionOrder;
+            var quantityCheck = lastPositionSignal != null && (lastPositionSignal.SignalResult.Signal as CrossSignal) == null ? CrossOrderQuantity : 0;
 
-            if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong) return;
-            if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort) return;
+            if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && portfolio.Quantity >= quantityCheck) return;
+            if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && portfolio.Quantity >= quantityCheck) return;
 
             var orderQuantity = portfolio.Quantity + CrossOrderQuantity;
 
-            var cross = (CrossSignal)signalResult.Signal;
-            sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+            if (portfolio.IsLong && signalResult.finalResult == BuySell.Buy)
+                orderQuantity = CrossOrderQuantity - portfolio.Quantity;
+            else if (portfolio.IsShort && signalResult.finalResult == BuySell.Sell)
+                orderQuantity = CrossOrderQuantity - portfolio.Quantity;
 
-
+            if (orderQuantity > 0)
+            {
+                var cross = (CrossSignal)signalResult.Signal;
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+            }
         }
 
         public override void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
         {
             var tp = this.positionRequest.SignalResult as ProfitLossResult;
             var cross = this.positionRequest.SignalResult as CrossSignalResult;
+            var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             if (tp != null)
             {
                 var tps = ((ProfitLossSignal)tp.Signal);
                 tps.IncrementSignal(1, positionRequest.Quantity);
                 tps.IncrementParams();
             }
-            if (cross != null)
+            else
             {
                 Signals.Where(p => p is ProfitLossSignal).Select(p => (ProfitLossSignal)p).ToList().ForEach(p => p.ResetChanges());
+            }
+            if (portfolio.IsEmpty)
+            {
+                Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
             }
             base.FillCurrentOrder(filledUnitPrice, filledQuantity);
         }

@@ -70,8 +70,12 @@ namespace Kalitte.Trading.Algos
         public decimal RsiProfitKeepQuantity { get; set; }
 
 
-        [AlgoParam(20)]
+        [AlgoParam(10)]
         public decimal RsiProfitStart { get; set; }
+
+        [AlgoParam(5)]
+        public decimal RsiLossStart { get; set; }
+
 
 
         [AlgoParam(0)]
@@ -164,6 +168,7 @@ namespace Kalitte.Trading.Algos
         //TakeProfitOrLossSignal takeProfitSignal = null;
         ProfitSignal profitSignal = null;
         LossSignal lossSignal = null;
+        LossSignal trendStopLossSignal = null;
         //TakeProfitOrLossSignal lossSignal = null;
         TrendSignal rsiTrendSignal = null;
         TrendProfitSignal rsiProfitSignal = null;
@@ -287,6 +292,12 @@ namespace Kalitte.Trading.Algos
                     this.rsiProfitSignal = new TrendProfitSignal("rsi-profit", Symbol, this, rsiTrendSignal, RsiTrendThreshold, RsiProfitStart, RsiProfitInitialQuantity, RsiProfitQuantityStep, RsiProfitQuantityStepMultiplier, RsiProfitStep, RsiProfitKeepQuantity);
                     Signals.Add(rsiProfitSignal);
                 }
+                if (RsiTrendOrderQuantity > 0)
+                {
+                    trendStopLossSignal = new LossSignal("trend-loss", Symbol, this, RsiLossStart, 1, 1, 1, RsiLossStart/2 , 0);
+                    trendStopLossSignal.LimitingSignals.Add(typeof(TrendSignal));
+                    this.Signals.Add(trendStopLossSignal);
+                }
                 this.Signals.Add(rsiTrendSignal);
             }
 
@@ -323,11 +334,11 @@ namespace Kalitte.Trading.Algos
                 if (!item.Value.IsEmpty)
                 {
                     Log($"Closing positions for {symbol} at {time}", LogLevel.Info, time);
-                    sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", 0, OrderIcon.PositionClose, time, signalResult , true);
+                    sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", 0, OrderIcon.PositionClose, time, signalResult, true);
                 }
             }
         }
-    
+
 
 
         public override void ConfigureMonitor()
@@ -605,7 +616,7 @@ namespace Kalitte.Trading.Algos
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-            var orderQuantity = 0M; 
+            var orderQuantity = CrossOrderQuantity;
 
             if (!keepPosition)
             {
@@ -613,7 +624,8 @@ namespace Kalitte.Trading.Algos
                     orderQuantity = CrossOrderQuantity - portfolio.Quantity;
                 else if (portfolio.IsShort && signalResult.finalResult == BuySell.Sell)
                     orderQuantity = CrossOrderQuantity - portfolio.Quantity;
-            } else orderQuantity = portfolio.Quantity + CrossOrderQuantity;
+            }
+            else orderQuantity = portfolio.Quantity + CrossOrderQuantity;
 
             if (orderQuantity > 0)
             {

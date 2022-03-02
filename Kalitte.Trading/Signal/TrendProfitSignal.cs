@@ -27,11 +27,6 @@ namespace Kalitte.Trading
             else return null;
         }
 
-        public override decimal KeepQuantity { get
-            {
-                return base.KeepQuantity;
-            } 
-            set => base.KeepQuantity = value; }
 
         public ProfitLossResult HandleTrendSignal(TrendSignal signal, TrendSignalResult signalResult)
         {

@@ -23,8 +23,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 2, 28);
+        settings.Start = new DateTime(2022, 3, 2);
+        settings.Finish = new DateTime(2022, 3, 2);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -32,7 +32,7 @@ public class Program
 
         // options
         alternates.Set("CrossOrderQuantity", 6);
-        alternates.Set("RsiTrendOrderQuantity", 0);
+        alternates.Set("RsiTrendOrderQuantity", 3);
         alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
@@ -61,6 +61,7 @@ public class Program
         alternates.Set("RsiProfitQuantityStep", 1);
         alternates.Set("RsiProfitQuantityStepMultiplier", 0);
         alternates.Set("RsiProfitStart", 9.0);
+        alternates.Set("RsiLossStart", 7.0);
         alternates.Set("RsiProfitPriceStep", 3.0);
 
         // rsi

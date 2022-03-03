@@ -23,7 +23,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 2);
+        settings.Start = new DateTime(2022, 2, 28);
         settings.Finish = new DateTime(2022, 3, 2);
         settings.AutoClosePositions = true;
 
@@ -51,8 +51,8 @@ public class Program
         alternates.Set("LossKeepQuantity", 0);
         alternates.Set("LossQuantityStep", 1);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 12);
-        alternates.Set("LossPriceStep", 2);
+        alternates.Set("LossStart", 16);
+        alternates.Set("LossPriceStep", 4);
 
 
         // rsi profit
@@ -69,7 +69,7 @@ public class Program
         alternates.Set("RsiLowLimit", 40);
         alternates.Set("Rsi", 14);        
         alternates.Set("RsiTrendSensitivity", 2M);
-        alternates.Set("RsiTrendThreshold", 0M);
+        alternates.Set("RsiTrendThreshold", 0.6, 0.65, 0.7,0.8,0.85,0.9);
 
         // price
         alternates.Set("PriceTrendSensitivity", 2.5M);

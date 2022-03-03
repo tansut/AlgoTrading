@@ -224,7 +224,6 @@ namespace Kalitte.Trading
             if (CollectList.Ready && mp >= 0)
             {
                 decimal mpAverage = CollectList.LastValue; 
-                //CollectList.Clear();
 
                 var l1 = i1k.NextValue(mpAverage);
 
@@ -247,13 +246,14 @@ namespace Kalitte.Trading
                     var speed = result.Trend.SpeedPerSecond;
                     if (speed.HasValue) Monitor("speed", speed.Value);
 
+                    var limit = lastReference;
                     var checkedLimits = !Min.HasValue && !Max.HasValue;
 
-                    if (Min.HasValue && lastReference <= Min.Value)
+                    if (Min.HasValue && limit <= Min.Value)
                     {
                         checkedLimits = true;
                     }
-                    else if (Max.HasValue && lastReference >= Max.Value)
+                    else if (Max.HasValue && limit >= Max.Value)
                     {
                         checkedLimits = true;
                     }

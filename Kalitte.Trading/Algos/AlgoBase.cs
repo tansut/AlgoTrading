@@ -388,7 +388,7 @@ namespace Kalitte.Trading.Algos
             //var existing = this.Symbols.Select(p => p.Symbol == symbol).FirstOrDefault();
             //if (existing)
             this.Symbols.Add(new SymbolData(symbol, periodBars));
-            Log($"Initialized total {periodBars.Count} for {symbol} using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
+            Log($"Initialized total {periodBars.Count} for {symbol}/{period} using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
         }
 
         public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime? t = null)
@@ -396,7 +396,7 @@ namespace Kalitte.Trading.Algos
             FinanceBars periodBars = null;
             try
             {
-                //periodBars = Exchange != null ? Exchange.GetPeriodBars(symbol, period, t): null;                
+                periodBars = Exchange != null ? Exchange.GetPeriodBars(symbol, period, t ?? DateTime.Now): null;                
                 if (periodBars == null)
                 {
                     dataProviders.TryGetValue(symbol + period.ToString(), out MarketDataFileLogger mdp);
@@ -408,9 +408,10 @@ namespace Kalitte.Trading.Algos
                         dataProviders[symbol + period.ToString()] = mdp;
                     }                    
                     periodBars = mdp.GetContentAsQuote(symbol, period, t ?? DateTime.Now);
-                    var total = periodBars.Count;
-                    periodBars.RecommendedSkip = Math.Min(total, total - 48);
                 }
+                var total = periodBars.Count;
+                periodBars.RecommendedSkip = Math.Min(total, total - 48);
+
             }
             catch (Exception ex)
             {

@@ -597,15 +597,16 @@ namespace Kalitte.Trading.Algos
             BuySell? bs = null;
             if (Math.Abs(trend.Change) < RsiTrendThreshold) return;
             else if (trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp)
-            {
+            {                
                 bs = BuySell.Sell;
+                //Console.WriteLine($"{signalResult.SignalTime} {bs} {trend.Direction} {trend.Change} {trend.SpeedPerSecond}");
             }
             else if (trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown)
             {
                 bs = BuySell.Buy;
-            }
-            else return;
-            sendOrder(Symbol, RsiTrendOrderQuantity, bs.Value, $"[{signalResult.Signal.Name}/{trend.Direction},{trend.Change}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+                //Console.WriteLine($"{signalResult.SignalTime} {bs} {trend.Direction} {trend.Change} {trend.SpeedPerSecond}");
+            }           
+            if (bs.HasValue) sendOrder(Symbol, RsiTrendOrderQuantity, bs.Value, $"[{signalResult.Signal.Name}/{trend.Direction},{trend.Change}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
         }
 
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)

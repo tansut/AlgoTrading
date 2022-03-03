@@ -105,6 +105,11 @@ namespace Kalitte.Trading
 
         }
 
+        public void Report(string name)
+        {
+
+        }
+
         public void CheckMonitor()
         {
             rwl.AcquireReaderLock(1000);
@@ -114,14 +119,14 @@ namespace Kalitte.Trading
                 {
                     if (this.State == StartableState.StopInProgress || this.State == StartableState.Stopped) break;
                     decimal change = 0M;
+                   
                     var oldVal = item.Value.OldValue;
                     var newValue = item.Value.CurrentValue;
                     if (!oldVal.HasValue) item.Value.OldValue = newValue;
                     else
                     {                        
                         if (newValue != oldVal)
-                        {
-                            
+                        {                            
                             var r = oldVal.Value != 0 ? ((newValue - oldVal.Value) / oldVal.Value) : 1;
                             change = 100M * r;
                             var f = Filters.Where(p => item.Value.Name.StartsWith(p.Filter)).FirstOrDefault();

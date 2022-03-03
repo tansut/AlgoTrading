@@ -290,11 +290,12 @@ namespace Kalitte.Trading.Algos
                 if (RsiProfitInitialQuantity > 0)
                 {
                     this.rsiProfitSignal = new TrendProfitSignal("rsi-profit", Symbol, this, rsiTrendSignal, RsiTrendThreshold, RsiProfitStart, RsiProfitInitialQuantity, RsiProfitQuantityStep, RsiProfitQuantityStepMultiplier, RsiProfitStep, RsiProfitKeepQuantity);
+                    rsiProfitSignal.LimitingSignals.Add(typeof(TrendSignal));
                     Signals.Add(rsiProfitSignal);
                 }
                 if (RsiTrendOrderQuantity > 0 && RsiLossStart > 0)
                 {
-                    trendStopLossSignal = new LossSignal("trend-loss", Symbol, this, RsiLossStart, 1, 1, 1, RsiLossStart/3 , 0);
+                    trendStopLossSignal = new LossSignal("trend-loss", Symbol, this, RsiLossStart, RsiTrendOrderQuantity, 1, 1, RsiLossStart/3 , 0);
                     trendStopLossSignal.LimitingSignals.Add(typeof(TrendSignal));
                     this.Signals.Add(trendStopLossSignal);
                 }
@@ -536,6 +537,7 @@ namespace Kalitte.Trading.Algos
                         if (profitResult != null) HandleProfitLossSignal(rsiProfitSignal, profitResult);
                         else HandleRsiTrendSignal(tpSignal, signalResult);
                     }
+                    else HandleRsiTrendSignal(tpSignal, signalResult);
                 }
                 else if (result.Signal.Name == "price-trend")
                 {
@@ -596,16 +598,16 @@ namespace Kalitte.Trading.Algos
             var trend = signalResult.Trend;
             BuySell? bs = null;
             if (Math.Abs(trend.Change) < RsiTrendThreshold) return;
-            else if (trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp)
+            else if (trend.NewValue >= RsiHighLimit && (trend.Direction == TrendDirection.ReturnDown  || trend.Direction == TrendDirection.LessUp || trend.Direction == TrendDirection.MoreUp))
             {                
                 bs = BuySell.Sell;
-                //Console.WriteLine($"{signalResult.SignalTime} {bs} {trend.Direction} {trend.Change} {trend.SpeedPerSecond}");
+                //Console.WriteLine($"{signalResult.SignalTime} {trend.NewValue} {bs} {trend.Direction} {trend.Change} {trend.SpeedPerSecond}");
             }
-            else if (trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown)
+            else if (trend.NewValue <= RsiLowLimit && (trend.Direction == TrendDirection.ReturnUp  || trend.Direction == TrendDirection.LessDown || trend.Direction == TrendDirection.MoreDown))
             {
                 bs = BuySell.Buy;
-                //Console.WriteLine($"{signalResult.SignalTime} {bs} {trend.Direction} {trend.Change} {trend.SpeedPerSecond}");
-            }           
+                //Console.WriteLine($"{signalResult.SignalTime} {trend.NewValue} {bs} {trend.Direction} {trend.Change} {trend.SpeedPerSecond}");
+            }
             if (bs.HasValue) sendOrder(Symbol, RsiTrendOrderQuantity, bs.Value, $"[{signalResult.Signal.Name}/{trend.Direction},{trend.Change}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
         }
 

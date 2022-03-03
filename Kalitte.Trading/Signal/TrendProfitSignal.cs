@@ -15,21 +15,22 @@ namespace Kalitte.Trading
 
         public override ProfitOrLoss SignalType => ProfitOrLoss.Profit;
 
-        protected override ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
-        {
-            var lastIsMe = portfolio.LastPositionOrder != null & portfolio.LastPositionOrder.SignalResult.Signal == this.TrendSignal;
-            if (lastIsMe)
-            {
-                var result = base.getResult(portfolio, marketPrice, quantity);
-                if (result != null) result.KeepQuantity = 0;
-                return result;
-            }
-            else return null;
-        }
+        //protected override ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
+        //{
+        //    var lastIsMe = portfolio.LastPositionOrder != null && portfolio.LastPositionOrder.SignalResult.Signal == this.TrendSignal? true: false;
+        //    if (lastIsMe)
+        //    {
+        //        var result = base.getResult(portfolio, marketPrice, quantity);
+        //        if (result != null) result.KeepQuantity = 0;
+        //        return result;
+        //    }
+        //    else return null;
+        //}
 
 
         public ProfitLossResult HandleTrendSignal(TrendSignal signal, TrendSignalResult signalResult)
         {
+            return null;
             var portfolio = Algo.UserPortfolioList.GetPortfolio(this.Symbol);
 
             if (!portfolio.IsEmpty)
@@ -47,13 +48,15 @@ namespace Kalitte.Trading
                     var trend = signalResult.Trend;
                     var speed = trend.SpeedPerSecond;
                     if (Math.Abs(trend.Change) < TrendThreshold) return null;
-                    else if ((trend.Direction == TrendDirection.ReturnDown || trend.Direction == TrendDirection.MoreUp) && InitialQuantity > 0 && portfolio.IsLong && pl >= this.UsedPriceChange)
+                    else if ((trend.Direction == TrendDirection.ReturnDown  || trend.Direction == TrendDirection.MoreUp ) && InitialQuantity > 0 && portfolio.IsLong && pl >= this.UsedPriceChange)
                     {
-                        bs = BuySell.Sell;
+                        //if (!TrendSignal.Max.HasValue || trend.NewValue > this.TrendSignal.Max) 
+                            bs = BuySell.Sell;
                     }
-                    else if ((trend.Direction == TrendDirection.ReturnUp || trend.Direction == TrendDirection.LessDown) && InitialQuantity > 0 && portfolio.IsShort && -pl >= this.UsedPriceChange)
+                    else if ((trend.Direction == TrendDirection.ReturnUp  || trend.Direction == TrendDirection.LessDown ) && InitialQuantity > 0 && portfolio.IsShort && -pl >= this.UsedPriceChange)
                     {
-                        bs = BuySell.Buy;
+                        //if (!TrendSignal.Min.HasValue || trend.NewValue < this.TrendSignal.Min) 
+                            bs = BuySell.Buy;
                     }
                     else return null;
 

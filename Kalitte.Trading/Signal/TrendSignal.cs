@@ -246,7 +246,7 @@ namespace Kalitte.Trading
                     var speed = result.Trend.SpeedPerSecond;
                     if (speed.HasValue) Monitor("speed", speed.Value);
 
-                    var limit = lastReference;
+                    var limit = currentVal;
                     var checkedLimits = !Min.HasValue && !Max.HasValue;
 
                     if (Min.HasValue && limit <= Min.Value)

@@ -23,7 +23,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
+        settings.Start = new DateTime(2022, 3, 2);
         settings.Finish = new DateTime(2022, 3, 2);
         settings.AutoClosePositions = true;
 
@@ -31,8 +31,8 @@ public class Program
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("CrossOrderQuantity", 0);
-        alternates.Set("RsiTrendOrderQuantity", 3);
+        alternates.Set("CrossOrderQuantity", 6);
+        alternates.Set("RsiTrendOrderQuantity", 0);
         alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
@@ -44,8 +44,8 @@ public class Program
         alternates.Set("ProfitKeepQuantity", 1);
         alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
-        alternates.Set("ProfitStart", 10.0);        
-        alternates.Set("ProfitPriceStep", 3.0);
+        alternates.Set("ProfitStart", 12.0);        
+        alternates.Set("ProfitPriceStep", 4.0);
 
         alternates.Set("LossInitialQuantity", 0);
         alternates.Set("LossKeepQuantity", 0);
@@ -62,7 +62,7 @@ public class Program
         alternates.Set("RsiProfitQuantityStepMultiplier", 0);
         alternates.Set("RsiProfitStart", 9.0);
         alternates.Set("RsiLossStart", 8);
-        alternates.Set("RsiProfitPriceStep", 3.0);
+        alternates.Set("RsiProfitPriceStep", 1.0);
 
         // rsi
         alternates.Set("RsiHighLimit", 60);

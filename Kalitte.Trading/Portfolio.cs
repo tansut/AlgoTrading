@@ -32,11 +32,11 @@ namespace Kalitte.Trading
 
         public string Symbol
         {
-            get;  set;
+            get; set;
         }
         public decimal PL
         {
-            get;  set;
+            get; set;
         }
 
         public decimal NetPL
@@ -48,11 +48,11 @@ namespace Kalitte.Trading
         }
         public decimal AvgCost
         {
-            get;  set;
+            get; set;
         }
         public decimal Quantity
         {
-            get;  set;
+            get; set;
         }
         public BuySell Side
         {
@@ -119,7 +119,7 @@ namespace Kalitte.Trading
 
         public List<ExchangeOrder> RequestedOrders { get; private set; } = new List<ExchangeOrder>();
         public List<ExchangeOrder> CompletedOrders { get; private set; } = new List<ExchangeOrder>();
-        
+
         public void AddRequestedOrder(ExchangeOrder o)
         {
             this.RequestedOrders.Add(o);
@@ -168,16 +168,27 @@ namespace Kalitte.Trading
             this.CompletedOrders.Add(position);
         }
 
-        
-        public bool IsLastOrderInstanceOf(params Type [] signalTypes)
+
+        public bool IsLastOrderInstanceOf(params Type[] signalTypes)
         {
             var last = this.LastPositionOrder;
             if (last == null) return false;
             foreach (var type in signalTypes)
             {
-                if (last.SignalResult.Signal.GetType().IsAssignableFrom(type)) return true;
+                if (type.IsAssignableFrom(last.SignalResult.Signal.GetType())) return true;
             }
-            return false;  
+            return false;
+        }
+
+        public ExchangeOrder GetLastOrder(Type skip = null)
+        {
+            for (var i = CompletedOrders.Count - 1; i >= 0; i--)
+            {
+                var type = CompletedOrders[i].SignalResult.Signal.GetType();
+                if (skip != null && skip.IsAssignableFrom(type)) continue;
+                else return CompletedOrders[i];
+            }
+            return null;
         }
 
 
@@ -194,7 +205,7 @@ namespace Kalitte.Trading
 
         public PortfolioItem GetPortfolio(string symbol)
         {
-            lock(this)
+            lock (this)
             {
                 if (!this.ContainsKey(symbol)) this.Add(symbol, new PortfolioItem(symbol));
                 return this[symbol];

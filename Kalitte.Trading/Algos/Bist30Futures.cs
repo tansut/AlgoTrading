@@ -611,12 +611,13 @@ namespace Kalitte.Trading.Algos
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)
         {
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
-            var keepPosition = portfolio.LastPositionOrder == null || portfolio.IsLastOrderInstanceOf(typeof(CrossSignal), typeof(ProfitSignal));
+            var lastOrder = portfolio.GetLastOrder(typeof(ProfitLossSignal));
+            var keepPosition = lastOrder == null || lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(CrossSignal));
 
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-            var orderQuantity = CrossOrderQuantity;
+            var orderQuantity = portfolio.Quantity + CrossOrderQuantity;
 
             if (!keepPosition)
             {
@@ -625,7 +626,6 @@ namespace Kalitte.Trading.Algos
                 else if (portfolio.IsShort && signalResult.finalResult == BuySell.Sell)
                     orderQuantity = CrossOrderQuantity - portfolio.Quantity;
             }
-            else orderQuantity = portfolio.Quantity + CrossOrderQuantity;
 
             if (orderQuantity > 0)
             {

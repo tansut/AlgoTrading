@@ -71,13 +71,15 @@ namespace Kalitte.Trading
         {
             get
             {
+                var list = this.List.List;
+                var count = list.Count;
                 if (this.Average == Average.Ema)
                 {
-                    return List.List.GetEma(List.Count, Candle).Last().Ema.Value;
+                    return list.GetEma(count, Candle).Last().Ema.Value;
                 }
                 else
                 {
-                    return List.List.GetSma(List.Count, Candle).Last().Sma.Value;
+                    return list.GetSma(count, Candle).Last().Sma.Value;
                 }
             }
         }
@@ -101,7 +103,7 @@ namespace Kalitte.Trading
         public AnalyseList CollectList { get; set; }
         public AnalyseList AnalyseList { get; set; }
 
-        public decimal SignalSensitivity { get; set; } = 1.0M;
+        public virtual decimal SignalSensitivity { get; set; } = 1.0M;
 
         public AnalyserBase(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
         {

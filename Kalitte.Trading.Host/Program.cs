@@ -23,8 +23,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 4);
-        settings.Finish = new DateTime(2022, 3, 4);
+        settings.Start = new DateTime(2022, 3, 3);
+        settings.Finish = new DateTime(2022, 3, 3);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -45,7 +45,7 @@ public class Program
         alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
         alternates.Set("ProfitStart", 10.0);        
-        alternates.Set("ProfitPriceStep", 3.0);
+        alternates.Set("ProfitPriceStep", 2.0);
 
         alternates.Set("LossInitialQuantity", 0);
         alternates.Set("LossKeepQuantity", 2);
@@ -75,6 +75,8 @@ public class Program
         // price
         alternates.Set("PriceTrendSensitivity", 2.5M);
 
+        alternates.Set("MaTrendSensitivity", 7M);
+        alternates.Set("MaTrendThreshold", 0.1);
 
         // volume power
         alternates.Set("PowerLookback", 5);
@@ -98,7 +100,7 @@ public class Program
         alternates.Set("LogConsole", true);
 
         alternates.SaveToFile($"c:\\kalitte\\Bist30Futures-test.json");
-        alternates.Set("LoggingLevel", LogLevel.Debug);
+        alternates.Set("LoggingLevel", LogLevel.Warning);
 
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
         return settings;

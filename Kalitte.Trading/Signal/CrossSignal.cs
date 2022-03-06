@@ -84,12 +84,13 @@ namespace Kalitte.Trading
 
         public void ResetCross()
         {
-            InOperationLock.WaitOne();
+            //InOperationLock.WaitOne();
             InOperationLock.Reset();
             try
             {
                 crossBars.Clear();
                 lastCross = 0;
+                Log($"Cross reset", LogLevel.Debug);
             }
             finally
             {
@@ -254,6 +255,7 @@ namespace Kalitte.Trading
         {
             var time = t ?? DateTime.Now;
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
+
             result.MorningSignal = Algo.IsMorningStart(time);
             if (result.MorningSignal) FillMorningCross(time);
 
@@ -286,9 +288,9 @@ namespace Kalitte.Trading
                     AnalyseList.Clear();
                 }
 
-                if (AnalyseList.Ready)
+                if (AnalyseList.Ready && lastCross != 0)
                 {
-                    var lastAvg = AnalyseList.LastValue; // UseSma ? differenceBars.List.GetSma(AnalyseSize).Last().Sma.Value : differenceBars.List.GetEma(AnalyseSize).Last().Ema.Value;
+                    var lastAvg = AnalyseList.LastValue; 
 
                     decimal last1 = i1k.Results.Last().Value.Value;
                     decimal last2 = i2k.Results.Last().Value.Value;
@@ -297,8 +299,8 @@ namespace Kalitte.Trading
                     result.i2Val = last2;
                     result.Dif = lastAvg;
 
-                    if (lastCross != 0 && lastAvg > AvgChange) result.finalResult = BuySell.Buy;
-                    else if (lastCross != 0 && lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
+                    if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
+                    else if (lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
 
                 }
 

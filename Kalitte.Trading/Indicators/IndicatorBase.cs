@@ -26,7 +26,6 @@ namespace Kalitte.Trading.Indicators
     {
         FinanceBars InputBars { get; }
         IndicatorResult NextValue(decimal? price = null, decimal? volume = null);
-        decimal? CurrentValue { get; }
         List<IndicatorResult> Results { get; }
         int Lookback { get; set; }
         BarPeriod Period { get; set; }
@@ -57,11 +56,7 @@ namespace Kalitte.Trading.Indicators
 
         protected abstract IndicatorResult ToValue(R result);
 
-        public decimal? CurrentValue { get
-            {
-                return ResultList.Count > 0 ? ToValue(ResultList.Last).Value: null;
-            }
-        }
+
 
         protected virtual void CreateResult()
         {

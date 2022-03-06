@@ -54,8 +54,14 @@ namespace Kalitte.Trading.Algos
         public decimal RsiTrendThreshold { get; set; }
 
 
-        [AlgoParam(1)]
+        [AlgoParam(3)]
         public decimal RsiTrendSensitivity { get; set; }
+
+        [AlgoParam(3)]
+        public decimal MaTrendSensitivity { get; set; }
+
+        [AlgoParam(0)]
+        public decimal MaTrendThreshold { get; set; }
 
         [AlgoParam(1)]
         public decimal PriceTrendSensitivity { get; set; }
@@ -265,8 +271,8 @@ namespace Kalitte.Trading.Algos
             {
                 this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MaAvgChange };
                 this.Signals.Add(maSignal);
-                //this.maTrendSignal = new TrendSignal("ma-trend", Symbol, this);
-                //Signals.Add(maTrendSignal);
+                this.maTrendSignal = new TrendSignal("ma-trend", Symbol, this) { SignalSensitivity = MaTrendSensitivity };
+                Signals.Add(maTrendSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
@@ -408,10 +414,7 @@ namespace Kalitte.Trading.Algos
 
 
 
-        private void HandleMaTrendSignal(TrendSignal signal, TrendSignalResult result)
-        {
 
-        }
 
         private void HandlePriceTrendSignal(TrendSignal signal, TrendSignalResult result)
         {
@@ -597,6 +600,14 @@ namespace Kalitte.Trading.Algos
             if (!portfolio.IsEmpty) ClosePositions(Symbol, result);
         }
 
+
+        private void HandleMaTrendSignal(TrendSignal signal, TrendSignalResult result)
+        {
+            var trend = result.Trend;
+            if (Math.Abs(trend.Change) < MaTrendThreshold) return;
+            //Log($"{result}", LogLevel.Warning);
+        }
+
         public void HandleRsiTrendSignal(TrendSignal signal, TrendSignalResult signalResult)
         {
             if (RsiTrendOrderQuantity == 0) return;
@@ -640,19 +651,36 @@ namespace Kalitte.Trading.Algos
 
             if (orderQuantity > 0)
             {
+                var cross = (CrossSignal)signalResult.Signal;
                 var currentRsi = rsiTrendSignal.AnalyseList.Ready ? rsiTrendSignal.AnalyseList.LastValue : 0;
+
                 if (!signalResult.MorningSignal && CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue > CrossRsiMax)
                 {
-                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Warning);
+                    //cross.ResetCross();
+                    //ClosePositions(Symbol, signalResult);
+                    
                     return;
                 };
-                if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue < CrossRsiMin)
+                if (!signalResult.MorningSignal &&  CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue < CrossRsiMin)
                 {
-                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Warning);
+                    //cross.ResetCross();
+                    //ClosePositions(Symbol, signalResult);
                     return;
                 };
-                var cross = (CrossSignal)signalResult.Signal;
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+                //var rsiResult = powerSignal.LastSignalResult as PowerSignalResult;
+                //if (rsiResult != null)
+                //{                    
+                //    if (rsiResult.Value < 50)
+                //    {
+                //        Log($"Ignoring cross {signalResult.finalResult} signal since current volume power is {rsiResult.Value} / {rsiResult.Power}", LogLevel.Warning);
+                //        ClosePositions(Symbol, signalResult);
+                //        return;
+                //    }
+                //}
+                
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}, {currentRsi}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }
         }
 

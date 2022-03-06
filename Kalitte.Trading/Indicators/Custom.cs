@@ -47,11 +47,7 @@ namespace Kalitte.Trading.Indicators
         }
 
 
-        protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
-        {
-            base.BarsChanged(sender, e);
-            CreateResult();
-        }
+
 
 
         //public override decimal NextValue(decimal newVal)

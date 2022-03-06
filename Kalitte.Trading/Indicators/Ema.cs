@@ -51,10 +51,6 @@ namespace Kalitte.Trading.Indicators
             return list.GetEma(this.Lookback, this.Candle).Last();
         }
 
-        protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
-        {
-            base.BarsChanged(sender, e);
-            CreateResult();
-        }
+
     }
 }

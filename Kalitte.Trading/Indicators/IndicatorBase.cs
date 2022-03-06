@@ -103,19 +103,31 @@ namespace Kalitte.Trading.Indicators
             Candle = candle;
             InputBars = bars;            
             ResultList = new FinanceList<R>(0, null);
-            bars.ListEvent += BarsChanged;
+            bars.ListEvent += BarsChangedEvent;
         }
 
-        protected virtual void BarsChanged(object sender, ListEventArgs<IQuote> e)
+
+
+        protected virtual void BarsChangedEvent(object sender, ListEventArgs<IQuote> e)
         {
-            if (e.Action == ListAction.Cleared) usedBars.Clear();
-            else if (e.Action == ListAction.ItemRemoved)
+            ResultList.WriterLock();
+            try
             {
-               CreateUsedBars();
-            } else if (e.Action == ListAction.ItemAdded)
+                if (e.Action == ListAction.Cleared) usedBars.Clear();
+                else if (e.Action == ListAction.ItemRemoved)
+                {
+                    CreateUsedBars();
+                }
+                else if (e.Action == ListAction.ItemAdded)
+                {
+                    UsedInput.Add(e.Item);
+                }
+                CreateResult();
+            } finally
             {
-                UsedInput.Add(e.Item);
+                ResultList.RelaseWriter();
             }
+
         }
 
 

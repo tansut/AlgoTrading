@@ -323,19 +323,31 @@ namespace Kalitte.Trading.Algos
             return time.Hour == 9 && time.Minute == 30;
         }
 
+        public void SetBarCurrentValues()
+        {
+            var time = Now;
+            foreach (var sd in Symbols)
+            {
+                var p = sd.Periods;
+                var close = GetMarketPrice(p.Symbol, Now);
+                var vol = GetVolume(p.Symbol, p.Period, Now);
+                p.SetCurrent(Now, close, vol);
+            }
+        }
+
         private void SeansTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            seansTimer.Enabled = false;
             var t = DateTime.Now;
             var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
             var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
             var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
-            var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
-
-            seansTimer.Enabled = false;
+            var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);            
             try
             {
                 if ((t >= t1 && t <= t2) || (t >= t3 && t <= t4))
                 {
+                    SetBarCurrentValues();
                     if (SignalsState == StartableState.Stopped)
                     {
                         Log($"Time seems OK, starting signals ...");
@@ -356,7 +368,6 @@ namespace Kalitte.Trading.Algos
             {
                 seansTimer.Enabled = true;
             }
-
         }
 
         public virtual void PushNewBar(string symbol, BarPeriod period, IQuote bar)
@@ -365,13 +376,12 @@ namespace Kalitte.Trading.Algos
             if (data == null)
             {
                 Log($"Received new bar for period {period}, but algo doesnot use it", LogLevel.Warning);
-
             }
             else
             {
                 data.Periods.Push(bar);
+                data.Periods.ClearCurrent();
                 Log($"Pushed new bar for period {period}, last bar is now: {data.Periods.Last}", LogLevel.Verbose, data.Periods.Last.Date);
-
             }
         }
 
@@ -741,7 +751,6 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-
         public int GetSymbolPeriodSeconds(string period)
         {
             int result;
@@ -839,8 +848,8 @@ namespace Kalitte.Trading.Algos
             if (Simulation)
             {
                 var list = GetMarketData(symbol, SymbolPeriod, t);
-                var price = list.Length > 0 ? list[1] : 0;
-                return price;
+                var vol = list.Length > 0 ? list[1] : 0;
+                return vol;
             }
             else return Exchange.GetVolume(symbol, period, t);
         }

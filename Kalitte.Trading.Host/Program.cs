@@ -23,8 +23,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 25);
-        settings.Finish = new DateTime(2022, 2, 25);
+        settings.Start = new DateTime(2022, 3, 4);
+        settings.Finish = new DateTime(2022, 3, 4);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -45,31 +45,31 @@ public class Program
         alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
         alternates.Set("ProfitStart", 10.0);        
-        alternates.Set("ProfitPriceStep", 2.0);
+        alternates.Set("ProfitPriceStep", 3.0);
 
         alternates.Set("LossInitialQuantity", 0);
-        alternates.Set("LossKeepQuantity", 0);
+        alternates.Set("LossKeepQuantity", 2);
         alternates.Set("LossQuantityStep", 1);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 16);
-        alternates.Set("LossPriceStep", 4);
+        alternates.Set("LossStart", 2);
+        alternates.Set("LossPriceStep", 2);
 
 
         // rsi profit
-        alternates.Set("RsiProfitInitialQuantity", 1);
+        alternates.Set("RsiProfitInitialQuantity", 3);
         alternates.Set("RsiProfitKeepQuantity", 0);
         alternates.Set("RsiProfitQuantityStep", 1);
         alternates.Set("RsiProfitQuantityStepMultiplier", 0);
-        alternates.Set("RsiProfitStart", 6.0);
+        alternates.Set("RsiProfitStart", 6);
         alternates.Set("RsiProfitPriceStep", 1.0);
 
-        alternates.Set("RsiLossStart", 4.0);
+        alternates.Set("RsiLossStart", 5);
 
         // rsi
         alternates.Set("RsiHighLimit", 69);
         alternates.Set("RsiLowLimit", 31);
         alternates.Set("Rsi", 14);        
-        alternates.Set("RsiTrendSensitivity", 2M);
+        alternates.Set("RsiTrendSensitivity", 3M);
         alternates.Set("RsiTrendThreshold", 0.1);
 
         // price
@@ -82,6 +82,8 @@ public class Program
         // ma cross        
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("DynamicCross", true);
+        alternates.Set("CrossRsiMax",  0);
+        alternates.Set("CrossRsiMin",  0);        
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);
         alternates.Set("PowerCrossPositiveMultiplier", 2.8);

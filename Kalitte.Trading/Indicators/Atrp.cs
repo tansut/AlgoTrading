@@ -52,12 +52,12 @@ namespace Kalitte.Trading.Indicators
         }
 
 
-        public override decimal NextValue(decimal newVal)
+        public override IndicatorResult NextValue(decimal? price = null, decimal? volume = null)
         {
             var last = UsedInput.Last();
-            var q = new Quote() { Date = DateTime.Now, Low = last.Low, High = last.High, Close = newVal };
+            var q = new Quote() { Date = DateTime.Now, Low = last.Low, High = last.High, Close = price.Value };
             var r = NextResult(q);
-            return (decimal)(r.Atrp ?? 0);
+            return new IndicatorResult(DateTime.Now, (decimal)(r.Atrp ?? 0));
 
         }
 

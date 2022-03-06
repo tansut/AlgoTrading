@@ -14,11 +14,11 @@ namespace Kalitte.Trading.Indicators
     {
         public Macd Owner;
 
-        public override decimal NextValue(decimal newVal)
-        {
-            return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Ema ?? 0;
+        //public override decimal NextValue(decimal newVal)
+        //{
+        //    return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Ema ?? 0;
 
-        }
+        //}
 
         private void createResult()
         {
@@ -101,10 +101,10 @@ namespace Kalitte.Trading.Indicators
         //    //return InputBars.AsList;
         //}
 
-        public override decimal NextValue(decimal newVal)
-        {
-            return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Macd ?? 0;
-        }
+        //public override decimal NextValue(decimal newVal)
+        //{
+        //    return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Macd ?? 0;
+        //}
 
         protected override IndicatorResult ToValue(MacdResult result)
         {

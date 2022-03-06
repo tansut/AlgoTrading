@@ -54,10 +54,10 @@ namespace Kalitte.Trading.Indicators
         }
 
 
-        public override decimal NextValue(decimal newVal)
-        {
-            return (decimal)(NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Value);
-        }
+        //public override decimal NextValue(decimal newVal)
+        //{
+        //    return (decimal)(NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Value);
+        //}
 
         public override CustomResult NextResult(IQuote quote)
         {

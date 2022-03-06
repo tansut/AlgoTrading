@@ -25,17 +25,12 @@ namespace Kalitte.Trading.Indicators
     public interface ITechnicalIndicator
     {
         FinanceBars InputBars { get; }
-        decimal NextValue(decimal newVal);
+        IndicatorResult NextValue(decimal? price = null, decimal? volume = null);
         decimal? CurrentValue { get; }
         List<IndicatorResult> Results { get; }
         int Lookback { get; set; }
-        //string Symbol { get;  set; }
         BarPeriod Period { get; set; }
         List<IQuote> UsedInput { get; }
-
-        
-        //CandlePart Candle { get; set; }
-
     }
 
     public abstract class IndicatorBase<R>: ITechnicalIndicator where R: ResultBase
@@ -47,20 +42,12 @@ namespace Kalitte.Trading.Indicators
         public bool Enabled { get; set; }
         public bool TimerEnabled { get; set; }
         public bool Simulation { get; set; }
-        //public string Symbol { get; set; }
         public BarPeriod Period { get; set; }
         public CandlePart Candle { get; set; } = CandlePart.Close;
         public FinanceBars InputBars { get; }
         public FinanceList<R> ResultList { get; set; } = null;
-
         private  List<IQuote> usedBars;
-
         public int Lookback { get; set; }
-
-        //public override string ToString()
-        //{
-        //    return $"{this.GetType().Name}[{this.Symbol}]";
-        //}
 
         public List<IQuote> UsedInput { get
             {if (usedBars == null) usedBars = CreateUsedBars();
@@ -87,8 +74,6 @@ namespace Kalitte.Trading.Indicators
         protected virtual List<IQuote> CreateUsedBars()
         {
             return InputBars.RecommendedItems;
-            //return InputBars.LastItems(Math.Min(InputBars.Count, 2 * (Lookback)));
-            //return InputBars.LastItems(Lookback);
         }
 
         public IndicatorBase(FinanceBars bars, CandlePart candle = CandlePart.Close)
@@ -97,7 +82,6 @@ namespace Kalitte.Trading.Indicators
             InputBars = bars;            
             ResultList = new FinanceList<R>(0, null);
             bars.ListEvent += BarsChanged;
-
         }
 
         protected virtual void BarsChanged(object sender, ListEventArgs<IQuote> e)
@@ -125,7 +109,19 @@ namespace Kalitte.Trading.Indicators
 
         }
 
-        public abstract decimal NextValue(decimal newVal);
+        public virtual IndicatorResult NextValue(decimal? price = null, decimal? volume = null)
+        {
+            IQuote quote = null;
+            if (!price.HasValue)
+            {
+                quote = InputBars.Current;
+            } else
+            {
+                quote = new MyQuote() { Date = DateTime.Now, Close = price.Value, Volume=volume.HasValue? volume.Value:0 };                    
+            }
+            var nr = NextResult(quote);
+            return ToValue(nr);
+        }
         public abstract R NextResult(IQuote quote);
         //public abstract decimal NextValue(R result);
     }

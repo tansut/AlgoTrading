@@ -45,7 +45,7 @@ namespace Kalitte.Trading
                 case CandlePart.Volume: { this.Volume = value; break; }
                 case CandlePart.Open: { this.Open = value; break; }
                 case CandlePart.High: { this.High = value; break; }
-                case CandlePart.Low: { this.Low = value; break; }                
+                case CandlePart.Low: { this.Low = value; break; }
             }
         }
     }
@@ -122,7 +122,7 @@ namespace Kalitte.Trading
             finally
             {
                 rvl.ReleaseReaderLock();
-            }           
+            }
         }
 
 
@@ -339,9 +339,63 @@ namespace Kalitte.Trading
     {
         public string Symbol { get; private set; }
         public BarPeriod Period { get; private set; }
-
         public int RecommendedSkip { get; set; } = 0;
+        protected ReaderWriterLock cvl = new ReaderWriterLock();
+        private MyQuote current = null;
 
+        public MyQuote Current
+        {
+            get
+            {
+                cvl.AcquireReaderLock(timeOut);
+                try
+                {
+                    return current;
+                }
+                finally
+                {
+                    cvl.ReleaseReaderLock();
+                }
+            }
+            private set
+            {
+                cvl.AcquireWriterLock(timeOut);
+                try
+                {
+                    current = value;
+                }
+                finally
+                {
+                    cvl.ReleaseWriterLock();
+                }
+            }
+        }
+
+        public void ClearCurrent()
+        {
+            Current = null;
+        }
+
+        public IQuote SetCurrent(DateTime date, decimal close, decimal? volume = null)
+        {
+            cvl.AcquireWriterLock(timeOut);
+            try
+            {
+                if (current == null)
+                    current = new MyQuote();
+                current.Date = date;
+                current.Close = close;
+                current.Volume = volume.HasValue ? volume.Value: Current.Volume;
+                current.Low = close < Current.Low ? close : Current.Low;
+                current.High = close > Current.High ? close : Current.Low;
+                Current.Open = Current.Open == 0 ? close: Current.Open;
+                return Current;
+            }
+            finally 
+            {
+                cvl.ReleaseWriterLock();
+            }            
+        }
 
         public FinanceBars(string symbol, BarPeriod period, int maxSize = 0) : base(maxSize)
         {
@@ -358,7 +412,15 @@ namespace Kalitte.Trading
         {
             get
             {
-                return this.Skip(RecommendedSkip);
+                rvl.AcquireReaderLock(timeOut);
+                try
+                {
+                    return this.Skip(RecommendedSkip);
+                }
+                finally
+                {
+                    rvl.ReleaseReaderLock();
+                }
             }
         }
 

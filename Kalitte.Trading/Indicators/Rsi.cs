@@ -75,11 +75,11 @@ namespace Kalitte.Trading.Indicators
         
 
 
-        public override decimal NextValue(decimal newVal)
-        {
-            return (decimal)(NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Rsi ?? 0);
+        //public override decimal NextValue(decimal newVal)
+        //{
+        //    return (decimal)(NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Rsi ?? 0);
 
-        }
+        //}
 
         public override RsiResult NextResult(IQuote quote)
         {

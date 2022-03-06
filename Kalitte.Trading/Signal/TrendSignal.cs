@@ -225,7 +225,7 @@ namespace Kalitte.Trading
             {
                 decimal mpAverage = CollectList.LastValue; 
 
-                var l1 = i1k.NextValue(mpAverage);
+                var l1 = i1k.NextValue(mpAverage).Value.Value;
 
                 AnalyseList.Collect(l1);
 

@@ -271,8 +271,8 @@ namespace Kalitte.Trading
             {
                 decimal mpAverage = CollectList.LastValue;
 
-                var l1 = i1k.NextValue(mpAverage);
-                var l2 = i2k.NextValue(mpAverage);
+                var l1 = i1k.NextValue(mpAverage).Value.Value;
+                var l2 = i2k.NextValue(mpAverage).Value.Value;
 
                 AnalyseList.Collect(l1 - l2);
                 crossBars.Push(l1 - l2);

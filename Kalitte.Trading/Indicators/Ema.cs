@@ -26,10 +26,6 @@ namespace Kalitte.Trading.Indicators
             createResult();
         }
 
-        //public bool HasResult => ResultList.Count > 0 && ResultList.Last.Ema.HasValue;
-
-
-
         private void createResult()
         {
             ResultList.Clear();
@@ -43,30 +39,13 @@ namespace Kalitte.Trading.Indicators
         }
 
 
-        //public IList<IQuote> LastBars
+        //public override decimal NextValue(decimal newVal)
         //{
-        //    //get { return InputBars.List; }
-        //    get { return InputBars.LastItems(startIndex + Lookback); }
-        //    //get { return InputBars.LastItems(Lookback); }
+        //    return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Ema ?? 0;
         //}
-
-
-
-        public override decimal NextValue(decimal newVal)
-        {
-            return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Ema ?? 0;
-
-            //var lastEma = (double)(ResultList.Last.Ema);
-            //var ema = (decimal)FinanceBars.EmaNext((double)newVal, lastEma, Lookback);
-            //return ema;
-        }
 
         public override EmaResult NextResult(IQuote quote)
         {
-            //return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Macd ?? 0;
-            //var lastEma = (double)(ResultList.Last.Ema);
-            //var ema = (decimal)FinanceBars.EmaNext((double)quote.Close, lastEma, Lookback);
-            //return new EmaResult() { Date = quote.Date, Ema = ema };
             var list = UsedInput.ToList();
             list.Add(quote);
             return list.GetEma(this.Lookback, this.Candle).Last();

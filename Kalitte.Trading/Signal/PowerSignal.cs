@@ -106,7 +106,7 @@ namespace Kalitte.Trading
             var volumePerSecond = (double)volumeAvg;
             Helper.SymbolSeconds(Indicator.InputBars.Period.ToString(), out int periodSeconds);
             var volume = volumePerSecond * periodSeconds;
-            var value = Indicator.NextValue((decimal)volume);
+            var value = Indicator.NextValue((decimal)volume).Value.Value;
             var last = Indicator.UsedInput.Last().Close;
             s.Value = value;
             s.VolumePerSecond = volumePerSecond;

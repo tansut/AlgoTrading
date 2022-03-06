@@ -28,6 +28,14 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(true)]
         public bool DynamicCross { get; set; }
 
+        [AlgoParam(45)]
+        public decimal CrossRsiMin { get; set; }
+
+
+        [AlgoParam(55)]
+        public decimal CrossRsiMax { get; set; }
+
+
 
         [AlgoParam(0.32)]
         public decimal MaAvgChange { get; set; }
@@ -161,7 +169,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(2.8)]
         public decimal PowerCrossPositiveMultiplier { get; set; }
 
-        public FinanceBars MinBars = null;
 
         CrossSignal maSignal = null;
         CrossSignal macSignal = null;
@@ -186,12 +193,12 @@ namespace Kalitte.Trading.Algos
         {
 
             var periodData = GetSymbolData(this.Symbol, this.SymbolPeriod);
-            //var oneMinData = GetSymbolData(this.Symbol, BarPeriod.Min);
-            var price = new Price(periodData.Periods, PowerLookback);
-            priceTrend.i1k = price;
+            var oneMinData = GetSymbolData(this.Symbol, BarPeriod.Min);
+            //var price = new Price(periodData.Periods, PowerLookback);
+            //priceTrend.i1k = price;
 
-            var atr = new Atrp(periodData.Periods, PowerLookback);
-            atrTrend.i1k = atr;
+            //var atr = new Atrp(periodData.Periods, PowerLookback);
+            //atrTrend.i1k = atr;
 
             powerSignal.Indicator = new Rsi(periodData.Periods, PowerLookback, CandlePart.Volume);
 
@@ -231,9 +238,10 @@ namespace Kalitte.Trading.Algos
 
         public override void InitializeBars(string symbol, BarPeriod period, DateTime? t = null)
         {
-            //this.MinBars = GetPeriodBars(symbol, period, t);
-            //this.oneMinBars = GetPeriodBars(symbol, BarPeriod.Min, t);
-            //base.InitializeBars(symbol, BarPeriod.Min, t);
+            var time = t ?? DateTime.Now;
+            //var tm = new DateTime(time.Year, time.Month, time.Day, time.Hour, 59, 0);
+            //var minBars = GetPeriodBars(symbol, BarPeriod.Min, tm);
+            //this.Symbols.Add(new SymbolData(symbol, minBars));                   
             base.InitializeBars(symbol, period, t);
         }
 
@@ -257,8 +265,8 @@ namespace Kalitte.Trading.Algos
             {
                 this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MaAvgChange };
                 this.Signals.Add(maSignal);
-                this.maTrendSignal = new TrendSignal("ma-trend", Symbol, this);
-                Signals.Add(maTrendSignal);
+                //this.maTrendSignal = new TrendSignal("ma-trend", Symbol, this);
+                //Signals.Add(maTrendSignal);
             }
 
             if (MACDShortPeriod > 0 && !SimulateOrderSignal)
@@ -284,7 +292,7 @@ namespace Kalitte.Trading.Algos
             }
             if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0))
             {
-                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : RsiLowLimit, RsiHighLimit == 0 ? new decimal() : RsiHighLimit) { };
+                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : new decimal?(), RsiHighLimit == 0 ? new decimal() : new decimal?()) { };
                 rsiTrendSignal.SignalSensitivity = RsiTrendSensitivity;
 
                 if (RsiProfitInitialQuantity > 0)
@@ -600,12 +608,12 @@ namespace Kalitte.Trading.Algos
             if (Math.Abs(trend.Change) < RsiTrendThreshold) return;
             else if (trend.NewValue >= RsiHighLimit && (trend.Direction == TrendDirection.ReturnDown  || trend.Direction == TrendDirection.LessUp || trend.Direction == TrendDirection.MoreUp))
             {                
-                bs = BuySell.Sell;
+                //bs = BuySell.Sell;
                 //Console.WriteLine($"{signalResult.SignalTime} {trend.NewValue} {bs} {trend.Direction} {trend.Change} {trend.SpeedPerSecond}");
             }
             else if (trend.NewValue <= RsiLowLimit && (trend.Direction == TrendDirection.ReturnUp  || trend.Direction == TrendDirection.LessDown || trend.Direction == TrendDirection.MoreDown))
             {
-                bs = BuySell.Buy;
+                //bs = BuySell.Buy;
                 //Console.WriteLine($"{signalResult.SignalTime} {trend.NewValue} {bs} {trend.Direction} {trend.Change} {trend.SpeedPerSecond}");
             }
             if (bs.HasValue) sendOrder(Symbol, RsiTrendOrderQuantity, bs.Value, $"[{signalResult.Signal.Name}/{trend.Direction},{trend.Change}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
@@ -632,6 +640,8 @@ namespace Kalitte.Trading.Algos
 
             if (orderQuantity > 0)
             {
+                if (CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue > CrossRsiMax) return;
+                if (CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue < CrossRsiMin) return;
                 var cross = (CrossSignal)signalResult.Signal;
                 sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }

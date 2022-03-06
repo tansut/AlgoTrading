@@ -106,7 +106,6 @@ namespace Kalitte.Trading
 
         public void Run(DateTime t1, DateTime t2)
         {
-
             var periodBarIndexes = new Dictionary<int, int>();
             var seconds = 0;
             var periodBarsLoaded = true;
@@ -121,6 +120,7 @@ namespace Kalitte.Trading
                     //if (p > Algo.TestFinish) break;
 
                     Algo.SetTime(p);
+                    Algo.SetBarCurrentValues();
                     var time = Algo.Now;
                     var tasks = new List<Task<SignalResult>>();
 

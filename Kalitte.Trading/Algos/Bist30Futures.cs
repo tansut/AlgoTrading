@@ -640,8 +640,17 @@ namespace Kalitte.Trading.Algos
 
             if (orderQuantity > 0)
             {
-                if (CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue > CrossRsiMax) return;
-                if (CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue < CrossRsiMin) return;
+                var currentRsi = rsiTrendSignal.AnalyseList.Ready ? rsiTrendSignal.AnalyseList.LastValue : 0;
+                if (!signalResult.MorningSignal && CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue > CrossRsiMax)
+                {
+                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                    return;
+                };
+                if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue < CrossRsiMin)
+                {
+                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                    return;
+                };
                 var cross = (CrossSignal)signalResult.Signal;
                 sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }

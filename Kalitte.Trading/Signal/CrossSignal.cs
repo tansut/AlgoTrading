@@ -35,6 +35,7 @@ namespace Kalitte.Trading
         public decimal i2Val { get; set; }
         public decimal Dif { get; set; }
         public Sensitivity Sensitivity { get; set; }
+        public bool MorningSignal { get; set; } = false;
 
         public CrossSignalResult(Signal signal, DateTime t) : base(signal, t)
         {
@@ -253,8 +254,8 @@ namespace Kalitte.Trading
         {
             var time = t ?? DateTime.Now;
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
-
-            if (Algo.IsMorningStart(time)) FillMorningCross(time);
+            result.MorningSignal = Algo.IsMorningStart(time);
+            if (result.MorningSignal) FillMorningCross(time);
 
             if (DynamicCross)
             {

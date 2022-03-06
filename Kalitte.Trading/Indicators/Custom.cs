@@ -29,15 +29,15 @@ namespace Kalitte.Trading.Indicators
         {
             this.Lookback = periods;
             this.Func = func;
-            createResult();     
+            base.CreateResult();     
         }
 
-        private void createResult()
-        {
-            ResultList.Clear();
-            foreach (var iten in UsedInput)
-                ResultList.Push(new CustomResult() { Date = iten.Date, Value = Func(iten) });
 
+        public override IEnumerable<CustomResult> GetResults()
+        {
+            foreach (var iten in UsedInput) {
+                yield return new CustomResult() { Date = iten.Date, Value = Func(iten) };
+            }
         }
 
 
@@ -50,7 +50,7 @@ namespace Kalitte.Trading.Indicators
         protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
             base.BarsChanged(sender, e);
-            createResult();
+            CreateResult();
         }
 
 

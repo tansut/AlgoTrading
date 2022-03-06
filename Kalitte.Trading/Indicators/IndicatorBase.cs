@@ -63,6 +63,28 @@ namespace Kalitte.Trading.Indicators
             }
         }
 
+        protected virtual void CreateResult()
+        {
+            ResultList.WriterLock();
+            try
+            {
+                ResultList.Clear();
+                var results = GetResults();
+                foreach (var item in results)
+                {
+                    ResultList.Push(item);
+                }
+            }
+            finally
+            {
+                ResultList.RelaseWriter();
+            }
+            
+
+        }
+
+        public abstract IEnumerable<R> GetResults();
+
         public List<IndicatorResult> Results
         {
             get
@@ -96,13 +118,6 @@ namespace Kalitte.Trading.Indicators
             }
         }
 
-        public virtual int LastItems
-        {
-            get
-            {
-                return Math.Min(InputBars.Count, 96);
-            }
-        }
 
         public IndicatorBase()
         {
@@ -111,18 +126,26 @@ namespace Kalitte.Trading.Indicators
 
         public virtual IndicatorResult NextValue(decimal? price = null, decimal? volume = null)
         {
-            IQuote quote = null;
-            if (!price.HasValue)
+            ResultList.WriterLock();
+            try
             {
-                quote = InputBars.Current;
-            } else
-            {
-                quote = new MyQuote() { Date = DateTime.Now, Close = price.Value, Volume=volume.HasValue? volume.Value:0 };                    
+                IQuote quote = null;
+                if (!price.HasValue)
+                {
+                    quote = InputBars.Current;
+                }
+                else
+                {
+                    quote = new MyQuote() { Date = DateTime.Now, Close = price.Value, Volume = volume.HasValue ? volume.Value : 0 };
+                }
+                var nr = NextResult(quote);
+                return ToValue(nr);
             }
-            var nr = NextResult(quote);
-            return ToValue(nr);
+            finally
+            {
+                ResultList.RelaseWriter();                
+            }
         }
         public abstract R NextResult(IQuote quote);
-        //public abstract decimal NextValue(R result);
     }
 }

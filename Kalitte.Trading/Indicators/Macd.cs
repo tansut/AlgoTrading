@@ -14,23 +14,16 @@ namespace Kalitte.Trading.Indicators
     {
         public Macd Owner;
 
-        //public override decimal NextValue(decimal newVal)
-        //{
-        //    return NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Ema ?? 0;
 
-        //}
-
-        private void createResult()
+        public override IEnumerable<EmaResult> GetResults()
         {
-            ResultList.Clear();
-            var result = Owner.ResultList.List.Select(p => new EmaResult() { Date = p.Date, Ema = p.Signal }).ToList();
-            result.ForEach(r => ResultList.Push(r));
+            return Owner.ResultList.List.Select(p => new EmaResult() { Date = p.Date, Ema = p.Signal });
         }
 
         public MacdTrigger(Macd owner) : base(owner.InputBars)
         {
             Owner = owner;
-            createResult();
+            CreateResult();
             Owner.ResultList.ListEvent += Bars_ListEvent;
         }
 
@@ -39,7 +32,7 @@ namespace Kalitte.Trading.Indicators
 
         private void Bars_ListEvent(object sender, ListEventArgs<MacdResult> e)
         {
-            createResult();
+            CreateResult();
         }
 
         public override EmaResult NextResult(IQuote quote)
@@ -76,23 +69,22 @@ namespace Kalitte.Trading.Indicators
             this.Slow = slow;
             this.Fast = fast;
             this.Signal = signal;
-            createResult();
+            CreateResult();
             this.Trigger = new MacdTrigger(this);
         }
 
-        private void createResult()
-        {
-            ResultList.Clear();
-            var results = UsedInput.GetMacd(this.Fast, this.Slow, this.Signal).ToList();
-            results.ForEach(r => ResultList.Push(r));            
-        }
 
+
+        public override IEnumerable<MacdResult> GetResults()
+        {
+            return UsedInput.GetMacd(this.Fast, this.Slow, this.Signal);
+        }
 
 
         protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
             base.BarsChanged(sender, e);
-            createResult();
+            CreateResult();
         }
 
         //protected override List<IQuote> CreateUsedBars()

@@ -23,14 +23,14 @@ namespace Kalitte.Trading.Indicators
         public Atrp(FinanceBars bars, int periods) : base(bars)
         {
             this.Lookback = periods;              
-            createResult();            
+            CreateResult();            
         }
 
-        private void createResult()
+
+
+        public override IEnumerable<AtrResult> GetResults()
         {
-            ResultList.Clear();
-            var results = UsedInput.GetAtr(Lookback).ToList();
-            results.ForEach(r => ResultList.Push(r));
+            return UsedInput.GetAtr(Lookback);
         }
 
 
@@ -43,7 +43,7 @@ namespace Kalitte.Trading.Indicators
         protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
             base.BarsChanged(sender, e);
-            createResult();
+            CreateResult();
         }
 
         protected override List<IQuote> CreateUsedBars()

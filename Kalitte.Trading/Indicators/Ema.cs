@@ -23,14 +23,14 @@ namespace Kalitte.Trading.Indicators
         public Ema(FinanceBars bars, int periods, CandlePart candle = CandlePart.Close) : base(bars, candle)
         {
             this.Lookback = periods;
-            createResult();
+            CreateResult();
         }
 
-        private void createResult()
+
+
+        public override IEnumerable<EmaResult> GetResults()
         {
-            ResultList.Clear();
-            var result = UsedInput.GetEma(Lookback, this.Candle).ToList();
-            result.ForEach(r => ResultList.Push(r));
+            return UsedInput.GetEma(Lookback, this.Candle);
         }
 
         protected override IndicatorResult ToValue(EmaResult result)
@@ -54,10 +54,7 @@ namespace Kalitte.Trading.Indicators
         protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
             base.BarsChanged(sender, e);
-            createResult();
+            CreateResult();
         }
-
-
-
     }
 }

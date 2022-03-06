@@ -56,7 +56,7 @@ public class Program
 
 
         // rsi profit
-        alternates.Set("RsiProfitInitialQuantity", 3);
+        alternates.Set("RsiProfitInitialQuantity", 0);
         alternates.Set("RsiProfitKeepQuantity", 0);
         alternates.Set("RsiProfitQuantityStep", 1);
         alternates.Set("RsiProfitQuantityStepMultiplier", 0);
@@ -82,8 +82,8 @@ public class Program
         // ma cross        
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("DynamicCross", true);
-        alternates.Set("CrossRsiMax",  0);
-        alternates.Set("CrossRsiMin",  0);        
+        alternates.Set("CrossRsiMax",  56);
+        alternates.Set("CrossRsiMin",  44);        
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);
         alternates.Set("PowerCrossPositiveMultiplier", 2.8);
@@ -98,7 +98,7 @@ public class Program
         alternates.Set("LogConsole", true);
 
         alternates.SaveToFile($"c:\\kalitte\\Bist30Futures-test.json");
-        alternates.Set("LoggingLevel", LogLevel.Warning);
+        alternates.Set("LoggingLevel", LogLevel.Debug);
 
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
         return settings;

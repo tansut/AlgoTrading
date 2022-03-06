@@ -254,6 +254,8 @@ namespace Kalitte.Trading
 
         }
 
+
+
         protected virtual void InputbarsChanged(object sender, ListEventArgs<IQuote> e)
         {
             InOperationLock.WaitOne();

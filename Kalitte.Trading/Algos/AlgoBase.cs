@@ -69,7 +69,7 @@ namespace Kalitte.Trading.Algos
         }
     }
 
-    public abstract class AlgoBase: MarshalByRefObject
+    public abstract class AlgoBase 
     {
 
         Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");
@@ -87,11 +87,11 @@ namespace Kalitte.Trading.Algos
         public DateTime? TestStart { get; set; }
         public DateTime? TestFinish { get; set; }
         public string SimulationFile { get; set; } = "";
-        public string [] SimulationFileFields { get; set; } = new string [] {};
+        public string[] SimulationFileFields { get; set; } = new string[] { };
 
         private DateTime? time { get; set; } = null;
 
-
+        private object simulationLock = new object();
 
         [AlgoParam(LogLevel.Verbose)]
         public LogLevel LoggingLevel { get; set; }
@@ -128,7 +128,7 @@ namespace Kalitte.Trading.Algos
 
         public StringBuilder LogContent { get; set; } = new StringBuilder(1000);
 
-        
+
 
         public PortfolioList UserPortfolioList = new PortfolioList();
         public decimal simulationPriceDif = 0;
@@ -201,7 +201,7 @@ namespace Kalitte.Trading.Algos
         public virtual void ConfigureMonitor()
         {
             this.Monitor.DefaultChange = 25.0M;
-            this.Monitor.MonitorEvent += Monitor_MonitorEvent;            
+            this.Monitor.MonitorEvent += Monitor_MonitorEvent;
         }
 
         protected virtual void Monitor_MonitorEvent(object sender, MonitorEventArgs e)
@@ -215,11 +215,11 @@ namespace Kalitte.Trading.Algos
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-            var port = UserPortfolioList.Where(p=>p.Key == positionRequest.Symbol).First().Value;
+            var port = UserPortfolioList.Where(p => p.Key == positionRequest.Symbol).First().Value;
             Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost} NetPL:{port.NetPL}]: {this.positionRequest.ToString()}", LogLevel.Order);
             CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
             this.positionRequest = null;
-            orderCounter++;            
+            orderCounter++;
             orderWait.Set();
         }
 
@@ -245,7 +245,8 @@ namespace Kalitte.Trading.Algos
                     last = last.AddDays(-1);
                 }
                 shouldBe = last;
-            } else if (t.Hour == 19 && t.Minute < nMax)
+            }
+            else if (t.Hour == 19 && t.Minute < nMax)
             {
                 shouldBe = t.Date.AddHours(18).AddMinutes(10);
             }
@@ -326,6 +327,17 @@ namespace Kalitte.Trading.Algos
         public void SetBarCurrentValues()
         {
             var time = Now;
+            var secDict = new Dictionary<int, BarPeriod>();
+            var secondsToStop = Symbols.Select(p => secDict[GetSymbolPeriodSeconds(p.Periods.Period.ToString())] = p.Periods.Period).ToList();
+            //var round = Helper.RoundDown(p, TimeSpan.FromSeconds(sec.Key));
+
+            foreach (var sec in secDict)
+            {
+                var round = Helper.RoundUp(time, TimeSpan.FromSeconds(sec.Key));
+                var roundDown = Helper.RoundDown(time, TimeSpan.FromSeconds(sec.Key));
+            }
+
+                
             foreach (var sd in Symbols)
             {
                 var p = sd.Periods;
@@ -342,12 +354,12 @@ namespace Kalitte.Trading.Algos
             var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
             var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
             var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
-            var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);            
+            var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
             try
             {
                 if ((t >= t1 && t <= t2) || (t >= t3 && t <= t4))
                 {
-                    SetBarCurrentValues();
+                    //SetBarCurrentValues();
                     if (SignalsState == StartableState.Stopped)
                     {
                         Log($"Time seems OK, starting signals ...");
@@ -381,7 +393,7 @@ namespace Kalitte.Trading.Algos
             {
                 data.Periods.Push(bar);
                 data.Periods.ClearCurrent();
-                Log($"Pushed new bar for period {period}, last bar is now: {data.Periods.Last}", LogLevel.Verbose, data.Periods.Last.Date);
+                Log($"Pushed new bar for period {period}, last bar is now: {data.Periods.Last}", LogLevel.Debug, data.Periods.Last.Date);
             }
         }
 
@@ -406,7 +418,7 @@ namespace Kalitte.Trading.Algos
             FinanceBars periodBars = null;
             try
             {
-                periodBars = Exchange != null ? Exchange.GetPeriodBars(symbol, period, t ?? DateTime.Now): null;                
+                periodBars = Exchange != null ? Exchange.GetPeriodBars(symbol, period, t ?? DateTime.Now) : null;
                 if (periodBars == null)
                 {
                     dataProviders.TryGetValue(symbol + period.ToString(), out MarketDataFileLogger mdp);
@@ -416,7 +428,7 @@ namespace Kalitte.Trading.Algos
                         mdp.FileName = "all.txt";
                         mdp.SaveDaily = true;
                         dataProviders[symbol + period.ToString()] = mdp;
-                    }                    
+                    }
                     periodBars = mdp.GetContentAsQuote(symbol, period, t ?? DateTime.Now);
                 }
                 var total = periodBars.Count;
@@ -646,7 +658,7 @@ namespace Kalitte.Trading.Algos
                 seansTimer.Dispose();
             }
             StopSignals();
-            this.Monitor.Stop();            
+            this.Monitor.Stop();
 
             Log($"Completed {this}", LogLevel.FinalResult);
             if (TestStart.HasValue)
@@ -679,7 +691,7 @@ namespace Kalitte.Trading.Algos
                 simulationFileMutext.WaitOne();
                 try
                 {
-                    var dictionary = SimulationFileFields.Length == 0? this.GetConfigValues(): this.GetConfigValues().Where(p=>SimulationFileFields.Contains(p.Key)).Select(p=>p);
+                    var dictionary = SimulationFileFields.Length == 0 ? this.GetConfigValues() : this.GetConfigValues().Where(p => SimulationFileFields.Contains(p.Key)).Select(p => p);
                     var sb = new StringBuilder();
                     if (UserPortfolioList.Count > 0)
                     {
@@ -708,7 +720,7 @@ namespace Kalitte.Trading.Algos
         {
             orderWait.Reset();
             var monitored = this.Monitor.Dump(true).ToString();
-            if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, t);            
+            if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, t);
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
             var portfolio = UserPortfolioList.GetPortfolio(symbol);
             var price = lprice > 0 ? lprice : this.GetMarketPrice(symbol, t);
@@ -825,31 +837,36 @@ namespace Kalitte.Trading.Algos
 
         public decimal[] GetMarketData(string symbol, BarPeriod period, DateTime? t = null)
         {
-
-            var values = PriceLogger.GetMarketDataList(t ?? DateTime.Now);
-            if (values.Length == 0)
+            lock (simulationLock)
             {
-                int toBack = 0, toForward = 0;
-                while (toBack-- > -5)
+                var values = PriceLogger.GetMarketDataList(t ?? DateTime.Now);
+                if (values.Length == 0)
                 {
-                    toForward++;
-                    values = PriceLogger.GetMarketDataList(t.Value.AddSeconds(toBack));
-                    if (values.Length > 0) return values;
-                    values = PriceLogger.GetMarketDataList(t.Value.AddSeconds(toForward));
-                    if (values.Length > 0) return values;
+                    int toBack = 0, toForward = 0;
+                    while (toBack-- > -5)
+                    {
+                        toForward++;
+                        values = PriceLogger.GetMarketDataList(t.Value.AddSeconds(toBack));
+                        if (values.Length > 0) return values;
+                        values = PriceLogger.GetMarketDataList(t.Value.AddSeconds(toForward));
+                        if (values.Length > 0) return values;
 
+                    }
                 }
+                return values;
             }
-            return values;
         }
 
         public virtual decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null)
         {
             if (Simulation)
             {
+
+
                 var list = GetMarketData(symbol, SymbolPeriod, t);
                 var vol = list.Length > 0 ? list[1] : 0;
                 return vol;
+
             }
             else return Exchange.GetVolume(symbol, period, t);
         }

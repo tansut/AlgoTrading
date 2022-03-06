@@ -64,6 +64,26 @@ namespace Kalitte.Trading
             return initial == null ? new List<T>() : new List<T>(initial);
         }
 
+        public void ReaderLock()
+        {
+            rvl.AcquireReaderLock(timeOut);
+        }
+
+        public void RelaseReader()
+        {
+            rvl.ReleaseReaderLock();
+        }
+
+        public void WriterLock()
+        {
+            rvl.AcquireWriterLock(timeOut);
+        }
+
+        public void RelaseWriter()
+        {
+            rvl.ReleaseWriterLock();
+        }
+
         public void Resize(int newSize)
         {
             rvl.AcquireWriterLock(timeOut);
@@ -427,8 +447,6 @@ namespace Kalitte.Trading
 
         public decimal[] Values(CandlePart candle)
         {
-
-
             rvl.AcquireReaderLock(timeOut);
             try
             {

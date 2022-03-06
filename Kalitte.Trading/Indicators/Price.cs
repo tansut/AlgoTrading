@@ -26,16 +26,14 @@ namespace Kalitte.Trading.Indicators
         public Price(FinanceBars bars, int periods) : base(bars)
         {
             this.Lookback = periods;              
-            createResult();                               
+            CreateResult();                               
         }
 
-        private void createResult()
+
+        public override IEnumerable<PriceResult> GetResults()
         {
-            ResultList.Clear();
-            var results = UsedInput.Select(p=>new PriceResult() { Price = p.Close, Date=p.Date}).ToList();
-            results.ForEach(r => ResultList.Push(r));
+            return UsedInput.Select(p => new PriceResult() { Price = p.Close, Date = p.Date });
         }
-
 
         protected override IndicatorResult ToValue(PriceResult result)
         {
@@ -46,15 +44,10 @@ namespace Kalitte.Trading.Indicators
         protected override void BarsChanged(object sender, ListEventArgs<IQuote> e)
         {
             base.BarsChanged(sender, e);
-            createResult();
+            CreateResult();
         }
 
 
-        //public override decimal NextValue(decimal newVal)
-        //{
-        //    return (decimal)(NextResult(new Quote() { Date = DateTime.Now, Close = newVal }).Price);
-
-        //}
 
         public override PriceResult NextResult(IQuote quote)
         {

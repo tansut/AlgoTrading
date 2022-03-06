@@ -23,8 +23,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 3);
-        settings.Finish = new DateTime(2022, 3, 3);
+        settings.Start = new DateTime(2022, 2, 28);
+        settings.Finish = new DateTime(2022, 2, 28);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -48,15 +48,15 @@ public class Program
         alternates.Set("ProfitPriceStep", 2.0);
 
         alternates.Set("LossInitialQuantity", 0);
-        alternates.Set("LossKeepQuantity", 2);
+        alternates.Set("LossKeepQuantity", 1);
         alternates.Set("LossQuantityStep", 1);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 2);
+        alternates.Set("LossStart", 16);
         alternates.Set("LossPriceStep", 2);
 
 
         // rsi profit
-        alternates.Set("RsiProfitInitialQuantity", 0);
+        alternates.Set("RsiProfitInitialQuantity",  0);
         alternates.Set("RsiProfitKeepQuantity", 0);
         alternates.Set("RsiProfitQuantityStep", 1);
         alternates.Set("RsiProfitQuantityStepMultiplier", 0);
@@ -84,8 +84,8 @@ public class Program
         // ma cross        
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("DynamicCross", true);
-        alternates.Set("CrossRsiMax",  56);
-        alternates.Set("CrossRsiMin",  44);        
+        alternates.Set("CrossRsiMax",  58);
+        alternates.Set("CrossRsiMin",  42);        
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);
         alternates.Set("PowerCrossPositiveMultiplier", 2.8);

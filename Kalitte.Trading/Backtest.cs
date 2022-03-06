@@ -224,7 +224,7 @@ namespace Kalitte.Trading
 
                 Run(periods.Item1.Item1, periods.Item1.Item2);
                 Run(periods.Item2.Item1, periods.Item2.Item2);
-                //if (Algo.ClosePositionsDaily) Algo.ClosePositions(Algo.Symbol);
+                //if (Algo.ClosePositionsDaily) Algo.ClosePositions(Algo.Symbol, null);
                 Algo.Signals.ForEach(p => p.Reset());
             }
             if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, null);

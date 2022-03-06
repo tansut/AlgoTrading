@@ -30,8 +30,6 @@ namespace Kalitte.Trading
             if (time.Hour == 22 && time.Minute == 59) bs = BuySell.Sell;
             return new SignalResult(this, t ?? DateTime.Now) { finalResult = bs };
         }
-
-
     }
 
 

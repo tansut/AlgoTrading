@@ -318,7 +318,7 @@ namespace Kalitte.Trading.Algos
 
 
             closePositionsSignal = new ClosePositionsSignal("daily-close", Symbol, this, ClosePositionsDaily);
-
+            if (ClosePositionsDaily) Signals.Add(closePositionsSignal);
 
             Signals.ForEach(p =>
             {

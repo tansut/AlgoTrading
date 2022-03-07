@@ -292,12 +292,12 @@ namespace Kalitte.Trading.Algos
             this.Signals.Add(this.powerSignal);
 
             rsiHigh = new DoubleCrossSignal("rsi-high", Symbol, this, 1M);
-            rsiHigh.RedLine = 71;
+            rsiHigh.RedLine = 72;
             rsiHigh.CollectSize = DataCollectSize;
             rsiHigh.AnalyseSize = DataAnalysisSize;
 
             rsiLow = new DoubleCrossSignal("rsi-low", Symbol, this, -1M);
-            rsiLow.RedLine = 29;
+            rsiLow.RedLine = 28;
             rsiLow.CollectSize = DataCollectSize;
             rsiLow.AnalyseSize = DataAnalysisSize;
 
@@ -443,6 +443,11 @@ namespace Kalitte.Trading.Algos
             if (portfolio.IsEmpty) return;
             if (result.finalResult == BuySell.Buy && portfolio.IsLong) return;
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
+
+            var lastSignalTime = portfolio.LastPositionOrder == null ? DateTime.MinValue : portfolio.LastPositionOrder.SignalResult.SignalTime;
+            if (signal.SignalType == ProfitOrLoss.Loss && (result.SignalTime - lastSignalTime).TotalSeconds < 180) return;
+            
+            
 
             decimal keep = result.KeepQuantity; // portfolio.IsLastOrderInstanceOf(typeof(TrendSignal)) ? 0: result.KeepQuantity;
             decimal quantity = result.Quantity;

@@ -91,6 +91,10 @@ namespace Kalitte.Trading
     public class TrendSignalResult : SignalResult
     {
         public TrendResult Trend { get; set; }
+        public IQuote[] CollectList { get; set; }
+        public IQuote[] AnalyseList { get; set; }
+        public decimal MarketPrice { get; set; }
+
 
         public TrendSignalResult(Signal signal, DateTime t) : base(signal, t)
         {
@@ -98,7 +102,9 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()} | {Trend}";
+            IQuote cl = CollectList == null ? null:  CollectList.LastOrDefault();
+            IQuote al = AnalyseList == null ? null: AnalyseList.LastOrDefault();
+            return $"{base.ToString()} mp: {this.MarketPrice} cl:{(cl == null ? 0:cl.Close)} al:{(al == null ? 0 : al.Close)} | {Trend}";
         }
 
         public override int GetHashCode()
@@ -238,6 +244,9 @@ namespace Kalitte.Trading
                     {
                         lastReference = lastValue.Value;
                     }
+                    result.MarketPrice = mp;
+                    result.CollectList = CollectList.List.ToArray;
+                    result.AnalyseList = AnalyseList.List.ToArray;
 
                     result.Trend =  getTrendDirection(lastReference, currentVal, this.ReferenceType == TrendReference.LastCheck ? null:  BarTrendResults.LastOrDefault());
                     result.Trend.Date = t ?? DateTime.Now;

@@ -22,6 +22,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(5)]
         public int MovPeriod { get; set; }
 
+        [AlgoParam(false)]
+        public bool UseVolumeWeightMa { get; set; }
+
         [AlgoParam(9)]
         public int MovPeriod2 { get; set; }
 
@@ -178,7 +181,7 @@ namespace Kalitte.Trading.Algos
 
         CrossSignal maSignal = null;
         CrossSignal macSignal = null;
-        //TakeProfitOrLossSignal takeProfitSignal = null;
+        
         ProfitSignal profitSignal = null;
         LossSignal lossSignal = null;
         LossSignal trendStopLossSignal = null;
@@ -210,8 +213,17 @@ namespace Kalitte.Trading.Algos
 
             if (maSignal != null)
             {
-                maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
-                maSignal.i2k = new Custom((q) => 0, periodData.Periods, MovPeriod + MovPeriod2 + MACDTrigger);
+                if (UseVolumeWeightMa)
+                {
+                    maSignal.i1k = new VWMA(periodData.Periods, MovPeriod);
+                    maSignal.i2k = new VWMA(periodData.Periods, MovPeriod2);
+
+                }
+                else
+                {
+                    maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
+                    maSignal.i2k = new Custom((q) => 0, periodData.Periods, MovPeriod + MovPeriod2 + MACDTrigger);
+                }
                 maSignal.PowerSignal = powerSignal;
 
                 if (maTrendSignal != null)
@@ -370,7 +382,7 @@ namespace Kalitte.Trading.Algos
             }
             if (rsiTrendSignal != null)
             {
-                this.Monitor.AddFilter($"{rsiTrendSignal.Name}/value", 10);
+                this.Monitor.AddFilter($"{rsiTrendSignal.Name}/value", 5);
                 this.Monitor.AddFilter($"{rsiTrendSignal.Name}/speed", 10);
             }
             if (priceTrend != null)

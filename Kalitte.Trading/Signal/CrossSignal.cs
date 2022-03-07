@@ -267,15 +267,16 @@ namespace Kalitte.Trading
             }
 
             var mp = Algo.GetMarketPrice(Symbol, t);
+            var volTotal = Algo.GetVolume(Symbol, i1k.InputBars.Period, t);
 
             if (mp > 0) CollectList.Collect(mp);
 
-            if (CollectList.Ready && mp >= 0)
+            if (CollectList.Ready && mp >= 0 && volTotal > 0)
             {
                 decimal mpAverage = CollectList.LastValue;
 
-                var l1 = i1k.NextValue(mpAverage).Value.Value;
-                var l2 = i2k.NextValue(mpAverage).Value.Value;
+                var l1 = i1k.NextValue(mpAverage, volTotal).Value.Value;
+                var l2 = i2k.NextValue(mpAverage, volTotal).Value.Value;
 
                 AnalyseList.Collect(l1 - l2);
                 crossBars.Push(l1 - l2);

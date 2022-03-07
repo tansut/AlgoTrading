@@ -808,9 +808,19 @@ namespace Kalitte.Trading.Algos
             }
         }
 
+        public double CalculateVolumeBySecond(DateTime t, decimal volume)
+        {
+            Helper.SymbolSeconds(SymbolPeriod.ToString(), out int periodSeconds);
+            var rounded = Helper.RoundDown(t, TimeSpan.FromSeconds(periodSeconds));
+            var elapsedSeconds = Math.Max(1, (t - rounded).TotalSeconds);
+            if (elapsedSeconds > 15) return (double)volume / elapsedSeconds;
+            else return 0;
+        }
+
         public void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null)
         {
-            if ((int)level >= (int)this.LoggingLevel)
+            var ilevel = (int)level;
+            if (ilevel >= (int)this.LoggingLevel)
             {
                 var time = t ?? Now;
                 string opTime = time.ToString("yyyy.MM.dd HH:mm:sss");
@@ -818,10 +828,14 @@ namespace Kalitte.Trading.Algos
                 if (Simulation) LogContent.AppendLine(content);
                 else
                 {
-                    File.AppendAllText(LogFile, content + Environment.NewLine);
+                    lock(this)
+                    {
+                        File.AppendAllText(LogFile, content + Environment.NewLine);
+                    }                    
                 }
-                if (LogConsole) Console.WriteLine(content);
-                if (Exchange != null) Exchange.Log(content, level, t);
+                var showUser = ilevel >= (int)LogLevel.Debug;
+                if (LogConsole && showUser) Console.WriteLine(content);
+                if (Exchange != null && showUser) Exchange.Log(content, level, t);
             }
         }
 

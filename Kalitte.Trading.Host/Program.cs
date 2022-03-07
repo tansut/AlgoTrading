@@ -23,28 +23,28 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 2, 28);
+        settings.Start = new DateTime(2022, 3, 3);
+        settings.Finish = new DateTime(2022, 3, 3);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("CrossOrderQuantity", 6);
+        alternates.Set("CrossOrderQuantity", 2);
         alternates.Set("RsiTrendOrderQuantity", 0);
-        alternates.Set("DataCollectSize", 12);
+        alternates.Set("DataCollectSize", 8);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
         alternates.Set("DataAnalysisUseSma", true);
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 3);
+        alternates.Set("ProfitInitialQuantity", 1);
         alternates.Set("ProfitKeepQuantity", 1);
         alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
-        alternates.Set("ProfitStart", 10.0);        
+        alternates.Set("ProfitStart", 9.0);        
         alternates.Set("ProfitPriceStep", 2.0);
 
         alternates.Set("LossInitialQuantity", 0);
@@ -84,8 +84,12 @@ public class Program
         // ma cross        
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("DynamicCross", true);
-        alternates.Set("CrossRsiMax",  58);
-        alternates.Set("CrossRsiMin",  42);        
+
+        
+
+        alternates.Set("UseVolumeWeightMa", false);
+        alternates.Set("CrossRsiMax",  56);
+        alternates.Set("CrossRsiMin",  44);        
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);
         alternates.Set("PowerCrossPositiveMultiplier", 2.8);
@@ -95,13 +99,13 @@ public class Program
 
 
         // System
-        alternates.Set("LoggingLevel", LogLevel.Debug);        
+        alternates.Set("LoggingLevel", LogLevel.Verbose);        
         alternates.Set("Symbol", "F_XU0300422");
-        alternates.Set("LogConsole", true);
+        alternates.Set("LogConsole", false);
 
         alternates.SaveToFile($"c:\\kalitte\\Bist30Futures-test.json");
         alternates.Set("LoggingLevel", LogLevel.Warning);
-
+        alternates.Set("LogConsole", true);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
         return settings;
     }

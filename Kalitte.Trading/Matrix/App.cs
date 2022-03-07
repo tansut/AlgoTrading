@@ -29,40 +29,11 @@ namespace Matriks.Lean.Algotrader
 
     }
 
-    public class MaAlg2 : Kalitte.Trading.Matrix.MaProfit
+
+
+
+    public class bardatalogger : Kalitte.Trading.Matrix.BarDataLogger
     {
 
     }
-
-    public class MaAlgMacd : Kalitte.Trading.Matrix.MaProfit
-    {
-
-    }
-
-    
-
-    public class backtest : Kalitte.Trading.Matrix.MaProfit
-    {
-        public override void OnInit()
-        {
-            
-            base.OnInit();
-        }
-    }
-
-    public class testalgo : Kalitte.Trading.Matrix.MaProfit
-    {
-        public override void OnInit()
-        {
-
-            base.OnInit();
-        }
-    }
-
-
-
-    //public class bardatalogger : Kalitte.Trading.Matrix.BarDataLogger
-    //{
-
-    //}
 }

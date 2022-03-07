@@ -91,14 +91,14 @@ namespace Kalitte.Trading
 
 
 
-        double calculateVolumeBySecond(DateTime t, decimal volume)
-        {
-            Helper.SymbolSeconds(Algo.SymbolPeriod.ToString(), out int periodSeconds);
-            var rounded = Helper.RoundDown(t, TimeSpan.FromSeconds(periodSeconds));
-            var elapsedSeconds = Math.Max(1, (t - rounded).TotalSeconds);
-            if (elapsedSeconds > 15) return (double)volume / elapsedSeconds;
-            else return 0;
-        }
+        //double calculateVolumeBySecond(DateTime t, decimal volume)
+        //{
+        //    Helper.SymbolSeconds(Algo.SymbolPeriod.ToString(), out int periodSeconds);
+        //    var rounded = Helper.RoundDown(t, TimeSpan.FromSeconds(periodSeconds));
+        //    var elapsedSeconds = Math.Max(1, (t - rounded).TotalSeconds);
+        //    if (elapsedSeconds > 15) return (double)volume / elapsedSeconds;
+        //    else return 0;
+        //}
 
         void SetPower(PowerSignalResult s, DateTime t)
         {
@@ -129,7 +129,7 @@ namespace Kalitte.Trading
             var mp = Algo.GetVolume(Symbol, Indicator.InputBars.Period, t);
             if (mp > 0)
             {
-                var volume = calculateVolumeBySecond(time, mp);
+                var volume = Algo.CalculateVolumeBySecond(time, mp);
                 if (volume > 0)
                 {
                     CollectList.Collect((decimal)volume);                    

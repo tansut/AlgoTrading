@@ -263,7 +263,7 @@ namespace Kalitte.Trading
             try
             {
                 LoadNewBars(sender, e);
-                Log($"Loaded new bars for {this.Name} Data: {e.Action}, {e.Item}", LogLevel.Verbose);
+                Log($"Loaded new bars for {this.Name} Data: {e.Action}, {e.Item}", LogLevel.Debug);
             }
             finally
             {

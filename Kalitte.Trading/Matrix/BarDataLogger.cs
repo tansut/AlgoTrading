@@ -1,4 +1,4 @@
-﻿//algo
+﻿// algo
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,20 +24,17 @@ using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading.Matrix
 {
-    public class BarDataLogger : MatrixAlgoBase<AlgoBase>
+    public class BarDataLogger : MatrixAlgoBase<Log>
     {
-
-
 
         [Parameter(1)]
         public int LogSeconds = 1;
 
-        [SymbolParameter("F_XU0300222")]
-        public string Symbol = "F_XU0300222";
+        [SymbolParameter("F_XU0300422")]
+        public string Symbol = "F_XU0300422";
 
         [Parameter(SymbolPeriod.Min10)]
         public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
-
 
         
         private MarketDataFileLogger priceLogger;
@@ -57,11 +54,15 @@ namespace Kalitte.Trading.Matrix
             var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
             var t2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
+            volume.RefreshIndicator = true;            
 
             if (t >= t1 && t <= t2)
             {
-                var price = GetMarketData(Symbol, SymbolUpdateField.Last);
-                priceLogger.LogMarketData(DateTime.Now, new decimal[] { price, volume.CurrentValue });
+                lock(this)
+                {
+                    var price = GetMarketData(Symbol, SymbolUpdateField.Last);
+                    priceLogger.LogMarketData(DateTime.Now, new decimal[] { price, volume.CurrentValue });
+                }
             }
         }
 
@@ -129,8 +130,6 @@ namespace Kalitte.Trading.Matrix
                 bd.Volume[i], 
                 bd.Diff[i], 
                 bd.DiffPercent[i]});
-
-
         }
 
         public override void OnDataUpdate(BarDataEventArgs barDataEventArgs)
@@ -152,7 +151,7 @@ namespace Kalitte.Trading.Matrix
            
         }
 
-        protected override AlgoBase createAlgoInstance()
+        protected override Log createAlgoInstance()
         {
             return new Log();
         }

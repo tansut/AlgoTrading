@@ -773,9 +773,9 @@ namespace Kalitte.Trading.Algos
             {
                 Signals.Where(p => p is ProfitLossSignal).Select(p => (ProfitLossSignal)p).ToList().ForEach(p => p.ResetChanges());
             }
-            //if (portfolio.IsEmpty)
+            if (portfolio.IsEmpty)
             {
-                Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.Reset());
+                Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
             }
 
             base.FillCurrentOrder(filledUnitPrice, filledQuantity);

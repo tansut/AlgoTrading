@@ -293,11 +293,11 @@ namespace Kalitte.Trading
                 {
                     var lastAvg = AnalyseList.LastValue; 
 
-                    decimal last1 = i1k.Results.Last().Value.Value;
-                    decimal last2 = i2k.Results.Last().Value.Value;
+                    //decimal last1 = i1k.Results.Last().Value.Value;
+                    //decimal last2 = i2k.Results.Last().Value.Value;
 
-                    result.i1Val = last1;
-                    result.i2Val = last2;
+                    result.i1Val = l1;
+                    result.i2Val = l2;
                     result.Dif = lastAvg;
 
                     if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;

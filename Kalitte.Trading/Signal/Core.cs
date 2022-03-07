@@ -216,7 +216,7 @@ namespace Kalitte.Trading
 
         public virtual void Reset()
         {
-            InOperationLock.WaitOne();
+            //InOperationLock.WaitOne();
             InOperationLock.Reset();
             try
             {

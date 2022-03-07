@@ -23,8 +23,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 4);
+        settings.Start = new DateTime(2022, 2, 28);
+        settings.Finish = new DateTime(2022, 2, 28);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -53,11 +53,11 @@ public class Program
         
             
 
-        alternates.Set("LossInitialQuantity", 0);
+        alternates.Set("LossInitialQuantity", 3);
         alternates.Set("LossKeepQuantity", 1);
         alternates.Set("LossQuantityStep", 1);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 16);
+        alternates.Set("LossStart", 12);
         alternates.Set("LossPriceStep", 2);
 
 

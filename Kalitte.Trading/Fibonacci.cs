@@ -31,8 +31,6 @@ namespace Kalitte.Trading
         {
             return this.Where(x => x.Ratio == ratio).FirstOrDefault();
         }
-
-
     }
 
     public class Fibonacci
@@ -44,7 +42,6 @@ namespace Kalitte.Trading
         public FibonacciList DownRetracement { get; private set; } = new FibonacciList();
         public FibonacciList UpExtension { get; private set; } = new FibonacciList();
         public FibonacciList DownExtension { get; private set; } = new FibonacciList();
-
 
         public static decimal[] RetracementRatios = new decimal[] { 0.0M, 23.6M, 38.2M, 50, 61.8M, 78.6M, 100, 138.2M };
         public static decimal[] ExtensionRatios = new decimal[] { 261.8M, 200, 161.8M, 138.2M, 100.0M, 61.8M };

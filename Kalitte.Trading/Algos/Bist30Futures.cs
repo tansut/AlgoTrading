@@ -201,7 +201,8 @@ namespace Kalitte.Trading.Algos
         TrendSignal atrTrend = null;
         PowerSignal powerSignal = null;
         ClosePositionsSignal closePositionsSignal = null;
-
+        DoubleCrossSignal rsiHigh;
+        DoubleCrossSignal rsiLow;
 
 
 
@@ -219,6 +220,8 @@ namespace Kalitte.Trading.Algos
 
             powerSignal.Indicator = new Rsi(periodData.Periods, PowerLookback, CandlePart.Volume);
 
+            
+
             if (maSignal != null)
             {
                 if (UseVolumeWeightMa)
@@ -229,7 +232,7 @@ namespace Kalitte.Trading.Algos
                 else
                 {
                     maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
-                    maSignal.i2k = new Custom((q) => 0, periodData.Periods, MovPeriod + MovPeriod2 + MACDTrigger);
+                    maSignal.i2k = new Custom((q) => 0, periodData.Periods);
                 }
                 maSignal.PowerSignal = powerSignal;
 
@@ -246,12 +249,15 @@ namespace Kalitte.Trading.Algos
                 macSignal.i2k = macdi.Trigger;
             }
 
+            var rsi = new Rsi(periodData.Periods, Rsi);
+
             if (rsiTrendSignal != null)
-            {
-                var rsi = new Rsi(periodData.Periods, Rsi);
+            {                
                 rsiTrendSignal.i1k = rsi;
             }
 
+            rsiLow.Indicator = rsi;
+            rsiHigh.Indicator = rsi;
 
 
             Signals.ForEach(p =>
@@ -285,6 +291,18 @@ namespace Kalitte.Trading.Algos
             //this.Signals.Add(this.atrTrend);
             this.Signals.Add(this.powerSignal);
 
+            rsiHigh = new DoubleCrossSignal("rsi-high", Symbol, this, 0.2M);
+            rsiHigh.RedLine = 72;
+            rsiHigh.CollectSize = DataCollectSize;
+            rsiHigh.AnalyseSize = DataAnalysisSize;
+
+            rsiLow = new DoubleCrossSignal("rsi-low", Symbol, this, -0.2M);
+            rsiLow.RedLine = 28;
+            rsiLow.CollectSize = DataCollectSize;
+            rsiLow.AnalyseSize = DataAnalysisSize;
+
+            Signals.Add(rsiHigh);
+            Signals.Add(rsiLow);
 
             if (MovPeriod > 0 && CrossOrderQuantity > 0 && !SimulateOrderSignal)
             {
@@ -565,6 +583,12 @@ namespace Kalitte.Trading.Algos
                     var signalResult = (ProfitLossResult)result;
                     HandleProfitLossSignal(tpSignal, signalResult);
                 }
+                else if ((result.Signal.Name == "rsi-high") || (result.Signal.Name == "rsi-low"))
+                {
+                    var tpSignal = (DoubleCrossSignal)(result.Signal);
+                    var signalResult = (DoubleCrossSignalResult)result;
+                    HandleRsiLimitSignal(tpSignal, signalResult);
+                }
                 else if (result.Signal.Name == "rsi-trend")
                 {
                     var tpSignal = (TrendSignal)(result.Signal);
@@ -618,6 +642,22 @@ namespace Kalitte.Trading.Algos
             finally
             {
                 operationWait.Set();
+            }
+        }
+
+        private void HandleRsiLimitSignal(DoubleCrossSignal signal, DoubleCrossSignalResult sr)
+        {
+            var portfolio = UserPortfolioList.GetPortfolio(Symbol);
+            if (sr.finalResult.HasValue && portfolio.Quantity == profitSignal.KeepQuantity)
+            {
+                var rsiLast = rsiTrendSignal.AnalyseList.LastValue;
+               
+                //sendOrder(Symbol, 2 * profitSignal.KeepQuantity, sr.finalResult.Value, $"{signal.Name}[{sr.L1},{sr.L2},{sr.IndicatorValue}]", 0, OrderIcon.StopLoss, sr.SignalTime, sr);
+                
+                //ClosePositions(Symbol, signalResult);
+                Log($"{signal.Name}:{sr.finalResult} {rsiLast}", LogLevel.Warning);
+                rsiHigh.Reset();
+                rsiLow.Reset();
             }
         }
 
@@ -730,6 +770,7 @@ namespace Kalitte.Trading.Algos
             {
                 Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
             }
+
             base.FillCurrentOrder(filledUnitPrice, filledQuantity);
         }
 

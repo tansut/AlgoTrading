@@ -168,7 +168,7 @@ namespace Kalitte.Trading
                 rvl.AcquireReaderLock(timeOut);
                 try
                 {
-                    return items;
+                    return items.ToList();
                 }
                 finally
                 {

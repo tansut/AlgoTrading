@@ -25,9 +25,9 @@ namespace Kalitte.Trading.Indicators
             return $"{base.ToString()}:({Lookback})";
         }
 
-        public Custom(Func<IQuote, decimal> func, FinanceBars bars, int periods) : base(bars)
+        public Custom(Func<IQuote, decimal> func, FinanceBars bars) : base(bars)
         {
-            this.Lookback = periods;
+            //this.Lookback = periods;
             this.Func = func;
             base.CreateResult();     
         }

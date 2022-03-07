@@ -27,7 +27,7 @@ namespace Kalitte.Trading
         public ProfitOrLoss Direction { get; set; }
         public decimal Quantity { get; set; }
         public decimal KeepQuantity { get; set; }
-
+        
         public ProfitLossResult(Signal signal, DateTime t) : base(signal, t)
         {
 
@@ -49,6 +49,8 @@ namespace Kalitte.Trading
         public virtual decimal PriceChange { get; set; }
         public virtual decimal InitialQuantity { get; set; }
         public virtual decimal KeepQuantity { get; set; }
+
+        public Fibonacci FibonacciLevels { get; set; } = null;
 
         public abstract ProfitOrLoss SignalType { get;  }
 

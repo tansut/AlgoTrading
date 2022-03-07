@@ -59,7 +59,7 @@ namespace Kalitte.Trading.Matrix
             if (t >= t1 && t <= t2)
             {
                 lock(this)
-                {
+                {                    
                     var price = GetMarketData(Symbol, SymbolUpdateField.Last);
                     priceLogger.LogMarketData(DateTime.Now, new decimal[] { price, volume.CurrentValue });
                 }

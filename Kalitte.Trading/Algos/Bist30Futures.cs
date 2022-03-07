@@ -112,8 +112,16 @@ namespace Kalitte.Trading.Algos
         public decimal ProfitKeepQuantity { get; set; }
 
 
-        [AlgoParam(20)]
+        [AlgoParam(0)]
         public decimal ProfitStart { get; set; }
+
+
+
+        [AlgoParam(0)]
+        public decimal PriceLowLimit { get; set; }
+
+        [AlgoParam(0)]
+        public decimal PriceHighLimit { get; set; }
 
         [AlgoParam(0)]
         public decimal LossPriceStep { get; set; }
@@ -217,7 +225,6 @@ namespace Kalitte.Trading.Algos
                 {
                     maSignal.i1k = new VWMA(periodData.Periods, MovPeriod);
                     maSignal.i2k = new VWMA(periodData.Periods, MovPeriod2);
-
                 }
                 else
                 {
@@ -287,7 +294,7 @@ namespace Kalitte.Trading.Algos
                 Signals.Add(maTrendSignal);
             }
 
-            if (MACDShortPeriod > 0 && !SimulateOrderSignal)
+            if (MACDShortPeriod > 0 && CrossOrderQuantity >0 && !SimulateOrderSignal)
             {
                 this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MacdAvgChange };
                 this.Signals.Add(macSignal);
@@ -332,6 +339,8 @@ namespace Kalitte.Trading.Algos
             closePositionsSignal = new ClosePositionsSignal("daily-close", Symbol, this, ClosePositionsDaily);
             if (ClosePositionsDaily) Signals.Add(closePositionsSignal);
 
+            Fibonacci fib = this.PriceLowLimit > 0 ? new Fibonacci(PriceLowLimit, PriceHighLimit): null;
+
             Signals.ForEach(p =>
             {
                 p.TimerEnabled = !Simulation;
@@ -340,6 +349,7 @@ namespace Kalitte.Trading.Algos
                 p.PerfMon = this.Monitor;
 
                 var analyser = p as AnalyserBase;
+                var profit = p as ProfitLossSignal;
 
                 if (analyser != null)
                 {
@@ -347,6 +357,11 @@ namespace Kalitte.Trading.Algos
                     analyser.AnalyseSize = DataAnalysisSize;
                     analyser.CollectAverage = DataCollectUseSma ? Average.Sma : Average.Ema;
                     analyser.AnalyseAverage = DataAnalysisUseSma ? Average.Sma : Average.Ema;
+                }
+
+                if (profit != null)
+                {
+                    profit.FibonacciLevels = fib;
                 }
             });
         }

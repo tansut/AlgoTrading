@@ -23,15 +23,15 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 3);
-        settings.Finish = new DateTime(2022, 3, 3);
+        settings.Start = new DateTime(2022, 3, 1);
+        settings.Finish = new DateTime(2022, 3, 4);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("CrossOrderQuantity", 2);
+        alternates.Set("CrossOrderQuantity", 6);
         alternates.Set("RsiTrendOrderQuantity", 0);
         alternates.Set("DataCollectSize", 8);
         alternates.Set("DataAnalysisSize", 48);
@@ -40,12 +40,18 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 1);
+        alternates.Set("ProfitInitialQuantity", 3);
         alternates.Set("ProfitKeepQuantity", 1);
         alternates.Set("ProfitQuantityStep", 1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
         alternates.Set("ProfitStart", 9.0);        
         alternates.Set("ProfitPriceStep", 2.0);
+
+        alternates.Set("PriceLowLimit", 2200);
+        alternates.Set("PriceHighLimit", 2300);
+
+        
+            
 
         alternates.Set("LossInitialQuantity", 0);
         alternates.Set("LossKeepQuantity", 1);
@@ -83,9 +89,17 @@ public class Program
 
         // ma cross        
         alternates.Set("MaAvgChange", 0.32M);
+        alternates.Set("MovPeriod", 5);
+        alternates.Set("MovPeriod2", 9);
         alternates.Set("DynamicCross", true);
 
-        
+        // macd
+        alternates.Set("MacdAvgChange", 0.32M);
+        alternates.Set("MACDShortPeriod", 0);
+        alternates.Set("MACDLongPeriod", 9);
+        alternates.Set("MACDTrigger", 9);
+
+
 
         alternates.Set("UseVolumeWeightMa", false);
         alternates.Set("CrossRsiMax",  56);

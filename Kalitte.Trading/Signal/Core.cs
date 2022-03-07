@@ -177,6 +177,7 @@ namespace Kalitte.Trading
             try
             {
                 if (this.State == StartableState.Paused) return null;
+                if (!Enabled) return null;
                 if (!EnsureUsingRightBars(time))
                 {
                     Log($"IMPORTANT: Detected wrong bars for indicators.", LogLevel.Error, t);

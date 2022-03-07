@@ -19,6 +19,11 @@ namespace Kalitte.Trading
         public DoubleCrossSignalResult(Signal signal, DateTime signalTime) : base(signal, signalTime)
         {
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()}[{L1},{ L2},{IndicatorValue}]"; ;
+        }
     }
 
     public class DoubleCrossSignal : Signal
@@ -36,6 +41,9 @@ namespace Kalitte.Trading
 
         public decimal L1 { get; set; }
         public decimal L2 { get; set; }
+        public bool L2Set { get; set; }
+
+        public decimal DeltaRatio { get; set; } = 0.2M;
 
         public Custom L1Indicator { get; set; }
         public Custom L2Indicator { get; set; }
@@ -49,8 +57,7 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            L1 = RedLine;
-            L2 = RedLine + Delta;
+            ResetLimits();
 
             this.Cross1 = new CrossSignal($"{this.Name}-c1", Symbol, Algo);
             this.Cross2 = new CrossSignal($"{this.Name}-c2", Symbol, Algo);
@@ -80,10 +87,16 @@ namespace Kalitte.Trading
             base.Init();
         }
 
-        protected override void ResetInternal()
+        protected void ResetLimits()
         {
             L1 = RedLine;
-            L2 = RedLine;
+            L2 = L1 + Delta * 10;
+            L2Set = false;
+        }
+
+        protected override void ResetInternal()
+        {
+            ResetLimits();
             Cross1.Reset();
             Cross2.Reset();
             base.ResetInternal();
@@ -95,7 +108,7 @@ namespace Kalitte.Trading
             var result = new DoubleCrossSignalResult(this, Algo.Now);
             var c1Res = Cross1.Check(t);
             var c2Res = Cross2.Check(t);
-            var i1Val = ((CrossSignalResult)c2Res).i1Val;
+            var i1Val = ((CrossSignalResult)c1Res).i1Val;
 
             if (i1Val != 0)
             {
@@ -103,55 +116,67 @@ namespace Kalitte.Trading
                 {
                     if (i1Val > L1)
                     {
-                        L1 = RedLine;
-                        L2 = RedLine;
+                        ResetLimits();
+                        ResetInternal();
+                        return result;
                     }
 
                     if (c1Res.finalResult == BuySell.Sell)
                     {
-                        if (c2Res.finalResult == BuySell.Sell)
+                        if (c2Res.finalResult == BuySell.Sell || !L2Set)
                         {
-                            L2 = i1Val + Delta;
+                            var newL2 = i1Val + Delta * DeltaRatio;
+                            if (newL2 > L2 && L2Set) result.finalResult = BuySell.Buy;
+                            L2 = newL2;
+                            L2Set = true;
                         }
+
                     }
                     if (c2Res.finalResult == BuySell.Buy)
                     {
-                        if (i1Val <= L2)
+                        if (i1Val < L1)
                             result.finalResult = BuySell.Buy;
                     }
                     else if (c1Res.finalResult == BuySell.Buy)
                     {
-                        if (i1Val <= L2) result.finalResult = BuySell.Buy;
+                        if (i1Val < L1)
+                            result.finalResult = BuySell.Buy;
                     }
                 }
                 else
                 {
                     if (i1Val < L1)
                     {
-                        L1 = RedLine;
-                        L2 = RedLine;
+                        ResetLimits();
+                        ResetInternal();
+                        return result;
                     }
                     if (c1Res.finalResult == BuySell.Buy)
                     {
-                        if (c2Res.finalResult == BuySell.Buy)
+                        if (c2Res.finalResult == BuySell.Buy || !L2Set)
                         {
-                            L2 = i1Val + Delta;
+                            var newL2 = i1Val + Delta * DeltaRatio;
+                            if (newL2 < L2 && L2Set) result.finalResult = BuySell.Sell;
+                            L2 = newL2;
+                            L2Set = true;
                         }
                     }
                     if (c2Res.finalResult == BuySell.Sell)
                     {
-                        if (i1Val >= L2)
+                        if (i1Val > L1)
                             result.finalResult = BuySell.Sell;
                     }
                     else if (c1Res.finalResult == BuySell.Sell)
                     {
-                        if (i1Val >= L2) result.finalResult = BuySell.Sell;
+                        if (i1Val > L1)
+                            result.finalResult = BuySell.Sell;
                     }
                 }
             }
             result.IndicatorValue = i1Val;
             result.L1 = L1;
             result.L2 = L2;
+            if (result.finalResult.HasValue) ResetInternal();
             return result;
         }
     }

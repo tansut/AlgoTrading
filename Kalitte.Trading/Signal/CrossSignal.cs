@@ -302,9 +302,7 @@ namespace Kalitte.Trading
 
                     if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
                     else if (lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
-
                 }
-
             }
 
 

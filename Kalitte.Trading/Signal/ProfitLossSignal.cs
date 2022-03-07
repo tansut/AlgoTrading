@@ -115,7 +115,8 @@ namespace Kalitte.Trading
         protected virtual ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
         {
             BuySell? bs = null;
-            var pl = marketPrice - portfolio.AvgCost;
+            var unitPl = marketPrice - portfolio.AvgCost;
+            var totalPl = unitPl * portfolio.Quantity;
 
             if (this.LimitingSignals.Any())
             {
@@ -125,23 +126,22 @@ namespace Kalitte.Trading
 
             if (this.SignalType == ProfitOrLoss.Profit)
             {
-                if (InitialQuantity > 0 && portfolio.IsLong && pl >= this.UsedPriceChange)
+                if (InitialQuantity > 0 && portfolio.IsLong && unitPl >= this.UsedPriceChange)
                 {
                     bs = BuySell.Sell;
                 }
-                else if (InitialQuantity > 0 && portfolio.IsShort && -pl >= this.UsedPriceChange)
+                else if (InitialQuantity > 0 && portfolio.IsShort && -unitPl >= this.UsedPriceChange)
                 {
                     bs = BuySell.Buy;
                 }
             }
             else if (this.SignalType == ProfitOrLoss.Loss)
-            {
-                if (InitialQuantity > 0 && portfolio.IsLong && pl <= -this.UsedPriceChange)
+            {               
+                if (InitialQuantity > 0 && portfolio.IsLong && totalPl <= -this.UsedPriceChange)
                 {
-
                     bs = BuySell.Sell;
                 }
-                else if (InitialQuantity > 0 && portfolio.IsShort && pl >= this.UsedPriceChange)
+                else if (InitialQuantity > 0 && portfolio.IsShort && totalPl >= this.UsedPriceChange)
                 {
                     bs = BuySell.Buy;
                 }
@@ -152,7 +152,7 @@ namespace Kalitte.Trading
             result.finalResult = bs;
             result.Quantity = quantity;
             result.MarketPrice = marketPrice;
-            result.PL = pl;
+            result.PL = unitPl;
             result.Direction = SignalType;
             result.KeepQuantity = this.KeepQuantity;
             return result;

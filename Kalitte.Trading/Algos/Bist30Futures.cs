@@ -291,13 +291,13 @@ namespace Kalitte.Trading.Algos
             //this.Signals.Add(this.atrTrend);
             this.Signals.Add(this.powerSignal);
 
-            rsiHigh = new DoubleCrossSignal("rsi-high", Symbol, this, 0.2M);
-            rsiHigh.RedLine = 72;
+            rsiHigh = new DoubleCrossSignal("rsi-high", Symbol, this, 1M);
+            rsiHigh.RedLine = 71;
             rsiHigh.CollectSize = DataCollectSize;
             rsiHigh.AnalyseSize = DataAnalysisSize;
 
-            rsiLow = new DoubleCrossSignal("rsi-low", Symbol, this, -0.2M);
-            rsiLow.RedLine = 28;
+            rsiLow = new DoubleCrossSignal("rsi-low", Symbol, this, -1M);
+            rsiLow.RedLine = 29;
             rsiLow.CollectSize = DataCollectSize;
             rsiLow.AnalyseSize = DataAnalysisSize;
 
@@ -344,12 +344,12 @@ namespace Kalitte.Trading.Algos
                     rsiProfitSignal.LimitingSignals.Add(typeof(TrendSignal));
                     Signals.Add(rsiProfitSignal);
                 }
-                if (RsiTrendOrderQuantity > 0 && RsiLossStart > 0)
-                {
-                    trendStopLossSignal = new LossSignal("trend-loss", Symbol, this, RsiLossStart, RsiTrendOrderQuantity, 1, 1, RsiLossStart/3 , 0);
-                    trendStopLossSignal.LimitingSignals.Add(typeof(TrendSignal));
-                    this.Signals.Add(trendStopLossSignal);
-                }
+                //if (RsiTrendOrderQuantity > 0 && RsiLossStart > 0)
+                //{
+                //    trendStopLossSignal = new LossSignal("trend-loss", Symbol, this, RsiLossStart, RsiTrendOrderQuantity, 1, 1, RsiLossStart/3 , 0);
+                //    trendStopLossSignal.LimitingSignals.Add(typeof(TrendSignal));
+                //    this.Signals.Add(trendStopLossSignal);
+                //}
                 this.Signals.Add(rsiTrendSignal);
             }
 
@@ -648,16 +648,17 @@ namespace Kalitte.Trading.Algos
         private void HandleRsiLimitSignal(DoubleCrossSignal signal, DoubleCrossSignalResult sr)
         {
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
-            if (sr.finalResult.HasValue && portfolio.Quantity == profitSignal.KeepQuantity)
+            if (portfolio.Quantity == profitSignal.KeepQuantity && RsiTrendOrderQuantity > 0)
             {
-                var rsiLast = rsiTrendSignal.AnalyseList.LastValue;
-               
-                //sendOrder(Symbol, 2 * profitSignal.KeepQuantity, sr.finalResult.Value, $"{signal.Name}[{sr.L1},{sr.L2},{sr.IndicatorValue}]", 0, OrderIcon.StopLoss, sr.SignalTime, sr);
-                
-                //ClosePositions(Symbol, signalResult);
-                Log($"{signal.Name}:{sr.finalResult} {rsiLast}", LogLevel.Warning);
-                rsiHigh.Reset();
-                rsiLow.Reset();
+                if (portfolio.Side == sr.finalResult.Value)
+                {
+                    Log($"Ignored {signal.Name} {sr} since portfolio is {portfolio.SideStr}", LogLevel.Warning);
+                    return;
+                }
+                sendOrder(Symbol, profitSignal.KeepQuantity + RsiTrendOrderQuantity, sr.finalResult.Value, $"{signal.Name}[{sr}]", 0, OrderIcon.StopLoss, sr.SignalTime, sr);
+            } else if (portfolio.IsEmpty && RsiTrendOrderQuantity > 0)
+            {
+                sendOrder(Symbol, RsiTrendOrderQuantity, sr.finalResult.Value, $"*{signal.Name}*[{sr}]", 0, OrderIcon.None, sr.SignalTime, sr);
             }
         }
 
@@ -677,6 +678,7 @@ namespace Kalitte.Trading.Algos
 
         public void HandleRsiTrendSignal(TrendSignal signal, TrendSignalResult signalResult)
         {
+            return;
             if (RsiTrendOrderQuantity == 0) return;
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
             if (!portfolio.IsEmpty) return;
@@ -766,9 +768,9 @@ namespace Kalitte.Trading.Algos
             {
                 Signals.Where(p => p is ProfitLossSignal).Select(p => (ProfitLossSignal)p).ToList().ForEach(p => p.ResetChanges());
             }
-            if (portfolio.IsEmpty)
+            //if (portfolio.IsEmpty)
             {
-                Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
+                Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.Reset());
             }
 
             base.FillCurrentOrder(filledUnitPrice, filledQuantity);

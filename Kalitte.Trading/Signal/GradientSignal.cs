@@ -26,7 +26,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()}[{L1},{ L2},{IndicatorValue}]"; ;
+            return $"{base.ToString()}[iVal: {IndicatorValue}, bv: {BestValue} r: {ResistanceValue} t: {TargetValue} uv: {UsedValue}]"; ;
         }
     }
 
@@ -50,7 +50,7 @@ namespace Kalitte.Trading
 
         public override void Init()
         {            
-            criticalBars = new FinanceList<decimal>(8);
+            criticalBars = new FinanceList<decimal>(4);
             base.Init();
         }
 
@@ -96,8 +96,9 @@ namespace Kalitte.Trading
                         if (currentValue >= BestValue)
                         {
                             BestValue = currentValue;
-                            ResistanceValue = BestValue - BestValue * Alfa * 0.25M;
+                            ResistanceValue = BestValue - BestValue * Alfa * 2M;
                         }
+                        criticalBars.Clear();
                     }
                     else if (currentValue < L1 && currentValue > L2)
                     {
@@ -106,8 +107,9 @@ namespace Kalitte.Trading
                         if (currentValue <= BestValue)
                         {
                             BestValue = currentValue;
-                            ResistanceValue = BestValue + BestValue * Alfa * 0.25M;
+                            ResistanceValue = BestValue + BestValue * Alfa * 2M;
                         }
+                        criticalBars.Clear();
                     }
                     else outOfRange = true;                     
                 }
@@ -120,6 +122,7 @@ namespace Kalitte.Trading
             result.BestValue = BestValue;
             if (result.finalResult.HasValue) ResetInternal();
             else if (outOfRange) ResetInternal();   
+            //Log($"{result}", LogLevel.Warning);
             return result;
         }
     }

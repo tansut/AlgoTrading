@@ -291,8 +291,8 @@ namespace Kalitte.Trading.Algos
             //this.Signals.Add(this.atrTrend);
             this.Signals.Add(this.powerSignal);
 
-            var rsiColSize = Convert.ToInt32(DataCollectSize * 1);
-            var rsiAnalSize = Convert.ToInt32(DataAnalysisSize * 1);
+            var rsiColSize = Convert.ToInt32(4);
+            var rsiAnalSize = Convert.ToInt32(DataAnalysisSize);
             var rsiSignalSensitivity = 1M;
 
             rsiHigh = new GradientSignal("rsi-high", Symbol, this, RsiHighLimit, 100);
@@ -328,7 +328,7 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0))
             {
                 this.profitSignal = new ProfitSignal("profit", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, ProfitPriceStep, ProfitKeepQuantity);
-                //this.profitSignal.LimitingSignals.Add(typeof(CrossSignal));
+                this.profitSignal.LimitingSignals.Add(typeof(CrossSignal));
                 this.Signals.Add(profitSignal);
             }
 
@@ -738,30 +738,14 @@ namespace Kalitte.Trading.Algos
 
                 if (!signalResult.MorningSignal && CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue > CrossRsiMax)
                 {
-                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Warning);
-                    //cross.ResetCross();
-                    //ClosePositions(Symbol, signalResult);
-                    
+                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
                     return;
                 };
                 if (!signalResult.MorningSignal &&  CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue < CrossRsiMin)
                 {
-                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Warning);
-                    //cross.ResetCross();
-                    //ClosePositions(Symbol, signalResult);
+                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
                     return;
-                };
-                //var rsiResult = powerSignal.LastSignalResult as PowerSignalResult;
-                //if (rsiResult != null)
-                //{                    
-                //    if (rsiResult.Value < 50)
-                //    {
-                //        Log($"Ignoring cross {signalResult.finalResult} signal since current volume power is {rsiResult.Value} / {rsiResult.Power}", LogLevel.Warning);
-                //        ClosePositions(Symbol, signalResult);
-                //        return;
-                //    }
-                //}
-                
+                };                
                 sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}, {currentRsi}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }
         }

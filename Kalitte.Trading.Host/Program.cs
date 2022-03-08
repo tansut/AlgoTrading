@@ -18,13 +18,11 @@ using System.Diagnostics;
 
 public class Program
 {
-
-
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 4);
-        settings.Finish = new DateTime(2022, 3, 4);
+        settings.Start = new DateTime(2022, 2, 28);
+        settings.Finish = new DateTime(2022, 3, 8);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -50,12 +48,12 @@ public class Program
         alternates.Set("PriceLowLimit", 2200);
         alternates.Set("PriceHighLimit", 2300);                   
 
-        alternates.Set("LossInitialQuantity", 2);
+        alternates.Set("LossInitialQuantity", 1);
         alternates.Set("LossKeepQuantity", 1);
         alternates.Set("LossQuantityStep", 1);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 50);
-        alternates.Set("LossPriceStep", 250);
+        alternates.Set("LossStart", 800);
+        alternates.Set("LossPriceStep", 200);
 
 
         // rsi profit
@@ -69,8 +67,8 @@ public class Program
         //alternates.Set("RsiLossStart", 5);
 
         // rsi
-        alternates.Set("RsiHighLimit", 72);
-        alternates.Set("RsiLowLimit", 28);
+        alternates.Set("RsiHighLimit", 75);
+        alternates.Set("RsiLowLimit", 25);
         alternates.Set("Rsi", 14);        
         alternates.Set("RsiTrendSensitivity", 3M);
         alternates.Set("RsiTrendThreshold", 0.1);
@@ -154,7 +152,6 @@ public class Program
                 Console.WriteLine("Unknown option");
                 return;
             }
-
         }
         
         var optimize = new Optimizer<Bist30Futures>(settings, typeof(Bist30Futures));

@@ -257,7 +257,7 @@ namespace Kalitte.Trading.Algos
             }
 
             rsiLow.Indicator = rsi;
-            //rsiHigh.Indicator = rsi;
+            rsiHigh.Indicator = rsi;
 
 
             Signals.ForEach(p =>
@@ -291,21 +291,21 @@ namespace Kalitte.Trading.Algos
             //this.Signals.Add(this.atrTrend);
             this.Signals.Add(this.powerSignal);
 
-            var rsiColSize = DataCollectSize;
-            var rsiAnalSize = DataAnalysisSize;
+            var rsiColSize = Convert.ToInt32(DataCollectSize * 1);
+            var rsiAnalSize = Convert.ToInt32(DataAnalysisSize * 1);
             var rsiSignalSensitivity = 1M;
 
-            //rsiHigh = new GradientSignal("rsi-high", Symbol, this, RsiHighLimit, 100);
-            //rsiHigh.CollectSize = rsiColSize;
-            //rsiHigh.AnalyseSize = rsiAnalSize;
-            //rsiHigh.SignalSensitivity = rsiSignalSensitivity;
+            rsiHigh = new GradientSignal("rsi-high", Symbol, this, RsiHighLimit, 100);
+            rsiHigh.CollectSize = rsiColSize;
+            rsiHigh.AnalyseSize = rsiAnalSize;
+            rsiHigh.SignalSensitivity = rsiSignalSensitivity;
 
             rsiLow = new GradientSignal("rsi-low", Symbol, this, RsiLowLimit, 0);
             rsiLow.CollectSize = rsiColSize;
             rsiLow.AnalyseSize = rsiAnalSize;
             rsiLow.SignalSensitivity = rsiSignalSensitivity;
 
-            //Signals.Add(rsiHigh);
+            Signals.Add(rsiHigh);
             Signals.Add(rsiLow);
 
             if (MovPeriod > 0 && CrossOrderQuantity > 0 && !SimulateOrderSignal)

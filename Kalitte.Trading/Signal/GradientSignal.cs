@@ -84,14 +84,14 @@ namespace Kalitte.Trading
                     {
                         if (currentValue >= TargetValue.Value) TargetValue = nextTarget;
                         else if (currentValue < BestValue) result.finalResult = BuySell.Sell;
-                        BestValue = currentValue;
+                        BestValue = currentValue - currentValue * Alfa * 0.2M;
                         //criticalBars.Clear();
                     }
                     else if (currentValue < L1 && currentValue > L2)
                     {
                         if (currentValue <= TargetValue.Value) TargetValue = nextTarget;
                         else if (currentValue > BestValue) result.finalResult = BuySell.Buy;
-                        BestValue = currentValue;
+                        BestValue = currentValue + currentValue * Alfa * 0.2M;
                         //criticalBars.Clear();
                     }
                     else ResetInternal();                          

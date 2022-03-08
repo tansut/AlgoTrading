@@ -43,7 +43,7 @@ namespace Kalitte.Trading
         public decimal L2 { get; set; }
         public bool L2Set { get; set; }
 
-        public decimal DeltaRatio { get; set; } = 0.2M;
+        public decimal DeltaRatio { get; set; } = 0.25M;
 
         public Custom L1Indicator { get; set; }
         public Custom L2Indicator { get; set; }
@@ -116,7 +116,6 @@ namespace Kalitte.Trading
                 {
                     if (i1Val > L1)
                     {
-                        ResetLimits();
                         ResetInternal();
                         return result;
                     }
@@ -128,9 +127,8 @@ namespace Kalitte.Trading
                             var newL2 = i1Val + Delta * DeltaRatio;
                             if (newL2 > L2 && L2Set) result.finalResult = BuySell.Buy;
                             L2 = newL2;
-                            L2Set = true;
+                            L2Set = true;                            
                         }
-
                     }
                     if (c2Res.finalResult == BuySell.Buy)
                     {
@@ -147,7 +145,6 @@ namespace Kalitte.Trading
                 {
                     if (i1Val < L1)
                     {
-                        ResetLimits();
                         ResetInternal();
                         return result;
                     }

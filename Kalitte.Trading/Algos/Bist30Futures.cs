@@ -192,10 +192,10 @@ namespace Kalitte.Trading.Algos
         
         ProfitSignal profitSignal = null;
         LossSignal lossSignal = null;
-        LossSignal trendStopLossSignal = null;
+        //LossSignal trendStopLossSignal = null;
         //TakeProfitOrLossSignal lossSignal = null;
         TrendSignal rsiTrendSignal = null;
-        TrendProfitSignal rsiProfitSignal = null;
+        //TrendProfitSignal rsiProfitSignal = null;
         TrendSignal maTrendSignal = null;
         TrendSignal priceTrend = null;
         TrendSignal atrTrend = null;
@@ -324,7 +324,7 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0))
             {
                 this.profitSignal = new ProfitSignal("profit", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, ProfitPriceStep, ProfitKeepQuantity);
-                this.profitSignal.LimitingSignals.Add(typeof(CrossSignal));
+                //this.profitSignal.LimitingSignals.Add(typeof(CrossSignal));
                 this.Signals.Add(profitSignal);
             }
 
@@ -338,12 +338,12 @@ namespace Kalitte.Trading.Algos
                 rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : new decimal?(), RsiHighLimit == 0 ? new decimal() : new decimal?()) { };
                 rsiTrendSignal.SignalSensitivity = RsiTrendSensitivity;
 
-                if (RsiProfitInitialQuantity > 0)
-                {
-                    this.rsiProfitSignal = new TrendProfitSignal("rsi-profit", Symbol, this, rsiTrendSignal, RsiTrendThreshold, RsiProfitStart, RsiProfitInitialQuantity, RsiProfitQuantityStep, RsiProfitQuantityStepMultiplier, RsiProfitStep, RsiProfitKeepQuantity);
-                    rsiProfitSignal.LimitingSignals.Add(typeof(TrendSignal));
-                    Signals.Add(rsiProfitSignal);
-                }
+                //if (RsiProfitInitialQuantity > 0)
+                //{
+                //    this.rsiProfitSignal = new TrendProfitSignal("rsi-profit", Symbol, this, rsiTrendSignal, RsiTrendThreshold, RsiProfitStart, RsiProfitInitialQuantity, RsiProfitQuantityStep, RsiProfitQuantityStepMultiplier, RsiProfitStep, RsiProfitKeepQuantity);
+                //    rsiProfitSignal.LimitingSignals.Add(typeof(TrendSignal));
+                //    Signals.Add(rsiProfitSignal);
+                //}
                 //if (RsiTrendOrderQuantity > 0 && RsiLossStart > 0)
                 //{
                 //    trendStopLossSignal = new LossSignal("trend-loss", Symbol, this, RsiLossStart, RsiTrendOrderQuantity, 1, 1, RsiLossStart/3 , 0);
@@ -445,7 +445,10 @@ namespace Kalitte.Trading.Algos
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
             var lastSignalTime = portfolio.LastPositionOrder == null ? DateTime.MinValue : portfolio.LastPositionOrder.SignalResult.SignalTime;
-            if (signal.SignalType == ProfitOrLoss.Loss && (result.SignalTime - lastSignalTime).TotalSeconds < 180) return;
+            if (signal.SignalType == ProfitOrLoss.Loss && (result.SignalTime - lastSignalTime).TotalSeconds < 60)
+            {
+                Log($"{signal.Name} {result} received but there is no time dif between {lastSignalTime} and {result.SignalTime}", LogLevel.Warning);
+            };
             
             
 
@@ -594,18 +597,18 @@ namespace Kalitte.Trading.Algos
                     var signalResult = (DoubleCrossSignalResult)result;
                     HandleRsiLimitSignal(tpSignal, signalResult);
                 }
-                else if (result.Signal.Name == "rsi-trend")
-                {
-                    var tpSignal = (TrendSignal)(result.Signal);
-                    var signalResult = (TrendSignalResult)result;
-                    if (rsiProfitSignal != null)
-                    {
-                        var profitResult = rsiProfitSignal.HandleTrendSignal(tpSignal, signalResult);
-                        if (profitResult != null) HandleProfitLossSignal(rsiProfitSignal, profitResult);
-                        else HandleRsiTrendSignal(tpSignal, signalResult);
-                    }
-                    else HandleRsiTrendSignal(tpSignal, signalResult);
-                }
+                //else if (result.Signal.Name == "rsi-trend")
+                //{
+                //    var tpSignal = (TrendSignal)(result.Signal);
+                //    var signalResult = (TrendSignalResult)result;
+                //    if (rsiProfitSignal != null)
+                //    {
+                //        var profitResult = rsiProfitSignal.HandleTrendSignal(tpSignal, signalResult);
+                //        if (profitResult != null) HandleProfitLossSignal(rsiProfitSignal, profitResult);
+                //        else HandleRsiTrendSignal(tpSignal, signalResult);
+                //    }
+                //    else HandleRsiTrendSignal(tpSignal, signalResult);
+                //}
                 else if (result.Signal.Name == "price-trend")
                 {
                     var tpSignal = (TrendSignal)(result.Signal);

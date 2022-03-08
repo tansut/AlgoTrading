@@ -16,6 +16,7 @@ namespace Kalitte.Trading
         public decimal L2 { get; set; }
         public decimal IndicatorValue { get; set; }
 
+
         public DoubleCrossSignalResult(Signal signal, DateTime signalTime) : base(signal, signalTime)
         {
         }
@@ -30,6 +31,7 @@ namespace Kalitte.Trading
     {
         public int CollectSize { get; set; }
         public int AnalyseSize { get; set; }
+        public virtual decimal SignalSensitivity { get; set; } = 1.0M;
 
         public CrossSignal Cross1 { get; set; }
         public CrossSignal Cross2 { get; set; }
@@ -43,12 +45,12 @@ namespace Kalitte.Trading
         public decimal L2 { get; set; }
         public bool L2Set { get; set; }
 
-        public decimal DeltaRatio { get; set; } = 0.25M;
+        public decimal DeltaRatio { get; set; } = 0.2M;
 
         public Custom L1Indicator { get; set; }
         public Custom L2Indicator { get; set; }
 
-        public decimal AvgChange { get; set; } = 0.5M;
+        public decimal AvgChange { get; set; } = 0.45M;
 
         public DoubleCrossSignal(string name, string symbol, AlgoBase owner, decimal delta) : base(name, symbol, owner)
         {
@@ -80,6 +82,9 @@ namespace Kalitte.Trading
 
             Cross1.AnalyseSize = AnalyseSize;
             Cross2.AnalyseSize = AnalyseSize;
+
+            Cross1.SignalSensitivity = this.SignalSensitivity;
+            Cross2.SignalSensitivity = this.SignalSensitivity;
 
             Cross1.Init();
             Cross2.Init();
@@ -127,18 +132,12 @@ namespace Kalitte.Trading
                             var newL2 = i1Val + Delta * DeltaRatio;
                             if (newL2 > L2 && L2Set) result.finalResult = BuySell.Buy;
                             L2 = newL2;
-                            L2Set = true;                            
+                            L2Set = true;
                         }
                     }
-                    if (c2Res.finalResult == BuySell.Buy)
+                    if (i1Val < L1 && (c2Res.finalResult == BuySell.Buy || c1Res.finalResult == BuySell.Buy))
                     {
-                        if (i1Val < L1)
-                            result.finalResult = BuySell.Buy;
-                    }
-                    else if (c1Res.finalResult == BuySell.Buy)
-                    {
-                        if (i1Val < L1)
-                            result.finalResult = BuySell.Buy;
+                        result.finalResult = BuySell.Buy;
                     }
                 }
                 else
@@ -158,15 +157,9 @@ namespace Kalitte.Trading
                             L2Set = true;
                         }
                     }
-                    if (c2Res.finalResult == BuySell.Sell)
+                    if (i1Val > L1 && (c2Res.finalResult == BuySell.Sell || c1Res.finalResult == BuySell.Sell))
                     {
-                        if (i1Val > L1)
-                            result.finalResult = BuySell.Sell;
-                    }
-                    else if (c1Res.finalResult == BuySell.Sell)
-                    {
-                        if (i1Val > L1)
-                            result.finalResult = BuySell.Sell;
+                        result.finalResult = BuySell.Sell;
                     }
                 }
             }

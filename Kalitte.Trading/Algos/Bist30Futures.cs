@@ -47,10 +47,10 @@ namespace Kalitte.Trading.Algos
         public bool SimulateOrderSignal { get; set; }
 
 
-        [AlgoParam(60)]
+        [AlgoParam(72)]
         public decimal RsiHighLimit { get; set; }
 
-        [AlgoParam(40)]
+        [AlgoParam(28)]
         public decimal RsiLowLimit { get; set; }
 
         [AlgoParam(2)]
@@ -291,15 +291,21 @@ namespace Kalitte.Trading.Algos
             //this.Signals.Add(this.atrTrend);
             this.Signals.Add(this.powerSignal);
 
+            var rsiColSize = DataCollectSize;
+            var rsiAnalSize = DataAnalysisSize;
+            var rsiSignalSensitivity = 1M;
+
             rsiHigh = new DoubleCrossSignal("rsi-high", Symbol, this, 1M);
-            rsiHigh.RedLine = 72;
-            rsiHigh.CollectSize = DataCollectSize;
-            rsiHigh.AnalyseSize = DataAnalysisSize;
+            rsiHigh.RedLine = RsiHighLimit;
+            rsiHigh.CollectSize = rsiColSize;
+            rsiHigh.AnalyseSize = rsiAnalSize;
+            //rsiHigh.SignalSensitivity = rsiSignalSensitivity;
 
             rsiLow = new DoubleCrossSignal("rsi-low", Symbol, this, -1M);
-            rsiLow.RedLine = 28;
-            rsiLow.CollectSize = DataCollectSize;
-            rsiLow.AnalyseSize = DataAnalysisSize;
+            rsiLow.RedLine = RsiLowLimit;
+            rsiLow.CollectSize = rsiColSize;
+            rsiLow.AnalyseSize = rsiAnalSize;
+            //rsiLow.SignalSensitivity = rsiSignalSensitivity;
 
             Signals.Add(rsiHigh);
             Signals.Add(rsiLow);
@@ -333,7 +339,7 @@ namespace Kalitte.Trading.Algos
                 this.lossSignal = new LossSignal("loss", Symbol, this, this.LossStart, this.LossInitialQuantity, this.LossQuantityStep, this.LossQuantityStepMultiplier, LossPriceStep, this.LossKeepQuantity);
                 this.Signals.Add(lossSignal);
             }
-            if (!SimulateOrderSignal && (RsiHighLimit > 0 || RsiLowLimit > 0))
+            if (!SimulateOrderSignal)
             {
                 rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : new decimal?(), RsiHighLimit == 0 ? new decimal() : new decimal?()) { };
                 rsiTrendSignal.SignalSensitivity = RsiTrendSensitivity;
@@ -656,6 +662,7 @@ namespace Kalitte.Trading.Algos
         private void HandleRsiLimitSignal(DoubleCrossSignal signal, DoubleCrossSignalResult sr)
         {
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
+            //var quantity = portfolio.Quantity + RsiTrendOrderQuantity;
             if (portfolio.Quantity == profitSignal.KeepQuantity && RsiTrendOrderQuantity > 0)
             {
                 if (portfolio.Side == sr.finalResult.Value)

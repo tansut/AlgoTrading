@@ -23,8 +23,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 2, 28);
+        settings.Start = new DateTime(2022, 3, 7);
+        settings.Finish = new DateTime(2022, 3, 7);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -59,18 +59,18 @@ public class Program
 
 
         // rsi profit
-        alternates.Set("RsiProfitInitialQuantity",  0);
-        alternates.Set("RsiProfitKeepQuantity", 0);
-        alternates.Set("RsiProfitQuantityStep", 1);
-        alternates.Set("RsiProfitQuantityStepMultiplier", 0);
-        alternates.Set("RsiProfitStart", 6);
-        alternates.Set("RsiProfitPriceStep", 1.0);
+        //alternates.Set("RsiProfitInitialQuantity",  0);
+        //alternates.Set("RsiProfitKeepQuantity", 0);
+        //alternates.Set("RsiProfitQuantityStep", 1);
+        //alternates.Set("RsiProfitQuantityStepMultiplier", 0);
+        //alternates.Set("RsiProfitStart", 6);
+        //alternates.Set("RsiProfitPriceStep", 1.0);
 
-        alternates.Set("RsiLossStart", 5);
+        //alternates.Set("RsiLossStart", 5);
 
         // rsi
-        alternates.Set("RsiHighLimit", 69);
-        alternates.Set("RsiLowLimit", 31);
+        alternates.Set("RsiHighLimit", 72);
+        alternates.Set("RsiLowLimit", 28);
         alternates.Set("Rsi", 14);        
         alternates.Set("RsiTrendSensitivity", 3M);
         alternates.Set("RsiTrendThreshold", 0.1);

@@ -13,6 +13,7 @@ namespace Kalitte.Trading
     {
         public decimal L1 { get; set; }
         public decimal L2 { get; set; }
+        public decimal? BestValue { get; set; }
         public decimal IndicatorValue { get; set; }
 
 
@@ -29,15 +30,32 @@ namespace Kalitte.Trading
     public class GradientSignal : AnalyserBase
     {
         public ITechnicalIndicator Indicator { get; set; }
-        public decimal Alfa { get; set; } = 0.2M;
+        public decimal Alfa { get; set; } = 0.02M;
         public decimal L1 { get; set; }
         public decimal L2 { get; set; }
+        public decimal? TargetValue { get; set; }
+        public decimal? BestValue { get; set; }
+        private FinanceList<decimal> criticalBars;
 
 
         public GradientSignal(string name, string symbol, AlgoBase owner, decimal l1, decimal l2) : base(name, symbol, owner)
         {
             L1 = l1;
             L2 = l2;
+        }
+
+        public override void Init()
+        {            
+            criticalBars = new FinanceList<decimal>(8);
+            base.Init();
+        }
+
+        protected override void ResetInternal()
+        {
+            TargetValue = null;
+            BestValue = null;
+            criticalBars.Clear();
+            base.ResetInternal();
         }
 
         protected override SignalResult CheckInternal(DateTime? t = null)
@@ -50,23 +68,39 @@ namespace Kalitte.Trading
             if (CollectList.Ready && mp > 0)
             {
                 decimal mpAverage = CollectList.LastValue;
-
                 var iVal = Indicator.NextValue(mpAverage).Value.Value;
-
+                result.IndicatorValue = iVal;
                 AnalyseList.Collect(iVal);
-
-                if (AnalyseList.Ready)
+                criticalBars.Push(iVal);
+                if (AnalyseList.Ready && criticalBars.IsFull)
                 {
-                    var lastAvg = AnalyseList.LastValue;
+                    var currentValue = AnalyseList.LastValue;
+                    var nextTarget = currentValue > L1 && currentValue < L2 ? currentValue + currentValue * Alfa:  currentValue - currentValue * Alfa;
+                    BestValue = BestValue.HasValue ?  BestValue.Value : currentValue;
+                    
+                    TargetValue = !TargetValue.HasValue ? currentValue : TargetValue;
 
-                    //result.i1Val = l1;
-                    //result.i2Val = l2;
-                    //result.Dif = lastAvg;
-
-                    //if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
-                    //else if (lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
+                    if (currentValue > L1 && currentValue < L2)
+                    {
+                        if (currentValue >= TargetValue.Value) TargetValue = nextTarget;
+                        else if (currentValue < BestValue) result.finalResult = BuySell.Sell;
+                        BestValue = currentValue;
+                        //criticalBars.Clear();
+                    }
+                    else if (currentValue < L1 && currentValue > L2)
+                    {
+                        if (currentValue <= TargetValue.Value) TargetValue = nextTarget;
+                        else if (currentValue > BestValue) result.finalResult = BuySell.Buy;
+                        BestValue = currentValue;
+                        //criticalBars.Clear();
+                    }
+                    else ResetInternal();                          
                 }
             }
+            result.L1 = L1;
+            result.L2 = L2;
+            result.BestValue = TargetValue;            
+            if (result.finalResult.HasValue) ResetInternal();
             return result;
         }
     }

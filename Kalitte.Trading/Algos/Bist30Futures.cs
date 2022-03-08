@@ -201,8 +201,8 @@ namespace Kalitte.Trading.Algos
         TrendSignal atrTrend = null;
         PowerSignal powerSignal = null;
         ClosePositionsSignal closePositionsSignal = null;
-        DoubleCrossSignal rsiHigh;
-        DoubleCrossSignal rsiLow;
+        GradientSignal rsiHigh;
+        GradientSignal rsiLow;
 
 
 
@@ -257,7 +257,7 @@ namespace Kalitte.Trading.Algos
             }
 
             rsiLow.Indicator = rsi;
-            rsiHigh.Indicator = rsi;
+            //rsiHigh.Indicator = rsi;
 
 
             Signals.ForEach(p =>
@@ -295,19 +295,17 @@ namespace Kalitte.Trading.Algos
             var rsiAnalSize = DataAnalysisSize;
             var rsiSignalSensitivity = 1M;
 
-            rsiHigh = new DoubleCrossSignal("rsi-high", Symbol, this, 1M);
-            rsiHigh.RedLine = RsiHighLimit;
-            rsiHigh.CollectSize = rsiColSize;
-            rsiHigh.AnalyseSize = rsiAnalSize;
+            //rsiHigh = new GradientSignal("rsi-high", Symbol, this, RsiHighLimit, 100);
+            //rsiHigh.CollectSize = rsiColSize;
+            //rsiHigh.AnalyseSize = rsiAnalSize;
             //rsiHigh.SignalSensitivity = rsiSignalSensitivity;
 
-            rsiLow = new DoubleCrossSignal("rsi-low", Symbol, this, -1M);
-            rsiLow.RedLine = RsiLowLimit;
+            rsiLow = new GradientSignal("rsi-low", Symbol, this, RsiLowLimit, 0);
             rsiLow.CollectSize = rsiColSize;
             rsiLow.AnalyseSize = rsiAnalSize;
-            //rsiLow.SignalSensitivity = rsiSignalSensitivity;
+            rsiLow.SignalSensitivity = rsiSignalSensitivity;
 
-            Signals.Add(rsiHigh);
+            //Signals.Add(rsiHigh);
             Signals.Add(rsiLow);
 
             if (MovPeriod > 0 && CrossOrderQuantity > 0 && !SimulateOrderSignal)
@@ -599,8 +597,8 @@ namespace Kalitte.Trading.Algos
                 }
                 else if ((result.Signal.Name == "rsi-high") || (result.Signal.Name == "rsi-low"))
                 {
-                    var tpSignal = (DoubleCrossSignal)(result.Signal);
-                    var signalResult = (DoubleCrossSignalResult)result;
+                    var tpSignal = (GradientSignal)(result.Signal);
+                    var signalResult = (GradientSignalResult)result;
                     HandleRsiLimitSignal(tpSignal, signalResult);
                 }
                 //else if (result.Signal.Name == "rsi-trend")
@@ -659,7 +657,7 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-        private void HandleRsiLimitSignal(DoubleCrossSignal signal, DoubleCrossSignalResult sr)
+        private void HandleRsiLimitSignal(GradientSignal signal, GradientSignalResult sr)
         {
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             //var quantity = portfolio.Quantity + RsiTrendOrderQuantity;

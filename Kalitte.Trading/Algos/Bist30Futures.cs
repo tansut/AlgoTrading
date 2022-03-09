@@ -448,7 +448,7 @@ namespace Kalitte.Trading.Algos
             if (result.finalResult == BuySell.Buy && portfolio.IsLong) return;
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
-            var lastSignalTime = portfolio.LastPositionOrder == null ? DateTime.MinValue : portfolio.LastPositionOrder.SignalResult.SignalTime;
+            var lastSignalTime = portfolio.LastNonProfitLossOrder == null ? DateTime.MinValue : portfolio.LastNonProfitLossOrder.SignalResult.SignalTime;
             if (signal.SignalType == ProfitOrLoss.Loss && (result.SignalTime - lastSignalTime).TotalSeconds < 60)
             {
                 Log($"{signal.Name} {result} received but there is no time dif between {lastSignalTime} and {result.SignalTime}", LogLevel.Warning);
@@ -715,7 +715,7 @@ namespace Kalitte.Trading.Algos
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)
         {
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
-            var lastOrder = portfolio.GetLastOrder(typeof(ProfitLossSignal));
+            var lastOrder = portfolio.GetLastOrderSkip(typeof(ProfitLossSignal));
             var keepPosition = lastOrder == null || lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(CrossSignal));
 
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;

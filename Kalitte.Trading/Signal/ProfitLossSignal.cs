@@ -120,7 +120,7 @@ namespace Kalitte.Trading
 
             if (this.LimitingSignals.Any())
             {
-                var valid = portfolio.IsLastOrderInstanceOf(this.LimitingSignals.ToArray());
+                var valid = portfolio.CompletedOrders.Count == 0 || portfolio.IsLastOrderInstanceOf(this.LimitingSignals.ToArray());
                 if (!valid) return null;
             }
 

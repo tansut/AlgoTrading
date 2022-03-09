@@ -171,7 +171,7 @@ namespace Kalitte.Trading
 
         public bool IsLastOrderInstanceOf(params Type[] signalTypes)
         {
-            var last = this.LastPositionOrder;
+            var last = this.LastNonProfitLossOrder;
             if (last == null) return false;
             foreach (var type in signalTypes)
             {
@@ -180,19 +180,19 @@ namespace Kalitte.Trading
             return false;
         }
 
-        public ExchangeOrder GetLastOrder(Type skip = null)
+        public ExchangeOrder GetLastOrderSkip(Type skip)
         {
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
                 var type = CompletedOrders[i].SignalResult.Signal.GetType();
-                if (skip != null && skip.IsAssignableFrom(type)) continue;
+                if (skip.IsAssignableFrom(type)) continue;
                 else return CompletedOrders[i];
             }
             return null;
         }
 
 
-        public ExchangeOrder LastPositionOrder
+        public ExchangeOrder LastNonProfitLossOrder
         {
             get
             {

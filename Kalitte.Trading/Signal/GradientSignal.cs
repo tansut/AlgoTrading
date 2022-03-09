@@ -14,7 +14,8 @@ namespace Kalitte.Trading
         public decimal L1 { get; set; }
         public decimal L2 { get; set; }
         public decimal? BestValue { get; set; }
-        public decimal? TargetValue { get; set; }
+        public decimal? FirstValue { get; set; }
+        public decimal? LastValue { get; set; }
         public decimal? ResistanceValue { get; set; }
         public decimal? UsedValue { get; set; }
         public decimal IndicatorValue { get; set; }
@@ -26,19 +27,24 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()}[iVal: {IndicatorValue}, bv: {BestValue} r: {ResistanceValue} t: {TargetValue} uv: {UsedValue}]"; ;
+            return $"{base.ToString()}[iVal: {IndicatorValue}, bv: {BestValue} r: {ResistanceValue} t: {FirstValue} uv: {UsedValue}]"; ;
         }
     }
 
     public class GradientSignal : AnalyserBase
     {
         public ITechnicalIndicator Indicator { get; set; }
-        public decimal Alfa { get; set; } = 0.02M;
+        public decimal ResistanceFirstAlfa { get; set; } = 0.015M;
+        public decimal ResistanceNextAlfa { get; set; } = 0.005M;
+        public decimal OutTolerance { get; set; } = 0.015M;
+
         public decimal L1 { get; set; }
         public decimal L2 { get; set; }
-        public decimal? TargetValue { get; set; }
+        public decimal? FirstValue { get; set; }
         public decimal? BestValue { get; set; }
         public decimal? ResistanceValue { get; set; }
+        public decimal? LastValue { get; set; }
+
         private FinanceList<decimal> criticalBars;
 
 
@@ -56,8 +62,9 @@ namespace Kalitte.Trading
 
         protected override void ResetInternal()
         {
-            TargetValue = null;
+            FirstValue = null;
             BestValue = null;
+            LastValue = null;
             ResistanceValue = null;
             criticalBars.Clear();
             base.ResetInternal();
@@ -81,43 +88,73 @@ namespace Kalitte.Trading
                 AnalyseList.Collect(iVal);
                 criticalBars.Push(iVal);
                 
-                if (AnalyseList.Ready && criticalBars.IsFull)
+                if (AnalyseList.Ready)
                 {
-                    var currentValue = result.UsedValue = AnalyseList.LastValue;
-                    var nextTarget = currentValue > L1 && currentValue < L2 ? currentValue + currentValue * Alfa:  currentValue - currentValue * Alfa;
-                    BestValue = BestValue.HasValue ?  BestValue.Value : currentValue;
-                    ResistanceValue = ResistanceValue.HasValue ? ResistanceValue.Value : currentValue;
-                    TargetValue = TargetValue.HasValue ? TargetValue.Value: currentValue;
-
+                    decimal currentValue = AnalyseList.LastValue;
+                    BestValue = BestValue ?? currentValue;
+                    ResistanceValue = ResistanceValue ?? currentValue;
+                    result.UsedValue = currentValue;
                     if (currentValue > L1 && currentValue < L2)
                     {
-                        if (currentValue >= TargetValue.Value) TargetValue = nextTarget;
-                        else if (currentValue < ResistanceValue) result.finalResult = BuySell.Sell;
+                        FirstValue = FirstValue ?? currentValue;
+                        result.LastValue = currentValue;
+
                         if (currentValue >= BestValue)
                         {
                             BestValue = currentValue;
-                            ResistanceValue = BestValue - BestValue * Alfa * 2M;
+                            ResistanceValue = currentValue - currentValue * ResistanceFirstAlfa;
+                            Log($"Set best value: {BestValue} r: {ResistanceValue} c: {currentValue} f: {FirstValue}", LogLevel.Debug);
+
                         }
-                        criticalBars.Clear();
+                        else if (currentValue <= ResistanceValue)
+                        {
+                            result.finalResult = BuySell.Sell;
+                        }
+                        else if (currentValue < BestValue)
+                        {
+                            var newResistance = Math.Min(ResistanceValue.Value + ResistanceValue.Value * ResistanceNextAlfa, currentValue);
+                            Log($"Increased resistance value: {ResistanceValue} -> {newResistance}. c: {currentValue} b: {BestValue} f: {FirstValue}", LogLevel.Debug);
+                            ResistanceValue = newResistance;
+                        } 
+                        LastValue = currentValue;
                     }
                     else if (currentValue < L1 && currentValue > L2)
                     {
-                        if (currentValue <= TargetValue.Value) TargetValue = nextTarget;
-                        else if (currentValue > ResistanceValue) result.finalResult = BuySell.Buy;
+                        FirstValue = FirstValue ?? currentValue;
+                        result.LastValue = currentValue;
+
                         if (currentValue <= BestValue)
                         {
                             BestValue = currentValue;
-                            ResistanceValue = BestValue + BestValue * Alfa * 2M;
+                            ResistanceValue = BestValue + BestValue * ResistanceFirstAlfa;
+                            Log($"Set best value: {BestValue} r: {ResistanceValue} c: {currentValue} f: {FirstValue}", LogLevel.Debug);
+                        } else if (currentValue >= ResistanceValue) result.finalResult = BuySell.Buy;
+                        else if (currentValue > BestValue)
+                        {
+                            var newResistance = Math.Min(ResistanceValue.Value - ResistanceValue.Value * ResistanceNextAlfa, currentValue);
+                            Log($"Decreased resistance value: {ResistanceValue} -> {newResistance}. c: {currentValue} b: {BestValue} f: {FirstValue}", LogLevel.Debug);
+                            ResistanceValue = newResistance;
                         }
-                        criticalBars.Clear();
+                        LastValue = currentValue;
                     }
-                    else outOfRange = true;                     
+                    else
+                    {
+                        outOfRange = true;
+                        if (FirstValue.HasValue)
+                        {
+                            var toleranceVal = FirstValue > L1 && FirstValue < L2 ? L1 - L1 * OutTolerance : L1 + L1 * OutTolerance;
+                            if (toleranceVal < L1 && currentValue >= toleranceVal) result.finalResult = BuySell.Sell;
+                            else if (toleranceVal > L1 && currentValue <= toleranceVal) result.finalResult = BuySell.Buy;
+                            Log($"Fast increase/decrease detected.: {result.finalResult} {toleranceVal} {currentValue} {BestValue} {ResistanceValue}", LogLevel.Debug);
+
+                        }
+                    }
                 }
             }
             result.L1 = L1;
             result.L2 = L2;
             result.BestValue = BestValue;            
-            result.TargetValue = TargetValue;            
+            result.FirstValue = FirstValue;            
             result.ResistanceValue = ResistanceValue;
             result.BestValue = BestValue;
             if (result.finalResult.HasValue) ResetInternal();

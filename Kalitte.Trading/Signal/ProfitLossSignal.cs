@@ -68,16 +68,13 @@ namespace Kalitte.Trading
             QuantityStepMultiplier = stepMultiplier;
             UsedPriceChange = priceChange;
             PriceStep = priceStep;
-            CompletedOrder = 0;
-            CompletedQuantity = 0;
             KeepQuantity = keepQuantity;
         }
 
-        public void ResetChanges()
+        public override void ResetOrders()
         {
             UsedPriceChange = PriceChange;
-            CompletedOrder = 0;
-            CompletedQuantity = 0;
+            base.ResetOrders();
         }
 
         public void IncrementParams()
@@ -88,11 +85,7 @@ namespace Kalitte.Trading
 
 
 
-        public void IncrementSignal(int orderInc, decimal quantityInc)
-        {
-            CompletedOrder += orderInc;
-            CompletedQuantity += quantityInc;
-        }
+
 
 
         public override string ToString()
@@ -102,7 +95,7 @@ namespace Kalitte.Trading
 
         protected override void ResetInternal()
         {
-            ResetChanges();
+            ResetOrders();
         }
 
         public virtual decimal GetQuantity()

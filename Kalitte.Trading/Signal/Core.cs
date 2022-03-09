@@ -67,6 +67,12 @@ namespace Kalitte.Trading
         public DateTime? PausedUntil { get; set; }
         protected Task collectorTask = null;
         protected CancellationTokenSource collectorTaskTokenSource;
+        public int CompletedOrder { get; set; } = 0;
+        public decimal CompletedQuantity { get; set; } = 0;
+
+        public DateTime FirstOrderDate { get; set; } = DateTime.MinValue;
+        public DateTime LastOrderDate { get; set; } = DateTime.MinValue;
+
 
         public PerformanceMonitor PerfMon { get; set; }
 
@@ -91,7 +97,21 @@ namespace Kalitte.Trading
             }
         }
 
+        public virtual void ResetOrders()
+        {
+            CompletedOrder = 0;
+            CompletedQuantity = 0;
+        }
 
+        public virtual void AddOrder(int orderInc, decimal quantityInc)
+        {
+            var time = Algo.Now;
+            if (FirstOrderDate == DateTime.MinValue) FirstOrderDate = time;
+            LastOrderDate = time;
+            CompletedOrder += orderInc;
+            CompletedQuantity += quantityInc;
+            
+        }
 
         public void MonitorInit(string name, decimal value)
         {

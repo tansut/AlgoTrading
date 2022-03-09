@@ -753,18 +753,21 @@ namespace Kalitte.Trading.Algos
 
         public override void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
         {
-            var tp = this.positionRequest.SignalResult as ProfitLossResult;
+            var signal = this.positionRequest.SignalResult.Signal;
+
+            var tp = signal as ProfitLossSignal;
             var cross = this.positionRequest.SignalResult as CrossSignalResult;
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
+
+            signal.AddOrder(1, positionRequest.Quantity);
+
             if (tp != null)
             {
-                var tps = ((ProfitLossSignal)tp.Signal);
-                tps.IncrementSignal(1, positionRequest.Quantity);
-                tps.IncrementParams();
+                tp.IncrementParams();
             }
             else
             {
-                Signals.Where(p => p is ProfitLossSignal).Select(p => (ProfitLossSignal)p).ToList().ForEach(p => p.ResetChanges());
+                Signals.Where(p => p is ProfitLossSignal).Select(p => (ProfitLossSignal)p).ToList().ForEach(p => p.ResetOrders());
             }
             if (portfolio.IsEmpty)
             {

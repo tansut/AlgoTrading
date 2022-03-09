@@ -877,7 +877,7 @@ namespace Kalitte.Trading.Algos
         {
             if (Simulation)
             {
-                var list = GetMarketData(symbol, SymbolPeriod, t);
+                var list = GetMarketData(symbol, SymbolPeriod, t ?? Now);
                 var price = list.Length > 0 ? list[0] : 0;
                 return price;
             }

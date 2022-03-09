@@ -51,7 +51,7 @@ namespace Kalitte.Trading
             grad = new Gradient(L1, L2, this.Algo);
             grad.ResistanceFirstAlfa = ResistanceFirstAlfa;
             grad.ResistanceNextAlfa = ResistanceNextAlfa;
-            grad.OutTolerance = OutTolerance;
+            //grad.OutTolerance = OutTolerance;
             criticalBars = new FinanceList<decimal>(4);
             base.Init();
         }

@@ -19,9 +19,56 @@ namespace Kalitte.Trading
         Profit
     }
 
+    public class PriceMonitor
+    {
+        public Gradient Grad { get; set; }
+        public ProfitLossSignal Owner { get; set; }
+        public ProfitLossResult Result { get; set; }
+        public AnalyseList List { get; set; }
+
+
+        public bool WorkingFor(ProfitLossResult newResult)
+        {
+            return Result.Quantity == newResult.Quantity
+                && Result.finalResult == newResult.finalResult
+                && Result.KeepQuantity == newResult.KeepQuantity
+                && Result.Direction == newResult.Direction;
+        }
+
+        public PriceMonitor(ProfitLossResult signalResult)
+        {
+            this.Result = signalResult;
+            this.Owner = signalResult.Signal as ProfitLossSignal;
+            var resistanceRatio = 0.0015M;
+            var l1 = Result.finalResult == BuySell.Buy ? Result.MarketPrice + Result.MarketPrice * resistanceRatio : Result.MarketPrice - Result.MarketPrice * resistanceRatio;
+            var l2 = Result.finalResult == BuySell.Buy ? Result.MarketPrice - Result.MarketPrice * .1M : Result.MarketPrice + Result.MarketPrice * .1M;
+            this.Grad = new Gradient(l1, l2, Owner.Algo);
+            this.Grad.ResistanceFirstAlfa = resistanceRatio;
+            this.Grad.ResistanceNextAlfa = 0.0005M;
+            this.List = new AnalyseList(4, Average.Ema);
+
+        }
+
+        public ProfitLossResult Check(decimal mp)
+        {
+            List.Collect(mp);
+            var price = List.LastValue;
+            var gradResult = this.Grad.Step(price);
+            if (gradResult.FinalResult.HasValue)
+            {
+                return this.Result;
+            }
+            else return null;
+            
+        }
+    }
+
+
+
     public class ProfitLossResult : SignalResult
     {
         public decimal PL { get; set; }
+        public decimal OriginalPrice { get; set; }
         public decimal MarketPrice { get; set; }
         public decimal PortfolioCost { get; set; }
         public ProfitOrLoss Direction { get; set; }
@@ -31,6 +78,11 @@ namespace Kalitte.Trading
         public ProfitLossResult(Signal signal, DateTime t) : base(signal, t)
         {
 
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} [MP: {MarketPrice} OP:{OriginalPrice} Q:{Quantity} PL:{PL}]";
         }
 
         public override int GetHashCode()
@@ -49,6 +101,8 @@ namespace Kalitte.Trading
         public virtual decimal PriceChange { get; set; }
         public virtual decimal InitialQuantity { get; set; }
         public virtual decimal KeepQuantity { get; set; }
+        public bool UsePriceMonitor { get; set; } = true;
+        public PriceMonitor PriceMonitor { get; protected set; }
 
         public Fibonacci FibonacciLevels { get; set; } = null;
 
@@ -56,8 +110,6 @@ namespace Kalitte.Trading
 
         public List<Type> LimitingSignals { get; set; } = new List<Type>();
 
-        public int CompletedOrder = 0;
-        public decimal CompletedQuantity = 0;
 
         public ProfitLossSignal(string name, string symbol, AlgoBase owner,
             decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep, decimal keepQuantity) : base(name, symbol, owner)
@@ -74,6 +126,12 @@ namespace Kalitte.Trading
         public override void ResetOrders()
         {
             UsedPriceChange = PriceChange;
+            if (PriceMonitor != null)
+            {
+                Log($"Destroying price monitor: {PriceMonitor.Result}", LogLevel.Warning);  
+                PriceMonitor = null;
+            }
+            
             base.ResetOrders();
         }
 
@@ -82,11 +140,12 @@ namespace Kalitte.Trading
             UsedPriceChange += PriceStep;
         }
 
-
-
-
-
-
+        protected virtual PriceMonitor CreatePriceMonitor(ProfitLossResult result)
+        {
+            var monitor = new PriceMonitor(result);            
+            Log($"Created price monitor for {result.Direction}/{result.finalResult} to get a better price than {result.MarketPrice}", LogLevel.Warning);
+            return monitor;
+        }
 
         public override string ToString()
         {
@@ -102,7 +161,6 @@ namespace Kalitte.Trading
         {
             return this.CompletedOrder == 0 ? InitialQuantity : this.QuantityStep + (this.CompletedOrder) * QuantityStepMultiplier;
         }
-
 
 
         protected virtual ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
@@ -145,9 +203,30 @@ namespace Kalitte.Trading
             result.finalResult = bs;
             result.Quantity = quantity;
             result.MarketPrice = marketPrice;
+            result.OriginalPrice = marketPrice;
             result.PL = unitPl;
             result.Direction = SignalType;
             result.KeepQuantity = this.KeepQuantity;
+
+            if (UsePriceMonitor && result.finalResult.HasValue && result.Direction == ProfitOrLoss.Profit)
+            {
+                PriceMonitor = PriceMonitor == null ? CreatePriceMonitor(result) : PriceMonitor;
+                if (!PriceMonitor.WorkingFor(result))
+                {
+                    Log($"Creating new PriceMonitor since there is a new result. {PriceMonitor.Result} vs {result}", LogLevel.Debug);
+                    PriceMonitor = CreatePriceMonitor(result);
+                }
+                var monitorResult = PriceMonitor.Check(marketPrice);
+                if (monitorResult != null && monitorResult.finalResult.HasValue)
+                {
+                    Log($"price monitor resulted: [{monitorResult.finalResult} {monitorResult.Direction}]: original: {monitorResult.MarketPrice} current: {marketPrice}", LogLevel.Warning);
+                    monitorResult.MarketPrice = marketPrice;
+                    monitorResult.PL = marketPrice - portfolio.AvgCost;
+                    PriceMonitor = null;
+                }
+                return monitorResult;
+            }
+
             return result;
         }
 

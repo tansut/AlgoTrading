@@ -136,7 +136,7 @@ namespace Kalitte.Trading
             }
             else if (this.Side == position.Side)
             {
-                this.AvgCost = ((this.Total + position.Total) / (this.Quantity + position.FilledQuantity));
+                this.AvgCost = (((this.Total + position.Total) / (this.Quantity + position.FilledQuantity))).ToCurrency();
                 this.Quantity += position.FilledQuantity;
 
             }

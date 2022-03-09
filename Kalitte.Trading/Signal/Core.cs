@@ -35,7 +35,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"time: {SignalTime}, finalResult: {finalResult}";
+            return $"{SignalTime}/{finalResult}";
         }
 
         public override int GetHashCode()

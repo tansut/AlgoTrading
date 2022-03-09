@@ -25,6 +25,19 @@ using Newtonsoft.Json;
 
 namespace Kalitte.Trading
 {
+    public interface IMarketDataProvider
+    {
+        decimal GetMarketPrice(string symbol, DateTime? t = null);
+        decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null);
+    }
+
+
+    public interface IExchange : IMarketDataProvider, ILogProvider
+    {
+        string CreateMarketOrder(string symbol, decimal quantity, BuySell side, string icon, bool night);
+        string CreateLimitOrder(string symbol, decimal quantity, BuySell side, decimal limitPrice, string icon, bool night);
+        FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t);
+    }
 
     [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field)]
     public class AlgoParam : Attribute

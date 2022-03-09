@@ -25,19 +25,7 @@ namespace Kalitte.Trading.Algos
     //    decimal GetMarketPrice(string symbol, DateTime? t = null);
     //}
 
-    public interface IMarketDataProvider
-    {
-        decimal GetMarketPrice(string symbol, DateTime? t = null);
-        decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null);
-    }
 
-    public interface IExchange : IMarketDataProvider
-    {
-        string CreateMarketOrder(string symbol, decimal quantity, BuySell side, string icon, bool night);
-        string CreateLimitOrder(string symbol, decimal quantity, BuySell side, decimal limitPrice, string icon, bool night);
-        void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null);
-        FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t);
-    }
 
     public class DelayedOrder
     {
@@ -69,7 +57,7 @@ namespace Kalitte.Trading.Algos
         }
     }
 
-    public abstract class AlgoBase 
+    public abstract class AlgoBase: ILogProvider
     {
 
         Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");

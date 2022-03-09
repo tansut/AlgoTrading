@@ -717,7 +717,7 @@ namespace Kalitte.Trading.Algos
         {
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
             var lastOrder = portfolio.GetLastOrderSkip(typeof(ProfitLossSignal));
-            var keepPosition = lastOrder == null || lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(CrossSignal));
+            var keepPosition = lastOrder != null && lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(CrossSignal));
 
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;

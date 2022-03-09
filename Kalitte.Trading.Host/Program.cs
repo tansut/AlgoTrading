@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 8);
-        settings.Finish = new DateTime(2022, 3, 8);
+        settings.Start = new DateTime(2022, 3, 1);
+        settings.Finish = new DateTime(2022, 3, 9);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
@@ -44,7 +44,7 @@ public class Program
         alternates.Set("ProfitQuantityStepMultiplier", 0);
         alternates.Set("ProfitStart", 9);        
         alternates.Set("ProfitPriceStep", 2.0);
-        alternates.Set("ProfitUseMonitor", true);
+        alternates.Set("ProfitUseMonitor", true, false);
 
         
 

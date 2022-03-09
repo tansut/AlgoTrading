@@ -219,7 +219,7 @@ namespace Kalitte.Trading
                 var monitorResult = PriceMonitor.Check(marketPrice);
                 if (monitorResult != null && monitorResult.finalResult.HasValue)
                 {
-                    Log($"price monitor resulted: [{monitorResult.finalResult} {monitorResult.Direction}]: original: {monitorResult.MarketPrice} current: {marketPrice}", LogLevel.Warning);
+                    //Log($"price monitor resulted: [{monitorResult.finalResult} {monitorResult.Direction}]: original: {monitorResult.MarketPrice} current: {marketPrice}", LogLevel.Warning);
                     monitorResult.MarketPrice = marketPrice;
                     monitorResult.PL = marketPrice - portfolio.AvgCost;
                     PriceMonitor = null;

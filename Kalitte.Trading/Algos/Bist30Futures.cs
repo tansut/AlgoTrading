@@ -468,7 +468,7 @@ namespace Kalitte.Trading.Algos
 
             if (quantity > 0)
             {
-                Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, OriginalPrice: {result.OriginalPrice} MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Order, result.SignalTime);
+                Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, OriginalPrice: {result.OriginalPrice} MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Info, result.SignalTime);
                 sendOrder(Symbol, quantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result.MarketPrice, result.Direction == ProfitOrLoss.Profit ? OrderIcon.TakeProfit : OrderIcon.StopLoss, result.SignalTime, result);
             }
         }

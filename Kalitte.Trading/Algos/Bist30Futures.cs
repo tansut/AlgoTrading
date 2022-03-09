@@ -376,7 +376,8 @@ namespace Kalitte.Trading.Algos
                 if (analyser != null)
                 {
                     analyser.CollectSize = DataCollectSize;
-                    analyser.AnalyseSize = DataAnalysisSize;
+                    analyser.AnalyseAverage = Average.Ema;
+                    analyser.AnalyseSize = Convert.ToInt32(DataAnalysisSize * 2);
                     analyser.CollectAverage = DataCollectUseSma ? Average.Sma : Average.Ema;
                     analyser.AnalyseAverage = DataAnalysisUseSma ? Average.Sma : Average.Ema;
                 }

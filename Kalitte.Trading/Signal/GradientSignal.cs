@@ -112,7 +112,7 @@ namespace Kalitte.Trading
                         }
                         else if (currentValue < BestValue)
                         {
-                            var newResistance = Math.Min(ResistanceValue.Value + ResistanceValue.Value * ResistanceNextAlfa, currentValue);
+                            var newResistance = ResistanceValue.Value + ResistanceValue.Value * ResistanceNextAlfa;
                             Log($"Increased resistance value: {ResistanceValue} -> {newResistance}. c: {currentValue} b: {BestValue} f: {FirstValue}", LogLevel.Debug);
                             ResistanceValue = newResistance;
                         } 
@@ -126,12 +126,16 @@ namespace Kalitte.Trading
                         if (currentValue <= BestValue)
                         {
                             BestValue = currentValue;
-                            ResistanceValue = BestValue + BestValue * ResistanceFirstAlfa;
+                            ResistanceValue = currentValue + currentValue * ResistanceFirstAlfa;
                             Log($"Set best value: {BestValue} r: {ResistanceValue} c: {currentValue} f: {FirstValue}", LogLevel.Debug);
-                        } else if (currentValue >= ResistanceValue) result.finalResult = BuySell.Buy;
+                        }
+                        else if (currentValue >= ResistanceValue)
+                        {
+                            result.finalResult = BuySell.Buy;
+                        }
                         else if (currentValue > BestValue)
                         {
-                            var newResistance = Math.Min(ResistanceValue.Value - ResistanceValue.Value * ResistanceNextAlfa, currentValue);
+                            var newResistance = ResistanceValue.Value - ResistanceValue.Value * ResistanceNextAlfa;
                             Log($"Decreased resistance value: {ResistanceValue} -> {newResistance}. c: {currentValue} b: {BestValue} f: {FirstValue}", LogLevel.Debug);
                             ResistanceValue = newResistance;
                         }

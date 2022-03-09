@@ -67,8 +67,8 @@ public class Program
         //alternates.Set("RsiLossStart", 5);
 
         // rsi
-        alternates.Set("RsiHighLimit", 75);
-        alternates.Set("RsiLowLimit", 25);
+        alternates.Set("RsiHighLimit", 74.9);
+        alternates.Set("RsiLowLimit", 23.9);
         alternates.Set("Rsi", 14);        
         alternates.Set("RsiTrendSensitivity", 3M);
         alternates.Set("RsiTrendThreshold", 0.1);

@@ -105,8 +105,8 @@ public class Program
         alternates.Set("LoggingLevel", LogLevel.Verbose);        
         alternates.Set("Symbol", "F_XU0300422");
         alternates.Set("LogConsole", false);
-
         alternates.SaveToFile($"c:\\kalitte\\Bist30Futures-test.json");
+
         alternates.Set("LoggingLevel", LogLevel.Order);
         alternates.Set("LogConsole", true);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");

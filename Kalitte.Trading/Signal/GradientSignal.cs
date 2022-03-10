@@ -49,8 +49,8 @@ namespace Kalitte.Trading
         public override void Init()
         {
             grad = new Gradient(L1, L2, this.Algo);
-            grad.ResistanceFirstAlfa = ResistanceFirstAlfa;
-            grad.ResistanceNextAlfa = ResistanceNextAlfa;
+            grad.Tolerance = ResistanceFirstAlfa;
+            grad.Alpha = ResistanceNextAlfa;
             //grad.OutTolerance = OutTolerance;
             criticalBars = new FinanceList<decimal>(4);
             base.Init();

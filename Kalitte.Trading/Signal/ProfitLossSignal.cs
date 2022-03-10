@@ -40,19 +40,18 @@ namespace Kalitte.Trading
             this.Result = signalResult;
             this.Owner = signalResult.Signal as ProfitLossSignal;
             var resistanceRatio = 0.0015M;
+            var alpha = 0.0005M;
             var l1 = Result.finalResult == BuySell.Buy ? Result.MarketPrice + Result.MarketPrice * resistanceRatio : Result.MarketPrice - Result.MarketPrice * resistanceRatio;
             var l2 = Result.finalResult == BuySell.Buy ? Result.MarketPrice - Result.MarketPrice * .1M : Result.MarketPrice + Result.MarketPrice * .1M;
             this.Grad = new Gradient(l1, l2, Owner.Algo);
-            this.Grad.ResistanceFirstAlfa = resistanceRatio;
-            this.Grad.ResistanceNextAlfa = 0.0005M;
+            this.Grad.Tolerance = resistanceRatio;
+            this.Grad.Alpha = alpha;
             this.List = new AnalyseList(4, Average.Ema);
-
         }
 
         public ProfitLossResult Check(decimal mp)
-        {
-            List.Collect(mp);
-            var price = List.LastValue;
+        {            
+            var price = List.Collect(mp).LastValue;
             var gradResult = this.Grad.Step(price);
             if (gradResult.FinalResult.HasValue)
             {

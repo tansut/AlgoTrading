@@ -29,16 +29,17 @@ namespace Kalitte.Trading
             this.Candle = candle;
         }
 
-        public void Collect(decimal val)
+        public AnalyseList Collect(decimal val)
         {
-            this.Collect(DateTime.Now, val);
+            return this.Collect(DateTime.Now, val);
         }
 
-        public void Collect(DateTime date, decimal value)
+        public AnalyseList Collect(DateTime date, decimal value)
         {
             var q = new MyQuote() { Date = date };
             q.Set(value, Candle);
             this.List.Push(q);
+            return this;
         }
 
         public void Clear()

@@ -18,7 +18,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(3.0)]
         public decimal RsiTrendOrderQuantity { get; set; }
 
-
         [AlgoParam(5)]
         public int MovPeriod { get; set; }
 
@@ -74,25 +73,7 @@ namespace Kalitte.Trading.Algos
         public decimal RsiProfitInitialQuantity { get; set; }
 
         [AlgoParam(0)]
-        public decimal RsiProfitStep { get; set; }
-
-        [AlgoParam(1)]
-        public decimal RsiProfitQuantityStep { get; set; }
-
-
-        [AlgoParam(0)]
-        public decimal RsiProfitQuantityStepMultiplier { get; set; }
-
-        [AlgoParam(0)]
         public decimal RsiProfitKeepQuantity { get; set; }
-
-
-        [AlgoParam(10)]
-        public decimal RsiProfitStart { get; set; }
-
-        [AlgoParam(5)]
-        public decimal RsiLossStart { get; set; }
-
 
 
         [AlgoParam(0)]
@@ -193,13 +174,12 @@ namespace Kalitte.Trading.Algos
         
         ProfitSignal profitSignal = null;
         LossSignal lossSignal = null;
-        //LossSignal trendStopLossSignal = null;
-        //TakeProfitOrLossSignal lossSignal = null;
+        ProfitSignal rsiProfitSignal = null;
+
         TrendSignal rsiTrendSignal = null;
-        //TrendProfitSignal rsiProfitSignal = null;
+        
         TrendSignal maTrendSignal = null;
         TrendSignal priceTrend = null;
-        TrendSignal atrTrend = null;
         PowerSignal powerSignal = null;
         ClosePositionsSignal closePositionsSignal = null;
         GradientSignal rsiHigh;
@@ -277,19 +257,18 @@ namespace Kalitte.Trading.Algos
             base.InitializeBars(symbol, period, t);
         }
 
+        public ProfitSignal CreateProfitSignal(string name, string symbol)
+        {
+            return new ProfitSignal(name, symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, ProfitPriceStep, ProfitKeepQuantity);
+        }
+
         public void InitSignals()
         {
             this.priceTrend = new TrendSignal("price-trend", Symbol, this);
             priceTrend.ReferenceType = TrendReference.LastCheck;
             priceTrend.SignalSensitivity = PriceTrendSensitivity;
 
-            this.atrTrend = new TrendSignal("atr-trend", Symbol, this);
-            atrTrend.HowToReset = ResetList.Always;
-
             this.powerSignal = new PowerSignal("power", Symbol, this);
-
-            //this.Signals.Add(this.priceTrend);
-            //this.Signals.Add(this.atrTrend);
             this.Signals.Add(this.powerSignal);
 
             var rsiColSize = Convert.ToInt32(DataCollectSize);
@@ -330,10 +309,21 @@ namespace Kalitte.Trading.Algos
 
             if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0))
             {
-                this.profitSignal = new ProfitSignal("profit", Symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, ProfitPriceStep, ProfitKeepQuantity);
+                this.profitSignal = CreateProfitSignal("profit", Symbol);
                 this.profitSignal.LimitingSignals.Add(typeof(CrossSignal));
                 this.Signals.Add(profitSignal);
             }
+
+            if (!SimulateOrderSignal && (this.RsiProfitInitialQuantity > 0))
+            {
+                this.rsiProfitSignal = CreateProfitSignal("rsi-profit", Symbol);
+                this.rsiProfitSignal.InitialQuantity = RsiProfitInitialQuantity;
+                this.rsiProfitSignal.KeepQuantity = RsiProfitKeepQuantity;
+                this.rsiProfitSignal.LimitingSignals.Add(typeof(GradientSignal));
+                this.Signals.Add(rsiProfitSignal);
+            }
+
+
 
             if (!SimulateOrderSignal && (this.LossInitialQuantity > 0))
             {
@@ -493,96 +483,6 @@ namespace Kalitte.Trading.Algos
             else return VolatileRatio.Critical;
         }
 
-        void HandlePowerSignal(PowerSignal signal, PowerSignalResult result)
-        {
-            return;
-            if (LastPower == null && result.Power != PowerRatio.Unknown)
-            {
-                LastPower = result;
-            }
-
-            if (LastPower != null && DynamicCross && Now.Second % 30 == 0)
-            {
-                //Log($"Current ATR volatility level: {result}", LogLevel.Warning);
-                var atrInd = (Atrp)(atrTrend as TrendSignal).i1k;
-                var last = atrInd.ResultList.Last;
-                Log($"ATR: atr: {last.Atr} tr: {last.Tr} p: {last.Atrp}", LogLevel.Debug);
-                Log($"POWER {LastPower.Power}: {LastPower} ", LogLevel.Debug, result.SignalTime);
-            }
-
-            if (DynamicCross && result.Power != PowerRatio.Unknown)
-            {
-                double ratio = 0;
-                //if (result.Value < PowerCrossThreshold || PowerCrossThreshold == 0)
-                //{
-                //    ratio = 0.25 * (double)(100 - result.Value) / 100D;
-                //}
-                //if (ratio < 0) ratio = 0;
-                //ratio = (double)(100 - result.Value) / 100D;
-                //Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{result.Power}/{result.Value}"));
-            }
-
-            //if (DynamicCross)
-            //{
-            //    var ratio = (double)(100 - result.Value) / 100;
-            //    if (result.Value < PowerCrossThreshold)
-            //    {
-            //        Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{result.Power}/{result.Value}"));
-            //    }
-            //}
-
-            //Log($"{result}", LogLevel.Critical, result.SignalTime);            
-        }
-
-
-        private void HandleAtrTrendSignal(TrendSignal signal, TrendSignalResult result)
-        {
-            return;
-            if (DynamicCross)
-            {
-                var newVal = EstimateVolatility(result.Trend.NewValue);
-                if (VolatileRatio != newVal)
-                {
-                    VolatileRatio = newVal;
-                    var val = result.Trend.NewValue;
-                    double ratio = 0;
-                    switch (VolatileRatio)
-                    {
-                        case VolatileRatio.Low:
-                            {
-                                ratio = 0.20;
-                                break;
-                            }
-                        case VolatileRatio.BelowAverage:
-                            {
-                                ratio = 0.15;
-                                break;
-                            }
-                        case VolatileRatio.High:
-                            {
-                                ratio = -0.15;
-                                break;
-                            }
-                        case VolatileRatio.Critical:
-                            {
-                                ratio = -0.30;
-                                break;
-                            }
-                    }
-                    //Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.AdjustSensitivity(ratio, $"{VolatileRatio}({result.Trend.NewValue.ToCurrency()})"));
-
-
-                }
-                if (Now.Second % 10 == 10)
-                {
-                    Log($"Current ATR volatility level: {result}", LogLevel.Warning);
-                    var atrInd = (Atrp)(result.Signal as TrendSignal).i1k;
-                    var last = atrInd.ResultList.Last;
-                    Log($"ATR last: atr: {last.Atr} tr: {last.Tr} p: {last.Atrp}", LogLevel.Warning);
-                    //Log($"Current ATR volatility level: {VolatileRatio}. Adjusted cross to {maSignal.AvgChange}, {maSignal.Periods}. Signal: {result}", LogLevel.Critical, result.SignalTime);
-                }
-            }
-        }
 
 
         public override void Decide(Signal signal, SignalEventArgs data)
@@ -629,19 +529,7 @@ namespace Kalitte.Trading.Algos
                     var tpSignal = (TrendSignal)(result.Signal);
                     var signalResult = (TrendSignalResult)result;
                     HandleMaTrendSignal(tpSignal, signalResult);
-                }
-                else if (result.Signal.Name == "atr-trend")
-                {
-                    var tpSignal = (TrendSignal)(result.Signal);
-                    var signalResult = (TrendSignalResult)result;
-                    HandleAtrTrendSignal(tpSignal, signalResult);
-                }
-                else if (result.Signal.Name == "power")
-                {
-                    var tpSignal = (PowerSignal)(result.Signal);
-                    var signalResult = (PowerSignalResult)result;
-                    HandlePowerSignal(tpSignal, signalResult);
-                }
+                }                
                 else if (result.Signal is CrossSignal)
                 {
                     var tpSignal = (CrossSignal)(result.Signal);

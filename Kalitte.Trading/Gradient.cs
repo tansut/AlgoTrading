@@ -27,8 +27,8 @@ namespace Kalitte.Trading
 
     public class Gradient
     {
-        public decimal ResistanceFirstAlfa { get; set; } = 0.015M;
-        public decimal ResistanceNextAlfa { get; set; } = 0.005M;
+        public decimal Tolerance { get; set; } = 0.015M;
+        public decimal Alpha { get; set; } = 0.005M;
 
         public decimal L1 { get; set; }
         public decimal L2 { get; set; }
@@ -69,7 +69,7 @@ namespace Kalitte.Trading
                 if (currentValue >= BestValue)
                 {
                     BestValue = currentValue;
-                    ResistanceValue = currentValue - currentValue * ResistanceFirstAlfa;
+                    ResistanceValue = currentValue - currentValue * Tolerance;
                     LogProvider.Log($"Set best value: {BestValue} r: {ResistanceValue} c: {currentValue} f: {FirstValue}", LogLevel.Verbose);
 
                 }
@@ -79,7 +79,7 @@ namespace Kalitte.Trading
                 }
                 else if (currentValue < BestValue &&  (LastValue.HasValue ? currentValue < LastValue : true))
                 {
-                    var newResistance = ResistanceValue.Value + ResistanceValue.Value * ResistanceNextAlfa;
+                    var newResistance = ResistanceValue.Value + ResistanceValue.Value * Alpha;
                     LogProvider.Log($"Increased resistance value: {ResistanceValue} -> {newResistance}. c: {currentValue} b: {BestValue} f: {FirstValue}", LogLevel.Verbose);
                     ResistanceValue = newResistance;
                 }
@@ -93,7 +93,7 @@ namespace Kalitte.Trading
                 if (currentValue <= BestValue)
                 {
                     BestValue = currentValue;
-                    ResistanceValue = currentValue + currentValue * ResistanceFirstAlfa;
+                    ResistanceValue = currentValue + currentValue * Tolerance;
                     LogProvider.Log($"Set best value: {BestValue} r: {ResistanceValue} c: {currentValue} f: {FirstValue}", LogLevel.Verbose);
                 }
                 else if (currentValue >= ResistanceValue)
@@ -102,7 +102,7 @@ namespace Kalitte.Trading
                 }
                 else if (currentValue > BestValue && (LastValue.HasValue ? currentValue > LastValue: true))
                 {
-                    var newResistance = ResistanceValue.Value - ResistanceValue.Value * ResistanceNextAlfa;
+                    var newResistance = ResistanceValue.Value - ResistanceValue.Value * Alpha;
                     LogProvider.Log($"Decreased resistance value: {ResistanceValue} -> {newResistance}. c: {currentValue} b: {BestValue} f: {FirstValue}", LogLevel.Verbose);
                     ResistanceValue = newResistance;
                 }
@@ -113,7 +113,7 @@ namespace Kalitte.Trading
                 result.OutOfRange = true;
                 if (FirstValue.HasValue)
                 {
-                    var toleranceVal = FirstValue > L1 && FirstValue < L2 ? L1 - L1 * ResistanceFirstAlfa : L1 + L1 * ResistanceFirstAlfa;
+                    var toleranceVal = FirstValue > L1 && FirstValue < L2 ? L1 - L1 * Tolerance : L1 + L1 * Tolerance;
                     if (toleranceVal < L1 && currentValue >= toleranceVal) result.FinalResult = BuySell.Sell;
                     else if (toleranceVal > L1 && currentValue <= toleranceVal) result.FinalResult = BuySell.Buy;
                     LogProvider.Log($"Fast increase/decrease detected.: {result.FinalResult} {toleranceVal} {currentValue} {BestValue} {ResistanceValue}", LogLevel.Verbose);

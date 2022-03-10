@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
-    internal class ProfitSignal : ProfitLossSignal
+    public class ProfitSignal : ProfitLossSignal
     {
         public override ProfitOrLoss SignalType => ProfitOrLoss.Profit;
      

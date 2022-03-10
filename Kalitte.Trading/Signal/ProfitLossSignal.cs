@@ -122,7 +122,7 @@ namespace Kalitte.Trading
             KeepQuantity = keepQuantity;
         }
 
-        public override void ResetOrders()
+        public override void ResetOrdersInternal()
         {
             UsedPriceChange = PriceChange;
             if (PriceMonitor != null)
@@ -131,12 +131,21 @@ namespace Kalitte.Trading
                 PriceMonitor = null;
             }
             
-            base.ResetOrders();
+            base.ResetOrdersInternal();
         }
 
         public void IncrementParams()
         {
-            UsedPriceChange += PriceStep;
+            Monitor.Enter(OperationLock);
+            try
+            {
+                UsedPriceChange += PriceStep;
+            }
+            finally
+            {
+                Monitor.Exit  (OperationLock);
+            }
+            
         }
 
         protected virtual PriceMonitor CreatePriceMonitor(ProfitLossResult result)
@@ -151,10 +160,7 @@ namespace Kalitte.Trading
             return $"{base.ToString()}: {InitialQuantity}/{PriceChange}";
         }
 
-        protected override void ResetInternal()
-        {
-            ResetOrders();
-        }
+
 
         public virtual decimal GetQuantity()
         {

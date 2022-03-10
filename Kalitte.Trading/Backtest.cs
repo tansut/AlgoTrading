@@ -41,17 +41,7 @@ namespace Kalitte.Trading
 
     public class Backtest
     {
-        internal class SignalData
-        {
-            public DateTime time;
-            public Signal signal;
 
-            internal SignalData(DateTime time, Signal signal)
-            {
-                this.time = time;
-                this.signal = signal;
-            }
-        }
 
 
         public AlgoBase Algo { get; set; }
@@ -71,11 +61,7 @@ namespace Kalitte.Trading
             Algo.Init();
         }
 
-        private Func<object, SignalResult> signalAction = (object stateo) =>
-                    {
-                        var state = (SignalData)stateo;
-                        return state.signal.Check(state.time);
-                    };
+
 
 
         private Dictionary<int, BarPeriod> secDict;
@@ -122,14 +108,7 @@ namespace Kalitte.Trading
                     Algo.SetTime(p);
                     Algo.SetBarCurrentValues();
                     var time = Algo.Now;
-                    var tasks = new List<Task<SignalResult>>();
-
-                    foreach (var signal in Algo.Signals)
-                    {
-                        var sd = new SignalData(time, signal);
-                        tasks.Add(Task<SignalResult>.Factory.StartNew(this.signalAction, sd));
-                    }
-                    Task.WaitAll(tasks.ToArray());
+                    Algo.RunSignals(time);
                     Algo.CheckDelayedOrders(time);
                     Algo.Monitor.CheckMonitor();
                     Algo.simulationCount++;

@@ -57,9 +57,22 @@ namespace Kalitte.Trading.Algos
         }
     }
 
+    public class SignalData
+    {
+        public DateTime time;
+        public Signal signal;
+
+        internal SignalData(DateTime time, Signal signal)
+        {
+            this.time = time;
+            this.signal = signal;
+        }
+    }
+
     public abstract class AlgoBase: ILogProvider
     {
-
+        private object signalLock = new object();
+        private object decideLock = new object();
         Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");
 
         Dictionary<string, MarketDataFileLogger> dataProviders = new Dictionary<string, MarketDataFileLogger>();
@@ -143,12 +156,29 @@ namespace Kalitte.Trading.Algos
         }
 
         public PerformanceMonitor Monitor = new PerformanceMonitor();
-
-
-        //public FinanceBars PeriodBars = null;
         int orderCounter = 0;
 
         public Dictionary<string, decimal> ordersBySignals = new Dictionary<string, decimal>();
+
+        private Func<object, SignalResult> signalAction = (object stateo) =>
+        {
+            var state = (SignalData)stateo;
+            return state.signal.Check(state.time);
+        };
+
+        internal Task[] RunSignals(DateTime time)
+        {
+            var tasks = new List<Task<SignalResult>>();            
+            foreach (var signal in Signals)
+            {
+                var sd = new SignalData(time, signal);
+                tasks.Add(Task<SignalResult>.Factory.StartNew(this.signalAction, sd));
+            }
+            var result = tasks.ToArray();
+            Task.WaitAll(result);
+            return result;
+            
+        }
 
         public Dictionary<string, PerformanceCounter> perfCounters = new Dictionary<string, PerformanceCounter>();
 
@@ -159,14 +189,13 @@ namespace Kalitte.Trading.Algos
         public StartableState SignalsState { get; private set; } = StartableState.Stopped;
 
         public ManualResetEvent orderWait = new ManualResetEvent(true);
-        public ManualResetEvent operationWait = new ManualResetEvent(true);
 
         public abstract void Decide(Signal signal, SignalEventArgs data);
 
-        public bool WaitSignalOperations(int timeOut = 1000)
-        {
-            return ManualResetEvent.WaitAll(Signals.Select(p => p.InOperationLock).ToArray(), timeOut);
-        }
+        //public bool WaitSignalOperations(int timeOut = 1000)
+        //{
+        //    return ManualResetEvent.WaitAll(Signals.Select(p => p.InOperationLock).ToArray(), timeOut);
+        //}
 
 
 
@@ -452,14 +481,12 @@ namespace Kalitte.Trading.Algos
             Current = this;
         }
 
-        public Boolean waitForOperationAndOrders(string message)
+        public Boolean WaitForOrder(string message)
         {
             var wait = Simulation ? 0 : 100;
-            var result1 = operationWait.WaitOne(wait);
             var result2 = orderWait.WaitOne(wait);
-            if (!result1 && !Simulation) Log($"Waiting for last operation to complete: {message}", LogLevel.Warning);
             if (!result2 && !Simulation) Log($"Waiting for last order to complete: {message}", LogLevel.Warning);
-            return result1 && result2;
+            return result2;
         }
 
         public void SignalReceieved(Signal signal, SignalEventArgs data)
@@ -467,7 +494,7 @@ namespace Kalitte.Trading.Algos
             SignalResult existing;
             BuySell? oldFinalResult = null;
             int? oldHashCode = null;
-            lock (SignalResults)
+            lock (signalLock)
             {
                 if (SignalResults.TryGetValue(signal.Name, out existing))
                 {
@@ -475,12 +502,11 @@ namespace Kalitte.Trading.Algos
                     oldHashCode = existing.GetHashCode();
                 }
                 SignalResults[signal.Name] = data.Result;
-
             }
             if (oldHashCode != data.Result.GetHashCode())
             {
                 Log($"Signal {signal.Name} changed from {existing} -> {data.Result }", LogLevel.Verbose, data.Result.SignalTime);
-                if (data.Result.finalResult.HasValue) Decide(signal, data);
+                if (data.Result.finalResult.HasValue) lock(decideLock) Decide(signal, data);
             }
         }
 

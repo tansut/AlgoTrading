@@ -84,8 +84,7 @@ namespace Kalitte.Trading
 
         public void ResetCross()
         {
-            //InOperationLock.WaitOne();
-            InOperationLock.Reset();
+            Monitor.Enter(OperationLock);
             try
             {
                 crossBars.Clear();
@@ -94,7 +93,7 @@ namespace Kalitte.Trading
             }
             finally
             {
-                InOperationLock.Set();
+                Monitor.Exit(OperationLock);
             }
         }
 
@@ -119,24 +118,25 @@ namespace Kalitte.Trading
         }
 
 
-        protected override void AdjustSensitivityInternal(double ratio, string reason)
-        {
-            AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
-            Monitor("sensitivity/avgchange", AvgChange);
-            base.AdjustSensitivityInternal(ratio, reason);
-        }
+        //protected override void AdjustSensitivityInternal(double ratio, string reason)
+        //{
+        //    AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
+        //    Watch("sensitivity/avgchange", AvgChange);
+        //    base.AdjustSensitivityInternal(ratio, reason);
+        //}
 
         public void AdjustSensitivity(double ratio, string reason)
         {
-            InOperationLock.WaitOne();
-            InOperationLock.Reset();
+            Monitor.Enter(OperationLock);
             try
             {
-                AdjustSensitivityInternal(ratio, reason);
+                AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
+                Watch("sensitivity/avgchange", AvgChange);
+                base.AdjustSensitivityInternal(ratio, reason);
             }
             finally
             {
-                InOperationLock.Set();
+                Monitor.Exit(OperationLock);
             }
         }
 
@@ -222,8 +222,8 @@ namespace Kalitte.Trading
                     }
                 }
 
-                Monitor("sensitivity/trendRatio", dtRatio);
-                Monitor("sensitivity/volumePower", usedPower);
+                Watch("sensitivity/trendRatio", dtRatio);
+                Watch("sensitivity/volumePower", usedPower);
                 result.TrendRatio = dtRatio;
                 result.Result = average;
             }

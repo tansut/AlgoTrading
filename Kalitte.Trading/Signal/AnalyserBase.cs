@@ -46,8 +46,8 @@ namespace Kalitte.Trading
             CollectSize = InitialCollectSize + Convert.ToInt32((InitialCollectSize * (decimal)ratio));
             CollectList.Resize(CollectSize);
             AnalyseList.Resize(AnalyseSize);
-            Monitor("sensitivity/collectsize", (decimal)CollectSize);
-            Monitor("sensitivity/analysesize", (decimal)AnalyseSize);
+            Watch("sensitivity/collectsize", (decimal)CollectSize);
+            Watch("sensitivity/analysesize", (decimal)AnalyseSize);
             //Monitor("sensitivity/ratio", (decimal)ratio);
             //Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): c:{CollectSize} a:{AnalyseSize}", LogLevel.Debug);
         }

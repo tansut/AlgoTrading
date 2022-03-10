@@ -251,9 +251,9 @@ namespace Kalitte.Trading
                     result.Trend =  getTrendDirection(lastReference, currentVal, this.ReferenceType == TrendReference.LastCheck ? null:  BarTrendResults.LastOrDefault());
                     result.Trend.Date = t ?? DateTime.Now;
 
-                    Monitor("value", result.Trend.NewValue);
+                    Watch("value", result.Trend.NewValue);
                     var speed = result.Trend.SpeedPerSecond;
-                    if (speed.HasValue) Monitor("speed", speed.Value);
+                    if (speed.HasValue) Watch("speed", speed.Value);
 
                     var limit = currentVal;
                     var checkedLimits = !Min.HasValue && !Max.HasValue;

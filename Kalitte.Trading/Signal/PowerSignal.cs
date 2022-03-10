@@ -113,8 +113,8 @@ namespace Kalitte.Trading
             s.CurrentVolume = volume;
             s.LastVolume = last;
 
-            Monitor("value", value);
-            Monitor("VolumePerSecond", (decimal)volumePerSecond);
+            Watch("value", value);
+            Watch("VolumePerSecond", (decimal)volumePerSecond);
         }
 
 

@@ -56,7 +56,10 @@ namespace Kalitte.Trading
     {
         public StartableState State { get; set; } = StartableState.Stopped;
         protected System.Timers.Timer _timer = null;
-        private static object _locker = new object();
+        private object _locker = new object();
+
+        protected object OperationLock = new object();
+
         public string Name { get; set; }
         public AlgoBase Algo { get; set; }
         public bool Enabled { get; set; }
@@ -78,8 +81,6 @@ namespace Kalitte.Trading
 
         public List<ITechnicalIndicator> Indicators { get; set; } = new List<ITechnicalIndicator>();
 
-        public ManualResetEvent InOperationLock = new ManualResetEvent(true);
-
         public event SignalEventHandler OnSignal;
 
         public override string ToString()
@@ -88,7 +89,7 @@ namespace Kalitte.Trading
         }
 
         public void Pause(DateTime until)
-        {            
+        {
             PausedUntil = until;
             if (this.State == StartableState.Started)
             {
@@ -97,10 +98,23 @@ namespace Kalitte.Trading
             }
         }
 
-        public virtual void ResetOrders()
+        public virtual void ResetOrdersInternal()
         {
             CompletedOrder = 0;
             CompletedQuantity = 0;
+        }
+
+        public void ResetOrders()
+        {
+            Monitor.Enter(OperationLock);
+            try
+            {
+                ResetOrdersInternal();
+            }
+            finally
+            {
+                Monitor.Exit(OperationLock);
+            }
         }
 
         public virtual void AddOrder(int orderInc, decimal quantityInc)
@@ -110,7 +124,7 @@ namespace Kalitte.Trading
             LastOrderDate = time;
             CompletedOrder += orderInc;
             CompletedQuantity += quantityInc;
-            
+
         }
 
         public void MonitorInit(string name, decimal value)
@@ -121,7 +135,7 @@ namespace Kalitte.Trading
             }
         }
 
-        public void Monitor(string name, decimal value)
+        public void Watch(string name, decimal value)
         {
             if (PerfMon != null)
             {
@@ -166,7 +180,7 @@ namespace Kalitte.Trading
             SignalResult result = null;
             try
             {
-                System.Threading.Monitor.TryEnter(_locker, ref hasLock);
+                Monitor.TryEnter(_locker, ref hasLock);
                 if (!hasLock)
                 {
                     return;
@@ -181,7 +195,7 @@ namespace Kalitte.Trading
             {
                 if (hasLock)
                 {
-                    System.Threading.Monitor.Exit(_locker);
+                    Monitor.Exit(_locker);
                     if (restartTimer) _timer.Start();
                 }
             }
@@ -191,36 +205,47 @@ namespace Kalitte.Trading
 
         public virtual SignalResult Check(DateTime? t = null)
         {
-            if (!InOperationLock.WaitOne()) return null;            
-            InOperationLock.Reset();
-            var time = t ?? DateTime.Now;
+            bool lockTaken = false;
             try
             {
-                if (this.State == StartableState.Paused) return null;
-                if (!Enabled) return null;
-                if (!EnsureUsingRightBars(time))
+                Monitor.TryEnter(OperationLock, ref lockTaken);
+                if (!lockTaken)
                 {
-                    Log($"IMPORTANT: Detected wrong bars for indicators.", LogLevel.Error, t);
                     return null;
                 }
 
-                var result = CheckInternal(t);
-                if (result != null)
+                var time = t ?? DateTime.Now;
+                try
                 {
-                    result.SignalTime = t ?? DateTime.Now;
-                    raiseSignal(new SignalEventArgs() { Result = result });
-                    LastSignalResult = result;
+                    if (this.State == StartableState.Paused) return null;
+                    if (!Enabled) return null;
+                    if (!EnsureUsingRightBars(time))
+                    {
+                        Log($"IMPORTANT: Detected wrong bars for indicators.", LogLevel.Error, t);
+                        return null;
+                    }
+
+                    var result = CheckInternal(t);
+                    if (result != null)
+                    {
+                        result.SignalTime = t ?? DateTime.Now;
+                        raiseSignal(new SignalEventArgs() { Result = result });
+                        LastSignalResult = result;
+                    }
+                    return result;
                 }
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
-                return new SignalResult(this, t ?? DateTime.Now) { finalResult = null };
+                catch (Exception ex)
+                {
+                    Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
+                    return new SignalResult(this, t ?? DateTime.Now) { finalResult = null };
+                }
             }
             finally
             {
-                InOperationLock.Set();
+                if (lockTaken)
+                {
+                    Monitor.Exit(OperationLock);
+                }
             }
         }
 
@@ -232,27 +257,26 @@ namespace Kalitte.Trading
 
         protected virtual void ResetInternal()
         {
-
+            ResetOrdersInternal();
         }
 
         public virtual void Reset()
         {
-            //InOperationLock.WaitOne();
-            InOperationLock.Reset();
+            Monitor.Enter(OperationLock);
             try
             {
                 ResetInternal();
             }
             finally
             {
-                InOperationLock.Set();
+                Monitor.Exit(OperationLock);
             }
         }
 
 
         public virtual void Init()
         {
-            
+
         }
 
         protected virtual bool EnsureUsingRightBars(DateTime t)
@@ -280,8 +304,7 @@ namespace Kalitte.Trading
         protected virtual void InputbarsChanged(object sender, ListEventArgs<IQuote> e)
         {
             Log($"Loading new bars for {this.Name} Data: {e.Action}, {e.Item}", LogLevel.Verbose);
-            InOperationLock.WaitOne();
-            InOperationLock.Reset();
+            Monitor.Enter(OperationLock);
             try
             {
                 LoadNewBars(sender, e);
@@ -289,15 +312,14 @@ namespace Kalitte.Trading
             }
             finally
             {
-                InOperationLock.Set();
+                Monitor.Exit(OperationLock);
             }
         }
 
         public virtual void Start()
         {
             this.State = StartableState.StartInProgress;
-            InOperationLock.WaitOne();
-            InOperationLock.Reset();
+            Monitor.Enter(OperationLock);
             try
             {
                 if (Enabled && TimerEnabled)
@@ -310,7 +332,7 @@ namespace Kalitte.Trading
             }
             finally
             {
-                InOperationLock.Set();
+                Monitor.Exit(OperationLock);
             }
 
 
@@ -333,8 +355,7 @@ namespace Kalitte.Trading
         public virtual void Stop()
         {
             this.State = StartableState.StopInProgress;
-            InOperationLock.WaitOne();
-            InOperationLock.Reset();
+            Monitor.Enter(OperationLock);
             try
             {
                 if (Enabled && TimerEnabled)
@@ -347,7 +368,7 @@ namespace Kalitte.Trading
             }
             finally
             {
-                InOperationLock.Set();
+                Monitor.Exit(OperationLock);
             }
 
 

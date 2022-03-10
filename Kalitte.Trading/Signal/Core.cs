@@ -279,6 +279,7 @@ namespace Kalitte.Trading
 
         protected virtual void InputbarsChanged(object sender, ListEventArgs<IQuote> e)
         {
+            Log($"Loading new bars for {this.Name} Data: {e.Action}, {e.Item}", LogLevel.Verbose);
             InOperationLock.WaitOne();
             InOperationLock.Reset();
             try

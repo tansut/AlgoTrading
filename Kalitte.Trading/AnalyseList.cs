@@ -16,16 +16,14 @@ namespace Kalitte.Trading
 
     public class AnalyseList
     {
-        public int Size { get; set; }
         public Average Average { get; set; }
         public FinanceList<IQuote> List { get; private set; }
         public CandlePart Candle { get; private set; }
 
         public AnalyseList(int size, Average average, CandlePart candle = CandlePart.Close)
         {
-            this.Size = size;
             this.Average = average;
-            this.List = new FinanceList<IQuote>(Size);
+            this.List = new FinanceList<IQuote>(size);
             this.Candle = candle;
         }
 
@@ -58,7 +56,6 @@ namespace Kalitte.Trading
 
         public void Resize(int newSize)
         {
-            this.Size = newSize;
             List.Resize(newSize);
         }
 

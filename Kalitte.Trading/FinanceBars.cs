@@ -311,7 +311,14 @@ namespace Kalitte.Trading
         {
             get
             {
-                return this.Count >= QueSize;
+                rvl.AcquireReaderLock(timeOut);
+                try
+                {
+                    return this.Count >= QueSize;
+                } finally
+                {
+                    rvl.ReleaseReaderLock();
+                }                
             }
         }
 

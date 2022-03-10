@@ -115,6 +115,7 @@ namespace Kalitte.Trading
         protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
         {
             AnalyseList.Clear();
+            Log($"Cleared AnalyseList", LogLevel.Verbose);
         }
 
 
@@ -266,17 +267,16 @@ namespace Kalitte.Trading
                 result.Sensitivity = sensitivity;
             }
 
-            var mp = Algo.GetMarketPrice(Symbol, t);
-            var volTotal = Algo.GetVolume(Symbol, i1k.InputBars.Period, t);
+            var mp = Algo.GetMarketPrice(Symbol, t);            
 
             if (mp > 0) CollectList.Collect(mp);
 
-            if (CollectList.Ready && mp >= 0 && volTotal > 0)
+            if (CollectList.Ready && mp >= 0)
             {
                 decimal mpAverage = CollectList.LastValue;
 
-                var l1 = i1k.NextValue(mpAverage, volTotal).Value.Value;
-                var l2 = i2k.NextValue(mpAverage, volTotal).Value.Value;
+                var l1 = i1k.NextValue(mpAverage).Value.Value;
+                var l2 = i2k.NextValue(mpAverage).Value.Value;
 
                 AnalyseList.Collect(l1 - l2);
                 crossBars.Push(l1 - l2);
@@ -292,9 +292,6 @@ namespace Kalitte.Trading
                 if (AnalyseList.Ready && lastCross != 0)
                 {
                     var lastAvg = AnalyseList.LastValue; 
-
-                    //decimal last1 = i1k.Results.Last().Value.Value;
-                    //decimal last2 = i2k.Results.Last().Value.Value;
 
                     result.i1Val = l1;
                     result.i2Val = l2;

@@ -176,10 +176,10 @@ namespace Kalitte.Trading.Algos
         LossSignal lossSignal = null;
         ProfitSignal rsiProfitSignal = null;
 
-        TrendSignal rsiTrendSignal = null;
-        
-        TrendSignal maTrendSignal = null;
-        TrendSignal priceTrend = null;
+        TrendSignal rsiTrendSignal = null;        
+        //TrendSignal maTrendSignal = null;
+        //TrendSignal priceTrend = null;
+
         PowerSignal powerSignal = null;
         ClosePositionsSignal closePositionsSignal = null;
         GradientSignal rsiHigh;
@@ -217,10 +217,10 @@ namespace Kalitte.Trading.Algos
                 }
                 maSignal.PowerSignal = powerSignal;
 
-                if (maTrendSignal != null)
-                {
-                    maTrendSignal.i1k = maSignal.i1k;
-                }
+                //if (maTrendSignal != null)
+                //{
+                //    maTrendSignal.i1k = maSignal.i1k;
+                //}
             }
 
             if (macSignal != null)
@@ -264,9 +264,9 @@ namespace Kalitte.Trading.Algos
 
         public void InitSignals()
         {
-            this.priceTrend = new TrendSignal("price-trend", Symbol, this);
-            priceTrend.ReferenceType = TrendReference.LastCheck;
-            priceTrend.SignalSensitivity = PriceTrendSensitivity;
+            //this.priceTrend = new TrendSignal("price-trend", Symbol, this);
+            //priceTrend.ReferenceType = TrendReference.LastCheck;
+            //priceTrend.SignalSensitivity = PriceTrendSensitivity;
 
             this.powerSignal = new PowerSignal("power", Symbol, this);
             this.Signals.Add(this.powerSignal);
@@ -294,8 +294,8 @@ namespace Kalitte.Trading.Algos
             {
                 this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MaAvgChange };
                 this.Signals.Add(maSignal);
-                this.maTrendSignal = new TrendSignal("ma-trend", Symbol, this) { SignalSensitivity = MaTrendSensitivity };
-                Signals.Add(maTrendSignal);
+                //this.maTrendSignal = new TrendSignal("ma-trend", Symbol, this) { SignalSensitivity = MaTrendSensitivity };
+                //Signals.Add(maTrendSignal);
             }
 
             if (MACDShortPeriod > 0 && CrossOrderQuantity >0 && !SimulateOrderSignal)
@@ -417,10 +417,10 @@ namespace Kalitte.Trading.Algos
                 this.Monitor.AddFilter($"{rsiTrendSignal.Name}/value", 5);
                 this.Monitor.AddFilter($"{rsiTrendSignal.Name}/speed", 10);
             }
-            if (priceTrend != null)
-            {
-                this.Monitor.AddFilter($"{priceTrend.Name}/value", 0.5M);
-            }
+            //if (priceTrend != null)
+            //{
+            //    this.Monitor.AddFilter($"{priceTrend.Name}/value", 0.5M);
+            //}
             base.ConfigureMonitor();
         }
 
@@ -612,6 +612,7 @@ namespace Kalitte.Trading.Algos
             var lastOrder = portfolio.GetLastOrderSkip(typeof(ProfitLossSignal));
             var keepPosition = lastOrder != null && lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(CrossSignal));
 
+            Log($"HandleCross: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 

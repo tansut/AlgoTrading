@@ -875,13 +875,16 @@ namespace Kalitte.Trading.Algos
 
         public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)
         {
+            var result = 0M;
             if (Simulation)
             {
                 var list = GetMarketData(symbol, SymbolPeriod, t ?? Now);
-                var price = list.Length > 0 ? list[0] : 0;
-                return price;
+                result = list.Length > 0 ? list[0] : 0;
+                
             }
-            else return Exchange.GetMarketPrice(symbol, t);
+            else result = Exchange.GetMarketPrice(symbol, t);
+            if (result == 0) Log($"Market price got zero", LogLevel.Warning, t);
+            return result;
         }
 
 

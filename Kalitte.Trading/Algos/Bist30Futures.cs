@@ -459,19 +459,20 @@ namespace Kalitte.Trading.Algos
                     Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
                     return;
                 };
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange},{cross.AnalyseSize}, {currentRsi}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, {currentRsi.ToCurrency()}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }
         }
 
-        public override void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
+        public override void CompletedOrder(ExchangeOrder order)
         {
-            var signal = this.positionRequest.SignalResult.Signal;
+
+            var signal = order.SignalResult.Signal;
 
             var tp = signal as ProfitLossSignal;
-            var cross = this.positionRequest.SignalResult as CrossSignalResult;
+            var cross = order.SignalResult as CrossSignalResult;
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
 
-            signal.AddOrder(1, positionRequest.Quantity);
+            signal.AddOrder(1, order.Quantity);
 
             if (tp != null)
             {
@@ -485,9 +486,10 @@ namespace Kalitte.Trading.Algos
             {
                 Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
             }
-
-            base.FillCurrentOrder(filledUnitPrice, filledQuantity);
+            base.CompletedOrder(order);
         }
+
+
 
 
         public Bist30Futures() : base()

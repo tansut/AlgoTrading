@@ -127,7 +127,7 @@ namespace Kalitte.Trading
             UsedPriceChange = PriceChange;
             if (PriceMonitor != null)
             {
-                Log($"Destroying price monitor: {PriceMonitor.Result}", LogLevel.Warning);  
+                Log($"Destroying price monitor: {PriceMonitor.Result}", LogLevel.Verbose);  
                 PriceMonitor = null;
             }
             
@@ -151,7 +151,7 @@ namespace Kalitte.Trading
         protected virtual PriceMonitor CreatePriceMonitor(ProfitLossResult result)
         {
             var monitor = new PriceMonitor(result);            
-            Log($"Created price monitor for {result.Direction}/{result.finalResult} to get a better price than {result.MarketPrice}", LogLevel.Warning);
+            Log($"Created price monitor for {result.Direction}/{result.finalResult} to get a better price than {result.MarketPrice}", LogLevel.Verbose);
             return monitor;
         }
 

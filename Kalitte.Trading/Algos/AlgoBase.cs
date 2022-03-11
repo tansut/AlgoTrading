@@ -228,8 +228,14 @@ namespace Kalitte.Trading.Algos
                 Log($"{e}", LogLevel.Debug);
         }
 
+        public virtual void CompletedOrder(ExchangeOrder order)
+        {
+            
+        }
+
         public virtual void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
         {
+            var savePosition = this.positionRequest;
             this.positionRequest.FilledUnitPrice = filledUnitPrice;
             this.positionRequest.FilledQuantity = filledQuantity;
             var portfolio = this.UserPortfolioList.Add(this.positionRequest);
@@ -238,6 +244,7 @@ namespace Kalitte.Trading.Algos
             CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
             this.positionRequest = null;
             orderCounter++;
+            CompletedOrder(savePosition);
             orderWait.Set();
         }
 

@@ -193,8 +193,7 @@ namespace Kalitte.Trading.Matrix
                 }
                 LoadRealPositions(Algo.Symbol);
                 Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod);
-                Algo.InitMySignals(DateTime.Now);
-                Algo.InitCompleted();
+                Algo.Start();
             }
         }
 

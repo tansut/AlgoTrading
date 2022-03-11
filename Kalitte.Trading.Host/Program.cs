@@ -107,7 +107,7 @@ public class Program
         alternates.Set("LogConsole", false);
         alternates.SaveToFile($"c:\\kalitte\\Bist30Futures-test.json");
 
-        alternates.Set("LoggingLevel", LogLevel.Order);
+        alternates.Set("LoggingLevel", LogLevel.Warning);
         alternates.Set("LogConsole", true);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
         return settings;

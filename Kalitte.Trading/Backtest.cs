@@ -110,7 +110,7 @@ namespace Kalitte.Trading
                     var time = Algo.Now;
                     Algo.RunSignals(time);
                     Algo.CheckDelayedOrders(time);
-                    Algo.Monitor.CheckMonitor();
+                    Algo.Watch.CheckMonitor();
                     Algo.simulationCount++;
                 }
 
@@ -190,8 +190,7 @@ namespace Kalitte.Trading
 
             var prevDayLastBar = new DateTime(Algo.TestStart.Value.Year, Algo.TestStart.Value.Month, Algo.TestStart.Value.Day).AddDays(-1).AddHours(22).AddMinutes(50);
             Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod, prevDayLastBar);
-            Algo.InitMySignals(Algo.Now);
-            Algo.InitCompleted();
+            Algo.Start();
             createParameters();
 
             for (var d = 0; d <= days.Days; d++)

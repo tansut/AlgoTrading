@@ -15,15 +15,6 @@ using System.Threading.Tasks;
 namespace Kalitte.Trading.Algos
 {
 
-    //public interface IAlgo
-    //{
-    //    bool Simulation { get; set; }
-    //    public LogLevel LogLevel { get; set; }
-    //    string InstanceName { get; set; }
-    //    DateTime? TimeSet { get; set; }
-    //    void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null);
-    //    decimal GetMarketPrice(string symbol, DateTime? t = null);
-    //}
 
 
 
@@ -73,6 +64,8 @@ namespace Kalitte.Trading.Algos
     {
         private object signalLock = new object();
         private object decideLock = new object();
+        private object orderLock = new object();        
+
         Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");
 
         Dictionary<string, MarketDataFileLogger> dataProviders = new Dictionary<string, MarketDataFileLogger>();
@@ -155,7 +148,7 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-        public PerformanceMonitor Monitor = new PerformanceMonitor();
+        public PerformanceMonitor Watch = new PerformanceMonitor();
         int orderCounter = 0;
 
         public Dictionary<string, decimal> ordersBySignals = new Dictionary<string, decimal>();
@@ -192,14 +185,6 @@ namespace Kalitte.Trading.Algos
 
         public abstract void Decide(Signal signal, SignalEventArgs data);
 
-        //public bool WaitSignalOperations(int timeOut = 1000)
-        //{
-        //    return ManualResetEvent.WaitAll(Signals.Select(p => p.InOperationLock).ToArray(), timeOut);
-        //}
-
-
-
-
 
         public void CheckDelayedOrders(DateTime t)
         {
@@ -215,10 +200,26 @@ namespace Kalitte.Trading.Algos
             }
         }
 
+        //public bool OrderInProgress
+        //{
+        //    get
+        //    {
+        //        bool taken = false;
+        //        try
+        //        {
+        //            Monitor.TryEnter(orderLock, ref taken);
+        //            return !taken;
+        //        } finally
+        //        {
+        //            if (taken) Monitor.Exit(orderLock);     
+        //        }
+        //    }
+        //}
+
         public virtual void ConfigureMonitor()
         {
-            this.Monitor.DefaultChange = 25.0M;
-            this.Monitor.MonitorEvent += Monitor_MonitorEvent;
+            this.Watch.DefaultChange = 25.0M;
+            this.Watch.MonitorEvent += Monitor_MonitorEvent;
         }
 
         protected virtual void Monitor_MonitorEvent(object sender, MonitorEventArgs e)
@@ -270,16 +271,7 @@ namespace Kalitte.Trading.Algos
             return shouldBe;
         }
 
-        //internal bool EnsureRightBar(DateTime t, BarPeriod period)
-        //{
-        //    var sholdBe
-        //    if (t.Hour == 9 && t.Minute < 10)
-        //    {
-        //        var last = new DateTime(). AddDays(-1).AddHours()
-        //        shouldBe = 
-        //    }
-        //    throw new NotImplementedException();
-        //}
+
 
         public void CountOrder(string signal, decimal quantity)
         {
@@ -466,11 +458,6 @@ namespace Kalitte.Trading.Algos
 
         }
 
-        //public AlgoBase(string configFile)
-        //{
-
-
-        //}
 
 
         public AlgoBase(Dictionary<string, object> initValues)
@@ -483,7 +470,7 @@ namespace Kalitte.Trading.Algos
 
         public Boolean WaitForOrder(string message)
         {
-            var wait = Simulation ? 0 : 100;
+            var wait = Simulation ? 1 : 100;
             var result2 = orderWait.WaitOne(wait);
             if (!result2 && !Simulation) Log($"Waiting for last order to complete: {message}", LogLevel.Warning);
             return result2;
@@ -600,23 +587,14 @@ namespace Kalitte.Trading.Algos
         public virtual void Init()
         {
             if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
-
-
-        }
-
-        public virtual void InitMySignals(DateTime t)
-        {
-
-        }
-
-
-
-
-        public virtual void InitCompleted()
-        {
             ConfigureMonitor();
-            this.Monitor.Start();
-            //CreatePerformanceCounters();
+        }
+
+
+
+        public virtual void Start()
+        {            
+            this.Watch.Start();
             if (!Simulation)
             {
                 Log($"Setting seans timer ...");
@@ -672,7 +650,7 @@ namespace Kalitte.Trading.Algos
                 seansTimer.Dispose();
             }
             StopSignals();
-            this.Monitor.Stop();
+            this.Watch.Stop();
 
             Log($"Completed {this}", LogLevel.FinalResult);
             if (TestStart.HasValue)
@@ -733,7 +711,7 @@ namespace Kalitte.Trading.Algos
         public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
         {
             orderWait.Reset();
-            var monitored = this.Monitor.Dump(true).ToString();
+            var monitored = this.Watch.Dump(true).ToString();
             if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, t);
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
             var portfolio = UserPortfolioList.GetPortfolio(symbol);

@@ -295,7 +295,7 @@ namespace Kalitte.Trading
 
             if (time.Second % 10 == 0)
             {
-                Log($"Report: lc:{lastCross}, {result}", LogLevel.Verbose, time);
+                Log($"Report: lc:{lastCross}, cs:{CollectList.Count}, as:{AnalyseList.Count}, asz:{AnalyseList.List.QueSize} {result}", LogLevel.Verbose, time);
             }
 
             return result;

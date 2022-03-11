@@ -410,7 +410,7 @@ namespace Kalitte.Trading.Algos
                     Log($"Ignored {signal.Name} {sr} since portfolio is {portfolio.SideStr}", LogLevel.Warning);
                     return;
                 }
-                sendOrder(Symbol, profitSignal.KeepQuantity + RsiTrendOrderQuantity, sr.finalResult.Value, $"{signal.Name}[{sr}]", 0, OrderIcon.StopLoss, sr.SignalTime, sr);
+                sendOrder(Symbol, profitSignal.KeepQuantity + RsiTrendOrderQuantity, sr.finalResult.Value, $"{signal.Name}[{sr}]", 0, OrderIcon.None, sr.SignalTime, sr);
             }
             else if (portfolio.IsEmpty)
             {

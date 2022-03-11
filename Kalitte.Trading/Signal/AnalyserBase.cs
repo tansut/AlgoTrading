@@ -52,6 +52,19 @@ namespace Kalitte.Trading
             //Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): c:{CollectSize} a:{AnalyseSize}", LogLevel.Debug);
         }
 
+        public void AdjustSensitivity(double ratio, string reason)
+        {
+            Monitor.Enter(OperationLock);
+            try
+            {
+                AdjustSensitivityInternal(ratio, reason);
+            }
+            finally
+            {
+                Monitor.Exit(OperationLock);
+            }
+        }
+
 
         public override void Init()
         {

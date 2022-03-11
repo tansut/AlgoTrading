@@ -887,16 +887,17 @@ namespace Kalitte.Trading.Algos
 
         public virtual decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null)
         {
+            var result = 0M;
             if (Simulation)
             {
-
-
                 var list = GetMarketData(symbol, SymbolPeriod, t);
-                var vol = list.Length > 0 ? list[1] : 0;
-                return vol;
+                result = list.Length > 0 ? list[1] : 0;
+                
 
             }
-            else return Exchange.GetVolume(symbol, period, t);
+            else result = Exchange.GetVolume(symbol, period, t);
+            if (result == 0) Log($"Market volume got zero", LogLevel.Warning, t);
+            return result;
         }
 
         public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)

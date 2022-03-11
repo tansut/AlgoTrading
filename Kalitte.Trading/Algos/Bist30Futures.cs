@@ -605,12 +605,12 @@ namespace Kalitte.Trading.Algos
                 var cross = (CrossSignal)signalResult.Signal;
                 var currentRsi = rsiTrendSignal.AnalyseList.Ready ? rsiTrendSignal.AnalyseList.LastValue : 0;
 
-                if (!signalResult.MorningSignal && CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue > CrossRsiMax)
+                if (!signalResult.MorningSignal && CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi != 0 && currentRsi > CrossRsiMax)
                 {
                     Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
                     return;
                 };
-                if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && rsiTrendSignal.AnalyseList.Ready && rsiTrendSignal.AnalyseList.LastValue < CrossRsiMin)
+                if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi != 0 && currentRsi < CrossRsiMin)
                 {
                     Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
                     return;

@@ -35,6 +35,8 @@ namespace Kalitte.Trading
         public decimal i2Val { get; set; }
         public decimal Dif { get; set; }
         public Sensitivity Sensitivity { get; set; }
+        public decimal AveragePrice { get; set; }
+        public decimal MarketPrice { get; set; }
         public bool MorningSignal { get; set; } = false;
 
         public CrossSignalResult(Signal signal, DateTime t) : base(signal, t)
@@ -43,7 +45,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()} | i1:{i1Val} i2:{i2Val} dif:{Dif}";
+            return $"{base.ToString()} | i1:{i1Val} i2:{i2Val} dif:{Dif} ap:{AveragePrice} mp:{MarketPrice}";
         }
     }
 
@@ -118,27 +120,14 @@ namespace Kalitte.Trading
         }
 
 
-        //protected override void AdjustSensitivityInternal(double ratio, string reason)
-        //{
-        //    AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
-        //    Watch("sensitivity/avgchange", AvgChange);
-        //    base.AdjustSensitivityInternal(ratio, reason);
-        //}
-
-        public void AdjustSensitivity(double ratio, string reason)
+        protected override void AdjustSensitivityInternal(double ratio, string reason)
         {
-            Monitor.Enter(OperationLock);
-            try
-            {
-                AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
-                Watch("sensitivity/avgchange", AvgChange);
-                base.AdjustSensitivityInternal(ratio, reason);
-            }
-            finally
-            {
-                Monitor.Exit(OperationLock);
-            }
+            AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
+            Watch("sensitivity/avgchange", AvgChange);
+            base.AdjustSensitivityInternal(ratio, reason);
         }
+
+
 
         public override string ToString()
         {
@@ -255,6 +244,7 @@ namespace Kalitte.Trading
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
             var time = t ?? DateTime.Now;
+            decimal lastAvg = 0M, l1 = 0M, l2 = 0M, mpAverage = 0M;
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
 
             result.MorningSignal = Algo.IsMorningStart(time);
@@ -267,16 +257,18 @@ namespace Kalitte.Trading
                 result.Sensitivity = sensitivity;
             }
 
-            var mp = Algo.GetMarketPrice(Symbol, t);            
+            var mp = Algo.GetMarketPrice(Symbol, t);
+            result.MarketPrice = mp;
 
             if (mp > 0) CollectList.Collect(mp);
 
             if (CollectList.Ready && mp >= 0)
             {
-                decimal mpAverage = CollectList.LastValue;
+                mpAverage = CollectList.LastValue;
+                result.AveragePrice = mpAverage;
 
-                var l1 = i1k.NextValue(mpAverage).Value.Value;
-                var l2 = i2k.NextValue(mpAverage).Value.Value;
+                result.i1Val = l1 = i1k.NextValue(mpAverage).Value.Value;
+                result.i2Val = l2 = i2k.NextValue(mpAverage).Value.Value;
 
                 AnalyseList.Collect(l1 - l2);
                 crossBars.Push(l1 - l2);
@@ -291,10 +283,7 @@ namespace Kalitte.Trading
 
                 if (AnalyseList.Ready && lastCross != 0)
                 {
-                    var lastAvg = AnalyseList.LastValue; 
-
-                    result.i1Val = l1;
-                    result.i2Val = l2;
+                    lastAvg = AnalyseList.LastValue; 
                     result.Dif = lastAvg;
 
                     if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
@@ -304,7 +293,10 @@ namespace Kalitte.Trading
 
 
 
-
+            if (time.Second % 10 == 0)
+            {
+                Log($"Report: lc:{lastCross}, {result}", LogLevel.Verbose, time);
+            }
 
             return result;
         }

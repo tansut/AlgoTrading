@@ -21,7 +21,8 @@ namespace Kalitte.Trading
         }
         public override string ToString()
         {
-            return $"{base.ToString()}[iVal: {IndicatorValue}, {Gradient}]"; ;
+            var iv = IndicatorValue.ToString(".##");
+            return $"{base.ToString()}[iVal: {iv}, {Gradient}]"; ;
         }
 
     }

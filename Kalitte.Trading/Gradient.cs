@@ -20,7 +20,11 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"bv: {BestValue} r: {ResistanceValue} t: {FirstValue} uv: {UsedValue}";
+            var bv = BestValue.HasValue ? BestValue.Value.ToString(".##") : "none";
+            var rv = ResistanceValue.HasValue ? ResistanceValue.Value.ToString(".##") : "none";
+            var fv = FirstValue.HasValue ? FirstValue.Value.ToString(".##") : "none";
+            var us = UsedValue.HasValue ? UsedValue.Value.ToString(".##") : "none";
+            return $"bv: {bv} r: {rv} t: {fv} uv: {us}";
         }
 
     }

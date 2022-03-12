@@ -124,7 +124,6 @@ namespace Kalitte.Trading
             LastOrderDate = time;
             CompletedOrder += orderInc;
             CompletedQuantity += quantityInc;
-
         }
 
         public void MonitorInit(string name, decimal value)
@@ -175,9 +174,10 @@ namespace Kalitte.Trading
 
         protected virtual void onTick(Object source, ElapsedEventArgs e)
         {
+            this.Check();
+            return;
             var hasLock = false;
             var restartTimer = false;
-            SignalResult result = null;
             try
             {
                 Monitor.TryEnter(_locker, ref hasLock);
@@ -189,7 +189,7 @@ namespace Kalitte.Trading
                 {
                     restartTimer = true;
                 }
-                result = this.Check();
+                SignalResult result = this.Check();
             }
             finally
             {
@@ -237,7 +237,7 @@ namespace Kalitte.Trading
                 catch (Exception ex)
                 {
                     Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
-                    return new SignalResult(this, t ?? DateTime.Now) { finalResult = null };
+                    return null;
                 }
             }
             finally

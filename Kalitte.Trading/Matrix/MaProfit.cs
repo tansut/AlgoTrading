@@ -153,10 +153,7 @@ namespace Kalitte.Trading.Matrix
             //AddSymbol(Symbol, SymbolPeriod.Min);
             WorkWithPermanentSignal(true);
             SendOrderSequential(false);
-            //if ((ProfitQuantity > 0 || LossQuantity > 0) && !Simulation)
-            //{
-                AddSymbolMarketData(Algo.Symbol);
-           // }
+            AddSymbolMarketData(Algo.Symbol);
             SetAlgoProperties();
             base.OnInit();
         }
@@ -181,21 +178,6 @@ namespace Kalitte.Trading.Matrix
 
 
 
-        public override void OnInitCompleted()
-        {           
-            if (!Algo.Simulation)
-            {
-                var assembly = typeof(MaProfit).Assembly.GetName();
-                Algo.Log($"{this}", LogLevel.Info);
-                if (Algo.UseVirtualOrders)
-                {
-                    Algo.Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
-                }
-                LoadRealPositions(Algo.Symbol);
-                Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod);
-                Algo.Start();
-            }
-        }
 
 
 

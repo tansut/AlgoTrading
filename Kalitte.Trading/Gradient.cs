@@ -1,9 +1,12 @@
 ﻿// algo
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZedGraph;
 
 namespace Kalitte.Trading
 {
@@ -17,7 +20,6 @@ namespace Kalitte.Trading
         public decimal? UsedValue { get; set; }
         public int Iterations { get; set; }
         public bool OutOfRange { get; set; } = false;
-
 
         public override string ToString()
         {
@@ -42,6 +44,10 @@ namespace Kalitte.Trading
         public decimal? ResistanceValue { get; set; }
         public decimal? LastValue { get; set; }
         public int Iterations { get; set; }
+        public string FileName { get; set; }
+
+        PointPairList currentValues = new PointPairList();
+        PointPairList resistanceValues = new PointPairList();
 
         public ILogProvider LogProvider { get; set; }
 
@@ -52,8 +58,21 @@ namespace Kalitte.Trading
             LastValue = null;
             ResistanceValue = null;
             Iterations = 0;
+            currentValues.Clear();
+            resistanceValues.Clear();
         }
 
+        public void SaveAsChart()
+        {
+            GraphPane myPane = new GraphPane(new RectangleF(0, 0, 3200, 2400), "Unscented Kalman Filter", "number", "measurement");
+            myPane.AddCurve("current", currentValues, Color.Green, SymbolType.XCross);
+            myPane.AddCurve("resistance", resistanceValues, Color.Red, SymbolType.Circle);
+            Bitmap bm = new Bitmap(200, 200);
+            Graphics g = Graphics.FromImage(bm);
+            myPane.AxisChange(g);
+            Image im = myPane.GetImage();
+            im.Save(FileName, ImageFormat.Png);
+        }
 
         public Gradient(decimal l1, decimal l2, ILogProvider logProvider)
         {
@@ -68,6 +87,7 @@ namespace Kalitte.Trading
             BestValue = BestValue ?? currentValue;
             ResistanceValue = ResistanceValue ?? currentValue;
             result.UsedValue = currentValue;
+
             if (currentValue > (L1) && currentValue < L2) // above 70
             {
                 FirstValue = FirstValue ?? currentValue;
@@ -79,7 +99,6 @@ namespace Kalitte.Trading
                     BestValue = currentValue;
                     ResistanceValue = currentValue - currentValue * Tolerance;
                     LogProvider.Log($"Set best value: {BestValue} r: {ResistanceValue} c: {currentValue} f: {FirstValue}", LogLevel.Verbose);
-
                 }
                 else if (currentValue <= ResistanceValue)
                 {
@@ -132,6 +151,18 @@ namespace Kalitte.Trading
             result.ResistanceValue = ResistanceValue;
             result.FirstValue = FirstValue;
             result.Iterations = Iterations;
+            if (!result.OutOfRange)
+            {
+                currentValues.Add((double)Iterations, (double)currentValue);
+                resistanceValues.Add((double)Iterations, (double)ResistanceValue);
+            }
+
+            if (result.FinalResult.HasValue)
+            {
+                if (!string.IsNullOrEmpty(FileName)) SaveAsChart();
+                Reset();
+            }
+            else if (result.OutOfRange) Reset();
             return result;
         }
     }

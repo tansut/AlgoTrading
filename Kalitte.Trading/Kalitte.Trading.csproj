@@ -97,6 +97,9 @@
     <Reference Include="Skender.Stock.Indicators">
       <HintPath>..\third.party\Skender.Stock.Indicators.dll</HintPath>
     </Reference>
+    <Reference Include="ZedGraph">
+      <HintPath>..\third.party\ZedGraph.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -3,6 +3,7 @@ using Kalitte.Trading.Algos;
 using Kalitte.Trading.Indicators;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,6 @@ namespace Kalitte.Trading
         public decimal L1 { get; set; }
         public decimal L2 { get; set; }
 
-        private FinanceList<decimal> criticalBars;
         public Gradient grad { get; set; }
 
 
@@ -49,17 +49,12 @@ namespace Kalitte.Trading
         public override void Init()
         {
             grad = new Gradient(L1, L2, this.Algo);
+            grad.FileName = Path.Combine(Algo.LogDir, this.Name + ".png");
             grad.Tolerance = Tolerance;
             grad.LearnRate = LearnRate;
-            criticalBars = new FinanceList<decimal>(4);
             base.Init();
         }
 
-        protected override void ResetInternal()
-        {
-            criticalBars.Clear();
-            base.ResetInternal();
-        }
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
@@ -76,7 +71,6 @@ namespace Kalitte.Trading
                 result.IndicatorValue = iVal;
 
                 AnalyseList.Collect(iVal);
-                criticalBars.Push(iVal);
                 
                 if (AnalyseList.Ready)
                 { 

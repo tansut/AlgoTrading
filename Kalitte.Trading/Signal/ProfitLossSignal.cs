@@ -39,14 +39,21 @@ namespace Kalitte.Trading
         {
             this.Result = signalResult;
             this.Owner = signalResult.Signal as ProfitLossSignal;
-            var resistanceRatio = 0.0015M;
-            var alpha = 0.0005M;
+            var resistanceRatio = Owner.GradientTolerance;
+            var alpha = Owner.GradientLearnRate;
             var l1 = Result.finalResult == BuySell.Buy ? Result.MarketPrice + Result.MarketPrice * resistanceRatio : Result.MarketPrice - Result.MarketPrice * resistanceRatio;
             var l2 = Result.finalResult == BuySell.Buy ? Result.MarketPrice - Result.MarketPrice * .1M : Result.MarketPrice + Result.MarketPrice * .1M;
             this.Grad = new Gradient(l1, l2, Owner.Algo);
             this.Grad.Tolerance = resistanceRatio;
             this.Grad.LearnRate = alpha;
+            this.Grad.FileName = this.Owner.Name + ".png";
             this.List = new AnalyseList(4, Average.Ema);
+        }
+
+        public void Reset()
+        {
+            this.Grad.Reset();
+            this.List.Clear();
         }
 
         public ProfitLossResult Check(decimal mp)
@@ -57,8 +64,7 @@ namespace Kalitte.Trading
             {
                 return this.Result;
             }
-            else return null;
-            
+            else return null;            
         }
     }
 
@@ -102,12 +108,11 @@ namespace Kalitte.Trading
         public virtual decimal KeepQuantity { get; set; }
         public bool UsePriceMonitor { get; set; } = true;
         public PriceMonitor PriceMonitor { get; protected set; }
-
         public Fibonacci FibonacciLevels { get; set; } = null;
-
         public abstract ProfitOrLoss SignalType { get;  }
-
-        public List<Type> LimitingSignals { get; set; } = new List<Type>();
+        public List<Type> LimitingSignals { get; set; } = new List<Type>();        
+        public decimal GradientTolerance { get; set; }        
+        public decimal GradientLearnRate { get; set; }
 
 
         public ProfitLossSignal(string name, string symbol, AlgoBase owner,
@@ -215,7 +220,7 @@ namespace Kalitte.Trading
 
             if (UsePriceMonitor && result.finalResult.HasValue && result.Direction == ProfitOrLoss.Profit)
             {
-                PriceMonitor = PriceMonitor == null ? CreatePriceMonitor(result) : PriceMonitor;
+                PriceMonitor = PriceMonitor ?? CreatePriceMonitor(result);
                 if (!PriceMonitor.WorkingFor(result))
                 {
                     Log($"Creating new PriceMonitor since there is a new result. {PriceMonitor.Result} vs {result}", LogLevel.Debug);
@@ -227,7 +232,7 @@ namespace Kalitte.Trading
                     //Log($"price monitor resulted: [{monitorResult.finalResult} {monitorResult.Direction}]: original: {monitorResult.MarketPrice} current: {marketPrice}", LogLevel.Warning);
                     monitorResult.MarketPrice = marketPrice;
                     monitorResult.PL = marketPrice - portfolio.AvgCost;
-                    PriceMonitor = null;
+                    PriceMonitor.Reset();
                 }
                 return monitorResult;
             }

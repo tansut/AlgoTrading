@@ -42,7 +42,7 @@ public class Program
         alternates.Set("ProfitKeepQuantity", 2);
         alternates.Set("ProfitQuantityStep", 2);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
-        alternates.Set("ProfitStart", 9);        
+        alternates.Set("ProfitStart", 10);        
         alternates.Set("ProfitPriceStep", 2.0);
         alternates.Set("ProfitUseMonitor", false);
 
@@ -51,22 +51,25 @@ public class Program
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitStart", 12);
         alternates.Set("RsiProfitPriceStep", 4.0);
+        
 
 
         alternates.Set("PriceLowLimit", 2200);
         alternates.Set("PriceHighLimit", 2300);                   
 
-        alternates.Set("LossInitialQuantity", 4);
-        alternates.Set("LossKeepQuantity", 1);
+        alternates.Set("LossInitialQuantity", 2);
+        alternates.Set("LossKeepQuantity", 0);
         alternates.Set("LossQuantityStep", 2);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 250);
+        alternates.Set("LossStart", 200);
         alternates.Set("LossPriceStep", 50);
 
         // rsi
         alternates.Set("RsiHighLimit", 74);
-        alternates.Set("RsiLowLimit", 24);
-        alternates.Set("Rsi", 14);        
+        alternates.Set("RsiLowLimit", 31);
+        alternates.Set("RsiProfitDeltaHighLimit", 2.0);
+        alternates.Set("RsiProfitDeltaLowLimit", 6.0);
+        alternates.Set("Rsi", 14);
         alternates.Set("RsiTrendSensitivity", 3M);
         alternates.Set("RsiTrendThreshold", 0.1);
 
@@ -86,15 +89,20 @@ public class Program
         alternates.Set("MACDTrigger", 9);
 
         alternates.Set("CrossRsiMax",  55.6);
-        alternates.Set("CrossRsiMin",  45.4);        
+        alternates.Set("CrossRsiMin",  45.2);        
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);
         alternates.Set("PowerCrossPositiveMultiplier", 2.8);
 
         // general
-        alternates.Set("ClosePositionsDaily", false);        
+        alternates.Set("ClosePositionsDaily", false);     
+        
         alternates.Set("RsiGradientTolerance", 0.015);
         alternates.Set("RsiGradientLearnRate", 0.005);
+
+        alternates.Set("ProfitGradientTolerance", 0.001);
+        alternates.Set("ProfitGradientLearnRate", 0.002);
+
         alternates.Set("RsiGradientSensitivity", 2);
 
         

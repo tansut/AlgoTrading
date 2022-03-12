@@ -47,6 +47,11 @@ namespace Kalitte.Trading.Algos
         public decimal RsiHighLimit { get; set; }
         [AlgoParam(28)]
         public decimal RsiLowLimit { get; set; }
+        [AlgoParam(0)]
+        public decimal RsiProfitDeltaLowLimit { get; set; }
+        [AlgoParam(0)]
+        public decimal RsiProfitDeltaHighLimit { get; set; }
+
         [AlgoParam(2)]
         public decimal RsiTrendThreshold { get; set; }
         [AlgoParam(3)]
@@ -82,7 +87,6 @@ namespace Kalitte.Trading.Algos
         // fibonachi
         [AlgoParam(0)]
         public decimal PriceLowLimit { get; set; }
-
         [AlgoParam(0)]
         public decimal PriceHighLimit { get; set; }
 
@@ -132,6 +136,10 @@ namespace Kalitte.Trading.Algos
         public decimal RsiGradientLearnRate { get; set; }
         [AlgoParam(1)]
         public decimal RsiGradientSensitivity { get; set; }
+        [AlgoParam(0.0015)]
+        public decimal ProfitGradientTolerance { get; set; }
+        [AlgoParam(0.001)]
+        public decimal ProfitGradientLearnRate { get; set; }
 
 
         CrossSignal maSignal = null;
@@ -198,7 +206,11 @@ namespace Kalitte.Trading.Algos
 
         public ProfitSignal CreateProfitSignal(string name, string symbol)
         {
-            return new ProfitSignal(name, symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, ProfitPriceStep, ProfitKeepQuantity);
+            var signal = new ProfitSignal(name, symbol, this, this.ProfitStart, this.ProfitInitialQuantity, this.ProfitQuantityStep, this.ProfitQuantityStepMultiplier, ProfitPriceStep, ProfitKeepQuantity);
+            signal.GradientTolerance = ProfitGradientTolerance;
+            signal.GradientLearnRate = ProfitGradientLearnRate;
+            signal.UsePriceMonitor = ProfitUseMonitor;
+            return signal;
         }
 
         public void CreateSignals()
@@ -304,10 +316,15 @@ namespace Kalitte.Trading.Algos
 
                 if (profit != null)
                 {
-                    profit.FibonacciLevels = fib;
-                    profit.UsePriceMonitor = ProfitUseMonitor;
+                    profit.FibonacciLevels = fib;                    
                 }
             });
+
+            if (rsiHigh != null && rsiLow != null)
+            {
+                rsiLow.AnalyseAverage = Average.Ema;
+                rsiHigh.AnalyseAverage = Average.Ema;
+            }
         }
 
 
@@ -417,39 +434,32 @@ namespace Kalitte.Trading.Algos
         {
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             var lastOrder = portfolio.GetLastOrderSkip(typeof(ProfitLossSignal));
-            var keepPosition = lastOrder != null && lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(GradientSignal));
+            var keepPosition = false; // lastOrder != null && lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(GradientSignal));
 
             Log($"HandleRsiLimit: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-            var orderQuantity = portfolio.Quantity + RsiTrendOrderQuantity;
+            var delta = signalResult.finalResult == BuySell.Buy ? RsiProfitDeltaLowLimit: RsiProfitDeltaHighLimit;
+            var usedRsiQuantity = RsiTrendOrderQuantity; 
+
+            if (delta > 0)
+            {
+                if (signalResult.finalResult == BuySell.Buy && signalResult.Gradient.UsedValue > signal.L1 - delta) usedRsiQuantity = usedRsiQuantity / 2;
+                else if (signalResult.finalResult == BuySell.Sell && signalResult.Gradient.UsedValue < signal.L1 + delta) usedRsiQuantity = usedRsiQuantity / 2;
+            }
+
+            var orderQuantity = portfolio.Quantity + usedRsiQuantity;
 
             if (!keepPosition && !portfolio.IsEmpty && portfolio.Side == signalResult.finalResult)
             {
-                orderQuantity = RsiTrendOrderQuantity - portfolio.Quantity;
+                orderQuantity = usedRsiQuantity - portfolio.Quantity;
             }
 
             if (orderQuantity > 0)
             {
                 sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"{signal.Name}[{signalResult}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }
-
-
-            ////var quantity = portfolio.Quantity + RsiTrendOrderQuantity;
-            //if (profitSignal != null && portfolio.Quantity == profitSignal.KeepQuantity)
-            //{
-            //    if (portfolio.Side == sr.finalResult.Value)
-            //    {
-            //        Log($"Ignored {signal.Name} {sr} since portfolio is {portfolio.SideStr}", LogLevel.Warning);
-            //        return;
-            //    }
-            //    sendOrder(Symbol, profitSignal.KeepQuantity + RsiTrendOrderQuantity, sr.finalResult.Value, $"{signal.Name}[{sr}]", 0, OrderIcon.None, sr.SignalTime, sr);
-            //}
-            //else if (portfolio.IsEmpty)
-            //{
-            //    sendOrder(Symbol, RsiTrendOrderQuantity, sr.finalResult.Value, $"*{signal.Name}*[{sr}]", 0, OrderIcon.None, sr.SignalTime, sr);
-            //}
         }
 
         public void HandleDailyCloseSignal(ClosePositionsSignal signal, SignalResult result)

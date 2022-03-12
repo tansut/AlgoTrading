@@ -33,8 +33,8 @@ namespace Kalitte.Trading.Matrix
         [SymbolParameter("F_XU0300422")]
         public string Symbol = "F_XU0300422";
 
-        [Parameter(SymbolPeriod.Min10)]
-        public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
+        //[Parameter(SymbolPeriod.Min10)]
+        //public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
 
         
         private MarketDataFileLogger priceLogger;
@@ -96,8 +96,7 @@ namespace Kalitte.Trading.Matrix
 
 
         public override void OnInit()
-        {
-            AddSymbol(Symbol, SymbolPeriod);
+        {           
             AddSymbolMarketData(Symbol);
             SetTimerInterval(1);
             WorkWithPermanentSignal(true);
@@ -113,9 +112,8 @@ namespace Kalitte.Trading.Matrix
                 loggerList.Add(logger);
             }
 
-            volume = VolumeIndicator(Symbol, SymbolPeriod);
-
-
+            volume = VolumeIndicator(Symbol, SymbolPeriod.Min10);
+            volume.RefreshIndicator = true;
         }
 
         void LogBardata(ISymbolBarData bd, int i)

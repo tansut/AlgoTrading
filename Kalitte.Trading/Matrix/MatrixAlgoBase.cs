@@ -130,7 +130,18 @@ namespace Kalitte.Trading.Matrix
             {
                 Debug($"{item.Key}:{item.Value}");
             }
-            base.OnInitComplated();
+            if (!Algo.Simulation)
+            {
+                var assembly = typeof(MaProfit).Assembly.GetName();
+                Algo.Log($"{this}", LogLevel.Info);
+                if (Algo.UseVirtualOrders)
+                {
+                    Algo.Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
+                }
+                LoadRealPositions(Algo.Symbol);
+                Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod);
+                Algo.Start();
+            }
         }
 
         public void Log(string text, LogLevel level = LogLevel.Info, DateTime? t = null)

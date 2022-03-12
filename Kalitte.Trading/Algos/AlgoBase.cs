@@ -420,7 +420,7 @@ namespace Kalitte.Trading.Algos
 
 
 
-        public virtual void InitializeBars(string symbol, BarPeriod period, DateTime? t)
+        public virtual void InitializeBars(string symbol, BarPeriod period, DateTime? t = null)
         {
             var periodBars = GetPeriodBars(symbol, period, t);
             //var existing = this.Symbols.Select(p => p.Symbol == symbol).FirstOrDefault();

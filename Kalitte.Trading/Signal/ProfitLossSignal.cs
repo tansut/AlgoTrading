@@ -45,7 +45,7 @@ namespace Kalitte.Trading
             var l2 = Result.finalResult == BuySell.Buy ? Result.MarketPrice - Result.MarketPrice * .1M : Result.MarketPrice + Result.MarketPrice * .1M;
             this.Grad = new Gradient(l1, l2, Owner.Algo);
             this.Grad.Tolerance = resistanceRatio;
-            this.Grad.Alpha = alpha;
+            this.Grad.LearnRate = alpha;
             this.List = new AnalyseList(4, Average.Ema);
         }
 

@@ -15,6 +15,7 @@ namespace Kalitte.Trading
         public decimal? LastValue { get; set; }
         public decimal? ResistanceValue { get; set; }
         public decimal? UsedValue { get; set; }
+        public int Iterations { get; set; }
         public bool OutOfRange { get; set; } = false;
 
 
@@ -24,7 +25,7 @@ namespace Kalitte.Trading
             var rv = ResistanceValue.HasValue ? ResistanceValue.Value.ToString(".##") : "none";
             var fv = FirstValue.HasValue ? FirstValue.Value.ToString(".##") : "none";
             var us = UsedValue.HasValue ? UsedValue.Value.ToString(".##") : "none";
-            return $"bv: {bv} r: {rv} t: {fv} uv: {us}";
+            return $"bv: {bv} r: {rv} t: {fv} uv: {us} it:{Iterations}";
         }
 
     }
@@ -32,7 +33,7 @@ namespace Kalitte.Trading
     public class Gradient
     {
         public decimal Tolerance { get; set; } = 0.015M;
-        public decimal Alpha { get; set; } = 0.005M;
+        public decimal LearnRate { get; set; } = 0.005M;
 
         public decimal L1 { get; set; }
         public decimal L2 { get; set; }
@@ -40,6 +41,7 @@ namespace Kalitte.Trading
         public decimal? BestValue { get; set; }
         public decimal? ResistanceValue { get; set; }
         public decimal? LastValue { get; set; }
+        public int Iterations { get; set; }
 
         public ILogProvider LogProvider { get; set; }
 
@@ -49,6 +51,7 @@ namespace Kalitte.Trading
             BestValue = null;
             LastValue = null;
             ResistanceValue = null;
+            Iterations = 0;
         }
 
 
@@ -69,6 +72,7 @@ namespace Kalitte.Trading
             {
                 FirstValue = FirstValue ?? currentValue;
                 result.LastValue = currentValue;
+                Iterations++;
 
                 if (currentValue >= BestValue)
                 {
@@ -83,7 +87,7 @@ namespace Kalitte.Trading
                 }
                 else if (currentValue < BestValue &&  (LastValue.HasValue ? currentValue < LastValue : true))
                 {
-                    var newResistance = ResistanceValue.Value + ResistanceValue.Value * Alpha;
+                    var newResistance = ResistanceValue.Value + ResistanceValue.Value * LearnRate;
                     LogProvider.Log($"Increased resistance value: {ResistanceValue} -> {newResistance}. c: {currentValue} b: {BestValue} f: {FirstValue}", LogLevel.Verbose);
                     ResistanceValue = newResistance;
                 }
@@ -93,6 +97,7 @@ namespace Kalitte.Trading
             {
                 FirstValue = FirstValue ?? currentValue;
                 result.LastValue = currentValue;
+                Iterations++;
 
                 if (currentValue <= BestValue)
                 {
@@ -106,7 +111,7 @@ namespace Kalitte.Trading
                 }
                 else if (currentValue > BestValue && (LastValue.HasValue ? currentValue > LastValue: true))
                 {
-                    var newResistance = ResistanceValue.Value - ResistanceValue.Value * Alpha;
+                    var newResistance = ResistanceValue.Value - ResistanceValue.Value * LearnRate;
                     LogProvider.Log($"Decreased resistance value: {ResistanceValue} -> {newResistance}. c: {currentValue} b: {BestValue} f: {FirstValue}", LogLevel.Verbose);
                     ResistanceValue = newResistance;
                 }
@@ -121,12 +126,12 @@ namespace Kalitte.Trading
                     if (toleranceVal < L1 && currentValue >= toleranceVal) result.FinalResult = BuySell.Sell;
                     else if (toleranceVal > L1 && currentValue <= toleranceVal) result.FinalResult = BuySell.Buy;
                     LogProvider.Log($"Fast increase/decrease detected.: {result.FinalResult} {toleranceVal} {currentValue} {BestValue} {ResistanceValue}", LogLevel.Verbose);
-
                 }
             }
             result.BestValue = BestValue;
             result.ResistanceValue = ResistanceValue;
             result.FirstValue = FirstValue;
+            result.Iterations = Iterations;
             return result;
         }
     }

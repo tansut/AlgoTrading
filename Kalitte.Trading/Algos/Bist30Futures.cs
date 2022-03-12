@@ -42,7 +42,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool SimulateOrderSignal { get; set; }
 
-
         // not used
         [AlgoParam(72)]
         public decimal RsiHighLimit { get; set; }
@@ -62,9 +61,7 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(0)]
         public decimal RsiProfitStart { get; set; }
         [AlgoParam(0)]
-        public decimal RsiProfitPriceStep { get; set; }
-        
-
+        public decimal RsiProfitPriceStep { get; set; }       
 
         // global profit
         [AlgoParam(0)]
@@ -129,10 +126,14 @@ namespace Kalitte.Trading.Algos
         public bool DataCollectUseSma { get; set; }
         [AlgoParam(false)]
         public bool DataAnalysisUseSma { get; set; }
+        [AlgoParam(0.015)]
+        public decimal RsiGradientTolerance { get; set; }
+        [AlgoParam(0.005)]
+        public decimal RsiGradientLearnRate { get; set; }
+        [AlgoParam(1)]
+        public decimal RsiGradientSensitivity { get; set; }
 
 
-
-        
         CrossSignal maSignal = null;
         CrossSignal macSignal = null;
 
@@ -208,19 +209,23 @@ namespace Kalitte.Trading.Algos
             {
                 var rsiColSize = Convert.ToInt32(DataCollectSize);
                 var rsiAnalSize = Convert.ToInt32(DataAnalysisSize);
-                var rsiSignalSensitivity = 1M;
+                var rsiSignalSensitivity = RsiGradientSensitivity;
 
                 rsiHigh = new GradientSignal("rsi-high", Symbol, this, RsiHighLimit, 100);
                 rsiHigh.CollectSize = rsiColSize;
                 rsiHigh.AnalyseSize = rsiAnalSize;
                 rsiHigh.SignalSensitivity = rsiSignalSensitivity;
                 rsiHigh.AnalyseAverage = Average.Ema;
+                rsiHigh.Tolerance = RsiGradientTolerance;
+                rsiHigh.LearnRate = RsiGradientLearnRate;                
 
                 rsiLow = new GradientSignal("rsi-low", Symbol, this, RsiLowLimit, 0);
                 rsiLow.CollectSize = rsiColSize;
                 rsiLow.AnalyseSize = rsiAnalSize;
                 rsiLow.SignalSensitivity = rsiSignalSensitivity;
                 rsiLow.AnalyseAverage = Average.Ema;
+                rsiLow.Tolerance = RsiGradientTolerance;
+                rsiLow.LearnRate = RsiGradientLearnRate;
 
                 Signals.Add(rsiHigh);
                 Signals.Add(rsiLow);
@@ -292,7 +297,7 @@ namespace Kalitte.Trading.Algos
                 {
                     analyser.CollectSize = DataCollectSize;
                     analyser.AnalyseAverage = Average.Ema;
-                    analyser.AnalyseSize = Convert.ToInt32(DataAnalysisSize * 2);
+                    analyser.AnalyseSize = Convert.ToInt32(DataAnalysisSize);
                     analyser.CollectAverage = DataCollectUseSma ? Average.Sma : Average.Ema;
                     analyser.AnalyseAverage = DataAnalysisUseSma ? Average.Sma : Average.Ema;
                 }
@@ -427,7 +432,7 @@ namespace Kalitte.Trading.Algos
 
             if (orderQuantity > 0)
             {
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"*{signal.Name}*[{signalResult}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"{signal.Name}[{signalResult}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }
 
 

@@ -137,7 +137,7 @@ namespace Kalitte.Trading
             rvl.AcquireReaderLock(timeOut);
             try
             {
-                return items.Skip(Math.Max(0, Count - n)).ToList();
+                return items.Skip(Math.Max(0, items.Count - n)).ToList();
             }
             finally
             {
@@ -302,7 +302,6 @@ namespace Kalitte.Trading
             }
             finally
             {
-
                 rvl.ReleaseWriterLock();
             }
         }

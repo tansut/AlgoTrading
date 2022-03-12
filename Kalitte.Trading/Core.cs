@@ -48,7 +48,6 @@ namespace Kalitte.Trading
             this.Value = val;
   
         }
-
     }
 
     public enum DataTime

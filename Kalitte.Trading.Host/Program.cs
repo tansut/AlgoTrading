@@ -29,8 +29,8 @@ public class Program
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("CrossOrderQuantity", 6);
-        alternates.Set("RsiTrendOrderQuantity", 6);
+        alternates.Set("CrossOrderQuantity", 8);
+        alternates.Set("RsiTrendOrderQuantity", 8);
         alternates.Set("DataCollectSize", 8);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
@@ -38,16 +38,16 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 3);
+        alternates.Set("ProfitInitialQuantity", 4);
         alternates.Set("ProfitKeepQuantity", 2);
-        alternates.Set("ProfitQuantityStep", 1);
+        alternates.Set("ProfitQuantityStep", 2);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
         alternates.Set("ProfitStart", 9);        
         alternates.Set("ProfitPriceStep", 2.0);
         alternates.Set("ProfitUseMonitor", false);
 
         // rsiTrendProfit
-        alternates.Set("RsiProfitInitialQuantity", 4);
+        alternates.Set("RsiProfitInitialQuantity", 5);
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitStart", 12);
         alternates.Set("RsiProfitPriceStep", 4.0);
@@ -56,12 +56,12 @@ public class Program
         alternates.Set("PriceLowLimit", 2200);
         alternates.Set("PriceHighLimit", 2300);                   
 
-        alternates.Set("LossInitialQuantity", 1);
+        alternates.Set("LossInitialQuantity", 4);
         alternates.Set("LossKeepQuantity", 1);
-        alternates.Set("LossQuantityStep", 1);
+        alternates.Set("LossQuantityStep", 2);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 800);
-        alternates.Set("LossPriceStep", 200);
+        alternates.Set("LossStart", 250);
+        alternates.Set("LossPriceStep", 50);
 
         // rsi
         alternates.Set("RsiHighLimit", 74);
@@ -85,16 +85,21 @@ public class Program
         alternates.Set("MACDLongPeriod", 9);
         alternates.Set("MACDTrigger", 9);
 
-
-        alternates.Set("CrossRsiMax",  56);
-        alternates.Set("CrossRsiMin",  44);        
+        alternates.Set("CrossRsiMax",  55.6);
+        alternates.Set("CrossRsiMin",  45.4);        
         alternates.Set("PowerCrossThreshold", 88);
         alternates.Set("PowerCrossNegativeMultiplier", 1.3);
         alternates.Set("PowerCrossPositiveMultiplier", 2.8);
 
         // general
-        alternates.Set("ClosePositionsDaily", false);
+        alternates.Set("ClosePositionsDaily", false);        
+        alternates.Set("RsiGradientTolerance", 0.015);
+        alternates.Set("RsiGradientLearnRate", 0.005);
+        alternates.Set("RsiGradientSensitivity", 2);
 
+        
+
+        
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);        

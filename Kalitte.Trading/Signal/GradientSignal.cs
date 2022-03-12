@@ -30,9 +30,8 @@ namespace Kalitte.Trading
     public class GradientSignal : AnalyserBase
     {
         public ITechnicalIndicator Indicator { get; set; }
-        public decimal ResistanceFirstAlfa { get; set; } = 0.015M;
-        public decimal ResistanceNextAlfa { get; set; } = 0.005M;
-        public decimal OutTolerance { get; set; } = 0.015M;
+        public decimal Tolerance { get; set; } = 0.010M;
+        public decimal LearnRate { get; set; } = 0.005M;
 
         public decimal L1 { get; set; }
         public decimal L2 { get; set; }
@@ -50,9 +49,8 @@ namespace Kalitte.Trading
         public override void Init()
         {
             grad = new Gradient(L1, L2, this.Algo);
-            grad.Tolerance = ResistanceFirstAlfa;
-            grad.Alpha = ResistanceNextAlfa;
-            //grad.OutTolerance = OutTolerance;
+            grad.Tolerance = Tolerance;
+            grad.LearnRate = LearnRate;
             criticalBars = new FinanceList<decimal>(4);
             base.Init();
         }

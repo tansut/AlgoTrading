@@ -280,6 +280,7 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && (this.LossInitialQuantity > 0))
             {
                 this.lossSignal = new LossSignal("loss", Symbol, this, this.LossStart, this.LossInitialQuantity, this.LossQuantityStep, this.LossQuantityStepMultiplier, LossPriceStep, this.LossKeepQuantity);
+                //this.lossSignal.LimitingSignals.Add(typeof(GradientSignal));
                 this.Signals.Add(lossSignal);
             }
             if (!SimulateOrderSignal)

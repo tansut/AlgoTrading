@@ -2269,7 +2269,6 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::CheckInternal[1]( [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::ResetInternal[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::Init[0]( ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.CrossSignal::LoadNewBars[2]( [mscorlib]System.Object, [Kalitte.Trading]Kalitte.Trading.ListEventArgs`1<[Skender.Stock.Indicators]Skender.Stock.Indicators.IQuote> ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::AdjustSensitivityInternal[2]( [mscorlib]System.Double, [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::.ctor[3]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::ResetCross[0]( ) skipped:  KeepPublicApi option in configuration

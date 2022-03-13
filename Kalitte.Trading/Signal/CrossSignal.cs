@@ -113,12 +113,6 @@ namespace Kalitte.Trading
         }
 
 
-        protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
-        {
-            AnalyseList.Clear();
-            Log($"Cleared AnalyseList", LogLevel.Verbose);
-        }
-
 
         protected override void AdjustSensitivityInternal(double ratio, string reason)
         {

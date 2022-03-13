@@ -58,11 +58,11 @@ public class Program
         alternates.Set("PriceHighLimit", 2300);                   
 
         alternates.Set("LossInitialQuantity", 4);
-        alternates.Set("LossKeepQuantity", 1);
-        alternates.Set("LossQuantityStep", 2);
+        alternates.Set("LossKeepQuantity", 0);
+        alternates.Set("LossQuantityStep", 4);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 250);
-        alternates.Set("LossPriceStep", 50);
+        alternates.Set("LossStart", 160);
+        alternates.Set("LossPriceStep", 40);
 
         // rsi
         alternates.Set("RsiHighLimit", 73);
@@ -161,4 +161,6 @@ public class Program
     }
 
 }
+
+
 

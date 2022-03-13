@@ -78,6 +78,7 @@ namespace Kalitte.Trading.Algos
 
         public IExchange Exchange { get; set; }
 
+        public bool MultipleTestOptimization { get; set; } = false;
         public DateTime? TestStart { get; set; }
         public DateTime? TestFinish { get; set; }
         public string SimulationFile { get; set; } = "";

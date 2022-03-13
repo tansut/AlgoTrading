@@ -54,7 +54,7 @@ namespace Kalitte.Trading
             Algo = algo;
             algo.TestStart = start;
             algo.TestFinish = end;
-            Algo.Simulation = true;
+            Algo.Simulation = true;            
             Algo.UseVirtualOrders = true;
             this.RelatedTest = related;
             AutoClosePositions = false;
@@ -237,6 +237,7 @@ namespace Kalitte.Trading
             var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { init });
             algo.SimulationFile = this.FileName;
             algo.SimulationFileFields = configs;
+            algo.MultipleTestOptimization = total > 1;
             Backtest test = new Backtest(algo, Settings.Start, Settings.Finish, related);
             test.AutoClosePositions = Settings.AutoClosePositions;
             //Console.WriteLine($"Running test case {i}/{cases.Count} for {algo.InstanceName} using {algo.LogFile}");

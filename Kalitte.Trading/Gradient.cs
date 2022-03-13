@@ -64,14 +64,20 @@ namespace Kalitte.Trading
 
         public void SaveAsChart()
         {
-            GraphPane myPane = new GraphPane(new RectangleF(0, 0, 3200, 2400), "Unscented Kalman Filter", "number", "measurement");
-            myPane.AddCurve("current", currentValues, Color.Green, SymbolType.XCross);
-            myPane.AddCurve("resistance", resistanceValues, Color.Red, SymbolType.Circle);
-            Bitmap bm = new Bitmap(200, 200);
-            Graphics g = Graphics.FromImage(bm);
-            myPane.AxisChange(g);
-            Image im = myPane.GetImage();
-            im.Save(FileName, ImageFormat.Png);
+            try
+            {
+                GraphPane myPane = new GraphPane(new RectangleF(0, 0, 3200, 2400), "Unscented Kalman Filter", "number", "measurement");
+                myPane.AddCurve("current", currentValues, Color.Green, SymbolType.XCross);
+                myPane.AddCurve("resistance", resistanceValues, Color.Red, SymbolType.Circle);
+                Bitmap bm = new Bitmap(200, 200);
+                Graphics g = Graphics.FromImage(bm);
+                myPane.AxisChange(g);
+                Image im = myPane.GetImage();
+                im.Save(FileName, ImageFormat.Png);
+            } catch (Exception ex)
+            {
+                LogProvider.Log($"{ex.Message} / {ex.StackTrace} while saving image", LogLevel.Error);
+            }
         }
 
         public Gradient(decimal l1, decimal l2, ILogProvider logProvider)

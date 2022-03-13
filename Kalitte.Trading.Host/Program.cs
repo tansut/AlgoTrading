@@ -80,7 +80,7 @@ public class Program
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("MovPeriod", 5);
         alternates.Set("MovPeriod2", 9);
-        alternates.Set("DynamicCross", true);
+        alternates.Set("DynamicCross", true, false);
 
         // macd
         alternates.Set("MacdAvgChange", 0.32M);

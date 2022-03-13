@@ -717,7 +717,7 @@ namespace Kalitte.Trading.Algos
 
         public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
         {
-            orderWait.Reset();
+            orderWait.Reset();           
             var monitored = this.Watch.Dump(true).ToString();
             if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, t);
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);

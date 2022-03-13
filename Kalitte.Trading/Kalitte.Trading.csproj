@@ -103,7 +103,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="C:\Users\tansu\source\repos\borsabot\Merge\bin\Debug\net472\merge.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading" />
+    <Exec Command="C:\Users\tansu\source\repos\borsabot\Merge\bin\Debug\net472\merge.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading&#xD;&#xA;C:\Users\tansu\source\repos\borsabot\third.party\obfuscar\Obfuscar.Console.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading\obfuscar.xml" />
   </Target>
 
 </Project>

@@ -2864,16 +2864,10 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixBist30::.ctor[0]( ) skipped:  special name
 }
 
-[Kalitte.Trading]Matriks.Lean.Algotrader.Bist301 skipped:  KeepPublicApi option in configuration
+[Kalitte.Trading]Matriks.Lean.Algotrader.Bist30 skipped:  KeepPublicApi option in configuration
 {
 
-	[Kalitte.Trading]Matriks.Lean.Algotrader.Bist301::.ctor[0]( ) skipped:  special name
-}
-
-[Kalitte.Trading]Matriks.Lean.Algotrader.Bist302 skipped:  KeepPublicApi option in configuration
-{
-
-	[Kalitte.Trading]Matriks.Lean.Algotrader.Bist302::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Matriks.Lean.Algotrader.Bist30::.ctor[0]( ) skipped:  special name
 }
 
 [Kalitte.Trading]Matriks.Lean.Algotrader.bardatalogger skipped:  KeepPublicApi option in configuration

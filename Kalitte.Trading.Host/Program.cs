@@ -59,10 +59,10 @@ public class Program
 
         alternates.Set("LossInitialQuantity", 4);
         alternates.Set("LossKeepQuantity", 0);
-        alternates.Set("LossQuantityStep", 4);
+        alternates.Set("LossQuantityStep", 2);
         alternates.Set("LossQuantityStepMultiplier", 0);                
         alternates.Set("LossStart", 200);
-        alternates.Set("LossPriceStep", 100);
+        alternates.Set("LossPriceStep", 50);
 
         // rsi
         alternates.Set("RsiHighLimit", 73);
@@ -113,7 +113,7 @@ public class Program
         alternates.Set("LoggingLevel", LogLevel.Verbose);        
         alternates.Set("Symbol", "F_XU0300422");
         alternates.Set("LogConsole", false);
-        alternates.SaveToFile($"c:\\kalitte\\Bist30Futures-test.json");
+        alternates.SaveToFile($"c:\\kalitte\\Bist30-test.json");
 
         alternates.Set("LoggingLevel", LogLevel.Order);
         alternates.Set("LogConsole", true);

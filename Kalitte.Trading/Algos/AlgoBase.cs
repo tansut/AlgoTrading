@@ -501,7 +501,18 @@ namespace Kalitte.Trading.Algos
             if (oldHashCode != data.Result.GetHashCode())
             {
                 Log($"Signal {signal.Name} changed from {existing} -> {data.Result }", LogLevel.Verbose, data.Result.SignalTime);
-                if (data.Result.finalResult.HasValue) lock(decideLock) Decide(signal, data);
+                if (data.Result.finalResult.HasValue)
+                {
+                    Monitor.Enter(decideLock);
+                    try
+                    {
+                        Decide(signal, data);
+                    }
+                    finally
+                    {
+                        Monitor.Exit(decideLock);
+                    }                    
+                }
             }
         }
 

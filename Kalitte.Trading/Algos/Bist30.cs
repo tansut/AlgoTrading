@@ -280,7 +280,7 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && (this.LossInitialQuantity > 0))
             {
                 this.lossSignal = new LossSignal("loss", Symbol, this, this.LossStart, this.LossInitialQuantity, this.LossQuantityStep, this.LossQuantityStepMultiplier, LossPriceStep, this.LossKeepQuantity);
-                //this.lossSignal.LimitingSignals.Add(typeof(GradientSignal));
+                this.lossSignal.LimitingSignals.Add(typeof(GradientSignal));
                 this.Signals.Add(lossSignal);
             }
             if (!SimulateOrderSignal)
@@ -434,9 +434,10 @@ namespace Kalitte.Trading.Algos
         private void HandleRsiLimitSignal(GradientSignal signal, GradientSignalResult signalResult)
         {
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
-            var lastOrder = portfolio.GetLastOrderSkip(typeof(ProfitLossSignal));
+            var lastOrder = portfolio.CompletedOrders.LastOrDefault();
+            var discardRsi = lastOrder != null && lastOrder.SignalResult.Signal is ProfitLossSignal && ((ProfitLossSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Loss;
             var keepPosition = false; // lastOrder != null && lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(GradientSignal));
-
+            if (discardRsi) return;  
             Log($"HandleRsiLimit: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
@@ -459,6 +460,7 @@ namespace Kalitte.Trading.Algos
 
             if (orderQuantity > 0)
             {
+
                 sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"{signal.Name}[{signalResult}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }
         }

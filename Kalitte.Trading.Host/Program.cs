@@ -57,16 +57,16 @@ public class Program
         alternates.Set("PriceLowLimit", 2200);
         alternates.Set("PriceHighLimit", 2300);                   
 
-        alternates.Set("LossInitialQuantity", 4);
+        alternates.Set("LossInitialQuantity", 8);
         alternates.Set("LossKeepQuantity", 0);
-        alternates.Set("LossQuantityStep", 4);
+        alternates.Set("LossQuantityStep", 0);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 160);
-        alternates.Set("LossPriceStep", 40);
+        alternates.Set("LossStart", 200);
+        alternates.Set("LossPriceStep", 0);
 
         // rsi
         alternates.Set("RsiHighLimit", 73);
-        alternates.Set("RsiLowLimit", 33);
+        alternates.Set("RsiLowLimit", 31);
         alternates.Set("RsiProfitDeltaHighLimit", 2.0);
         alternates.Set("RsiProfitDeltaLowLimit", 6.0);
         alternates.Set("Rsi", 14);
@@ -80,7 +80,7 @@ public class Program
         alternates.Set("MaAvgChange", 0.32M);
         alternates.Set("MovPeriod", 5);
         alternates.Set("MovPeriod2", 9);
-        alternates.Set("DynamicCross", true, false);
+        alternates.Set("DynamicCross", true);
 
         // macd
         alternates.Set("MacdAvgChange", 0.32M);
@@ -159,7 +159,6 @@ public class Program
         var optimize = new Optimizer<Bist30>(settings, typeof(Bist30));
         optimize.Start();
     }
-
 }
 
 

@@ -24,12 +24,15 @@ using System.Threading.Tasks;
 
 namespace Matriks.Lean.Algotrader
 {
-    public class MaAlg : Kalitte.Trading.Matrix.MaProfit
+    public class Bist301 : Kalitte.Trading.Matrix.MatrixBist30
     {
 
     }
 
+    public class Bist302 : Kalitte.Trading.Matrix.MatrixBist30
+    {
 
+    }
 
 
     public class bardatalogger : Kalitte.Trading.Matrix.BarDataLogger

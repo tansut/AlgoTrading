@@ -119,7 +119,6 @@ namespace Kalitte.Trading.Matrix
         {
             Algo.Init();
             volume = VolumeIndicator(Algo.Symbol, (SymbolPeriod)Enum.Parse(typeof(SymbolPeriod), Algo.SymbolPeriod.ToString()));
-
         }
 
 
@@ -132,7 +131,7 @@ namespace Kalitte.Trading.Matrix
             }
             if (!Algo.Simulation)
             {
-                var assembly = typeof(MaProfit).Assembly.GetName();
+                var assembly = typeof(MatrixBist30).Assembly.GetName();
                 Algo.Log($"{this}", LogLevel.Info);
                 if (Algo.UseVirtualOrders)
                 {
@@ -253,7 +252,15 @@ namespace Kalitte.Trading.Matrix
 
         public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)
         {
-            return this.GetMarketData(symbol, SymbolUpdateField.Last);
+            try
+            {
+                return this.GetMarketData(symbol, SymbolUpdateField.Last);
+            } catch (Exception ex)
+            {
+                Algo.Log($"{ex.Message}", LogLevel.Error);
+                return 0;
+            }
+            
 
         }
 

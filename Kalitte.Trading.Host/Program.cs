@@ -25,7 +25,7 @@ public class Program
         settings.Finish = new DateTime(2022, 3, 11);
         settings.AutoClosePositions = true;
 
-        var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
+        var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
@@ -57,16 +57,16 @@ public class Program
         alternates.Set("PriceLowLimit", 2200);
         alternates.Set("PriceHighLimit", 2300);                   
 
-        alternates.Set("LossInitialQuantity", 2);
+        alternates.Set("LossInitialQuantity", 4);
         alternates.Set("LossKeepQuantity", 0);
-        alternates.Set("LossQuantityStep", 2);
+        alternates.Set("LossQuantityStep", 4);
         alternates.Set("LossQuantityStepMultiplier", 0);                
         alternates.Set("LossStart", 200);
-        alternates.Set("LossPriceStep", 50);
+        alternates.Set("LossPriceStep", 100);
 
         // rsi
-        alternates.Set("RsiHighLimit", 74);
-        alternates.Set("RsiLowLimit", 31);
+        alternates.Set("RsiHighLimit", 73);
+        alternates.Set("RsiLowLimit", 33);
         alternates.Set("RsiProfitDeltaHighLimit", 2.0);
         alternates.Set("RsiProfitDeltaLowLimit", 6.0);
         alternates.Set("Rsi", 14);
@@ -139,7 +139,7 @@ public class Program
             if (args[1] == "init")
             {
 
-                var initValues = AlgoBase.GetConfigValues(typeof(Bist30Futures));
+                var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
                 settings.Alternates = settings.Alternates = new AlternateValues(initValues);
                 settings.SaveToFile(args[0]);
                 return;
@@ -156,7 +156,7 @@ public class Program
             }
         }
         
-        var optimize = new Optimizer<Bist30Futures>(settings, typeof(Bist30Futures));
+        var optimize = new Optimizer<Bist30>(settings, typeof(Bist30));
         optimize.Start();
     }
 

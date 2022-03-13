@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Kalitte.Trading.Algos
 {
-    public class Bist30Futures : AlgoBase
+    public class Bist30 : AlgoBase
     {
 
         // order params
@@ -534,20 +534,20 @@ namespace Kalitte.Trading.Algos
 
 
 
-        public Bist30Futures() : base()
+        public Bist30() : base()
         {
 
         }
 
 
-        public Bist30Futures(Dictionary<string, object> init) : base(init)
+        public Bist30(Dictionary<string, object> init) : base(init)
         {
 
         }
 
         public override string ToString()
         {
-            var assembly = typeof(Bist30Futures).Assembly.GetName();
+            var assembly = typeof(Bist30).Assembly.GetName();
             return $"Instance {InstanceName} [{this.Symbol}/{SymbolPeriod}] using assembly {assembly.FullName}";
         }
 

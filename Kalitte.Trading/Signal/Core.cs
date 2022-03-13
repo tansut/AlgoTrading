@@ -56,7 +56,6 @@ namespace Kalitte.Trading
     {
         public StartableState State { get; set; } = StartableState.Stopped;
         protected System.Timers.Timer _timer = null;
-        private object _locker = new object();
 
         protected object OperationLock = new object();
 
@@ -175,30 +174,6 @@ namespace Kalitte.Trading
         protected virtual void onTick(Object source, ElapsedEventArgs e)
         {
             this.Check();
-            return;
-            var hasLock = false;
-            var restartTimer = false;
-            try
-            {
-                Monitor.TryEnter(_locker, ref hasLock);
-                if (!hasLock)
-                {
-                    return;
-                }
-                if (_timer != null && _timer.Enabled)
-                {
-                    restartTimer = true;
-                }
-                SignalResult result = this.Check();
-            }
-            finally
-            {
-                if (hasLock)
-                {
-                    Monitor.Exit(_locker);
-                    if (restartTimer) _timer.Start();
-                }
-            }
         }
 
         protected abstract SignalResult CheckInternal(DateTime? t = null);

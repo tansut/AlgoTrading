@@ -169,9 +169,90 @@ namespace Kalitte.Trading
         }
 
 
-        public bool IsLastOrderInstanceOf(params Type[] signalTypes)
+
+        public bool IsLastPositionOrderInstanceOf(params Signal[] signals)
         {
-            var last = this.LastNonProfitLossOrder;
+            var last = this.LastPositionOrder;
+            if (last == null) return false;
+            foreach (var signal in signals)
+            {
+                if (signal == last.SignalResult.Signal) return true;
+            }
+            return false;
+        }
+
+        public bool LastOrderIsLoss
+        {
+            get
+            {
+                var lastOrder = CompletedOrders.LastOrDefault();
+                return lastOrder != null && lastOrder.SignalResult.Signal is ProfitLossSignal && ((ProfitLossSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Loss;
+            }
+        }
+
+        public bool LastOrderIsProfit
+        {
+            get
+            {
+                var lastOrder = CompletedOrders.LastOrDefault();
+                return lastOrder != null && lastOrder.SignalResult.Signal is ProfitLossSignal && ((ProfitLossSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Profit;
+            }
+        }
+
+        public ExchangeOrder GetLastPositionOrder(params Type[] signalTypes)
+        {
+            var last = this.LastPositionOrder;            
+            foreach (var type in signalTypes)
+            {
+                if (type.IsAssignableFrom(last.SignalResult.Signal.GetType())) return last;
+            }
+            return null;
+        }
+
+        public ExchangeOrder GetLastPositionOrder(params Signal[] signals)
+        {
+            var last = this.LastPositionOrder;
+            foreach (var signal in signals)
+            {
+                if (last.SignalResult.Signal == signal) return last;
+            }
+            return null;
+        }
+
+        public decimal LastAverageCost(params Signal[] signals)
+        {
+            var orders = GetLastPositionOrders(signals);
+            var totalQ = orders.Sum(p=>p.FilledQuantity);
+            var totalPrice = orders.Sum(p=>(p.FilledUnitPrice * p.FilledQuantity));
+            if (totalQ > 0)
+            {
+                return (totalPrice / totalQ).ToCurrency();
+            }
+            else return 0M;
+        }
+
+        public List<ExchangeOrder> GetLastPositionOrders(params Signal[] signals)
+        {
+            var result = new List<ExchangeOrder>();
+            var skip = typeof(ProfitLossSignal);
+            for (var i = CompletedOrders.Count - 1; i >= 0; i--)
+            {
+                var type = CompletedOrders[i].SignalResult.Signal.GetType();
+                if (skip.IsAssignableFrom(type))
+                {
+                    if (result.Count > 0) break;
+                    continue;
+                }
+                else if (signals.Any(s => s == CompletedOrders[i].SignalResult.Signal)) result.Add(CompletedOrders[i]);
+                else break;
+            }
+            return result;
+        }
+
+
+        public bool IsLastPositionOrderInstanceOf(params Type[] signalTypes)
+        {
+            var last = this.LastPositionOrder;
             if (last == null) return false;
             foreach (var type in signalTypes)
             {
@@ -190,13 +271,14 @@ namespace Kalitte.Trading
             }
             return null;
         }
+        
 
 
-        public ExchangeOrder LastNonProfitLossOrder
+        public ExchangeOrder LastPositionOrder
         {
             get
             {
-                return this.CompletedOrders.LastOrDefault(p => (!(p.SignalResult.Signal is ProfitLossSignal)));
+                return GetLastOrderSkip(typeof(ProfitLossSignal));
             }
         }
     }

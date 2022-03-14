@@ -262,7 +262,7 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0))
             {
                 this.profitSignal = CreateProfitSignal("profit", Symbol);
-                this.profitSignal.LimitingSignals.Add(typeof(CrossSignal));
+                this.profitSignal.LimitingSignalTypes.Add(typeof(CrossSignal));
                 this.Signals.Add(profitSignal);
             }
 
@@ -273,14 +273,16 @@ namespace Kalitte.Trading.Algos
                 this.rsiProfitSignal.KeepQuantity = RsiProfitKeepQuantity == 0 ? ProfitKeepQuantity : RsiProfitKeepQuantity;
                 this.rsiProfitSignal.PriceChange = RsiProfitStart == 0 ? ProfitStart : RsiProfitStart;
                 this.rsiProfitSignal.PriceStep = RsiProfitPriceStep == 0 ? ProfitPriceStep: RsiProfitPriceStep;
-                this.rsiProfitSignal.LimitingSignals.Add(typeof(GradientSignal));
+                this.rsiProfitSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
                 this.Signals.Add(rsiProfitSignal);
             }
 
             if (!SimulateOrderSignal && (this.LossInitialQuantity > 0))
             {
                 this.lossSignal = new LossSignal("loss", Symbol, this, this.LossStart, this.LossInitialQuantity, this.LossQuantityStep, this.LossQuantityStepMultiplier, LossPriceStep, this.LossKeepQuantity);
-                //this.lossSignal.LimitingSignals.Add(typeof(GradientSignal));
+                this.lossSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
+                if (rsiLow != null) this.lossSignal.CostSignals.Add(rsiLow);
+                if (rsiHigh != null) this.lossSignal.CostSignals.Add(rsiHigh);
                 this.Signals.Add(lossSignal);
             }
             if (!SimulateOrderSignal)
@@ -381,7 +383,7 @@ namespace Kalitte.Trading.Algos
             if (result.finalResult == BuySell.Buy && portfolio.IsLong) return;
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
-            var lastSignalTime = portfolio.LastNonProfitLossOrder == null ? DateTime.MinValue : portfolio.LastNonProfitLossOrder.SignalResult.SignalTime;
+            var lastSignalTime = portfolio.LastPositionOrder == null ? DateTime.MinValue : portfolio.LastPositionOrder.SignalResult.SignalTime;
             if (signal.SignalType == ProfitOrLoss.Loss && (result.SignalTime - lastSignalTime).TotalSeconds < 60)
             {
                 Log($"{signal.Name} {result} received but there is no time dif between {lastSignalTime} and {result.SignalTime}", LogLevel.Warning);
@@ -434,16 +436,15 @@ namespace Kalitte.Trading.Algos
         private void HandleRsiLimitSignal(GradientSignal signal, GradientSignalResult signalResult)
         {
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
-            var lastOrder = portfolio.CompletedOrders.LastOrDefault();
-            var lastPositionOrder = portfolio.LastNonProfitLossOrder;
-            
-            var lastOrderIsRsi = lastPositionOrder != null && lastPositionOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(GradientSignal));
-            var lastOrderIsLoss = lastOrder != null && lastOrder.SignalResult.Signal is ProfitLossSignal && ((ProfitLossSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Loss;
-            if (lastOrderIsLoss && lastOrderIsRsi) return;
+            var lastOrder = portfolio.CompletedOrders.LastOrDefault();            
 
-            var keepPosition = false; // lastOrder != null && lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(GradientSignal));
-            
+            var lastOrderIsRsi = portfolio.IsLastPositionOrderInstanceOf(typeof(Gradient));
+            var lastOrderIsLoss = portfolio.LastOrderIsLoss; 
+            if (lastOrderIsLoss && lastOrderIsRsi) return;
+            var keepPosition = lastOrderIsRsi;
+
             Log($"HandleRsiLimit: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
+
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
@@ -465,7 +466,6 @@ namespace Kalitte.Trading.Algos
 
             if (orderQuantity > 0)
             {
-
                 sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"{signal.Name}[{signalResult}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }
         }
@@ -478,9 +478,8 @@ namespace Kalitte.Trading.Algos
 
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)
         {
-            var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
-            var lastOrder = portfolio.GetLastOrderSkip(typeof(ProfitLossSignal));
-            var keepPosition = lastOrder != null && lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(CrossSignal));
+            var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);            
+            var keepPosition = portfolio.IsLastPositionOrderInstanceOf(typeof(CrossSignal)); // lastOrder != null && lastOrder.SignalResult.Signal.GetType().IsAssignableFrom(typeof(CrossSignal));
 
             Log($"HandleCross: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;

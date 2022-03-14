@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 3, 11);
+        settings.Start = new DateTime(2022, 3, 14);
+        settings.Finish = new DateTime(2022, 3, 14);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
@@ -30,7 +30,7 @@ public class Program
 
         // options
         alternates.Set("CrossOrderQuantity", 8);
-        alternates.Set("RsiTrendOrderQuantity", 8);
+        alternates.Set("RsiTrendOrderQuantity", 4);
         alternates.Set("DataCollectSize", 8);
         alternates.Set("DataAnalysisSize", 48);
         alternates.Set("DataCollectUseSma", false);
@@ -47,7 +47,7 @@ public class Program
         alternates.Set("ProfitUseMonitor", false);
 
         // rsiTrendProfit
-        alternates.Set("RsiProfitInitialQuantity", 5);
+        alternates.Set("RsiProfitInitialQuantity", 3);
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitStart", 12);
         alternates.Set("RsiProfitPriceStep", 4.0);
@@ -57,17 +57,17 @@ public class Program
         alternates.Set("PriceLowLimit", 2200);
         alternates.Set("PriceHighLimit", 2300);                   
 
-        alternates.Set("LossInitialQuantity", 8);
+        alternates.Set("LossInitialQuantity", 4);
         alternates.Set("LossKeepQuantity", 0);
         alternates.Set("LossQuantityStep", 0);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 200);
+        alternates.Set("LossStart", 80);
         alternates.Set("LossPriceStep", 0);
 
         // rsi
-        alternates.Set("RsiHighLimit", 73);
-        alternates.Set("RsiLowLimit", 31);
-        alternates.Set("RsiProfitDeltaHighLimit", 2.0);
+        alternates.Set("RsiHighLimit", 74);
+        alternates.Set("RsiLowLimit", 26);
+        alternates.Set("RsiProfitDeltaHighLimit", 6.0);
         alternates.Set("RsiProfitDeltaLowLimit", 6.0);
         alternates.Set("Rsi", 14);
         alternates.Set("RsiTrendSensitivity", 3M);

@@ -155,13 +155,25 @@ Renamed Types:
 
 [Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c -> [Kalitte.Trading]Kalitte.Trading.PortfolioItem/A
 {
-	[Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c::<get_LastNonProfitLossOrder>b__52_0[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> A
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c::<LastAverageCost>b__56_0[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> A
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c::<LastAverageCost>b__56_1[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> a
 
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c::.ctor[0]( ) skipped:  special name
 
 	Kalitte.Trading.PortfolioItem/<>c [Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c Kalitte.Trading.PortfolioItem/<>c::<>9 -> A
-	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Boolean> Kalitte.Trading.PortfolioItem/<>c::<>9__52_0 -> A
+	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> Kalitte.Trading.PortfolioItem/<>c::<>9__56_0 -> A
+	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> Kalitte.Trading.PortfolioItem/<>c::<>9__56_1 -> a
+}
+
+[Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c__DisplayClass57_0 -> [Kalitte.Trading]Kalitte.Trading.PortfolioItem/a
+{
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c__DisplayClass57_0::<GetLastPositionOrders>b__0[1]( [Kalitte.Trading]Kalitte.Trading.Signal ) -> A
+
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c__DisplayClass57_0::.ctor[0]( ) skipped:  special name
+
+	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.PortfolioItem/<>c__DisplayClass57_0::i -> A
+	Kalitte.Trading.PortfolioItem [Kalitte.Trading]Kalitte.Trading.PortfolioItem Kalitte.Trading.PortfolioItem/<>c__DisplayClass57_0::<>4__this -> A
 }
 
 [Kalitte.Trading]Kalitte.Trading.PortfolioList/<>c -> [Kalitte.Trading]Kalitte.Trading.PortfolioList/A
@@ -275,7 +287,7 @@ Renamed Types:
 	System.Func`2<System.String,System.Decimal> [Kalitte.Trading]System.Func`2<System.String,System.Decimal> Kalitte.Trading.FileLogger/<>c::<>9__15_0 -> a
 }
 
-[Kalitte.Trading]Kalitte.Trading.TrendProfitSignal -> [Kalitte.Trading]A.m
+[Kalitte.Trading]Kalitte.Trading.TrendProfitSignal -> [Kalitte.Trading]A.N
 {
 	[Kalitte.Trading]Kalitte.Trading.TrendProfitSignal::get_TrendSignal[0]( ) -> A
 	[Kalitte.Trading]Kalitte.Trading.TrendProfitSignal::set_TrendSignal[1]( [Kalitte.Trading]Kalitte.Trading.TrendSignal ) -> A
@@ -397,7 +409,7 @@ Renamed Types:
 	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.Algos.Bist30/<>c__DisplayClass221_0::fib -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.M
+[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.m
 {
 
 	[Kalitte.Trading]Kalitte.Trading.LossSignal::get_SignalType[0]( ) skipped:  skip by property
@@ -1204,13 +1216,20 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::set_RequestedOrders[1]( [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.ExchangeOrder> ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::get_CompletedOrders[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::set_CompletedOrders[1]( [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.ExchangeOrder> ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::get_LastNonProfitLossOrder[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::get_LastOrderIsLoss[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::get_LastOrderIsProfit[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::get_LastPositionOrder[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::ToString[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::.ctor[4]( [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.BuySell, [mscorlib]System.Decimal, [mscorlib]System.Decimal ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::.ctor[1]( [mscorlib]System.String ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::AddRequestedOrder[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::OrderCompleted[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::IsLastOrderInstanceOf[1]( [mscorlib]System.Type[] ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::IsLastPositionOrderInstanceOf[1]( [Kalitte.Trading]Kalitte.Trading.Signal[] ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::GetLastPositionOrder[1]( [mscorlib]System.Type[] ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::GetLastPositionOrder[1]( [Kalitte.Trading]Kalitte.Trading.Signal[] ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::LastAverageCost[1]( [Kalitte.Trading]Kalitte.Trading.Signal[] ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::GetLastPositionOrders[1]( [Kalitte.Trading]Kalitte.Trading.Signal[] ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::IsLastPositionOrderInstanceOf[1]( [mscorlib]System.Type[] ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::GetLastOrderSkip[1]( [mscorlib]System.Type ) skipped:  KeepPublicApi option in configuration
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PortfolioItem::<Commission>k__BackingField -> A
@@ -1237,7 +1256,9 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PortfolioItem::Total skipped:  KeepPublicApi option in configuration
 	System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> Kalitte.Trading.PortfolioItem::RequestedOrders skipped:  KeepPublicApi option in configuration
 	System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> Kalitte.Trading.PortfolioItem::CompletedOrders skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.ExchangeOrder [Kalitte.Trading]Kalitte.Trading.ExchangeOrder Kalitte.Trading.PortfolioItem::LastNonProfitLossOrder skipped:  KeepPublicApi option in configuration
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.PortfolioItem::LastOrderIsLoss skipped:  KeepPublicApi option in configuration
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.PortfolioItem::LastOrderIsProfit skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.ExchangeOrder [Kalitte.Trading]Kalitte.Trading.ExchangeOrder Kalitte.Trading.PortfolioItem::LastPositionOrder skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.SignalResult skipped:  KeepPublicApi option in configuration
@@ -1945,8 +1966,12 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::get_FibonacciLevels[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::set_FibonacciLevels[1]( [Kalitte.Trading]Kalitte.Trading.Fibonacci ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::get_SignalType[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::get_LimitingSignalTypes[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::set_LimitingSignalTypes[1]( [mscorlib]System.Collections.Generic.List`1<[mscorlib]System.Type> ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::get_LimitingSignals[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::set_LimitingSignals[1]( [mscorlib]System.Collections.Generic.List`1<[mscorlib]System.Type> ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::set_LimitingSignals[1]( [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.Signal> ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::get_CostSignals[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::set_CostSignals[1]( [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.Signal> ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::get_GradientTolerance[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::set_GradientTolerance[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::get_GradientLearnRate[0]( ) skipped:  skip by property
@@ -1958,6 +1983,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::IncrementParams[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::CreatePriceMonitor[1]( [Kalitte.Trading]Kalitte.Trading.ProfitLossResult ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::GetQuantity[0]( ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::AverageCost[1]( [Kalitte.Trading]Kalitte.Trading.PortfolioItem ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossSignal::getResult[3]( [Kalitte.Trading]Kalitte.Trading.PortfolioItem, [mscorlib]System.Decimal, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossSignal::<UsedPriceChange>k__BackingField -> A
@@ -1970,7 +1996,9 @@ Skipped Types:
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.ProfitLossSignal::<UsePriceMonitor>k__BackingField -> A
 	Kalitte.Trading.PriceMonitor [Kalitte.Trading]Kalitte.Trading.PriceMonitor Kalitte.Trading.ProfitLossSignal::<PriceMonitor>k__BackingField -> A
 	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.ProfitLossSignal::<FibonacciLevels>k__BackingField -> A
-	System.Collections.Generic.List`1<System.Type> [Kalitte.Trading]System.Collections.Generic.List`1<System.Type> Kalitte.Trading.ProfitLossSignal::<LimitingSignals>k__BackingField -> A
+	System.Collections.Generic.List`1<System.Type> [Kalitte.Trading]System.Collections.Generic.List`1<System.Type> Kalitte.Trading.ProfitLossSignal::<LimitingSignalTypes>k__BackingField -> A
+	System.Collections.Generic.List`1<Kalitte.Trading.Signal> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.Signal> Kalitte.Trading.ProfitLossSignal::<LimitingSignals>k__BackingField -> A
+	System.Collections.Generic.List`1<Kalitte.Trading.Signal> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.Signal> Kalitte.Trading.ProfitLossSignal::<CostSignals>k__BackingField -> a
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossSignal::<GradientTolerance>k__BackingField -> d
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossSignal::<GradientLearnRate>k__BackingField -> E
 
@@ -1986,7 +2014,9 @@ Skipped Types:
 	Kalitte.Trading.PriceMonitor [Kalitte.Trading]Kalitte.Trading.PriceMonitor Kalitte.Trading.ProfitLossSignal::PriceMonitor skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.ProfitLossSignal::FibonacciLevels skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.ProfitOrLoss [Kalitte.Trading]Kalitte.Trading.ProfitOrLoss Kalitte.Trading.ProfitLossSignal::SignalType skipped:  KeepPublicApi option in configuration
-	System.Collections.Generic.List`1<System.Type> [Kalitte.Trading]System.Collections.Generic.List`1<System.Type> Kalitte.Trading.ProfitLossSignal::LimitingSignals skipped:  KeepPublicApi option in configuration
+	System.Collections.Generic.List`1<System.Type> [Kalitte.Trading]System.Collections.Generic.List`1<System.Type> Kalitte.Trading.ProfitLossSignal::LimitingSignalTypes skipped:  KeepPublicApi option in configuration
+	System.Collections.Generic.List`1<Kalitte.Trading.Signal> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.Signal> Kalitte.Trading.ProfitLossSignal::LimitingSignals skipped:  KeepPublicApi option in configuration
+	System.Collections.Generic.List`1<Kalitte.Trading.Signal> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.Signal> Kalitte.Trading.ProfitLossSignal::CostSignals skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossSignal::GradientTolerance skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossSignal::GradientLearnRate skipped:  KeepPublicApi option in configuration
 }

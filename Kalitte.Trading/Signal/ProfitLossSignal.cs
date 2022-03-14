@@ -110,7 +110,12 @@ namespace Kalitte.Trading
         public PriceMonitor PriceMonitor { get; protected set; }
         public Fibonacci FibonacciLevels { get; set; } = null;
         public abstract ProfitOrLoss SignalType { get;  }
-        public List<Type> LimitingSignals { get; set; } = new List<Type>();        
+
+        public List<Type> LimitingSignalTypes { get; set; } = new List<Type>();        
+        public List<Signal> LimitingSignals { get; set; } = new List<Signal>();        
+        public List<Signal> CostSignals { get; set; } = new List<Signal>();
+
+
         public decimal GradientTolerance { get; set; }        
         public decimal GradientLearnRate { get; set; }
 
@@ -166,24 +171,45 @@ namespace Kalitte.Trading
         }
 
 
-
         public virtual decimal GetQuantity()
         {
             return this.CompletedOrder == 0 ? InitialQuantity : this.QuantityStep + (this.CompletedOrder) * QuantityStepMultiplier;
         }
 
+        protected virtual decimal AverageCost(PortfolioItem portfolio)
+        {
+            if (CostSignals.Count == 0)
+                return portfolio.AvgCost;
+            var cost = portfolio.LastAverageCost(CostSignals.ToArray());
+            //var lastSignal = portfolio.GetLastPositionOrder(CostSignals.ToArray());
+            //if (lastSignal == null) return 0M;
+            //return lastSignal.FilledUnitPrice;
+            return cost;
+        }
+
 
         protected virtual ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
         {
-            BuySell? bs = null;
-            var unitPl = marketPrice - portfolio.AvgCost;
-            var totalPl = unitPl * portfolio.Quantity;
+            if (this.LimitingSignalTypes.Any())
+            {
+                var valid = portfolio.CompletedOrders.Count == 0 || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignalTypes.ToArray());
+                if (!valid) return null;
+            }
 
             if (this.LimitingSignals.Any())
             {
-                var valid = portfolio.CompletedOrders.Count == 0 || portfolio.IsLastOrderInstanceOf(this.LimitingSignals.ToArray());
+                var valid = portfolio.CompletedOrders.Count == 0 || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignals.ToArray());
                 if (!valid) return null;
             }
+
+            var cost = AverageCost(portfolio);
+
+            if (cost == 0) return null;
+
+            BuySell? bs = null;
+            var unitPl = marketPrice - cost;
+            var totalPl = unitPl * portfolio.Quantity;
+
 
             if (this.SignalType == ProfitOrLoss.Profit)
             {

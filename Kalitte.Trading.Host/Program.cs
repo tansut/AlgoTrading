@@ -21,7 +21,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 14);
+        settings.Start = new DateTime(2022, 3, 1);
         settings.Finish = new DateTime(2022, 3, 14);
         settings.AutoClosePositions = true;
 
@@ -47,7 +47,7 @@ public class Program
         alternates.Set("ProfitUseMonitor", false);
 
         // rsiTrendProfit
-        alternates.Set("RsiProfitInitialQuantity", 3);
+        alternates.Set("RsiProfitInitialQuantity", 5);
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitStart", 12);
         alternates.Set("RsiProfitPriceStep", 4.0);
@@ -61,14 +61,14 @@ public class Program
         alternates.Set("LossKeepQuantity", 0);
         alternates.Set("LossQuantityStep", 0);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 80);
+        alternates.Set("LossStart", 100);
         alternates.Set("LossPriceStep", 0);
 
         // rsi
-        alternates.Set("RsiHighLimit", 74);
-        alternates.Set("RsiLowLimit", 26);
-        alternates.Set("RsiProfitDeltaHighLimit", 6.0);
-        alternates.Set("RsiProfitDeltaLowLimit", 6.0);
+        alternates.Set("RsiHighLimit", 76);
+        alternates.Set("RsiLowLimit", 24);
+        alternates.Set("RsiProfitDeltaHighLimit", 0.0);
+        alternates.Set("RsiProfitDeltaLowLimit", 0.0);
         alternates.Set("Rsi", 14);
         alternates.Set("RsiTrendSensitivity", 3M);
         alternates.Set("RsiTrendThreshold", 0.1);

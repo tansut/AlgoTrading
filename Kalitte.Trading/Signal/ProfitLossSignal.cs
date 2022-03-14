@@ -176,16 +176,13 @@ namespace Kalitte.Trading
             return this.CompletedOrder == 0 ? InitialQuantity : this.QuantityStep + (this.CompletedOrder) * QuantityStepMultiplier;
         }
 
-        protected virtual decimal AverageCost(PortfolioItem portfolio)
-        {
-            if (CostSignals.Count == 0)
-                return portfolio.AvgCost;
-            var cost = portfolio.LastAverageCost(CostSignals.ToArray());
-            //var lastSignal = portfolio.GetLastPositionOrder(CostSignals.ToArray());
-            //if (lastSignal == null) return 0M;
-            //return lastSignal.FilledUnitPrice;
-            return cost;
-        }
+        //protected virtual decimal AverageCost(PortfolioItem portfolio)
+        //{
+        //    if (CostSignals.Count == 0)
+        //        return portfolio.AvgCost;
+        //    var cost = portfolio.LastAverageCost(CostSignals.ToArray());
+        //    return cost.AverageCost;
+        //}
 
 
         protected virtual ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
@@ -202,7 +199,17 @@ namespace Kalitte.Trading
                 if (!valid) return null;
             }
 
-            var cost = AverageCost(portfolio);
+            var cost = portfolio.AvgCost;
+
+            if (CostSignals.Count > 0)
+            {
+                var costDetail = portfolio.LastAverageCost(CostSignals.ToArray());
+                //quantity = costDetail.TotalQuantity;
+                cost = costDetail.AverageCost;
+            }
+
+
+
 
             if (cost == 0) return null;
 

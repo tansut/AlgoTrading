@@ -23,6 +23,33 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
+
+    public class AverageCostResult
+    {
+        public List<ExchangeOrder> Orders { get; set; }
+        public decimal TotalQuantity
+        {
+            get
+            {
+                return Orders.Sum(p => p.FilledQuantity);
+            }
+        }
+        public decimal Total
+        {
+            get
+            {
+                return Orders.Sum(p => (p.FilledUnitPrice * p.FilledQuantity));
+            }
+        }
+        public decimal AverageCost
+        {
+            get
+            {
+                return TotalQuantity == 0 ? 0 : (Total / TotalQuantity).ToCurrency();
+            }
+        }
+    }
+
     public class PortfolioItem
     {
 
@@ -201,7 +228,7 @@ namespace Kalitte.Trading
 
         public ExchangeOrder GetLastPositionOrder(params Type[] signalTypes)
         {
-            var last = this.LastPositionOrder;            
+            var last = this.LastPositionOrder;
             foreach (var type in signalTypes)
             {
                 if (type.IsAssignableFrom(last.SignalResult.Signal.GetType())) return last;
@@ -219,16 +246,29 @@ namespace Kalitte.Trading
             return null;
         }
 
-        public decimal LastAverageCost(params Signal[] signals)
+        public AverageCostResult LastAverageCost(params Signal[] signals)
         {
-            var orders = GetLastPositionOrders(signals);
-            var totalQ = orders.Sum(p=>p.FilledQuantity);
-            var totalPrice = orders.Sum(p=>(p.FilledUnitPrice * p.FilledQuantity));
-            if (totalQ > 0)
+            var res = new AverageCostResult();
+            res.Orders = GetLastPositionOrders(signals);
+            return res;
+        }
+
+        public List<ExchangeOrder> GetLastPositionOrders(params Type[] types)
+        {
+            var result = new List<ExchangeOrder>();
+            var skipType = typeof(ProfitLossSignal);
+            for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
-                return (totalPrice / totalQ).ToCurrency();
+                var type = CompletedOrders[i].SignalResult.Signal.GetType();
+                if (skipType.IsAssignableFrom(type))
+                {
+                    if (result.Count > 0) break;
+                    continue;
+                }
+                else if (types.Any(t => t.IsAssignableFrom(type))) result.Add(CompletedOrders[i]);
+                else break;
             }
-            else return 0M;
+            return result;
         }
 
         public List<ExchangeOrder> GetLastPositionOrders(params Signal[] signals)
@@ -248,7 +288,6 @@ namespace Kalitte.Trading
             }
             return result;
         }
-
 
         public bool IsLastPositionOrderInstanceOf(params Type[] signalTypes)
         {
@@ -271,7 +310,7 @@ namespace Kalitte.Trading
             }
             return null;
         }
-        
+
 
 
         public ExchangeOrder LastPositionOrder

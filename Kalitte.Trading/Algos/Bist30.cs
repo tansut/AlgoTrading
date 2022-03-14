@@ -436,19 +436,20 @@ namespace Kalitte.Trading.Algos
         private void HandleRsiLimitSignal(GradientSignal signal, GradientSignalResult signalResult)
         {
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
-            var lastOrder = portfolio.CompletedOrders.LastOrDefault();            
-
-            var lastOrderIsRsi = portfolio.IsLastPositionOrderInstanceOf(typeof(Gradient));
+            var lastOrder = portfolio.CompletedOrders.LastOrDefault();
+            var delta = signalResult.finalResult == BuySell.Buy ? RsiProfitDeltaLowLimit : RsiProfitDeltaHighLimit;
+            
+            var rsiOrders = portfolio.GetLastPositionOrders(typeof(GradientSignal));
             var lastOrderIsLoss = portfolio.LastOrderIsLoss; 
-            if (lastOrderIsLoss && lastOrderIsRsi) return;
-            var keepPosition = lastOrderIsRsi;
+            if (lastOrderIsLoss && rsiOrders.Count > 0) return;
+            var keepPosition = delta == 0 ? rsiOrders.Count > 0 : rsiOrders.Count > 1;
 
             Log($"HandleRsiLimit: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
 
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-            var delta = signalResult.finalResult == BuySell.Buy ? RsiProfitDeltaLowLimit: RsiProfitDeltaHighLimit;
+            
             var usedRsiQuantity = RsiTrendOrderQuantity; 
 
             if (delta > 0)

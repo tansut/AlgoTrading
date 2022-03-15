@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 14);
+        settings.Start = new DateTime(2022, 2, 28);
+        settings.Finish = new DateTime(2022, 3, 15);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
@@ -39,16 +39,16 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 2);
+        alternates.Set("ProfitInitialQuantity", 4);
         alternates.Set("ProfitKeepQuantity", 2);
-        alternates.Set("ProfitQuantityStep", 1);
+        alternates.Set("ProfitQuantityStep", 2);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
         alternates.Set("ProfitStart", 10);        
-        alternates.Set("ProfitPriceStep", 1.0);
+        alternates.Set("ProfitPriceStep", 2.0);
         alternates.Set("ProfitUseMonitor", false);
 
         // rsiTrendProfit
-        alternates.Set("RsiProfitInitialQuantity", 0);
+        alternates.Set("RsiProfitInitialQuantity", 5);
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitStart", 12);
         alternates.Set("RsiProfitPriceStep", 4.0);
@@ -61,13 +61,13 @@ public class Program
         alternates.Set("LossKeepQuantity", 0);
         alternates.Set("LossQuantityStep", 0);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 192);
+        alternates.Set("LossStart", 96);
         alternates.Set("LossPriceStep", 0);
 
         // rsi
-        alternates.Set("RsiHighLimit", 75);
+        alternates.Set("RsiHighLimit", 73);
         alternates.Set("RsiLowLimit", 32);
-        alternates.Set("RsiProfitDeltaHighLimit", 3.0);
+        alternates.Set("RsiProfitDeltaHighLimit", 2.0);
         alternates.Set("RsiProfitDeltaLowLimit", 7.0);
         alternates.Set("Rsi", 14);
         alternates.Set("RsiTrendSensitivity", 3M);

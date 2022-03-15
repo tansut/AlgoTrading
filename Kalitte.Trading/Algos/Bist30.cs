@@ -262,7 +262,7 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0))
             {
                 this.profitSignal = CreateProfitSignal("profit", Symbol);
-                //this.profitSignal.LimitingSignalTypes.Add(typeof(CrossSignal));
+                this.profitSignal.LimitingSignalTypes.Add(typeof(CrossSignal));
                 this.Signals.Add(profitSignal);
             }
 
@@ -444,7 +444,7 @@ namespace Kalitte.Trading.Algos
             if (lastOrderIsLoss && rsiOrders.Count > 0) return;
             var keepPosition = delta == 0 ? rsiOrders.Count > 0 : rsiOrders.Count > 1;
 
-            Log($"HandleRsiLimit: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
+            Log($"HandleRsiLimit: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition} {signalResult.Gradient.UsedValue}", LogLevel.Verbose);
 
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;

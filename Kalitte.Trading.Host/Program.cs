@@ -22,7 +22,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 14);
+        settings.Finish = new DateTime(2022, 3, 15);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
@@ -30,9 +30,9 @@ public class Program
 
         // options
         alternates.Set("CrossOrderQuantity", 8);
-        alternates.Set("RsiTrendOrderQuantity", 4);
+        alternates.Set("RsiTrendOrderQuantity", 8);
         alternates.Set("DataCollectSize", 8);
-        alternates.Set("DataAnalysisSize", 48);
+        alternates.Set("DataAnalysisSize", 80);
         alternates.Set("DataCollectUseSma", false);
         alternates.Set("DataAnalysisUseSma", true);
 
@@ -57,11 +57,11 @@ public class Program
         alternates.Set("PriceLowLimit", 2200);
         alternates.Set("PriceHighLimit", 2300);                   
 
-        alternates.Set("LossInitialQuantity", 4);
+        alternates.Set("LossInitialQuantity", 8);
         alternates.Set("LossKeepQuantity", 0);
         alternates.Set("LossQuantityStep", 0);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 100);
+        alternates.Set("LossStart", 960);
         alternates.Set("LossPriceStep", 0);
 
         // rsi
@@ -103,7 +103,7 @@ public class Program
         alternates.Set("ProfitGradientTolerance", 0.001);
         alternates.Set("ProfitGradientLearnRate", 0.002);
 
-        alternates.Set("RsiGradientSensitivity", 2);
+        alternates.Set("RsiGradientSensitivity", 1);
 
         
 

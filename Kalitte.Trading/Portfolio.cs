@@ -31,14 +31,14 @@ namespace Kalitte.Trading
         {
             get
             {
-                return Orders.Sum(p => p.FilledQuantity);
+                return Orders.Sum(p => (p.FilledQuantity - p.DirectionChangedQuantity));
             }
         }
         public decimal Total
         {
             get
             {
-                return Orders.Sum(p => (p.FilledUnitPrice * p.FilledQuantity));
+                return Orders.Sum(p => (p.FilledUnitPrice * (p.FilledQuantity - p.DirectionChangedQuantity)));
             }
         }
         public decimal AverageCost
@@ -190,6 +190,7 @@ namespace Kalitte.Trading
                     this.Side = position.Side;
                     this.Quantity = position.FilledQuantity - this.Quantity;
                     this.AvgCost = position.FilledUnitPrice;
+                    position.DirectionChangedQuantity = delta;
                 }
             }
             this.CompletedOrders.Add(position);

@@ -215,7 +215,6 @@ namespace Kalitte.Trading
                 tr.Date = list[index].Date;
                 BarTrendResults.Add(tr);
             }
-
         }
 
         protected override SignalResult CheckInternal(DateTime? t = null)

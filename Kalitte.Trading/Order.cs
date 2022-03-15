@@ -34,6 +34,7 @@ namespace Kalitte.Trading
         public BuySell Side;
         public decimal UnitPrice;
         public decimal Quantity;
+        public decimal DirectionChangedQuantity;
         public string Comment;
         public decimal ComissionRate = 0.0002M;
         public decimal FilledUnitPrice

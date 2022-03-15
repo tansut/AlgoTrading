@@ -262,7 +262,7 @@ namespace Kalitte.Trading.Algos
             if (!SimulateOrderSignal && (this.ProfitInitialQuantity > 0))
             {
                 this.profitSignal = CreateProfitSignal("profit", Symbol);
-                this.profitSignal.LimitingSignalTypes.Add(typeof(CrossSignal));
+                //this.profitSignal.LimitingSignalTypes.Add(typeof(CrossSignal));
                 this.Signals.Add(profitSignal);
             }
 

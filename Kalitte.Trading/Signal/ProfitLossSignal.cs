@@ -204,7 +204,7 @@ namespace Kalitte.Trading
             if (CostSignals.Count > 0)
             {
                 var costDetail = portfolio.LastAverageCost(CostSignals.ToArray());
-                //quantity = costDetail.TotalQuantity;
+                quantity = costDetail.TotalQuantity;
                 cost = costDetail.AverageCost;
             }
 

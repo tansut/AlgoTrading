@@ -109,7 +109,11 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(0)]
         public decimal ExpectedNetPl { get; set; }
 
-        [AlgoParam(BarPeriod.Min10)]
+        [AlgoParam(false)]
+        public bool UsePerformanceMonitor { get; set; }
+         
+
+                [AlgoParam(BarPeriod.Min10)]
         public BarPeriod SymbolPeriod { get; set; }
 
 
@@ -149,7 +153,7 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-        public PerformanceMonitor Watch = new PerformanceMonitor();
+        public PerformanceMonitor Watch;
         int orderCounter = 0;
 
         public Dictionary<string, decimal> ordersBySignals = new Dictionary<string, decimal>();
@@ -606,14 +610,19 @@ namespace Kalitte.Trading.Algos
         public virtual void Init()
         {
             if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
-            ConfigureMonitor();
+            if (this.UsePerformanceMonitor)
+            {
+                this.Watch = new PerformanceMonitor();
+                ConfigureMonitor();
+            }
+            
         }
 
 
 
         public virtual void Start()
         {            
-            this.Watch.Start();
+            if (this.Watch != null) this.Watch.Start();
             if (!Simulation)
             {
                 Log($"Setting seans timer ...");
@@ -669,7 +678,7 @@ namespace Kalitte.Trading.Algos
                 seansTimer.Dispose();
             }
             StopSignals();
-            this.Watch.Stop();
+            if (this.Watch != null) this.Watch.Stop();
 
             Log($"Completed {this}", LogLevel.FinalResult);
             if (TestStart.HasValue)
@@ -730,8 +739,11 @@ namespace Kalitte.Trading.Algos
         public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
         {
             orderWait.Reset();           
-            var monitored = this.Watch.Dump(true).ToString();
-            if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, t);
+            if (this.Watch != null)
+            {
+                var monitored = this.Watch.Dump(true).ToString();
+                if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, t);
+            }
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
             var portfolio = UserPortfolioList.GetPortfolio(symbol);
             var price = lprice > 0 ? lprice : this.GetMarketPrice(symbol, t);

@@ -370,9 +370,6 @@ Renamed Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__230_0[1]( [Kalitte.Trading]Kalitte.Trading.Signal ) -> a
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__230_1[1]( [Kalitte.Trading]Kalitte.Trading.Signal ) -> B
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__230_2[1]( [Kalitte.Trading]Kalitte.Trading.ProfitLossSignal ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__230_3[1]( [Kalitte.Trading]Kalitte.Trading.Signal ) -> b
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__230_4[1]( [Kalitte.Trading]Kalitte.Trading.Signal ) -> C
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__230_5[1]( [Kalitte.Trading]Kalitte.Trading.CrossSignal ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::.ctor[0]( ) skipped:  special name
@@ -383,9 +380,6 @@ Renamed Types:
 	System.Func`2<Kalitte.Trading.Signal,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.Signal,System.Boolean> Kalitte.Trading.Algos.Bist30/<>c::<>9__230_0 -> A
 	System.Func`2<Kalitte.Trading.Signal,Kalitte.Trading.ProfitLossSignal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.Signal,Kalitte.Trading.ProfitLossSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__230_1 -> A
 	System.Action`1<Kalitte.Trading.ProfitLossSignal> [Kalitte.Trading]System.Action`1<Kalitte.Trading.ProfitLossSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__230_2 -> A
-	System.Func`2<Kalitte.Trading.Signal,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.Signal,System.Boolean> Kalitte.Trading.Algos.Bist30/<>c::<>9__230_3 -> a
-	System.Func`2<Kalitte.Trading.Signal,Kalitte.Trading.CrossSignal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.Signal,Kalitte.Trading.CrossSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__230_4 -> A
-	System.Action`1<Kalitte.Trading.CrossSignal> [Kalitte.Trading]System.Action`1<Kalitte.Trading.CrossSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__230_5 -> A
 }
 
 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass221_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/a

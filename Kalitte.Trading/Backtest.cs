@@ -73,6 +73,7 @@ namespace Kalitte.Trading
         {
             public DateTime T1 { get; set; }
             public DateTime T2 { get; set; }
+            public bool Break { get; set; } = false;
         }
 
         void createParameters()
@@ -102,30 +103,28 @@ namespace Kalitte.Trading
             var prms = (BarLoaderParams)data;
             var fired = new Dictionary<int, DateTime>();
             var periodBarIndexes = new Dictionary<int, int>();
-            //DateTime existing = DateTime.MinValue;
-            while (Algo.Now < prms.T2)
+            while (Algo.Now < prms.T2 && !prms.Break)
             {
                 var now = Algo.Now;
                 var elapsed = (now - prms.T1);
                 foreach (var sec in secDict)
                 {
                     var round = Helper.RoundDown(now, TimeSpan.FromSeconds(sec.Key));
-                    //var found = fired.TryGetValue(sec.Key, out DateTime existing);
-                    //if (found && existing == round) continue;
+                    var found = fired.TryGetValue(sec.Key, out DateTime existing);
+                    if (found && existing == round) continue;
                     if (elapsed.TotalSeconds % sec.Key >= sec.Key - 1)
                     {
                         fired[sec.Key] = round;
                         IQuote period = null;
-                        
+
                         if (!periodBarIndexes.ContainsKey(sec.Key))
                         {
                             periodBarIndexes[sec.Key] = periodBars[sec.Key].FindIndex(i => i.Date == round);
                         }
                         period = periodBars.ContainsKey(sec.Key) ? periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]) : null;
-                        if (period == null )
+                        if (period == null)
                         {
                             Algo.Log($"Error loading period for {round}", LogLevel.Error, now);
-                            //periodBarsLoaded = false;
                         }
                         else if (period.Date != round)
                         {
@@ -134,20 +133,7 @@ namespace Kalitte.Trading
                         else
                         {
                             Algo.PushNewBar(Algo.Symbol, sec.Value, period);
-                            //Console.WriteLine($"** thread push {sec.Value}-{period}");
-                            //var timeOut = new RandomGenerator().Next(1, 2);
-                            //var iterations = 0;
-                            //while (true)
-                            //{
-                            //    if (iterations++ > 100 || Algo.Now - now >= TimeSpan.FromSeconds(timeOut))
-                            //    {
-                            //        Algo.PushNewBar(Algo.Symbol, sec.Value, period);
-                            //        break;
-                            //    }
-                            //    Thread.Sleep(1);
-                            //}
                             periodBarIndexes[sec.Key] = periodBarIndexes[sec.Key] + 1;
-                            //periodBarsLoaded = true;
                         }
                     }
                 }
@@ -177,73 +163,28 @@ namespace Kalitte.Trading
         {
             var periodBarIndexes = new Dictionary<int, int>();
             var seconds = 0;
-            var periodBarsLoaded = true;
-            Algo.SetTime(t1);
 
+            Algo.SetTime(t1);
             var bl = new Thread(new ParameterizedThreadStart(BarLoaderThread));
-            var barsStarted = false;
-            bl.Start(new BarLoaderParams() { T1 = t1, T2 = t2 });
+            var barParams = new BarLoaderParams() { T1 = t1, T2 = t2 };
+            bl.Start(barParams);
 
             for (var p = t1; p <= t2; p = p.AddSeconds(1))
             {
-                if (periodBarsLoaded)
+                if (p > DateTime.Now)
                 {
-                    if (p > DateTime.Now) break;
-                    Algo.SetTime(p);
-                    Algo.SetBarCurrentValues();
-                    var time = Algo.Now;
-                    Algo.RunSignals(time);
-                    Algo.CheckDelayedOrders(time);
-                    if (Algo.UsePerformanceMonitor) Algo.Watch.CheckMonitor();
-                    Algo.simulationCount++;
+                    barParams.Break = true;
+                    break;
                 }
-
-
-
-
-                seconds++;
-
-                if (!barsStarted && seconds > 1)
-                {
-                    //bl.Start(new BarLoaderParams() { T1 = p, T2 = t2 });
-                    barsStarted = true;
-                }
-
-
-                //foreach (var sec in secDict)
-                //{
-                //    if (seconds % sec.Key == 0)
-                //    {
-                //        IQuote period = null;
-                //        var round = Helper.RoundDown(p, TimeSpan.FromSeconds(sec.Key));
-                //        if (!periodBarIndexes.ContainsKey(sec.Key))
-                //        {
-                //            periodBarIndexes[sec.Key] = periodBars[sec.Key].FindIndex(i => i.Date == round);
-                //        }
-                //        period = periodBars.ContainsKey(sec.Key) ? periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]) : null;
-                //        if (period == null || period.Date != round)
-                //        {
-                //            Algo.Log($"Error loading period for {round}", LogLevel.Error, p);
-                //            periodBarsLoaded = false;
-                //        }
-                //        else
-                //        {
-                //            Algo.PushNewBar(Algo.Symbol, sec.Value, period);
-                //            periodBarIndexes[sec.Key] = periodBarIndexes[sec.Key] + 1;
-                //            periodBarsLoaded = true;
-                //        }
-                //    }
-                //}
-
-
-
+                Algo.SetTime(p);
+                Algo.SetBarCurrentValues();
+                var time = Algo.Now;
+                Algo.RunSignals(time);
+                Algo.CheckDelayedOrders(time);
+                if (Algo.UsePerformanceMonitor) Algo.Watch.CheckMonitor();
+                Algo.simulationCount++;
             }
-
-
-
             bl.Join();
-
-
         }
 
 

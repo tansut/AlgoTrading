@@ -11,14 +11,18 @@ Renamed Types:
 	[Kalitte.Trading]Kalitte.Trading.Backtest/BarLoaderParams::set_T1[1]( [mscorlib]System.DateTime ) -> A
 	[Kalitte.Trading]Kalitte.Trading.Backtest/BarLoaderParams::get_T2[0]( ) -> a
 	[Kalitte.Trading]Kalitte.Trading.Backtest/BarLoaderParams::set_T2[1]( [mscorlib]System.DateTime ) -> a
+	[Kalitte.Trading]Kalitte.Trading.Backtest/BarLoaderParams::get_Break[0]( ) -> B
+	[Kalitte.Trading]Kalitte.Trading.Backtest/BarLoaderParams::set_Break[1]( [mscorlib]System.Boolean ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.Backtest/BarLoaderParams::.ctor[0]( ) skipped:  special name
 
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.Backtest/BarLoaderParams::<T1>k__BackingField -> A
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.Backtest/BarLoaderParams::<T2>k__BackingField -> a
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Backtest/BarLoaderParams::<Break>k__BackingField -> A
 
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.Backtest/BarLoaderParams::T1 -> dropped
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.Backtest/BarLoaderParams::T2 -> dropped
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Backtest/BarLoaderParams::Break -> dropped
 }
 
 [Kalitte.Trading]Kalitte.Trading.Backtest/<>c -> [Kalitte.Trading]Kalitte.Trading.Backtest/a

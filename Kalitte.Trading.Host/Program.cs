@@ -21,7 +21,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
+        settings.Start = new DateTime(2022, 3, 16);
         settings.Finish = new DateTime(2022, 3, 16);
         settings.AutoClosePositions = true;
 

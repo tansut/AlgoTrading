@@ -98,13 +98,9 @@ namespace Kalitte.Trading
 
             for (var p = t1; p <= t2; p = p.AddSeconds(1))
             {
-
                 if (periodBarsLoaded)
                 {
                     if (p > DateTime.Now) break;
-                    //if (p < Algo.TestStart) continue;
-                    //if (p > Algo.TestFinish) break;
-
                     Algo.SetTime(p);
                     Algo.SetBarCurrentValues();
                     var time = Algo.Now;

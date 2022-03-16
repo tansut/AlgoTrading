@@ -284,6 +284,7 @@ namespace Kalitte.Trading
 
         public void Push(T item)
         {
+            ListEventArgs<T> evtRemove = null, evtAdd = null;
             rvl.AcquireWriterLock(timeOut);
             try
             {
@@ -291,18 +292,20 @@ namespace Kalitte.Trading
                 {
                     var existing = items[0];
                     items.RemoveAt(0);
-                    if (ListEvent != null) ListEvent(this, new ListEventArgs<T>() { Action = ListAction.ItemRemoved, Item = existing });
+                    evtRemove = new ListEventArgs<T>() { Action = ListAction.ItemRemoved, Item = existing };
                 }
                 items.Add(item);
-                if (ListEvent != null)
-                {
-                    ListEvent(this, new ListEventArgs<T>() { Action = ListAction.ItemAdded, Item = item });
-                }
-
+                evtAdd = new ListEventArgs<T>() { Action = ListAction.ItemAdded, Item = item };              
             }
             finally
             {
                 rvl.ReleaseWriterLock();
+            }
+
+            if (ListEvent != null)
+            {
+                if (evtRemove != null) ListEvent(this, evtRemove);
+                if (evtAdd != null) ListEvent(this, evtAdd);
             }
         }
 

@@ -66,7 +66,12 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(0)]
         public decimal RsiProfitStart { get; set; }
         [AlgoParam(0)]
-        public decimal RsiProfitPriceStep { get; set; }       
+        public decimal RsiProfitPriceStep { get; set; }
+
+        [AlgoParam(false)]
+        public bool RsiProfitDisableLimitingSignalsOnStart { get; set; }
+
+        
 
         // global profit
         [AlgoParam(0)]
@@ -274,6 +279,7 @@ namespace Kalitte.Trading.Algos
                 this.rsiProfitSignal.PriceChange = RsiProfitStart == 0 ? ProfitStart : RsiProfitStart;
                 this.rsiProfitSignal.PriceStep = RsiProfitPriceStep == 0 ? ProfitPriceStep: RsiProfitPriceStep;
                 this.rsiProfitSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
+                this.rsiProfitSignal.DisableLimitingSignalsOnStart = RsiProfitDisableLimitingSignalsOnStart;
                 this.Signals.Add(rsiProfitSignal);
             }
 
@@ -409,7 +415,10 @@ namespace Kalitte.Trading.Algos
 
         public override void Decide(Signal signal, SignalEventArgs data)
         {
-            Log($"About to process signal as {data.Result} from {data.Result.Signal.Name}", LogLevel.Verbose);           
+            if (data.Result.SignalTime.Second % 30 == 0 && !Simulation)
+            {
+                Log($"Process [{data.Result.Signal.Name}] using {data.Result} from ", LogLevel.Debug);
+            }
             if (!WaitForOrder("Decide")) return;
             
             var result = data.Result;
@@ -442,7 +451,7 @@ namespace Kalitte.Trading.Algos
             var rsiOrders = portfolio.GetLastPositionOrders(typeof(GradientSignal));
             var lastOrderIsLoss = portfolio.LastOrderIsLoss; 
             if (lastOrderIsLoss && rsiOrders.Count > 0) return;
-            var keepPosition = delta == 0 ? rsiOrders.Count > 0 : rsiOrders.Count > 1;
+            var keepPosition =  delta == 0 ? rsiOrders.Count > 0 : rsiOrders.Count > 1;
 
             Log($"HandleRsiLimit: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition} {signalResult.Gradient.UsedValue}", LogLevel.Verbose);
 
@@ -532,9 +541,12 @@ namespace Kalitte.Trading.Algos
             {
                 Signals.Where(p => p is ProfitLossSignal).Select(p => (ProfitLossSignal)p).ToList().ForEach(p => p.ResetOrders());
             }
-            if (portfolio.IsEmpty)
+            if (portfolio.IsEmpty)  
             {
-                Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
+                if (portfolio.LastOrderIsLoss && portfolio.IsLastPositionOrderInstanceOf(typeof(GradientSignal))) {
+                    Log($"Skipping cross reset since last order is position close by loss/rsi", LogLevel.Debug);
+                }
+                else Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
             }
             base.CompletedOrder(order);
         }

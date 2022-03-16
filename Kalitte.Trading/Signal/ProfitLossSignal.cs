@@ -107,6 +107,7 @@ namespace Kalitte.Trading
         public virtual decimal InitialQuantity { get; set; }
         public virtual decimal KeepQuantity { get; set; }
         public bool UsePriceMonitor { get; set; } = true;
+        public bool DisableLimitingSignalsOnStart { get; set; } = false;
         public PriceMonitor PriceMonitor { get; protected set; }
         public Fibonacci FibonacciLevels { get; set; } = null;
         public abstract ProfitOrLoss SignalType { get;  }
@@ -189,13 +190,13 @@ namespace Kalitte.Trading
         {
             if (this.LimitingSignalTypes.Any())
             {
-                var valid = portfolio.CompletedOrders.Count == 0 || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignalTypes.ToArray());
+                var valid = (portfolio.CompletedOrders.Count == 0 && !DisableLimitingSignalsOnStart) || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignalTypes.ToArray());
                 if (!valid) return null;
             }
 
             if (this.LimitingSignals.Any())
             {
-                var valid = portfolio.CompletedOrders.Count == 0 || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignals.ToArray());
+                var valid = (portfolio.CompletedOrders.Count == 0 && !DisableLimitingSignalsOnStart) || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignals.ToArray());
                 if (!valid) return null;
             }
 

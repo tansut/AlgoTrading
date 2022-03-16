@@ -279,7 +279,7 @@ namespace Kalitte.Trading
         protected virtual void InputbarsChanged(object sender, ListEventArgs<IQuote> e)
         {
             Log($"Loading new bars for {this.Name} Data: {e.Action}, {e.Item}", LogLevel.Verbose);
-            Monitor.Enter(OperationLock);
+            //Monitor.Enter(OperationLock);
             try
             {
                 LoadNewBars(sender, e);
@@ -287,7 +287,7 @@ namespace Kalitte.Trading
             }
             finally
             {
-                Monitor.Exit(OperationLock);
+                //Monitor.Exit(OperationLock);
             }
         }
 

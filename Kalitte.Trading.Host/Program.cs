@@ -29,8 +29,8 @@ public class Program
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("CrossOrderQuantity", 8);
-        alternates.Set("RsiTrendOrderQuantity", 8);
+        alternates.Set("CrossOrderQuantity", 9);
+        alternates.Set("RsiTrendOrderQuantity", 9);
         alternates.Set("DataCollectSize", 8);
         alternates.Set("DataAnalysisSize", 80);
         alternates.Set("DataCollectUseSma", false);
@@ -39,16 +39,16 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 4);
-        alternates.Set("ProfitKeepQuantity", 2);
-        alternates.Set("ProfitQuantityStep", 2);
+        alternates.Set("ProfitInitialQuantity", 5, 6, 4);
+        alternates.Set("ProfitKeepQuantity", 2, 1);
+        alternates.Set("ProfitQuantityStep", 2,1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
-        alternates.Set("ProfitStart", 10);        
-        alternates.Set("ProfitPriceStep", 2.0);
+        alternates.Set("ProfitStart", 11,10);        
+        alternates.Set("ProfitPriceStep", 3.0, 2, 4);
         alternates.Set("ProfitUseMonitor", false);
 
         // rsiTrendProfit
-        alternates.Set("RsiProfitInitialQuantity", 5);
+        alternates.Set("RsiProfitInitialQuantity", 0);
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitStart", 12);
         alternates.Set("RsiProfitPriceStep", 4.0);

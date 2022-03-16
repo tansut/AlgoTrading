@@ -425,6 +425,8 @@ Renamed Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass225_0::.ctor[0]( ) skipped:  special name
 
 	Kalitte.Trading.Algos.Bist30 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30 Kalitte.Trading.Algos.Bist30/<>c__DisplayClass225_0::<>4__this -> A
+	System.Nullable`1<System.DateTime> [Kalitte.Trading]System.Nullable`1<System.DateTime> Kalitte.Trading.Algos.Bist30/<>c__DisplayClass225_0::trackStart -> A
+	System.Nullable`1<System.DateTime> [Kalitte.Trading]System.Nullable`1<System.DateTime> Kalitte.Trading.Algos.Bist30/<>c__DisplayClass225_0::trackFinish -> a
 	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.Algos.Bist30/<>c__DisplayClass225_0::fib -> A
 }
 

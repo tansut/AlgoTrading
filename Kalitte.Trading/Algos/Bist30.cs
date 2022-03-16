@@ -166,6 +166,7 @@ namespace Kalitte.Trading.Algos
         public void InitSignals()
         {
             var periodData = GetSymbolData(this.Symbol, this.SymbolPeriod);
+
             powerSignal.Indicator = new Rsi(periodData.Periods, PowerLookback, CandlePart.Volume);
 
             if (maSignal != null)
@@ -173,8 +174,9 @@ namespace Kalitte.Trading.Algos
                 maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
                 maSignal.i2k = new Custom((q) => 0, periodData.Periods);
                 maSignal.PowerSignal = powerSignal;
-                //maSignal.TrackStart = new DateTime(2022, 03, 16, 9, 08, 0);
-                //maSignal.TrackEnd = new DateTime(2022, 03, 16, 12, 15, 50);
+
+                //maSignal.TrackStart = trackStart ?? maSignal.TrackStart;
+                //maSignal.TrackEnd = trackFinish?? maSignal.TrackEnd
             }
 
             if (macSignal != null)
@@ -185,11 +187,6 @@ namespace Kalitte.Trading.Algos
             }
 
             var rsi = new Rsi(periodData.Periods, Rsi);
-
-            //if (rsiTrendSignal != null)
-            //{
-            //    rsiTrendSignal.i1k = rsi;
-            //}
 
             rsiValue.i1k = rsi;
 
@@ -225,6 +222,9 @@ namespace Kalitte.Trading.Algos
 
         public void CreateSignals()
         {
+            //DateTime? trackStart = new DateTime(2022, 03, 15, 9, 30, 0);
+            //DateTime? trackFinish = new DateTime(2022, 03, 15, 18, 15, 0);
+
             this.powerSignal = new PowerSignal("power", Symbol, this);
             this.Signals.Add(this.powerSignal);
 
@@ -303,14 +303,6 @@ namespace Kalitte.Trading.Algos
                 this.Signals.Add(lossSignal);
             }
 
-            if (!SimulateOrderSignal)
-            {
-                //rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : new decimal?(), RsiHighLimit == 0 ? new decimal() : new decimal?()) { };
-                //rsiTrendSignal.SignalSensitivity = RsiTrendSensitivity;
-                //this.Signals.Add(rsiTrendSignal);
-            }
-
-
             closePositionsSignal = new ClosePositionsSignal("daily-close", Symbol, this, ClosePositionsDaily);
             if (ClosePositionsDaily) Signals.Add(closePositionsSignal);
 
@@ -333,6 +325,8 @@ namespace Kalitte.Trading.Algos
                     analyser.AnalyseSize = Convert.ToInt32(DataAnalysisSize);
                     analyser.CollectAverage = DataCollectUseSma ? Average.Sma : Average.Ema;
                     analyser.AnalyseAverage = DataAnalysisUseSma ? Average.Sma : Average.Ema;
+                    analyser.TrackStart = trackStart ?? analyser.TrackStart;
+                    analyser.TrackEnd = trackFinish ?? analyser.TrackEnd;
                 }
 
                 if (profit != null)

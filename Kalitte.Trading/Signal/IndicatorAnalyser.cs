@@ -24,19 +24,25 @@ namespace Kalitte.Trading
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
-            var result = new SignalResult(this, t ?? Algo.Now);
+            var time = t ?? Algo.Now;
+            var result = new SignalResult(this, time );
 
             var mp = Algo.GetMarketPrice(Symbol, t);
 
             if (mp > 0) CollectList.Collect(mp);
 
-            if (CollectList.Ready && mp >= 0)
+            if (CollectList.Ready && mp > 0)
             {
                 decimal mpAverage = CollectList.LastValue;
 
                 var l1 = i1k.NextValue(mpAverage).Value.Value;
 
                 AnalyseList.Collect(l1);
+            }
+            if (mp > 0)
+            {
+                TrackAnalyseList(time);
+                TrackCollectList(time, mp);
             }
 
             return result;

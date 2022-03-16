@@ -77,7 +77,7 @@ namespace Kalitte.Trading
                 Graphics g = Graphics.FromImage(bm);
                 myPane.AxisChange(g);
                 Image im = myPane.GetImage();
-                im.Save($"c:\\kalitte\\{this.Name}-collect-{TrackStart.ToString("HH-mm-ss")}-{TrackEnd.ToString("HH-mm-ss")}.png", ImageFormat.Png);
+                im.Save(Path.Combine(Algo.LogDir, $"{this.Name}-collect-{TrackStart.ToString("HH-mm-ss")}-{TrackEnd.ToString("HH-mm-ss")}.png"), ImageFormat.Png);
                 collectedValues.Clear();
                 collectRawValues.Clear();
             }
@@ -105,7 +105,7 @@ namespace Kalitte.Trading
                 Graphics g = Graphics.FromImage(bm);
                 myPane.AxisChange(g);
                 Image im = myPane.GetImage();
-                im.Save($"c:\\kalitte\\{this.Name}-al-{TrackStart.ToString("HH-mm-ss")}-{TrackEnd.ToString("HH-mm-ss")}.png", ImageFormat.Png);
+                im.Save(Path.Combine(Algo.LogDir, $"{this.Name}-al-{TrackStart.ToString("HH-mm-ss")}-{TrackEnd.ToString("HH-mm-ss")}.png"), ImageFormat.Png);
                 analyseValues.Clear();
             }
         }

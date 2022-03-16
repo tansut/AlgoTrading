@@ -292,9 +292,9 @@ namespace Kalitte.Trading
                 Log($"Report: lc:{lastCross}, cs:{CollectList.Count}, as:{AnalyseList.Count}, asz:{AnalyseList.List.QueSize} {result}", LogLevel.Verbose, time);
             }
 
-            if (result.finalResult.HasValue)
+            if (mp > 0)
             {
-                if (mp > 0) TrackCollectList(time, mp);
+                TrackCollectList(time, mp);
                 TrackAnalyseList(time);
             }
 

@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 15);
-        settings.Finish = new DateTime(2022, 3, 15);
+        settings.Start = new DateTime(2022, 3, 16);
+        settings.Finish = new DateTime(2022, 3, 16);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));

@@ -173,8 +173,8 @@ namespace Kalitte.Trading.Algos
                 maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
                 maSignal.i2k = new Custom((q) => 0, periodData.Periods);
                 maSignal.PowerSignal = powerSignal;
-                maSignal.TrackStart = new DateTime(2022, 03, 15, 11, 08, 0);
-                maSignal.TrackEnd = new DateTime(2022, 03, 15, 11, 15, 50);
+                //maSignal.TrackStart = new DateTime(2022, 03, 16, 9, 08, 0);
+                //maSignal.TrackEnd = new DateTime(2022, 03, 16, 12, 15, 50);
             }
 
             if (macSignal != null)

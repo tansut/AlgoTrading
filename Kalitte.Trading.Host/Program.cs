@@ -22,7 +22,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 3, 15);
+        settings.Finish = new DateTime(2022, 3, 16);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
@@ -94,7 +94,7 @@ public class Program
         alternates.Set("PowerCrossPositiveMultiplier", 2.8);
 
         // general
-        alternates.Set("ClosePositionsDaily", false);     
+        alternates.Set("ClosePositionsDaily", true);     
         
         alternates.Set("RsiGradientTolerance", 0.015);
         alternates.Set("RsiGradientLearnRate", 0.005);

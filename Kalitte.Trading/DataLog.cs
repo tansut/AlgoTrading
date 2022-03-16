@@ -129,7 +129,13 @@ namespace Kalitte.Trading
                     {
                         var key = parts[0];
                         parts.RemoveAt(0);
-                        content.Add(key, parts.Select(p => decimal.Parse(p, CultureInfo.InvariantCulture)).ToArray());
+                        try
+                        {
+                            content.Add(key, parts.Select(p => decimal.Parse(p, CultureInfo.InvariantCulture)).ToArray());
+                        }
+                        catch (ArgumentException)
+                        {
+                        }
                     }
                     catch (ArgumentException ex)
                     {

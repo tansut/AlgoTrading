@@ -256,8 +256,8 @@ namespace Kalitte.Trading
 
             if (mp > 0) CollectList.Collect(mp);
 
-            if (CollectList.Ready && mp >= 0)
-            {
+            if (CollectList.Ready && mp > 0)
+            {                
                 mpAverage = CollectList.LastValue;
                 result.AveragePrice = mpAverage;
 
@@ -290,6 +290,12 @@ namespace Kalitte.Trading
             if (time.Second % 10 == 0)
             {
                 Log($"Report: lc:{lastCross}, cs:{CollectList.Count}, as:{AnalyseList.Count}, asz:{AnalyseList.List.QueSize} {result}", LogLevel.Verbose, time);
+            }
+
+            if (result.finalResult.HasValue)
+            {
+                if (mp > 0) TrackCollectList(time, mp);
+                TrackAnalyseList(time);
             }
 
             return result;

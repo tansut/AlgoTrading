@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kalitte.Trading
@@ -54,7 +55,7 @@ namespace Kalitte.Trading
             Algo = algo;
             algo.TestStart = start;
             algo.TestFinish = end;
-            Algo.Simulation = true;            
+            Algo.Simulation = true;
             Algo.UseVirtualOrders = true;
             this.RelatedTest = related;
             AutoClosePositions = false;
@@ -67,6 +68,12 @@ namespace Kalitte.Trading
         private Dictionary<int, BarPeriod> secDict;
         private List<BarPeriod> secondsToStop;
         private Dictionary<int, FinanceBars> periodBars;
+
+        class BarLoaderParams
+        {
+            public DateTime T1 { get; set; }
+            public DateTime T2 { get; set; }
+        }
 
         void createParameters()
         {
@@ -90,11 +97,92 @@ namespace Kalitte.Trading
             }
         }
 
+        private void BarLoaderThread(object data)
+        {
+            var prms = (BarLoaderParams)data;
+            var fired = new Dictionary<int, DateTime>();
+            var periodBarIndexes = new Dictionary<int, int>();
+            //DateTime existing = DateTime.MinValue;
+            while (Algo.Now < prms.T2)
+            {
+                var now = Algo.Now;
+                var elapsed = (now - prms.T1);
+                foreach (var sec in secDict)
+                {
+                    var round = Helper.RoundDown(now, TimeSpan.FromSeconds(sec.Key));
+                    //var found = fired.TryGetValue(sec.Key, out DateTime existing);
+                    //if (found && existing == round) continue;
+                    if (elapsed.TotalSeconds % sec.Key >= sec.Key - 1)
+                    {
+                        fired[sec.Key] = round;
+                        IQuote period = null;
+                        
+                        if (!periodBarIndexes.ContainsKey(sec.Key))
+                        {
+                            periodBarIndexes[sec.Key] = periodBars[sec.Key].FindIndex(i => i.Date == round);
+                        }
+                        period = periodBars.ContainsKey(sec.Key) ? periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]) : null;
+                        if (period == null )
+                        {
+                            Algo.Log($"Error loading period for {round}", LogLevel.Error, now);
+                            //periodBarsLoaded = false;
+                        }
+                        else if (period.Date != round)
+                        {
+                            //Algo.Log($"Skipping period for {round}", LogLevel.Error, now);
+                        }
+                        else
+                        {
+                            Algo.PushNewBar(Algo.Symbol, sec.Value, period);
+                            //Console.WriteLine($"** thread push {sec.Value}-{period}");
+                            //var timeOut = new RandomGenerator().Next(1, 2);
+                            //var iterations = 0;
+                            //while (true)
+                            //{
+                            //    if (iterations++ > 100 || Algo.Now - now >= TimeSpan.FromSeconds(timeOut))
+                            //    {
+                            //        Algo.PushNewBar(Algo.Symbol, sec.Value, period);
+                            //        break;
+                            //    }
+                            //    Thread.Sleep(1);
+                            //}
+                            periodBarIndexes[sec.Key] = periodBarIndexes[sec.Key] + 1;
+                            //periodBarsLoaded = true;
+                        }
+                    }
+                }
+
+            }
+
+            foreach (var sec in secDict)
+            {
+                var round = Helper.RoundUp(prms.T2, TimeSpan.FromSeconds(sec.Key));
+                var roundDown = Helper.RoundDown(prms.T2, TimeSpan.FromSeconds(sec.Key));
+                if (round != prms.T2)
+                {
+                    var period = periodBars.ContainsKey(sec.Key) && periodBarIndexes.ContainsKey(sec.Key) ? periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]) : null;
+                    if (period == null || period.Date != roundDown)
+                    {
+                        Algo.Log($"Error loading period for {round}", LogLevel.Error, round);
+                    }
+                    else
+                    {
+                        Algo.PushNewBar(Algo.Symbol, sec.Value, period);
+                    }
+                }
+            }
+        }
+
         public void Run(DateTime t1, DateTime t2)
         {
             var periodBarIndexes = new Dictionary<int, int>();
             var seconds = 0;
             var periodBarsLoaded = true;
+            Algo.SetTime(t1);
+
+            var bl = new Thread(new ParameterizedThreadStart(BarLoaderThread));
+            var barsStarted = false;
+            bl.Start(new BarLoaderParams() { T1 = t1, T2 = t2 });
 
             for (var p = t1; p <= t2; p = p.AddSeconds(1))
             {
@@ -110,54 +198,52 @@ namespace Kalitte.Trading
                     Algo.simulationCount++;
                 }
 
+
+
+
                 seconds++;
 
-                foreach (var sec in secDict)
+                if (!barsStarted && seconds > 1)
                 {
-                    if (seconds % sec.Key == 0)
-                    {
-                        IQuote period = null;
-                        var round = Helper.RoundDown(p, TimeSpan.FromSeconds(sec.Key));
-                        if (!periodBarIndexes.ContainsKey(sec.Key))
-                        {
-                            periodBarIndexes[sec.Key] = periodBars[sec.Key].FindIndex(i => i.Date == round);
-                        }
-                        period = periodBars.ContainsKey(sec.Key) ? periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]): null;
-                        if (period == null || period.Date != round)
-                        {
-                            Algo.Log($"Error loading period for {round}", LogLevel.Error, p);
-                            periodBarsLoaded = false;
-                        }
-                        else
-                        {
-                            Algo.PushNewBar(Algo.Symbol, sec.Value, period);
-                            periodBarIndexes[sec.Key] = periodBarIndexes[sec.Key] + 1;
-                            periodBarsLoaded = true;
-                        }
-                    }
+                    //bl.Start(new BarLoaderParams() { T1 = p, T2 = t2 });
+                    barsStarted = true;
                 }
 
-                
+
+                //foreach (var sec in secDict)
+                //{
+                //    if (seconds % sec.Key == 0)
+                //    {
+                //        IQuote period = null;
+                //        var round = Helper.RoundDown(p, TimeSpan.FromSeconds(sec.Key));
+                //        if (!periodBarIndexes.ContainsKey(sec.Key))
+                //        {
+                //            periodBarIndexes[sec.Key] = periodBars[sec.Key].FindIndex(i => i.Date == round);
+                //        }
+                //        period = periodBars.ContainsKey(sec.Key) ? periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]) : null;
+                //        if (period == null || period.Date != round)
+                //        {
+                //            Algo.Log($"Error loading period for {round}", LogLevel.Error, p);
+                //            periodBarsLoaded = false;
+                //        }
+                //        else
+                //        {
+                //            Algo.PushNewBar(Algo.Symbol, sec.Value, period);
+                //            periodBarIndexes[sec.Key] = periodBarIndexes[sec.Key] + 1;
+                //            periodBarsLoaded = true;
+                //        }
+                //    }
+                //}
+
+
 
             }
 
-            foreach (var sec in secDict)
-            {
-                var round = Helper.RoundUp(t2, TimeSpan.FromSeconds(sec.Key));
-                var roundDown = Helper.RoundDown(t2, TimeSpan.FromSeconds(sec.Key));
-                if (round != t2)
-                {
-                    var period = periodBars.ContainsKey(sec.Key) && periodBarIndexes.ContainsKey(sec.Key) ? periodBars[sec.Key].GetItem(periodBarIndexes[sec.Key]): null;
-                    if (period == null || period.Date != roundDown)
-                    {
-                        Algo.Log($"Error loading period for {round}", LogLevel.Error, round);
-                    }
-                    else
-                    {
-                        Algo.PushNewBar(Algo.Symbol, sec.Value, period);
-                    }
-                }
-            }
+
+
+            bl.Join();
+
+
         }
 
 
@@ -223,7 +309,7 @@ namespace Kalitte.Trading
             this.FileName = $"c:\\kalitte\\log\\simulation\\results\\br-{Settings.Start.ToString("yyyy-MM-dd")}-{Settings.Finish.ToString("yyyy-MM-dd")}-{(random.Next(1000000, 9999999))}.tsv";
         }
 
-        private Backtest run(Dictionary<string, object> init, int index, int total, string [] configs, Backtest related = null)
+        private Backtest run(Dictionary<string, object> init, int index, int total, string[] configs, Backtest related = null)
         {
             //var appDomain = AppDomain.CreateDomain("noname");
             //var typeName = typeof(T).FullName;
@@ -254,7 +340,7 @@ namespace Kalitte.Trading
 
         }
 
-        public void Start( )
+        public void Start()
         {
             var alternates = Settings.Alternates;
             Console.WriteLine("Generating test cases ...");
@@ -281,18 +367,18 @@ namespace Kalitte.Trading
             Parallel.For(0, cases.Count, i =>
             {
                 var initValues = cases[i];
-                run(initValues, ++completed, cases.Count, headers);    
+                run(initValues, ++completed, cases.Count, headers);
             });
             Console.WriteLine(" ** COMPLETED ** Hit to close ...");
             //Console.ReadKey();
         }
 
-        private string [] CreateHeaders(string resultFile)
+        private string[] CreateHeaders(string resultFile)
         {
             var multiple = Settings.Alternates.Where(p => p.Value.Length > 1);
-            var dictionary = multiple.Any() ? multiple.Select(p=>p.Key).ToArray() : AlgoBase.GetConfigValues(typeof(T)).Select(p=>p.Key).ToArray();
+            var dictionary = multiple.Any() ? multiple.Select(p => p.Key).ToArray() : AlgoBase.GetConfigValues(typeof(T)).Select(p => p.Key).ToArray();
             var sb = new StringBuilder();
-            
+
             //F_XU0300222: long/ 1 / Cost: 2250.75 Total: 2250.75 PL: -32.25 Commission: 39.15 NetPL: -71.40
             sb.Append("Pos\tQuantity\tCost\tTotal\tPL\tCommission\tNetPL\tOrdertotal\tLog\t");
             foreach (var key in dictionary) sb.Append(key + "\t");

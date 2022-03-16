@@ -54,8 +54,9 @@ namespace Kalitte.Trading.Algos
 
         [AlgoParam(2)]
         public decimal RsiTrendThreshold { get; set; }
-        [AlgoParam(3)]
-        public decimal RsiTrendSensitivity { get; set; }
+
+        [AlgoParam(1)]
+        public decimal RsiValueSignalSensitivity { get; set; }
 
 
         // rsi profit
@@ -69,7 +70,7 @@ namespace Kalitte.Trading.Algos
         public decimal RsiProfitPriceStep { get; set; }
 
         [AlgoParam(false)]
-        public bool RsiProfitDisableLimitingSignalsOnStart { get; set; }
+        public bool RsiProfitEnableLimitingSignalsOnStart { get; set; }
 
         
 
@@ -154,8 +155,8 @@ namespace Kalitte.Trading.Algos
         LossSignal lossSignal = null;
         ProfitSignal rsiProfitSignal = null;
 
-        TrendSignal rsiTrendSignal = null;
-        
+        //TrendSignal rsiTrendSignal = null;
+        IndicatorAnalyser rsiValue = null;
         PowerSignal powerSignal = null;
         ClosePositionsSignal closePositionsSignal = null;
         GradientSignal rsiHigh;
@@ -172,6 +173,8 @@ namespace Kalitte.Trading.Algos
                 maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, MACDTrigger);
                 maSignal.i2k = new Custom((q) => 0, periodData.Periods);
                 maSignal.PowerSignal = powerSignal;
+                maSignal.TrackStart = new DateTime(2022, 03, 15, 11, 08, 0);
+                maSignal.TrackEnd = new DateTime(2022, 03, 15, 11, 15, 50);
             }
 
             if (macSignal != null)
@@ -183,10 +186,12 @@ namespace Kalitte.Trading.Algos
 
             var rsi = new Rsi(periodData.Periods, Rsi);
 
-            if (rsiTrendSignal != null)
-            {
-                rsiTrendSignal.i1k = rsi;
-            }
+            //if (rsiTrendSignal != null)
+            //{
+            //    rsiTrendSignal.i1k = rsi;
+            //}
+
+            rsiValue.i1k = rsi;
 
             if (rsiLow != null) rsiLow.Indicator = rsi;
             if (rsiHigh != null) rsiHigh.Indicator = rsi;
@@ -222,6 +227,12 @@ namespace Kalitte.Trading.Algos
         {
             this.powerSignal = new PowerSignal("power", Symbol, this);
             this.Signals.Add(this.powerSignal);
+
+            this.rsiValue = new IndicatorAnalyser("rsi", Symbol, this);
+            rsiValue.SignalSensitivity = RsiValueSignalSensitivity;
+            this.Signals.Add(this.rsiValue);
+
+
             if (RsiTrendOrderQuantity > 0)
             {
                 var rsiColSize = Convert.ToInt32(DataCollectSize);
@@ -251,13 +262,13 @@ namespace Kalitte.Trading.Algos
 
             if (MovPeriod > 0 && CrossOrderQuantity > 0 && !SimulateOrderSignal)
             {
-                this.maSignal = new CrossSignal("cross:ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MaAvgChange };
+                this.maSignal = new CrossSignal("cross-ma59", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MaAvgChange };
                 this.Signals.Add(maSignal);
             }
 
             if (MACDShortPeriod > 0 && CrossOrderQuantity > 0 && !SimulateOrderSignal)
             {
-                this.macSignal = new CrossSignal("cross:macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MacdAvgChange };
+                this.macSignal = new CrossSignal("cross-macd593", Symbol, this) { PowerCrossNegativeMultiplier = PowerCrossNegativeMultiplier, PowerCrossPositiveMultiplier = PowerCrossPositiveMultiplier, PowerCrossThreshold = PowerCrossThreshold, DynamicCross = this.DynamicCross, AvgChange = MacdAvgChange };
                 this.Signals.Add(macSignal);
             }
 
@@ -279,7 +290,7 @@ namespace Kalitte.Trading.Algos
                 this.rsiProfitSignal.PriceChange = RsiProfitStart == 0 ? ProfitStart : RsiProfitStart;
                 this.rsiProfitSignal.PriceStep = RsiProfitPriceStep == 0 ? ProfitPriceStep: RsiProfitPriceStep;
                 this.rsiProfitSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
-                this.rsiProfitSignal.DisableLimitingSignalsOnStart = RsiProfitDisableLimitingSignalsOnStart;
+                this.rsiProfitSignal.EnableLimitingSignalsOnStart = RsiProfitEnableLimitingSignalsOnStart;
                 this.Signals.Add(rsiProfitSignal);
             }
 
@@ -291,11 +302,12 @@ namespace Kalitte.Trading.Algos
                 if (rsiHigh != null) this.lossSignal.CostSignals.Add(rsiHigh);
                 this.Signals.Add(lossSignal);
             }
+
             if (!SimulateOrderSignal)
             {
-                rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : new decimal?(), RsiHighLimit == 0 ? new decimal() : new decimal?()) { };
-                rsiTrendSignal.SignalSensitivity = RsiTrendSensitivity;
-                this.Signals.Add(rsiTrendSignal);
+                //rsiTrendSignal = new TrendSignal("rsi-trend", Symbol, this, RsiLowLimit == 0 ? new decimal?() : new decimal?(), RsiHighLimit == 0 ? new decimal() : new decimal?()) { };
+                //rsiTrendSignal.SignalSensitivity = RsiTrendSensitivity;
+                //this.Signals.Add(rsiTrendSignal);
             }
 
 
@@ -365,11 +377,11 @@ namespace Kalitte.Trading.Algos
                 this.Watch.AddFilter($"{powerSignal.Name}/volume", 10);
                 this.Watch.AddFilter($"{powerSignal.Name}/VolumePerSecond", 10);
             }
-            if (rsiTrendSignal != null)
-            {
-                this.Watch.AddFilter($"{rsiTrendSignal.Name}/value", 5);
-                this.Watch.AddFilter($"{rsiTrendSignal.Name}/speed", 10);
-            }
+            //if (rsiTrendSignal != null)
+            //{
+            //    this.Watch.AddFilter($"{rsiTrendSignal.Name}/value", 5);
+            //    this.Watch.AddFilter($"{rsiTrendSignal.Name}/speed", 10);
+            //}
             base.ConfigureMonitor();
         }
 
@@ -506,19 +518,23 @@ namespace Kalitte.Trading.Algos
             if (orderQuantity > 0)
             {
                 var cross = (CrossSignal)signalResult.Signal;
-                var currentRsi = rsiTrendSignal.AnalyseList.Ready ? rsiTrendSignal.AnalyseList.LastValue : 0;
+                var currentRsi = rsiValue.GetCurrentValue(); 
 
-                if (!signalResult.MorningSignal && CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi != 0 && currentRsi > CrossRsiMax)
+                if (currentRsi.HasValue)
                 {
-                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
-                    return;
-                };
-                if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi != 0 && currentRsi < CrossRsiMin)
-                {
-                    Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
-                    return;
-                };
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, {currentRsi.ToCurrency()}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+                    if (!signalResult.MorningSignal && CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi != 0 && currentRsi > CrossRsiMax)
+                    {
+                        Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                        return;
+                    };
+                    if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi != 0 && currentRsi < CrossRsiMin)
+                    {
+                        Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                        return;
+                    };
+                }
+
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, {(currentRsi.HasValue ? currentRsi.Value.ToCurrency():0)}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
             }
         }
 

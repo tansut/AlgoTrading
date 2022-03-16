@@ -21,7 +21,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
+        settings.Start = new DateTime(2022, 3, 15);
         settings.Finish = new DateTime(2022, 3, 15);
         settings.AutoClosePositions = true;
 
@@ -52,11 +52,7 @@ public class Program
         alternates.Set("RsiProfitKeepQuantity", 1);
         alternates.Set("RsiProfitStart", 12);
         alternates.Set("RsiProfitPriceStep", 4.0);
-        alternates.Set("RsiProfitDisableLimitingSignalsOnStart", true);
-
-        
-
-
+        alternates.Set("RsiProfitEnableLimitingSignalsOnStart", false);
 
         alternates.Set("PriceLowLimit", 2200);
         alternates.Set("PriceHighLimit", 2300);                   
@@ -74,8 +70,7 @@ public class Program
         alternates.Set("RsiProfitDeltaHighLimit", 3.0);
         alternates.Set("RsiProfitDeltaLowLimit", 7.0);
         alternates.Set("Rsi", 14);
-        alternates.Set("RsiTrendSensitivity", 3M);
-        alternates.Set("RsiTrendThreshold", 0.1);
+        alternates.Set("RsiValueSignalSensitivity", 3M);        
 
         // volume power
         alternates.Set("PowerLookback", 5);

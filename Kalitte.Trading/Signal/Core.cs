@@ -196,7 +196,7 @@ namespace Kalitte.Trading
                     if (!Enabled) return null;
                     if (!EnsureUsingRightBars(time))
                     {
-                        Log($"IMPORTANT: Detected wrong bars for indicators.", LogLevel.Error, t);
+                        //Log($"IMPORTANT: Detected wrong bars for indicators.", LogLevel.Error, t);
                         return null;
                     }
 
@@ -254,6 +254,22 @@ namespace Kalitte.Trading
 
         }
 
+        public bool BarDifferenceNegligible(DateTime t, DateTime expected, DateTime existing, BarPeriod period)
+        {
+            Helper.SymbolSeconds(period.ToString(), out int seconds);
+            if (period == BarPeriod.Min10 && t.Hour == 18 && t.Minute == 15)
+                seconds = seconds / 2;
+            var rup = Helper.RoundUp(t, TimeSpan.FromSeconds(seconds));
+            var rdown = Helper.RoundDown(t, TimeSpan.FromSeconds(seconds));
+            var difference = Math.Min(Math.Abs((rup - t).TotalSeconds), Math.Abs((rup - t).TotalSeconds));
+            var tolerance = 10;
+
+            if (rup == rdown) return true;
+            if (difference < tolerance) return true;
+            return false;
+
+        }
+
         protected virtual bool EnsureUsingRightBars(DateTime t)
         {
             var result = true;
@@ -262,8 +278,14 @@ namespace Kalitte.Trading
                 var expected = Algo.GetExpectedBarPeriod(t, indicator.InputBars.Period);
                 if (expected != indicator.InputBars.Last.Date)
                 {
-                    Log($"Wrong bar: expected:{expected} using:{indicator.InputBars.Last.Date}", LogLevel.Error, t);
-                    return false;
+                    if (!BarDifferenceNegligible(t, expected, indicator.InputBars.Last.Date, indicator.InputBars.Period))
+                    {
+                        Log($"Wrong bar: now: {t} expected:{expected} using:{indicator.InputBars.Last.Date}", LogLevel.Error, t);
+                        return false;
+                    } else
+                    {
+                        Log($"Wrong bar neglegted: now: {t} expected:{expected} using:{indicator.InputBars.Last.Date}", LogLevel.Warning, t);
+                    }
                 }
             }
             return result;

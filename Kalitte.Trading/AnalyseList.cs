@@ -16,6 +16,8 @@ namespace Kalitte.Trading
 
     public class AnalyseList
     {
+
+
         public Average Average { get; set; }
         public FinanceList<IQuote> List { get; private set; }
         public CandlePart Candle { get; private set; }

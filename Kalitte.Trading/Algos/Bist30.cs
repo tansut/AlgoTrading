@@ -225,6 +225,9 @@ namespace Kalitte.Trading.Algos
             //DateTime? trackStart = new DateTime(2022, 03, 15, 9, 30, 0);
             //DateTime? trackFinish = new DateTime(2022, 03, 15, 18, 15, 0);
 
+            DateTime? trackStart = null;
+            DateTime? trackFinish = null;
+
             this.powerSignal = new PowerSignal("power", Symbol, this);
             this.Signals.Add(this.powerSignal);
 

@@ -107,8 +107,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam("F_XU0300422")]
         public string Symbol { get; set; } = "F_XU0300422";
 
-        [AlgoParam(0)]
-        public decimal ExpectedNetPl { get; set; }
 
         [AlgoParam(false)]
         public bool UsePerformanceMonitor { get; set; }
@@ -120,10 +118,6 @@ namespace Kalitte.Trading.Algos
 
         [AlgoParam(false)]
         public bool UseVirtualOrders { get; set; }
-
-        [AlgoParam(false)]
-        public bool ClosePositionsDaily { get; set; }
-
 
 
         public StringBuilder LogContent { get; set; } = new StringBuilder(1000);
@@ -744,13 +738,9 @@ namespace Kalitte.Trading.Algos
 
             var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
 
-            var saveLog = true;
-            if (Simulation && ExpectedNetPl != 0 && netPL < ExpectedNetPl)
-            {
-                saveLog = false;
-            }
-            if (Simulation && saveLog) File.AppendAllText(LogFile, LogContent.ToString());
-            if (Simulation && string.IsNullOrEmpty(SimulationFile) && saveLog) Process.Start(LogFile);
+            
+            if (Simulation) File.AppendAllText(LogFile, LogContent.ToString());
+            if (Simulation && string.IsNullOrEmpty(SimulationFile)) Process.Start(LogFile);
             if (!string.IsNullOrEmpty(SimulationFile))
             {
                 simulationFileMutext.WaitOne();

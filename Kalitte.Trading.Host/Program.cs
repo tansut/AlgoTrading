@@ -24,6 +24,7 @@ public class Program
         settings.Start = new DateTime(2022, 2, 28);
         settings.Finish = new DateTime(2022, 3, 17);
         settings.AutoClosePositions = true;
+        settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
         var alternates = settings.Alternates = new AlternateValues(initValues);

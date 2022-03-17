@@ -39,7 +39,7 @@ namespace Kalitte.Trading
         public decimal MarketPrice { get; set; }
         public bool MorningSignal { get; set; } = false;
 
-        public CrossSignalResult(Signal signal, DateTime t) : base(signal, t)
+        public CrossSignalResult(SignalBase signal, DateTime t) : base(signal, t)
         {
         }
 
@@ -49,30 +49,50 @@ namespace Kalitte.Trading
         }
     }
 
-    public class CrossSignal : AnalyserBase
+    public class CrossSignalConfig : AnalyserConfig
     {
-        public bool DynamicCross { get; set; } = false;
+        [AlgoParam(0)]
+        public decimal PowerThreshold { get; set; }
+
+        [AlgoParam(0)]
+        public decimal PowerNegativeMultiplier { get; set; }
+        
+        [AlgoParam(0)]
+        public decimal PowerPositiveMultiplier { get; set; }
+
+        [AlgoParam(true)]
+        public bool Dynamic { get; set; }
+
+        [AlgoParam(0.3)]
+        public decimal AvgChange { get; set; }
+        
+    }
+
+    public class CrossSignal : AnalyserBase<CrossSignalConfig>
+    {
+        
         public PowerSignal PowerSignal { get; set; }
-        public decimal PowerCrossThreshold { get; set; }
-        public decimal PowerCrossNegativeMultiplier { get; set; }
-        public decimal PowerCrossPositiveMultiplier { get; set; }
+
+
 
         public ITechnicalIndicator i1k;
         public ITechnicalIndicator i2k;
 
         public decimal AvgChange = 0.3M;
-        public decimal InitialAvgChange;
+        
 
         private FinanceList<decimal> crossBars;
 
 
         private decimal lastCross = 0;
+
+        public CrossSignal(string name, string symbol, AlgoBase owner, CrossSignalConfig config) : base(name, symbol, owner, config)
+        {
+        }
+
         public Sensitivity LastCalculatedSensitivity { get; set; }
 
-        public CrossSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
-        {
 
-        }
 
 
 
@@ -80,7 +100,7 @@ namespace Kalitte.Trading
         {
             crossBars.Clear();
             lastCross = 0;
-            AvgChange = InitialAvgChange;
+            AvgChange = Config.AvgChange;
             base.ResetInternal();
         }
 
@@ -101,7 +121,7 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            this.InitialAvgChange = AvgChange;
+            AvgChange = Config.AvgChange;
             crossBars = new FinanceList<decimal>(100);
             this.Indicators.Add(i1k);
             this.Indicators.Add(i2k);
@@ -116,7 +136,7 @@ namespace Kalitte.Trading
 
         protected override void AdjustSensitivityInternal(double ratio, string reason)
         {
-            AvgChange = InitialAvgChange + (InitialAvgChange * (decimal)ratio);
+            AvgChange = Config.AvgChange + (Config.AvgChange * (decimal)ratio);
             Watch("sensitivity/avgchange", AvgChange);
             base.AdjustSensitivityInternal(ratio, reason);
         }
@@ -164,7 +184,7 @@ namespace Kalitte.Trading
                 var dt = Math.Abs((dl - d).Value);
                 var da = Math.Abs(((dl + d) / 2).Value);
 
-                var max = InitialAvgChange * 1M;
+                var max = Config.AvgChange * 1M;
 
                 var powerRatio = 0M;
                 var powerNote = "";
@@ -176,8 +196,8 @@ namespace Kalitte.Trading
                     var barPower = PowerSignal.Indicator.Results.Last();
                     result.VolumeTime = instantPower != null && instantPower.Value > 0 ? DataTime.Current : DataTime.LastBar;
                     usedPower = result.VolumeTime == DataTime.Current ? instantPower.Value : barPower.Value.Value;
-                    powerRatio = (PowerCrossThreshold - usedPower) / 100;
-                    powerRatio = powerRatio > 0 ? powerRatio * PowerCrossPositiveMultiplier : powerRatio * PowerCrossNegativeMultiplier;
+                    powerRatio = (Config.PowerThreshold - usedPower) / 100;
+                    powerRatio = powerRatio > 0 ? powerRatio * Config.PowerPositiveMultiplier : powerRatio * Config.PowerNegativeMultiplier;
                     powerNote = $"bar: {barPower.Date} rsiBar: {barPower.Value} rsiInstant: {(instantPower == null ? 0 : instantPower.Value)}";
                     result.VolumePower = usedPower;
                     result.VolumeRatio = powerRatio;
@@ -198,7 +218,7 @@ namespace Kalitte.Trading
 
                 if (Algo.IsMorningStart() && lastCross != 0)
                 {
-                    var difRatio =  (double)(Math.Abs(lastCross) / InitialAvgChange);
+                    var difRatio =  (double)(Math.Abs(lastCross) / Config.AvgChange);
                     if (difRatio > 2.0)
                     {
                         average = -(decimal)(1 / (1 + Math.Pow(Math.E, -(1*difRatio))));
@@ -244,7 +264,7 @@ namespace Kalitte.Trading
             result.MorningSignal = Algo.IsMorningStart(time);
             if (result.MorningSignal) FillMorningCross(time);
 
-            if (DynamicCross)
+            if (Config.Dynamic)
             {
                 var sensitivity = CalculateSensitivity();
                 applySensitivity(sensitivity);

@@ -49,7 +49,7 @@ namespace Kalitte.Trading
         //public double Strenght { get; internal set; }
         public decimal LastVolume { get; internal set; }
 
-        public PowerSignalResult(Signal signal, DateTime t) : base(signal, t)
+        public PowerSignalResult(SignalBase signal, DateTime t) : base(signal, t)
         {
             this.finalResult = BuySell.Sell;
         }
@@ -66,7 +66,12 @@ namespace Kalitte.Trading
 
     }
 
-    public class PowerSignal : AnalyserBase
+    public class PowerSignalConfig: AnalyserConfig
+    {
+
+    }
+
+    public class PowerSignal : AnalyserBase<PowerSignalConfig>
     {
         public ITechnicalIndicator Indicator { get; set; }
 
@@ -78,13 +83,10 @@ namespace Kalitte.Trading
             base.Init();
         }
 
-        protected override void LoadNewBars(object sender, ListEventArgs<Skender.Stock.Indicators.IQuote> e)
-        {
-
-        }
 
 
-        public PowerSignal(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
+
+        public PowerSignal(string name, string symbol, AlgoBase owner, PowerSignalConfig config) : base(name, symbol, owner, config)
         {
 
         }

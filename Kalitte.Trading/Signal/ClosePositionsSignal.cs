@@ -13,7 +13,7 @@ using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
-    public class ClosePositionsSignal : Signal
+    public class ClosePositionsSignal : SignalBase
     {
         public bool AutoClose { get; set; }        
 

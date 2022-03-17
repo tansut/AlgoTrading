@@ -96,7 +96,7 @@ namespace Kalitte.Trading
         public decimal MarketPrice { get; set; }
 
 
-        public TrendSignalResult(Signal signal, DateTime t) : base(signal, t)
+        public TrendSignalResult(SignalBase signal, DateTime t) : base(signal, t)
         {
         }
 
@@ -113,7 +113,12 @@ namespace Kalitte.Trading
         }
     }
 
-    public class TrendSignal : AnalyserBase
+    public class TrendSignalConfig : AnalyserConfig
+    {
+
+    }
+
+    public class TrendSignal : AnalyserBase<TrendSignalConfig>
     {
         public ITechnicalIndicator i1k;
         public decimal? Min { get; set; }
@@ -125,7 +130,7 @@ namespace Kalitte.Trading
         public ResetList HowToReset { get; set; } = ResetList.None;
 
 
-        public TrendSignal(string name, string symbol, AlgoBase owner, decimal? min = null, decimal? max  = null) : base(name, symbol, owner)
+        public TrendSignal(string name, string symbol, AlgoBase owner, TrendSignalConfig config, decimal? min = null, decimal? max  = null) : base(name, symbol, owner, config)
         {
             Min = min;
             Max = max;

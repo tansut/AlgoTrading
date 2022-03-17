@@ -43,12 +43,25 @@ namespace Kalitte.Trading
     public class AlgoParam : Attribute
     {
         public object Value { get; set; } = null;
-        public AlgoParam(object val)
+        public string Name { get; set; } = null;
+        public AlgoParam(object val, string name = null)
         {
             this.Value = val;
-  
+            this.Name = name;
+ 
         }
     }
+
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class ConfigParam : Attribute
+    {
+        public string Prefix { get; set; } = null;
+        public ConfigParam(string perfix)
+        {
+            this.Prefix = perfix;
+        }
+    }
+
 
     public enum DataTime
     {

@@ -198,7 +198,7 @@ namespace Kalitte.Trading
 
 
 
-        public bool IsLastPositionOrderInstanceOf(params Signal[] signals)
+        public bool IsLastPositionOrderInstanceOf(params SignalBase[] signals)
         {
             var last = this.LastPositionOrder;
             if (last == null) return false;
@@ -214,7 +214,7 @@ namespace Kalitte.Trading
             get
             {
                 var lastOrder = CompletedOrders.LastOrDefault();
-                return lastOrder != null && lastOrder.SignalResult.Signal is ProfitLossSignal && ((ProfitLossSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Loss;
+                return lastOrder != null && lastOrder.SignalResult.Signal is PLSignal && ((PLSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Loss;
             }
         }
 
@@ -223,7 +223,7 @@ namespace Kalitte.Trading
             get
             {
                 var lastOrder = CompletedOrders.LastOrDefault();
-                return lastOrder != null && lastOrder.SignalResult.Signal is ProfitLossSignal && ((ProfitLossSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Profit;
+                return lastOrder != null && lastOrder.SignalResult.Signal is PLSignal && ((PLSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Profit;
             }
         }
 
@@ -237,7 +237,7 @@ namespace Kalitte.Trading
             return null;
         }
 
-        public ExchangeOrder GetLastPositionOrder(params Signal[] signals)
+        public ExchangeOrder GetLastPositionOrder(params SignalBase[] signals)
         {
             var last = this.LastPositionOrder;
             foreach (var signal in signals)
@@ -247,7 +247,7 @@ namespace Kalitte.Trading
             return null;
         }
 
-        public AverageCostResult LastAverageCost(params Signal[] signals)
+        public AverageCostResult LastAverageCost(params SignalBase[] signals)
         {
             var res = new AverageCostResult();
             res.Orders = GetLastPositionOrders(signals);
@@ -257,7 +257,7 @@ namespace Kalitte.Trading
         public List<ExchangeOrder> GetLastPositionOrders(params Type[] types)
         {
             var result = new List<ExchangeOrder>();
-            var skipType = typeof(ProfitLossSignal);
+            var skipType = typeof(PLSignal);
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
                 var type = CompletedOrders[i].SignalResult.Signal.GetType();
@@ -272,10 +272,10 @@ namespace Kalitte.Trading
             return result;
         }
 
-        public List<ExchangeOrder> GetLastPositionOrders(params Signal[] signals)
+        public List<ExchangeOrder> GetLastPositionOrders(params SignalBase[] signals)
         {
             var result = new List<ExchangeOrder>();
-            var skip = typeof(ProfitLossSignal);
+            var skip = typeof(PLSignal);
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
                 var type = CompletedOrders[i].SignalResult.Signal.GetType();
@@ -318,7 +318,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return GetLastOrderSkip(typeof(ProfitLossSignal));
+                return GetLastOrderSkip(typeof(PLSignal));
             }
         }
     }

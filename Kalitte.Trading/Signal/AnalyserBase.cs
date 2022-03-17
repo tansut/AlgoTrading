@@ -17,8 +17,22 @@ using System.Drawing.Imaging;
 
 namespace Kalitte.Trading
 {
+    public class AnalyserConfig: SignalConfig
+    {
+        [AlgoParam(0, "AnalyseSize")]
+        public int InitialAnalyseSize { get; set; }
 
-    public class AnalyserBase : Signal
+        [AlgoParam(0, "CollectSize")]
+        public int InitialCollectSize { get; set; }
+
+        [AlgoParam(Average.Ema)]
+        public Average CollectAverage { get; set; }
+
+        [AlgoParam(Average.Sma)]
+        public Average AnalyseAverage { get; set; }
+    }
+
+    public class AnalyserBase<C> : Signal<C> where C: AnalyserConfig
     {
 
         public DateTime TrackStart { get; set; } = DateTime.MaxValue;
@@ -32,19 +46,17 @@ namespace Kalitte.Trading
         public int CollectSize { get; set; }
         public int AnalyseSize { get; set; }
 
-        public int InitialAnalyseSize { get; set; }
-        public int InitialCollectSize { get; set; }
 
 
-        public Average CollectAverage { get; set; } = Average.Ema;
-        public Average AnalyseAverage { get; set; } = Average.Sma;
+
+
 
         public AnalyseList CollectList { get; set; }
         public AnalyseList AnalyseList { get; set; }
 
         public virtual decimal SignalSensitivity { get; set; } = 1.0M;
 
-        public AnalyserBase(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
+        public AnalyserBase(string name, string symbol, AlgoBase owner, C config) : base(name, symbol, owner, config)
         {
 
         }
@@ -113,9 +125,8 @@ namespace Kalitte.Trading
 
         protected virtual void AdjustSensitivityInternal(double ratio, string reason)
         {
-            AnalyseSize = InitialAnalyseSize + Convert.ToInt32((InitialAnalyseSize * (decimal)ratio));
-            
-            CollectSize = InitialCollectSize + Convert.ToInt32((InitialCollectSize * (decimal)ratio));
+            AnalyseSize = Config.InitialAnalyseSize + Convert.ToInt32((Config.InitialAnalyseSize * (decimal)ratio));            
+            CollectSize = Config.InitialCollectSize + Convert.ToInt32((Config.InitialCollectSize * (decimal)ratio));
             CollectList.Resize(CollectSize);
             AnalyseList.Resize(AnalyseSize);
             Watch("sensitivity/collectsize", (decimal)CollectSize);
@@ -140,12 +151,10 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            CollectSize = Convert.ToInt32(CollectSize * SignalSensitivity);
-            AnalyseSize = Convert.ToInt32(AnalyseSize * SignalSensitivity);
-            InitialAnalyseSize = AnalyseSize;
-            InitialCollectSize = CollectSize;
-            CollectList = new AnalyseList(CollectSize, CollectAverage);
-            AnalyseList = new AnalyseList(AnalyseSize, AnalyseAverage);
+            CollectSize = Convert.ToInt32(Config.InitialCollectSize * SignalSensitivity);
+            AnalyseSize = Convert.ToInt32(Config.InitialAnalyseSize * SignalSensitivity);
+            CollectList = new AnalyseList(CollectSize, Config.CollectAverage);
+            AnalyseList = new AnalyseList(AnalyseSize, Config.AnalyseAverage);
             ResetInternal();
             MonitorInit("sensitivity/collectsize", (decimal)CollectSize);
             MonitorInit("sensitivity/analysesize", (decimal)AnalyseSize);

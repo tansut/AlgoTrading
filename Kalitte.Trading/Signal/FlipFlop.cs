@@ -13,7 +13,7 @@ using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
-    public class FlipFlopSignal : Signal
+    public class FlipFlopSignal : SignalBase
     {
         public BuySell Side { get; set; }
 

@@ -18,16 +18,20 @@ namespace Kalitte.Trading
 {
 
 
-
+    public class SignalConfig
+    {
+        [AlgoParam(true)]
+        public bool Enabled { get; set; }
+    }
 
     public class SignalResult
     {
         public BuySell? finalResult = null;
-        public Signal Signal { get; set; }
+        public SignalBase Signal { get; set; }
         public DateTime SignalTime { get; set; }
 
 
-        public SignalResult(Signal signal, DateTime signalTime)
+        public SignalResult(SignalBase signal, DateTime signalTime)
         {
             this.Signal = signal;
             this.SignalTime = signalTime;
@@ -50,9 +54,21 @@ namespace Kalitte.Trading
         public SignalResult Result { get; set; }
     }
 
-    public delegate void SignalEventHandler(Signal signal, SignalEventArgs data);
+    public delegate void SignalEventHandler(SignalBase signal, SignalEventArgs data);
 
-    public abstract class Signal
+
+    public abstract class Signal<C> : SignalBase where C : SignalConfig 
+    {
+        public C Config { get; set; }
+
+        protected Signal(string name, string symbol, AlgoBase owner, C config) : base(name, symbol, owner)
+        {
+            this.Config = config;
+            this.Enabled = config.Enabled;
+        }
+    }
+
+    public abstract class SignalBase
     {
         public StartableState State { get; set; } = StartableState.Stopped;
         protected System.Timers.Timer _timer = null;
@@ -152,7 +168,7 @@ namespace Kalitte.Trading
             }
         }
 
-        public Signal(string name, string symbol, AlgoBase owner)
+        public SignalBase(string name, string symbol, AlgoBase owner)
         {
             Name = name;
             Symbol = symbol;

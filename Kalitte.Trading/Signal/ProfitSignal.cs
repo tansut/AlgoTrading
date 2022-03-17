@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
-    public class ProfitSignal : ProfitLossSignal
+    public class ProfitSignal : PLSignal
     {
+        public ProfitSignal(string name, string symbol, AlgoBase owner, PLSignalConfig config) : base(name, symbol, owner, config)
+        {
+        }
+
         public override ProfitOrLoss SignalType => ProfitOrLoss.Profit;
      
-        public ProfitSignal(string name, string symbol, AlgoBase owner, decimal priceChange, decimal initialQuantity, decimal quantityStep, decimal stepMultiplier, decimal priceStep, decimal keepQuantity) : base(name, symbol, owner, priceChange, initialQuantity, quantityStep, stepMultiplier,  priceStep, keepQuantity)
-        {
-
-        }
+    
     }
 }

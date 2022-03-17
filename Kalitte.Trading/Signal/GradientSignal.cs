@@ -17,7 +17,7 @@ namespace Kalitte.Trading
         public decimal IndicatorValue { get; set; }
 
 
-        public GradientSignalResult(Signal signal, DateTime signalTime) : base(signal, signalTime)
+        public GradientSignalResult(SignalBase signal, DateTime signalTime) : base(signal, signalTime)
         {
         }
         public override string ToString()
@@ -28,37 +28,49 @@ namespace Kalitte.Trading
 
     }
 
-    public class GradientSignal : AnalyserBase
+    public class GradientSignalConfig : AnalyserConfig
+    {
+        [AlgoParam(0.01)]
+        public decimal Tolerance { get; set; }
+
+        [AlgoParam(0.005)]
+        public decimal LearnRate { get; set; }
+
+        [AlgoParam(0)]
+        public decimal L1 { get; set; }
+        
+        [AlgoParam(0)]
+        public decimal L2 { get; set; }
+    }
+
+    public class GradientSignal : AnalyserBase<GradientSignalConfig>
     {
         public ITechnicalIndicator Indicator { get; set; }
-        public decimal Tolerance { get; set; } = 0.010M;
-        public decimal LearnRate { get; set; } = 0.005M;
 
-        public decimal L1 { get; set; }
-        public decimal L2 { get; set; }
 
         public Gradient grad { get; set; }
 
 
-        public GradientSignal(string name, string symbol, AlgoBase owner, decimal l1, decimal l2) : base(name, symbol, owner)
+        public GradientSignal(string name, string symbol, AlgoBase owner, GradientSignalConfig config) : base(name, symbol, owner, config)
         {
-            L1 = l1;
-            L2 = l2;
+
         }
 
         public override void Init()
         {
-            grad = new Gradient(L1, L2, this.Algo);
+            grad = new Gradient(Config.L1, Config.L2, this.Algo);
             grad.FileName = Algo.MultipleTestOptimization ? "": Path.Combine(Algo.LogDir, this.Name + ".png");
-            grad.Tolerance = Tolerance;
-            grad.LearnRate = LearnRate;
+            grad.Tolerance = Config.Tolerance;
+            grad.LearnRate = Config.LearnRate;
             base.Init();
         }
 
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
-            var result = new GradientSignalResult(this, Algo.Now);
+            var time = t ?? Algo.Now;
+
+            var result = new GradientSignalResult(this, time);
 
             var mp = Algo.GetMarketPrice(Symbol, t);
 
@@ -76,6 +88,12 @@ namespace Kalitte.Trading
                 { 
                     result.Gradient = grad.Step(AnalyseList.LastValue);
                 }
+            }
+
+            if (mp > 0)
+            {
+                TrackAnalyseList(time);
+                TrackCollectList(time, mp);
             }
 
             if (result.Gradient != null)

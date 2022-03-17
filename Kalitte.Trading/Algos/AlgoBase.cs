@@ -51,9 +51,9 @@ namespace Kalitte.Trading.Algos
     public class SignalData
     {
         public DateTime time;
-        public Signal signal;
+        public SignalBase signal;
 
-        internal SignalData(DateTime time, Signal signal)
+        internal SignalData(DateTime time, SignalBase signal)
         {
             this.time = time;
             this.signal = signal;
@@ -207,7 +207,7 @@ namespace Kalitte.Trading.Algos
 
         public ManualResetEvent orderWait = new ManualResetEvent(true);
 
-        public abstract void Decide(Signal signal, SignalEventArgs data);
+        public abstract void Decide(SignalBase signal, SignalEventArgs data);
 
 
         public void CheckDelayedOrders(DateTime t)
@@ -321,7 +321,7 @@ namespace Kalitte.Trading.Algos
             SignalsState = StartableState.StartInProgress;
             try
             {
-                foreach (var signal in Signals)
+                foreach (var signal in Signals.Where(p=>p.Enabled))
                 {
                     signal.Start();
                     Log($"Started signal {signal}", LogLevel.Info);
@@ -340,12 +340,11 @@ namespace Kalitte.Trading.Algos
             SignalsState = StartableState.StopInProgress;
             try
             {
-                foreach (var signal in Signals)
+                foreach (var signal in Signals.Where(p => p.Enabled))
                 {
 
                     signal.Stop();
                     Log($"Stopped signal {signal}", LogLevel.Info);
-
                 }
             }
             catch (Exception ex)
@@ -507,7 +506,7 @@ namespace Kalitte.Trading.Algos
             return result2;
         }
 
-        public void SignalReceieved(Signal signal, SignalEventArgs data)
+        public void SignalReceieved(SignalBase signal, SignalEventArgs data)
         {
             SignalResult existing;
             BuySell? oldFinalResult = null;
@@ -544,9 +543,16 @@ namespace Kalitte.Trading.Algos
             Dictionary<string, object> result = new Dictionary<string, object>();
             var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
             foreach (var prop in properties)
-            {
+            {               
                 var attr = (AlgoParam)prop.GetCustomAttributes(true).Where(p => p is AlgoParam).First();
-                result.Add(prop.Name, prop.GetValue(this));
+                if (prop.PropertyType.IsClass)
+                {
+                    var subClassProps = GetConfigValues(prop.PropertyType);
+                    foreach (var subClassProp in subClassProps) result.Add($"{attr.Name ?? prop.Name}/{subClassProp.Key}", subClassProp.Value);
+                }
+                else result.Add(attr.Name ?? prop.Name, prop.GetValue(this));
+
+                
             }
             return result;
         }
@@ -558,15 +564,20 @@ namespace Kalitte.Trading.Algos
             foreach (var prop in properties)
             {
                 var attr = (AlgoParam)prop.GetCustomAttributes(true).Where(p => p is AlgoParam).First();
-                result.Add(prop.Name, attr.Value);
+                if (prop.PropertyType.IsClass && !prop.PropertyType.IsPrimitive && prop.PropertyType != typeof(string))
+                {
+                    var subClassProps = GetConfigValues(prop.PropertyType);
+                    foreach (var subClassProp in subClassProps) result.Add($"{attr.Name ?? prop.Name}/{subClassProp.Key}", subClassProp.Value);
+                }
+                else result.Add(attr.Name ?? prop.Name, attr.Value);
             }
             return result;
         }
 
-        public void ApplyProperties(Dictionary<string, object> init = null)
+        public void ApplyProperties(object target, Dictionary<string, object> init = null)
         {
-            if (init == null) init = GetConfigValues(this.GetType());
-            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
+            if (init == null) init = GetConfigValues(target.GetType());
+            var properties = target.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
             foreach (var item in properties)
             {
                 object val;
@@ -579,30 +590,44 @@ namespace Kalitte.Trading.Algos
                         {
                             propValue = Convert.ToDecimal(val);
                         }
+                        if (item.PropertyType == typeof(string))
+                        {
+                            propValue = val;
+                        }
                         else if (item.PropertyType == typeof(int))
                         {
                             propValue = Convert.ToInt32(val);
                         }
-                        else if (item.PropertyType == typeof(LogLevel))
+                        else if (item.PropertyType.IsEnum)
                         {
-                            propValue = (LogLevel)Convert.ToInt32(val);
-                        }
+                            propValue = Enum.ToObject(item.PropertyType, Convert.ToInt32(val));                        }
                         else if (item.PropertyType == typeof(BarPeriod))
                         {
                             propValue = (BarPeriod)Convert.ToInt32(val);
                         }
-                        //if (typeof(propValue) != propValue)
-                        //var tc = new TypeConverter();
-                        //propValue = tc.ConvertTo(val, item.PropertyType);
                     }
-                    this.GetType().GetProperty(item.Name).SetValue(this, propValue);
+                    target.GetType().GetProperty(item.Name).SetValue(target, propValue);
                 }
                 else
-                {
+                {                    
                     var paramVal = item.GetCustomAttributes(typeof(AlgoParam), true).Cast<AlgoParam>().FirstOrDefault();
-                    if (paramVal != null) item.SetValue(this, paramVal.Value);
+                    
+                    if (paramVal != null && !item.PropertyType.IsClass) item.SetValue(target, paramVal.Value);
+                    else if (paramVal != null)
+                    {
+                        var subProps = init.Where(p => p.Key.StartsWith($"{paramVal.Name ?? item.Name}/")).ToList();
+                        var dict = new Dictionary<string, object>();
+                        subProps.ForEach(p => dict.Add(p.Key.Split('/')[1], p.Value));
+                        if (subProps.Any()) ApplyProperties(item.GetValue(target), dict);
+                    }
                 }
             }
+        }
+
+
+        public void ApplyProperties(Dictionary<string, object> init = null)
+        {
+            ApplyProperties(this, init);
         }
 
         public StringBuilder PropSummary()
@@ -825,7 +850,7 @@ namespace Kalitte.Trading.Algos
 
 
 
-        public List<Signal> Signals = new List<Signal>();
+        public List<SignalBase> Signals = new List<SignalBase>();
         public ConcurrentDictionary<string, SignalResult> SignalResults = new ConcurrentDictionary<string, SignalResult>();
 
 

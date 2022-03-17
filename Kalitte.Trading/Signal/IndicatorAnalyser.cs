@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Kalitte.Trading
 {
-    internal class IndicatorAnalyser : AnalyserBase
+    internal class IndicatorAnalyser : AnalyserBase<AnalyserConfig>
     {
         public ITechnicalIndicator i1k;
 
-        public IndicatorAnalyser(string name, string symbol, AlgoBase owner) : base(name, symbol, owner)
+        public IndicatorAnalyser(string name, string symbol, AlgoBase owner, AnalyserConfig config) : base(name, symbol, owner, config)
         {
 
         }

@@ -9,7 +9,7 @@ namespace Kalitte.Trading.Algos
 {
     public class Log : AlgoBase
     {
-        public override void Decide(Signal signal, SignalEventArgs data)
+        public override void Decide(SignalBase signal, SignalEventArgs data)
         {
             
         }

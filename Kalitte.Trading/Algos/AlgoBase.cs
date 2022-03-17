@@ -531,20 +531,24 @@ namespace Kalitte.Trading.Algos
                 }
             }
         }
-
         public Dictionary<string, object> GetConfigValues()
         {
+            return this.GetConfigValues(this);
+        }
+
+        public Dictionary<string, object> GetConfigValues(object target)
+        {
             Dictionary<string, object> result = new Dictionary<string, object>();
-            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
+            var properties = target.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
             foreach (var prop in properties)
             {               
                 var attr = (AlgoParam)prop.GetCustomAttributes(true).Where(p => p is AlgoParam).First();
-                if (prop.PropertyType.IsClass)
+                if (prop.PropertyType.IsClass && prop.PropertyType != typeof(string))
                 {
                     var subClassProps = GetConfigValues(prop.PropertyType);
                     foreach (var subClassProp in subClassProps) result.Add($"{attr.Name ?? prop.Name}/{subClassProp.Key}", subClassProp.Value);
                 }
-                else result.Add(attr.Name ?? prop.Name, prop.GetValue(this));
+                else result.Add(attr.Name ?? prop.Name, prop.GetValue(target));
 
                 
             }

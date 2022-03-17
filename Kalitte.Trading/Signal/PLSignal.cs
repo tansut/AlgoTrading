@@ -168,8 +168,7 @@ namespace Kalitte.Trading
             finally
             {
                 Monitor.Exit  (OperationLock);
-            }
-            
+            }            
         }
 
         protected virtual PriceMonitor CreatePriceMonitor(ProfitLossResult result)

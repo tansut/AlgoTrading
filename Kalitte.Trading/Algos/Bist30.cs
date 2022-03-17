@@ -210,11 +210,11 @@ namespace Kalitte.Trading.Algos
 
         public void CreateSignals()
         {
-            DateTime? trackStart = new DateTime(2022, 03, 17, 9, 30, 0);
-            DateTime? trackFinish = new DateTime(2022, 03, 17, 11, 0, 0);
+            //DateTime? trackStart = new DateTime(2022, 03, 17, 9, 30, 0);
+            //DateTime? trackFinish = new DateTime(2022, 03, 17, 11, 0, 0);
 
-            //DateTime? trackStart = null;
-            //DateTime? trackFinish = null;
+            DateTime? trackStart = null;
+            DateTime? trackFinish = null;
 
 
             SetAnalyserDefaults(this.GetType().GetProperties().Where(p => typeof(AnalyserConfig).IsAssignableFrom(p.PropertyType)).Select(p => p.GetValue(this)).Select(p=>(AnalyserConfig)p).ToArray());

@@ -618,6 +618,7 @@ namespace Kalitte.Trading.Algos
                         var subProps = init.Where(p => p.Key.StartsWith($"{paramVal.Name ?? item.Name}/")).ToList();
                         var dict = new Dictionary<string, object>();
                         subProps.ForEach(p => dict.Add(p.Key.Split('/')[1], p.Value));
+                        if (item.GetValue(target) == null) item.SetValue(target, Activator.CreateInstance(item.PropertyType));
                         if (subProps.Any()) ApplyProperties(item.GetValue(target), dict);
                     }
                 }

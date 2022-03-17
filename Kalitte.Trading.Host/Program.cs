@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 2, 28);
+        settings.Start = new DateTime(2022, 3, 14);
+        settings.Finish = new DateTime(2022, 3, 14);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
@@ -31,8 +31,16 @@ public class Program
         // options
         alternates.Set("CrossOrderQuantity", 9);
 
-        alternates.Set("RsiOrderL1Quantity", 4);
-        alternates.Set("RsiOrderL2Quantity", 5);
+        alternates.Set("RsiOrderL1/Quantity", 1);
+        alternates.Set("RsiOrderL1/Action", RsiPositionAction.OpenIfEmpty);
+
+        alternates.Set("RsiOrderL2/Quantity", 1);
+        alternates.Set("RsiOrderL2/Action", RsiPositionAction.BuyAdditional);
+
+        alternates.Set("RsiOrderL3/Quantity", 2);
+        alternates.Set("RsiOrderL3/Action", RsiPositionAction.ChangePosition);
+
+
 
         alternates.Set("UsePerformanceMonitor", false);
 
@@ -65,17 +73,24 @@ public class Program
 
         // rsi
         alternates.Set("Rsi", 14);
+
         alternates.Set("RsiHighL1/L1", 73.00);        
-        alternates.Set("RsiHighL1/L2", 84.00);
+        alternates.Set("RsiHighL1/L2", 76.00);
 
-        alternates.Set("RsiHighL2/L1", 84.01);
-        alternates.Set("RsiHighL2/L2", 100);
+        alternates.Set("RsiHighL2/L1", 76.01);
+        alternates.Set("RsiHighL2/L2", 83.00);
 
-        alternates.Set("RsiLowL1/L1", 32.00);
-        alternates.Set("RsiLowL1/L2", 24.00);
+        alternates.Set("RsiHighL3/L1", 83.01);
+        alternates.Set("RsiHighL3/L2", 100);
 
-        alternates.Set("RsiLowL2/L1", 23.99);
-        alternates.Set("RsiLowL2/L2", 0);
+        alternates.Set("RsiLowL1/L1", 33.00);
+        alternates.Set("RsiLowL1/L2", 29.00);
+
+        alternates.Set("RsiLowL2/L1", 28.99);
+        alternates.Set("RsiLowL2/L2", 23.00);
+
+        alternates.Set("RsiLowL3/L1", 22.99);
+        alternates.Set("RsiLowL3/L2", 0);
 
         alternates.Set("RsiGradientTolerance", 0.02);
         alternates.Set("RsiGradientLearnRate", 0.005);

@@ -7,17 +7,38 @@ using System.Linq;
 
 namespace Kalitte.Trading.Algos
 {
+
+    public enum RsiPositionAction
+    {
+        OpenIfEmpty,
+        BuyAdditional,
+        ChangePosition
+    }
+
+    public class RsiOrderConfig
+    {
+        [AlgoParam(0)]
+        public decimal Quantity { get; set; }
+        [AlgoParam(RsiPositionAction.OpenIfEmpty)]
+        public RsiPositionAction Action { get; set; }
+    }
+
+
     public class Bist30 : AlgoBase
     {
 
         // order params
         [AlgoParam(6.0)]
         public decimal CrossOrderQuantity { get; set; }
-        [AlgoParam(3.0)]
-        public decimal RsiOrderL1Quantity { get; set; }
 
-        [AlgoParam(3.0)]
-        public decimal RsiOrderL2Quantity { get; set; }
+        [AlgoParam(null)]
+        public RsiOrderConfig RsiOrderL1 { get; set; }
+
+        [AlgoParam(null)]
+        public RsiOrderConfig RsiOrderL2 { get; set; }
+
+        [AlgoParam(null)]
+        public RsiOrderConfig RsiOrderL3 { get; set; }
 
 
         // ma cross
@@ -54,11 +75,19 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(null, "RsiHighL2")]
         public GradientSignalConfig RsiHighL2Config { get; set; } = new GradientSignalConfig();
 
+        [AlgoParam(null, "RsiHighL3")]
+        public GradientSignalConfig RsiHighL3Config { get; set; } = new GradientSignalConfig();
+
+
         [AlgoParam(null, "RsiLowL1")]
         public GradientSignalConfig RsiLowL1Config { get; set; } = new GradientSignalConfig();
 
         [AlgoParam(null, "RsiLowL2")]
         public GradientSignalConfig RsiLowL2Config { get; set; } = new GradientSignalConfig();
+
+        [AlgoParam(null, "RsiLowL3")]
+        public GradientSignalConfig RsiLowL3Config { get; set; } = new GradientSignalConfig();
+
 
         [AlgoParam(null, "MaCross")]
         public CrossSignalConfig MaCrossConfig { get; set; } = new CrossSignalConfig();
@@ -105,10 +134,13 @@ namespace Kalitte.Trading.Algos
         PowerSignal powerSignal = null;
         ClosePositionsSignal closePositionsSignal = null;
 
-        GradientSignal rsiHighL1 = null;
+        GradientSignal rsiHighL1;
         GradientSignal rsiHighL2;
+        GradientSignal rsiHighL3;        
+
         GradientSignal rsiLowL1;
         GradientSignal rsiLowL2;
+        GradientSignal rsiLowL3;
 
 
         public void InitSignals()
@@ -126,8 +158,11 @@ namespace Kalitte.Trading.Algos
 
             rsiHighL1.Indicator = rsi;
             rsiHighL2.Indicator = rsi;
+            rsiHighL3.Indicator = rsi;
+
             rsiLowL1.Indicator = rsi;
             rsiLowL2.Indicator = rsi;
+            rsiLowL3.Indicator = rsi;
 
 
             Signals.ForEach(p =>
@@ -153,13 +188,13 @@ namespace Kalitte.Trading.Algos
             return signal;
         }
 
-        public GradientSignal CreateRsiPositionSignal(string name, string symbol, GradientSignalConfig config)
+        public GradientSignal CreateRsiPositionSignal(string name, string symbol, GradientSignalConfig config, BuySell action)
         {
             config.Tolerance = RsiGradientTolerance;
             config.LearnRate = RsiGradientLearnRate;
             config.AnalyseAverage = Average.Ema;
             config.CollectAverage = Average.Ema;
-            var signal = new GradientSignal(name, symbol, this, config);
+            var signal = new GradientSignal(name, symbol, this, config, action);
             return signal;
         }
 
@@ -189,10 +224,14 @@ namespace Kalitte.Trading.Algos
             this.Signals.Add(this.powerSignal = new PowerSignal("power", Symbol, this, VolumePowerConfig));
             this.Signals.Add(this.rsiValue = new IndicatorAnalyser("rsi", Symbol, this, RsiValueConfig));            
 
-            this.Signals.Add(this.rsiHighL1 = CreateRsiPositionSignal("rsi-high-l1", Symbol, RsiHighL1Config));
-            this.Signals.Add(this.rsiHighL2 = CreateRsiPositionSignal("rsi-high-l2", Symbol, RsiHighL2Config));
-            this.Signals.Add(this.rsiLowL1 = CreateRsiPositionSignal("rsi-low-l1", Symbol, RsiLowL1Config));
-            this.Signals.Add(this.rsiLowL2 = CreateRsiPositionSignal("rsi-low-l2", Symbol, RsiLowL2Config));
+            this.Signals.Add(this.rsiHighL1 = CreateRsiPositionSignal("rsi-high-l1", Symbol, RsiHighL1Config, BuySell.Sell));
+            this.Signals.Add(this.rsiHighL2 = CreateRsiPositionSignal("rsi-high-l2", Symbol, RsiHighL2Config, BuySell.Sell));
+            this.Signals.Add(this.rsiHighL3 = CreateRsiPositionSignal("rsi-high-l3", Symbol, RsiHighL3Config, BuySell.Sell));
+            
+            this.Signals.Add(this.rsiLowL1 = CreateRsiPositionSignal("rsi-low-l1", Symbol, RsiLowL1Config, BuySell.Buy));
+            this.Signals.Add(this.rsiLowL2 = CreateRsiPositionSignal("rsi-low-l2", Symbol, RsiLowL2Config, BuySell.Buy));
+            this.Signals.Add(this.rsiLowL3 = CreateRsiPositionSignal("rsi-low-l3", Symbol, RsiLowL3Config, BuySell.Buy));
+
             this.Signals.Add(this.maCross = new CrossSignal("cross-ma59", Symbol, this, MaCrossConfig));
 
 
@@ -355,14 +394,19 @@ namespace Kalitte.Trading.Algos
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-            var signalIsL1 = signal == rsiHighL1 || signal == rsiLowL1;
-            var usedRsiQuantity = signalIsL1 ? RsiOrderL1Quantity: RsiOrderL2Quantity;
+            RsiOrderConfig config = signal == rsiHighL1 || signal == rsiLowL1 ? RsiOrderL1: 
+                (signal == rsiHighL2 || signal == rsiLowL2 ? RsiOrderL2 : RsiOrderL3);
 
-            var orderQuantity = portfolio.Quantity + usedRsiQuantity;
+            if (config.Action == RsiPositionAction.OpenIfEmpty && !portfolio.IsEmpty) return;
+
+            if (config.Action == RsiPositionAction.BuyAdditional && !portfolio.IsEmpty && portfolio.Side != signalResult.finalResult) return;
+            if (config.Action == RsiPositionAction.BuyAdditional && portfolio.Quantity >= config.Quantity) return;
+
+            var orderQuantity = (config.Action == RsiPositionAction.BuyAdditional || config.Action == RsiPositionAction.OpenIfEmpty) ? config.Quantity: portfolio.Quantity + config.Quantity;
 
             if (!keepPosition && !portfolio.IsEmpty && portfolio.Side == signalResult.finalResult)
             {
-                orderQuantity = usedRsiQuantity - portfolio.Quantity;
+                orderQuantity = config.Quantity - portfolio.Quantity;
             }
 
             if (orderQuantity > 0)

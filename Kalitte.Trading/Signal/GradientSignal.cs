@@ -46,14 +46,12 @@ namespace Kalitte.Trading
     public class GradientSignal : AnalyserBase<GradientSignalConfig>
     {
         public ITechnicalIndicator Indicator { get; set; }
-
-
         public Gradient grad { get; set; }
+        public BuySell DefaultAction { get; set; }
 
-
-        public GradientSignal(string name, string symbol, AlgoBase owner, GradientSignalConfig config) : base(name, symbol, owner, config)
+        public GradientSignal(string name, string symbol, AlgoBase owner, GradientSignalConfig config, BuySell defaultAction) : base(name, symbol, owner, config)
         {
-
+            this.DefaultAction = defaultAction;
         }
 
         public override void Init()

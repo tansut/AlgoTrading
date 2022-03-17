@@ -65,17 +65,15 @@ namespace Kalitte.Trading.Matrix
         {
             var fileName = $"c:\\kalitte\\{this.GetType().Name}.json";
             Bist30 algo;
-            Dictionary<string, object> init = null ;
-            if (File.Exists(fileName))
-            {
-                var file = File.ReadAllText(fileName);
-                var fileContent = JsonConvert.DeserializeObject<Dictionary<string, object [] >>(file);
-                init = new AlternateValues(fileContent).Lean();
-            } else init = AlgoBase.GetConfigValues(typeof(Bist30));
+            Dictionary<string, object> init = null;
+
+            var file = File.ReadAllText(fileName);
+            var fileContent = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(file);
+            init = new AlternateValues(fileContent).Lean();
             init["Symbol"] = "F_XU0300422";
-            algo = new Bist30(init);             
-            var content =new AlternateValues(algo.GetConfigValues());
-            File.WriteAllText(fileName, JsonConvert.SerializeObject(content, Formatting.Indented));
+            algo = new Bist30(init);
+            //var content = new AlternateValues(algo.GetConfigValues());
+            //File.WriteAllText(fileName, JsonConvert.SerializeObject(content, Formatting.Indented));
             return algo;
         }
     }

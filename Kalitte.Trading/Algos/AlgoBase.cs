@@ -606,13 +606,20 @@ namespace Kalitte.Trading.Algos
                 {                    
                     var paramVal = item.GetCustomAttributes(typeof(AlgoParam), true).Cast<AlgoParam>().FirstOrDefault();
                     
-                    if (paramVal != null && !item.PropertyType.IsClass) item.SetValue(target, paramVal.Value);
+                    if (paramVal != null && (!item.PropertyType.IsClass || item.PropertyType == typeof(string))) item.SetValue(target, paramVal.Value);
                     else if (paramVal != null)
                     {
                         var subProps = init.Where(p => p.Key.StartsWith($"{paramVal.Name ?? item.Name}/")).ToList();
                         var dict = new Dictionary<string, object>();
                         subProps.ForEach(p => dict.Add(p.Key.Split('/')[1], p.Value));
-                        if (item.GetValue(target) == null) item.SetValue(target, Activator.CreateInstance(item.PropertyType));
+                        if (item.GetValue(target) == null) {
+                            try {
+                                var instance = Activator.CreateInstance(item.PropertyType);
+                                item.SetValue(target, instance);
+                            } catch(Exception ex) {
+                                throw new Exception($"{item.Name}/{item.PropertyType.FullName} property error while creating instance", ex);
+                            }
+                        } 
                         if (subProps.Any()) ApplyProperties(item.GetValue(target), dict);
                     }
                 }

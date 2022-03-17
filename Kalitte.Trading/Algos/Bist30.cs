@@ -440,7 +440,7 @@ namespace Kalitte.Trading.Algos
             {
                 var macd = maCross.i1k.Results.Last().Value.Value;
                 var expectedSide = macd > 0 ? BuySell.Buy : BuySell.Sell;
-                MakePortfolio(Symbol, result.Quantity, expectedSide, "daily close", result);
+                MakePortfolio(Symbol, result.Quantity, expectedSide, $"daily close macd:{macd}", result);
             }                        
         }
 

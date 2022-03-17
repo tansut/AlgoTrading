@@ -63,9 +63,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(null, "RsiLoss")]
         public PLSignalConfig RsiLossConfig { get; set; } = new PLSignalConfig();
 
-        [AlgoParam(null, "RsiProfit")]
-        public PLSignalConfig RsiProfitConfig { get; set; } = new PLSignalConfig();
-
         [AlgoParam(null, "Profit")]
         public PLSignalConfig ProfitConfig { get; set; } = new PLSignalConfig();
 
@@ -131,7 +128,6 @@ namespace Kalitte.Trading.Algos
 
         ProfitSignal profitSignal = null;
         LossSignal rsiLossSignal = null;
-        ProfitSignal rsiProfitSignal = null;
 
         IndicatorAnalyser rsiValue = null;
         PowerSignal powerSignal = null;
@@ -239,15 +235,16 @@ namespace Kalitte.Trading.Algos
 
 
             this.Signals.Add(this.profitSignal = CreateProfitSignal("profit", Symbol, ProfitConfig));
-            this.Signals.Add(this.rsiProfitSignal = CreateProfitSignal("rsi-profit", Symbol, RsiProfitConfig));
-            this.rsiProfitSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
-            this.Signals.Add(this.rsiLossSignal = new LossSignal("loss", Symbol, this, RsiLossConfig));
+            this.Signals.Add(this.rsiLossSignal = new LossSignal("rsi-loss", Symbol, this, RsiLossConfig));
             this.rsiLossSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
 
-            if (rsiLowL1.Enabled) this.rsiLossSignal.CostSignals.Add(rsiLowL1);
-            if (rsiHighL1.Enabled) this.rsiLossSignal.CostSignals.Add(rsiHighL1);
-            if (rsiLowL2.Enabled) this.rsiLossSignal.CostSignals.Add(rsiLowL2);
+            
+            if (rsiHighL1.Enabled) this.rsiLossSignal.CostSignals.Add(rsiHighL1);            
             if (rsiHighL2.Enabled) this.rsiLossSignal.CostSignals.Add(rsiHighL2);
+            if (rsiHighL3.Enabled) this.rsiLossSignal.CostSignals.Add(rsiHighL3);
+            if (rsiLowL1.Enabled) this.rsiLossSignal.CostSignals.Add(rsiLowL1);
+            if (rsiLowL2.Enabled) this.rsiLossSignal.CostSignals.Add(rsiLowL2);
+            if (rsiLowL3.Enabled) this.rsiLossSignal.CostSignals.Add(rsiLowL3);
 
             this.Signals.Add(this.closePositionsSignal = new ClosePositionsSignal("daily-close", Symbol, this, DailyCloseConfig));
 
@@ -265,7 +262,6 @@ namespace Kalitte.Trading.Algos
 
                 if (analyser != null)
                 {
-                    analyser.CollectSize = DataCollectSize;
                     analyser.TrackStart = trackStart ?? analyser.TrackStart;
                     analyser.TrackEnd = trackFinish ?? analyser.TrackEnd;
                 }

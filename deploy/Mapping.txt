@@ -406,44 +406,44 @@ Renamed Types:
 
 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c -> [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/A
 {
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<InitSignals>b__137_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.IQuote ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<InitSignals>b__137_1[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CreateSignals>b__142_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CreateSignals>b__142_2[1]( [mscorlib]System.Object ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__152_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> a
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__152_1[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> B
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__152_2[1]( [Kalitte.Trading]Kalitte.Trading.PLSignal ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__152_3[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> b
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__152_4[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> C
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__152_5[1]( [Kalitte.Trading]Kalitte.Trading.CrossSignal ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<InitSignals>b__132_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.IQuote ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<InitSignals>b__132_1[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CreateSignals>b__137_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CreateSignals>b__137_2[1]( [mscorlib]System.Object ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__147_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> a
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__147_1[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> B
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__147_2[1]( [Kalitte.Trading]Kalitte.Trading.PLSignal ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__147_3[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> b
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__147_4[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> C
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::<CompletedOrder>b__147_5[1]( [Kalitte.Trading]Kalitte.Trading.CrossSignal ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c::.ctor[0]( ) skipped:  special name
 
 	Kalitte.Trading.Algos.Bist30/<>c [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c Kalitte.Trading.Algos.Bist30/<>c::<>9 -> A
-	System.Func`2<Skender.Stock.Indicators.IQuote,System.Decimal> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.IQuote,System.Decimal> Kalitte.Trading.Algos.Bist30/<>c::<>9__137_0 -> A
-	System.Action`1<Kalitte.Trading.SignalBase> [Kalitte.Trading]System.Action`1<Kalitte.Trading.SignalBase> Kalitte.Trading.Algos.Bist30/<>c::<>9__137_1 -> A
-	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.Bist30/<>c::<>9__142_0 -> A
-	System.Func`2<System.Object,Kalitte.Trading.AnalyserConfig> [Kalitte.Trading]System.Func`2<System.Object,Kalitte.Trading.AnalyserConfig> Kalitte.Trading.Algos.Bist30/<>c::<>9__142_2 -> A
-	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.Bist30/<>c::<>9__152_0 -> A
-	System.Func`2<Kalitte.Trading.SignalBase,Kalitte.Trading.PLSignal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,Kalitte.Trading.PLSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__152_1 -> A
-	System.Action`1<Kalitte.Trading.PLSignal> [Kalitte.Trading]System.Action`1<Kalitte.Trading.PLSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__152_2 -> A
-	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.Bist30/<>c::<>9__152_3 -> a
-	System.Func`2<Kalitte.Trading.SignalBase,Kalitte.Trading.CrossSignal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,Kalitte.Trading.CrossSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__152_4 -> A
-	System.Action`1<Kalitte.Trading.CrossSignal> [Kalitte.Trading]System.Action`1<Kalitte.Trading.CrossSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__152_5 -> A
+	System.Func`2<Skender.Stock.Indicators.IQuote,System.Decimal> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.IQuote,System.Decimal> Kalitte.Trading.Algos.Bist30/<>c::<>9__132_0 -> A
+	System.Action`1<Kalitte.Trading.SignalBase> [Kalitte.Trading]System.Action`1<Kalitte.Trading.SignalBase> Kalitte.Trading.Algos.Bist30/<>c::<>9__132_1 -> A
+	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.Bist30/<>c::<>9__137_0 -> A
+	System.Func`2<System.Object,Kalitte.Trading.AnalyserConfig> [Kalitte.Trading]System.Func`2<System.Object,Kalitte.Trading.AnalyserConfig> Kalitte.Trading.Algos.Bist30/<>c::<>9__137_2 -> A
+	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.Bist30/<>c::<>9__147_0 -> A
+	System.Func`2<Kalitte.Trading.SignalBase,Kalitte.Trading.PLSignal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,Kalitte.Trading.PLSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__147_1 -> A
+	System.Action`1<Kalitte.Trading.PLSignal> [Kalitte.Trading]System.Action`1<Kalitte.Trading.PLSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__147_2 -> A
+	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.Bist30/<>c::<>9__147_3 -> a
+	System.Func`2<Kalitte.Trading.SignalBase,Kalitte.Trading.CrossSignal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,Kalitte.Trading.CrossSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__147_4 -> A
+	System.Action`1<Kalitte.Trading.CrossSignal> [Kalitte.Trading]System.Action`1<Kalitte.Trading.CrossSignal> Kalitte.Trading.Algos.Bist30/<>c::<>9__147_5 -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass142_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/a
+[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass137_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/a
 {
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass142_0::<CreateSignals>b__1[1]( [mscorlib]System.Reflection.PropertyInfo ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass142_0::<CreateSignals>b__3[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass137_0::<CreateSignals>b__1[1]( [mscorlib]System.Reflection.PropertyInfo ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass137_0::<CreateSignals>b__3[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
 
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass142_0::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass137_0::.ctor[0]( ) skipped:  special name
 
-	Kalitte.Trading.Algos.Bist30 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30 Kalitte.Trading.Algos.Bist30/<>c__DisplayClass142_0::<>4__this -> A
-	System.Nullable`1<System.DateTime> [Kalitte.Trading]System.Nullable`1<System.DateTime> Kalitte.Trading.Algos.Bist30/<>c__DisplayClass142_0::trackStart -> A
-	System.Nullable`1<System.DateTime> [Kalitte.Trading]System.Nullable`1<System.DateTime> Kalitte.Trading.Algos.Bist30/<>c__DisplayClass142_0::trackFinish -> a
-	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.Algos.Bist30/<>c__DisplayClass142_0::fib -> A
+	Kalitte.Trading.Algos.Bist30 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30 Kalitte.Trading.Algos.Bist30/<>c__DisplayClass137_0::<>4__this -> A
+	System.Nullable`1<System.DateTime> [Kalitte.Trading]System.Nullable`1<System.DateTime> Kalitte.Trading.Algos.Bist30/<>c__DisplayClass137_0::trackStart -> A
+	System.Nullable`1<System.DateTime> [Kalitte.Trading]System.Nullable`1<System.DateTime> Kalitte.Trading.Algos.Bist30/<>c__DisplayClass137_0::trackFinish -> a
+	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.Algos.Bist30/<>c__DisplayClass137_0::fib -> A
 }
 
 [Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.J
@@ -2686,8 +2686,6 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::set_PriceHighLimit[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::get_RsiLossConfig[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::set_RsiLossConfig[1]( [Kalitte.Trading]Kalitte.Trading.PLSignalConfig ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::get_RsiProfitConfig[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::set_RsiProfitConfig[1]( [Kalitte.Trading]Kalitte.Trading.PLSignalConfig ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::get_ProfitConfig[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::set_ProfitConfig[1]( [Kalitte.Trading]Kalitte.Trading.PLSignalConfig ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::get_RsiHighL1Config[0]( ) skipped:  skip by property
@@ -2755,8 +2753,7 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.Bist30::<PriceLowLimit>k__BackingField -> b
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.Bist30::<PriceHighLimit>k__BackingField -> C
 	Kalitte.Trading.PLSignalConfig [Kalitte.Trading]Kalitte.Trading.PLSignalConfig Kalitte.Trading.Algos.Bist30::<RsiLossConfig>k__BackingField -> A
-	Kalitte.Trading.PLSignalConfig [Kalitte.Trading]Kalitte.Trading.PLSignalConfig Kalitte.Trading.Algos.Bist30::<RsiProfitConfig>k__BackingField -> a
-	Kalitte.Trading.PLSignalConfig [Kalitte.Trading]Kalitte.Trading.PLSignalConfig Kalitte.Trading.Algos.Bist30::<ProfitConfig>k__BackingField -> B
+	Kalitte.Trading.PLSignalConfig [Kalitte.Trading]Kalitte.Trading.PLSignalConfig Kalitte.Trading.Algos.Bist30::<ProfitConfig>k__BackingField -> a
 	Kalitte.Trading.GradientSignalConfig [Kalitte.Trading]Kalitte.Trading.GradientSignalConfig Kalitte.Trading.Algos.Bist30::<RsiHighL1Config>k__BackingField -> A
 	Kalitte.Trading.GradientSignalConfig [Kalitte.Trading]Kalitte.Trading.GradientSignalConfig Kalitte.Trading.Algos.Bist30::<RsiHighL2Config>k__BackingField -> a
 	Kalitte.Trading.GradientSignalConfig [Kalitte.Trading]Kalitte.Trading.GradientSignalConfig Kalitte.Trading.Algos.Bist30::<RsiHighL3Config>k__BackingField -> B
@@ -2778,7 +2775,6 @@ Skipped Types:
 	Kalitte.Trading.CrossSignal [Kalitte.Trading]Kalitte.Trading.CrossSignal Kalitte.Trading.Algos.Bist30::maCross -> A
 	Kalitte.Trading.ProfitSignal [Kalitte.Trading]Kalitte.Trading.ProfitSignal Kalitte.Trading.Algos.Bist30::profitSignal -> A
 	Kalitte.Trading.LossSignal [Kalitte.Trading]Kalitte.Trading.LossSignal Kalitte.Trading.Algos.Bist30::rsiLossSignal -> A
-	Kalitte.Trading.ProfitSignal [Kalitte.Trading]Kalitte.Trading.ProfitSignal Kalitte.Trading.Algos.Bist30::rsiProfitSignal -> a
 	Kalitte.Trading.IndicatorAnalyser [Kalitte.Trading]Kalitte.Trading.IndicatorAnalyser Kalitte.Trading.Algos.Bist30::rsiValue -> A
 	Kalitte.Trading.PowerSignal [Kalitte.Trading]Kalitte.Trading.PowerSignal Kalitte.Trading.Algos.Bist30::powerSignal -> A
 	Kalitte.Trading.ClosePositionsSignal [Kalitte.Trading]Kalitte.Trading.ClosePositionsSignal Kalitte.Trading.Algos.Bist30::closePositionsSignal -> A
@@ -2801,7 +2797,6 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.Bist30::PriceLowLimit skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.Bist30::PriceHighLimit skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.PLSignalConfig [Kalitte.Trading]Kalitte.Trading.PLSignalConfig Kalitte.Trading.Algos.Bist30::RsiLossConfig skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.PLSignalConfig [Kalitte.Trading]Kalitte.Trading.PLSignalConfig Kalitte.Trading.Algos.Bist30::RsiProfitConfig skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.PLSignalConfig [Kalitte.Trading]Kalitte.Trading.PLSignalConfig Kalitte.Trading.Algos.Bist30::ProfitConfig skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.GradientSignalConfig [Kalitte.Trading]Kalitte.Trading.GradientSignalConfig Kalitte.Trading.Algos.Bist30::RsiHighL1Config skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.GradientSignalConfig [Kalitte.Trading]Kalitte.Trading.GradientSignalConfig Kalitte.Trading.Algos.Bist30::RsiHighL2Config skipped:  KeepPublicApi option in configuration

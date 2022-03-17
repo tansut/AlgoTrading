@@ -21,7 +21,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 14);
+        settings.Start = new DateTime(2022, 2, 28);
         settings.Finish = new DateTime(2022, 3, 17);
         settings.AutoClosePositions = true;
 
@@ -34,7 +34,7 @@ public class Program
         alternates.Set("RsiOrderL1/Quantity", 1);
         alternates.Set("RsiOrderL1/Action", RsiPositionAction.OpenIfEmpty);
 
-        alternates.Set("RsiOrderL2/Quantity", 2);
+        alternates.Set("RsiOrderL2/Quantity", 3);
         alternates.Set("RsiOrderL2/Action", RsiPositionAction.BuyAdditional);
 
         alternates.Set("RsiOrderL3/Quantity", 4);
@@ -46,17 +46,17 @@ public class Program
 
         // analyser defaults
         alternates.Set("DataCollectSize", 8);
-        alternates.Set("DataAnalysisSize", 64);
+        alternates.Set("DataAnalysisSize", 80);
         alternates.Set("DataCollectAverage", Average.Ema);
         alternates.Set("DataAnalysisAverage", Average.Sma);
         
         // profit && loss
-        alternates.Set("Profit/InitialQuantity", 4);
-        alternates.Set("Profit/KeepQuantity", 1);
-        alternates.Set("Profit/QuantityStep", 2);
+        alternates.Set("Profit/InitialQuantity", 5);
+        alternates.Set("Profit/KeepQuantity", 2);
+        alternates.Set("Profit/QuantityStep", 1);
         alternates.Set("Profit/QuantityStepMultiplier", 0);
         alternates.Set("Profit/Start", 10);        
-        alternates.Set("Profit/PriceStep", 3.0);
+        alternates.Set("Profit/PriceStep", 2.0);
         
 
         alternates.Set("PriceLowLimit", 2200);

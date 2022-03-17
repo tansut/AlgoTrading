@@ -45,7 +45,7 @@ namespace Kalitte.Trading
             var result = new ClosePositionsSignalResult(this, time);
             var portfolio = Algo.UserPortfolioList.GetPortfolio(this.Symbol);
             
-            if (time.Hour == 22 && time.Minute == 57)
+            if (time.Hour == 22 && time.Minute >= 58)
             {
                 result.finalResult = BuySell.Sell;
                 result.Quantity = Config.KeepQuantity;

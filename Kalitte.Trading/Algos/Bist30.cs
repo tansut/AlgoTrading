@@ -171,7 +171,6 @@ namespace Kalitte.Trading.Algos
                 if (item.InitialAnalyseSize == 0) item.InitialAnalyseSize = DataAnalysisSize;
                 item.CollectAverage = DataCollectAverage;
                 item.AnalyseAverage = DataAnalysisAverage;
-
             }
         }
 
@@ -344,12 +343,12 @@ namespace Kalitte.Trading.Algos
         {
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
-            var delta = 0; 
+            
 
             var rsiOrders = portfolio.GetLastPositionOrders(typeof(GradientSignal));
             var lastOrderIsLoss = portfolio.LastOrderIsLoss;
             if (lastOrderIsLoss && rsiOrders.Count > 0) return;
-            var keepPosition = delta == 0 ? rsiOrders.Count > 0 : rsiOrders.Count > 1;
+            var keepPosition = false;
 
             Log($"HandleRsiLimit: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition} {signalResult.Gradient.UsedValue}", LogLevel.Verbose);
 

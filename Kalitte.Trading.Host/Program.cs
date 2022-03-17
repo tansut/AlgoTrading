@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 14);
-        settings.Finish = new DateTime(2022, 3, 14);
+        settings.Start = new DateTime(2022, 2, 28);
+        settings.Finish = new DateTime(2022, 2, 28);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
@@ -38,7 +38,7 @@ public class Program
 
         // analyser defaults
         alternates.Set("DataCollectSize", 8);
-        alternates.Set("DataAnalysisSize", 80);
+        alternates.Set("DataAnalysisSize", 64);
         alternates.Set("DataCollectAverage", Average.Ema);
         alternates.Set("DataAnalysisAverage", Average.Sma);
         

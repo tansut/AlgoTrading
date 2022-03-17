@@ -22,7 +22,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 3, 14);
-        settings.Finish = new DateTime(2022, 3, 14);
+        settings.Finish = new DateTime(2022, 3, 17);
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
@@ -34,10 +34,10 @@ public class Program
         alternates.Set("RsiOrderL1/Quantity", 1);
         alternates.Set("RsiOrderL1/Action", RsiPositionAction.OpenIfEmpty);
 
-        alternates.Set("RsiOrderL2/Quantity", 1);
+        alternates.Set("RsiOrderL2/Quantity", 2);
         alternates.Set("RsiOrderL2/Action", RsiPositionAction.BuyAdditional);
 
-        alternates.Set("RsiOrderL3/Quantity", 2);
+        alternates.Set("RsiOrderL3/Quantity", 4);
         alternates.Set("RsiOrderL3/Action", RsiPositionAction.ChangePosition);
 
 
@@ -67,7 +67,7 @@ public class Program
         alternates.Set("RsiLoss/KeepQuantity", 0);
         alternates.Set("RsiLoss/QuantityStep", 0);
         alternates.Set("RsiLoss/QuantityStepMultiplier", 0);                
-        alternates.Set("RsiLoss/Start", 288);
+        alternates.Set("RsiLoss/Start", 96);
         alternates.Set("RsiLoss/PriceStep", 0);
 
 

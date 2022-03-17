@@ -98,6 +98,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(null, "RsiValue")]
         public AnalyserConfig RsiValueConfig { get; set; } = new AnalyserConfig();
 
+        [AlgoParam(null, "DailyClose")]
+        public ClosePositionsSignalConfig DailyCloseConfig { get; set; }
+
         // rsi
         [AlgoParam(14)]
         public int Rsi { get; set; }
@@ -246,9 +249,7 @@ namespace Kalitte.Trading.Algos
             if (rsiLowL2.Enabled) this.rsiLossSignal.CostSignals.Add(rsiLowL2);
             if (rsiHighL2.Enabled) this.rsiLossSignal.CostSignals.Add(rsiHighL2);
 
-
-            closePositionsSignal = new ClosePositionsSignal("daily-close", Symbol, this, ClosePositionsDaily);
-            if (ClosePositionsDaily) Signals.Add(closePositionsSignal);
+            this.Signals.Add(this.closePositionsSignal = new ClosePositionsSignal("daily-close", Symbol, this, DailyCloseConfig));
 
             Fibonacci fib = this.PriceLowLimit > 0 ? new Fibonacci(PriceLowLimit, PriceHighLimit) : null;
 

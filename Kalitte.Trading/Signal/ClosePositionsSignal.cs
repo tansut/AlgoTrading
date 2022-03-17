@@ -13,13 +13,15 @@ using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
-    public class ClosePositionsSignal : SignalBase
+    public class ClosePositionsSignalConfig : SignalConfig
     {
-        public bool AutoClose { get; set; }        
 
-        public ClosePositionsSignal(string name, string symbol, AlgoBase owner, bool autoClose) : base(name, symbol, owner)
+    }
+
+    public class ClosePositionsSignal : Signal<ClosePositionsSignalConfig>
+    {
+        public ClosePositionsSignal(string name, string symbol, AlgoBase owner, ClosePositionsSignalConfig config) : base(name, symbol, owner, config)
         {
-            this.AutoClose = AutoClose;
         }
 
 

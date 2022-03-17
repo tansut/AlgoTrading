@@ -375,7 +375,7 @@ namespace Kalitte.Trading.Algos
             }
             else if (result.Signal.Name == "daily-close")
             {
-                HandleDailyCloseSignal((ClosePositionsSignal)result.Signal, result);
+                HandleDailyCloseSignal((ClosePositionsSignal)result.Signal, (ClosePositionsSignalResult)result);
             }
         }
 
@@ -416,10 +416,36 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-        public void HandleDailyCloseSignal(ClosePositionsSignal signal, SignalResult result)
+        public void MakePortfolio(string symbol, decimal quantity, BuySell side, string comment, SignalResult result)
         {
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
-            if (!portfolio.IsEmpty) ClosePositions(Symbol, result);
+            var orderQuantity = quantity;            
+            
+            if (!portfolio.IsEmpty)
+            {
+                orderQuantity = portfolio.Side == side ? quantity - portfolio.Quantity: portfolio.Quantity + quantity;
+                if (orderQuantity < 0) {
+                    side = side == BuySell.Buy ? BuySell.Sell : BuySell.Buy;
+                    orderQuantity = Math.Abs(orderQuantity);
+                }
+            }
+
+            if (orderQuantity > 0) sendOrder(Symbol, orderQuantity, side, comment, 0, OrderIcon.PositionClose, Now, result, false);
+
+        }
+
+        public void HandleDailyCloseSignal(ClosePositionsSignal signal, ClosePositionsSignalResult result)
+        {
+            var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
+
+
+            if (result.Quantity == 0 && !portfolio.IsEmpty) ClosePositions(Symbol, result);
+            else
+            {
+                var macd = maCross.i1k.Results.Last().Value.Value;
+                var expectedSide = macd > 0 ? BuySell.Buy : BuySell.Sell;
+                MakePortfolio(Symbol, result.Quantity, expectedSide, "daily close", result);
+            }                        
         }
 
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)

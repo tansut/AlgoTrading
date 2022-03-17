@@ -114,7 +114,8 @@ public class Program
 
 
         // general
-        alternates.Set("ClosePositionsDaily", false);     
+        alternates.Set("DailyClose/Enabled", true);     
+        alternates.Set("DailyClose/KeepQuantity", 2);
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);        

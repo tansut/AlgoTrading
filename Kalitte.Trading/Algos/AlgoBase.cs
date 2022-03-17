@@ -85,6 +85,7 @@ namespace Kalitte.Trading.Algos
         public string[] SimulationFileFields { get; set; } = new string[] { };
 
         private DateTime? time { get; set; } = null;
+        private ReaderWriterLock timeReaderLock = new ReaderWriterLock();
 
         private object simulationLock = new object();
 
@@ -113,7 +114,7 @@ namespace Kalitte.Trading.Algos
         public bool UsePerformanceMonitor { get; set; }
          
 
-                [AlgoParam(BarPeriod.Min10)]
+        [AlgoParam(BarPeriod.Min10)]
         public BarPeriod SymbolPeriod { get; set; }
 
 
@@ -142,14 +143,32 @@ namespace Kalitte.Trading.Algos
 
         internal DateTime SetTime(DateTime t)
         {
-            return (DateTime)(time = t);
+            timeReaderLock.AcquireWriterLock(1000);
+            try
+            {
+                return (DateTime)(time = t);
+            }
+            finally
+            {
+                timeReaderLock.ReleaseWriterLock();
+            }
+            
         }
 
         public DateTime Now
         {
             get
             {
-                return time ?? DateTime.Now;
+                timeReaderLock.AcquireReaderLock(1000);
+                try
+                {
+                    return time ?? DateTime.Now;
+                }
+                finally
+                {
+                    timeReaderLock.ReleaseReaderLock();
+                }
+                
             }
         }
 

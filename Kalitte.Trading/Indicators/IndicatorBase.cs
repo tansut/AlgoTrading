@@ -122,7 +122,6 @@ namespace Kalitte.Trading.Indicators
             {
                 ResultList.RelaseWriter();
             }
-
         }
 
 

@@ -39,12 +39,12 @@ public class Program
 
 
         // profit && loss
-        alternates.Set("ProfitInitialQuantity", 5, 6, 4);
-        alternates.Set("ProfitKeepQuantity", 2, 1);
+        alternates.Set("ProfitInitialQuantity", 4);
+        alternates.Set("ProfitKeepQuantity", 1,2);
         alternates.Set("ProfitQuantityStep", 2,1);
         alternates.Set("ProfitQuantityStepMultiplier", 0);
-        alternates.Set("ProfitStart", 11,10);        
-        alternates.Set("ProfitPriceStep", 3.0, 2, 4);
+        alternates.Set("ProfitStart", 10);        
+        alternates.Set("ProfitPriceStep", 3.0,2);
         alternates.Set("ProfitUseMonitor", false);
 
         // rsiTrendProfit
@@ -57,11 +57,11 @@ public class Program
         alternates.Set("PriceLowLimit", 2200);
         alternates.Set("PriceHighLimit", 2300);                   
 
-        alternates.Set("LossInitialQuantity", 8);
+        alternates.Set("LossInitialQuantity", 9);
         alternates.Set("LossKeepQuantity", 0);
         alternates.Set("LossQuantityStep", 0);
         alternates.Set("LossQuantityStepMultiplier", 0);                
-        alternates.Set("LossStart", 192);
+        alternates.Set("LossStart", 288);
         alternates.Set("LossPriceStep", 0);
 
         // rsi
@@ -94,7 +94,7 @@ public class Program
         alternates.Set("PowerCrossPositiveMultiplier", 2.8);
 
         // general
-        alternates.Set("ClosePositionsDaily", true);     
+        alternates.Set("ClosePositionsDaily", false);     
         
         alternates.Set("RsiGradientTolerance", 0.015);
         alternates.Set("RsiGradientLearnRate", 0.005);

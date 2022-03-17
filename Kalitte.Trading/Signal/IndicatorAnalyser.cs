@@ -1,4 +1,5 @@
-﻿using Kalitte.Trading.Algos;
+﻿// algo
+using Kalitte.Trading.Algos;
 using Kalitte.Trading.Indicators;
 using System;
 using System.Collections.Generic;

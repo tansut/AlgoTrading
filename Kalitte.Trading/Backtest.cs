@@ -74,6 +74,7 @@ namespace Kalitte.Trading
             public DateTime T1 { get; set; }
             public DateTime T2 { get; set; }
             public bool Break { get; set; } = false;
+            public AutoResetEvent TimeEvent { get; set; }
         }
 
         void createParameters()
@@ -132,11 +133,13 @@ namespace Kalitte.Trading
                         }
                         else
                         {
+                            Console.WriteLine($"** LOADED[{Thread.CurrentThread.ManagedThreadId}] ** NOW:{now} ELAPSE:{elapsed} ALGO.NOW:{Algo.Now} P: {period}");
                             Algo.PushNewBar(Algo.Symbol, sec.Value, period);
                             periodBarIndexes[sec.Key] = periodBarIndexes[sec.Key] + 1;
                         }
                     }
                 }
+                prms.TimeEvent.Set();
 
             }
 
@@ -157,32 +160,36 @@ namespace Kalitte.Trading
                     }
                 }
             }
+
+            
         }
 
         public void Run(DateTime t1, DateTime t2)
         {
+            
             var periodBarIndexes = new Dictionary<int, int>();
-            var seconds = 0;
-
             Algo.SetTime(t1);
             var bl = new Thread(new ParameterizedThreadStart(BarLoaderThread));
             var barParams = new BarLoaderParams() { T1 = t1, T2 = t2 };
+            barParams.TimeEvent = new AutoResetEvent(false);
             bl.Start(barParams);
 
             for (var p = t1; p <= t2; p = p.AddSeconds(1))
-            {
-                if (p > DateTime.Now)
+            {                
+                if (p > DateTime.Now)   
                 {
                     barParams.Break = true;
                     break;
                 }
                 Algo.SetTime(p);
+                
                 Algo.SetBarCurrentValues();
-                var time = Algo.Now;
+                var time = Algo.Now;                
                 Algo.RunSignals(time);
                 Algo.CheckDelayedOrders(time);
                 if (Algo.UsePerformanceMonitor) Algo.Watch.CheckMonitor();
                 Algo.simulationCount++;
+                barParams.TimeEvent.WaitOne();
             }
             bl.Join();
         }
@@ -196,10 +203,6 @@ namespace Kalitte.Trading
             var n1 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
             var n2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
-            //if (m1 < s) m1 = s;
-            //if (m2 > f) m2 = f;
-            ////if (n1 < s) n1 = s;
-            //if (n2 > f) n2 = f;
 
             return new Tuple<Tuple<DateTime, DateTime>, Tuple<DateTime, DateTime>>(
                    new Tuple<DateTime, DateTime>(m1, m2), new Tuple<DateTime, DateTime>(n1, n2)
@@ -224,8 +227,7 @@ namespace Kalitte.Trading
                 var periods = this.GetDates(currentDay, Algo.TestStart.Value, Algo.TestFinish.Value);
 
                 Run(periods.Item1.Item1, periods.Item1.Item2);
-                Run(periods.Item2.Item1, periods.Item2.Item2);
-                //if (Algo.ClosePositionsDaily) Algo.ClosePositions(Algo.Symbol, null);
+                Run(periods.Item2.Item1, periods.Item2.Item2);               
                 Algo.Signals.ForEach(p => p.Reset());
             }
             if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, null);
@@ -252,11 +254,6 @@ namespace Kalitte.Trading
 
         private Backtest run(Dictionary<string, object> init, int index, int total, string[] configs, Backtest related = null)
         {
-            //var appDomain = AppDomain.CreateDomain("noname");
-            //var typeName = typeof(T).FullName;
-            //var handle = appDomain.CreateInstance(typeof(T).Assembly.FullName, typeName);
-            //var algo = (AlgoBase)handle.Unwrap();
-            //algo.ApplyProperties(init);
             var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { init });
             algo.SimulationFile = this.FileName;
             algo.SimulationFileFields = configs;

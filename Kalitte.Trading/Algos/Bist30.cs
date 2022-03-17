@@ -472,8 +472,8 @@ namespace Kalitte.Trading.Algos
 
             if (delta > 0)
             {
-                if (signalResult.finalResult == BuySell.Buy && signalResult.Gradient.UsedValue > signal.L1 - delta) usedRsiQuantity = usedRsiQuantity / 2;
-                else if (signalResult.finalResult == BuySell.Sell && signalResult.Gradient.UsedValue < signal.L1 + delta) usedRsiQuantity = usedRsiQuantity / 2;
+                if (signalResult.finalResult == BuySell.Buy && signalResult.Gradient.UsedValue > signal.L1 - delta) usedRsiQuantity = Math.Floor(usedRsiQuantity / 2);
+                else if (signalResult.finalResult == BuySell.Sell && signalResult.Gradient.UsedValue < signal.L1 + delta) usedRsiQuantity = Math.Floor(usedRsiQuantity / 2);
             }
 
             var orderQuantity = portfolio.Quantity + usedRsiQuantity;

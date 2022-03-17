@@ -280,7 +280,7 @@ namespace Kalitte.Trading
                 {
                     if (!BarDifferenceNegligible(t, expected, indicator.InputBars.Last.Date, indicator.InputBars.Period))
                     {
-                        Log($"Wrong bar: now: {t} expected:{expected} using:{indicator.InputBars.Last.Date}", LogLevel.Error, t);
+                        Log($"Wrong bar[{Thread.CurrentThread.ManagedThreadId}]: now: {t} expected:{expected} using:{indicator.InputBars.Last.Date}", LogLevel.Error, t);
                         return false;
                     } else
                     {

@@ -14,7 +14,10 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(6.0)]
         public decimal CrossOrderQuantity { get; set; }
         [AlgoParam(3.0)]
-        public decimal RsiOrderQuantity { get; set; }
+        public decimal RsiOrderL1Quantity { get; set; }
+
+        [AlgoParam(3.0)]
+        public decimal RsiOrderL2Quantity { get; set; }
 
 
         // ma cross
@@ -28,9 +31,6 @@ namespace Kalitte.Trading.Algos
         public decimal CrossRsiMin { get; set; }
         [AlgoParam(55)]
         public decimal CrossRsiMax { get; set; }
-        [AlgoParam(1)]
-        public decimal RsiValueSignalSensitivity { get; set; }
-
 
         // fibonachi
         [AlgoParam(0)]
@@ -87,8 +87,6 @@ namespace Kalitte.Trading.Algos
         public Average DataAnalysisAverage { get; set; }
 
 
-
-
         [AlgoParam(0.015)]
         public decimal RsiGradientTolerance { get; set; }
         [AlgoParam(0.005)]
@@ -97,7 +95,7 @@ namespace Kalitte.Trading.Algos
 
 
 
-        CrossSignal maSignal = null;
+        CrossSignal maCross = null;
 
         ProfitSignal profitSignal = null;
         LossSignal rsiLossSignal = null;
@@ -118,9 +116,9 @@ namespace Kalitte.Trading.Algos
             var periodData = GetSymbolData(this.Symbol, this.SymbolPeriod);
 
             powerSignal.Indicator = new Rsi(periodData.Periods, PowerLookback, CandlePart.Volume);
-            maSignal.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, 9);
-            maSignal.i2k = new Custom((q) => 0, periodData.Periods);
-            maSignal.PowerSignal = powerSignal;
+            maCross.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, 9);
+            maCross.i2k = new Custom((q) => 0, periodData.Periods);
+            maCross.PowerSignal = powerSignal;
 
             var rsi = new Rsi(periodData.Periods, Rsi);
 
@@ -152,8 +150,6 @@ namespace Kalitte.Trading.Algos
         public ProfitSignal CreateProfitSignal(string name, string symbol, PLSignalConfig config)
         {
             var signal = new ProfitSignal(name, symbol, this, config);
-            signal.GradientTolerance = ProfitGradientTolerance;
-            signal.GradientLearnRate = ProfitGradientLearnRate;
             return signal;
         }
 
@@ -167,12 +163,12 @@ namespace Kalitte.Trading.Algos
             return signal;
         }
 
-        public SetAnalyserDefaults(params AnalyserConfig[] configs)
+        public void SetAnalyserDefaults(params AnalyserConfig[] configs)
         {
             foreach (var item in configs)
             {
                 if (item.InitialCollectSize == 0) item.InitialCollectSize = DataCollectSize;
-                if (item.InitialAnalyseSize == 0) item.InitialCollectSize = DataAnalysisSize;
+                if (item.InitialAnalyseSize == 0) item.InitialAnalyseSize = DataAnalysisSize;
                 item.CollectAverage = DataCollectAverage;
                 item.AnalyseAverage = DataAnalysisAverage;
 
@@ -187,16 +183,18 @@ namespace Kalitte.Trading.Algos
             //DateTime? trackStart = null;
             //DateTime? trackFinish = null;
 
+
+            SetAnalyserDefaults(this.GetType().GetProperties().Where(p => typeof(AnalyserConfig).IsAssignableFrom(p.PropertyType)).Select(p => p.GetValue(this)).Select(p=>(AnalyserConfig)p).ToArray());
+
             
             this.Signals.Add(this.powerSignal = new PowerSignal("power", Symbol, this, VolumePowerConfig));
-            this.Signals.Add(this.rsiValue = new IndicatorAnalyser("rsi", Symbol, this, RsiValueConfig));
-            // unutma: rsiValue.SignalSensitivity = RsiValueSignalSensitivity;
+            this.Signals.Add(this.rsiValue = new IndicatorAnalyser("rsi", Symbol, this, RsiValueConfig));            
 
-            this.Signals.Add(CreateRsiPositionSignal("rsi-high-l1", Symbol, RsiHighL1Config));
-            this.Signals.Add(CreateRsiPositionSignal("rsi-high-l2", Symbol, RsiHighL2Config));
-            this.Signals.Add(CreateRsiPositionSignal("rsi-low-l1", Symbol, RsiLowL1Config));
-            this.Signals.Add(CreateRsiPositionSignal("rsi-low-l2", Symbol, RsiLowL2Config));
-            this.Signals.Add(new CrossSignal("cross-ma59", Symbol, this, MaCrossConfig));
+            this.Signals.Add(this.rsiHighL1 = CreateRsiPositionSignal("rsi-high-l1", Symbol, RsiHighL1Config));
+            this.Signals.Add(this.rsiHighL2 = CreateRsiPositionSignal("rsi-high-l2", Symbol, RsiHighL2Config));
+            this.Signals.Add(this.rsiLowL1 = CreateRsiPositionSignal("rsi-low-l1", Symbol, RsiLowL1Config));
+            this.Signals.Add(this.rsiLowL2 = CreateRsiPositionSignal("rsi-low-l2", Symbol, RsiLowL2Config));
+            this.Signals.Add(this.maCross = new CrossSignal("cross-ma59", Symbol, this, MaCrossConfig));
 
 
             this.Signals.Add(this.profitSignal = CreateProfitSignal("profit", Symbol, ProfitConfig));
@@ -204,6 +202,7 @@ namespace Kalitte.Trading.Algos
             this.rsiProfitSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
             this.Signals.Add(this.rsiLossSignal = new LossSignal("loss", Symbol, this, RsiLossConfig));
             this.rsiLossSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
+
             if (rsiLowL1.Enabled) this.rsiLossSignal.CostSignals.Add(rsiLowL1);
             if (rsiHighL1.Enabled) this.rsiLossSignal.CostSignals.Add(rsiHighL1);
             if (rsiLowL2.Enabled) this.rsiLossSignal.CostSignals.Add(rsiLowL2);
@@ -228,10 +227,6 @@ namespace Kalitte.Trading.Algos
                 if (analyser != null)
                 {
                     analyser.CollectSize = DataCollectSize;
-                    //analyser.AnalyseAverage = Average.Ema;
-                    //analyser.AnalyseSize = Convert.ToInt32(DataAnalysisSize);
-                    //analyser.CollectAverage = DataCollectUseSma ? Average.Sma : Average.Ema;
-                    //analyser.AnalyseAverage = DataAnalysisUseSma ? Average.Sma : Average.Ema;
                     analyser.TrackStart = trackStart ?? analyser.TrackStart;
                     analyser.TrackEnd = trackFinish ?? analyser.TrackEnd;
                 }
@@ -264,20 +259,15 @@ namespace Kalitte.Trading.Algos
         public override void ConfigureMonitor()
         {
 
-            if (maSignal != null)
+            if (maCross != null)
             {
-                this.Watch.AddFilter($"{maSignal.Name}/sensitivity", 10);
+                this.Watch.AddFilter($"{maCross.Name}/sensitivity", 10);
             }
             if (powerSignal != null)
             {
                 this.Watch.AddFilter($"{powerSignal.Name}/volume", 10);
                 this.Watch.AddFilter($"{powerSignal.Name}/VolumePerSecond", 10);
             }
-            //if (rsiTrendSignal != null)
-            //{
-            //    this.Watch.AddFilter($"{rsiTrendSignal.Name}/value", 5);
-            //    this.Watch.AddFilter($"{rsiTrendSignal.Name}/speed", 10);
-            //}
             base.ConfigureMonitor();
         }
 
@@ -336,7 +326,7 @@ namespace Kalitte.Trading.Algos
             {
                 HandleProfitLossSignal((PLSignal)result.Signal, (ProfitLossResult)result);
             }
-            else if ((result.Signal.Name == "rsi-high") || (result.Signal.Name == "rsi-low"))
+            else if ((result.Signal.Name.StartsWith("rsi") && result.Signal is GradientSignal))
             {
                 HandleRsiLimitSignal((GradientSignal)result.Signal, (GradientSignalResult)result);
             }
@@ -366,14 +356,8 @@ namespace Kalitte.Trading.Algos
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-
-            var usedRsiQuantity = RsiOrderQuantity;
-
-            //if (delta > 0)
-            //{
-            //    if (signalResult.finalResult == BuySell.Buy && signalResult.Gradient.UsedValue > signal.L1 - delta) usedRsiQuantity = Math.Floor(usedRsiQuantity / 2);
-            //    else if (signalResult.finalResult == BuySell.Sell && signalResult.Gradient.UsedValue < signal.L1 + delta) usedRsiQuantity = Math.Floor(usedRsiQuantity / 2);
-            //}
+            var signalIsL1 = signal == rsiHighL1 || signal == rsiLowL1;
+            var usedRsiQuantity = signalIsL1 ? RsiOrderL1Quantity: RsiOrderL2Quantity;
 
             var orderQuantity = portfolio.Quantity + usedRsiQuantity;
 

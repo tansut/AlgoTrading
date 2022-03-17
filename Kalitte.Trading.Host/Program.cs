@@ -30,7 +30,10 @@ public class Program
 
         // options
         alternates.Set("CrossOrderQuantity", 9);
-        alternates.Set("RsiOrderQuantity", 9);
+
+        alternates.Set("RsiOrderL1Quantity", 4);
+        alternates.Set("RsiOrderL2Quantity", 5);
+
         alternates.Set("UsePerformanceMonitor", false);
 
         // analyser defaults
@@ -64,11 +67,13 @@ public class Program
         alternates.Set("Rsi", 14);
         alternates.Set("RsiHighL1/L1", 73.00);        
         alternates.Set("RsiHighL1/L2", 84.00);
+
         alternates.Set("RsiHighL2/L1", 84.01);
         alternates.Set("RsiHighL2/L2", 100);
 
         alternates.Set("RsiLowL1/L1", 32.00);
         alternates.Set("RsiLowL1/L2", 24.00);
+
         alternates.Set("RsiLowL2/L1", 23.99);
         alternates.Set("RsiLowL2/L2", 0);
 

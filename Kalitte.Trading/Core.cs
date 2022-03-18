@@ -52,16 +52,17 @@ namespace Kalitte.Trading
         }
     }
 
-    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field)]
-    public class ConfigParam : Attribute
+    public class ConfigParameters
     {
-        public string Prefix { get; set; } = null;
-        public ConfigParam(string perfix)
+        public override string ToString()
         {
-            this.Prefix = perfix;
+             var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
+            var sb = new StringBuilder();
+            foreach (var prop in properties)
+                sb.Append($"{prop.Name}: {prop.GetValue(this)} ");
+            return sb.ToString();
         }
     }
-
 
     public enum DataTime
     {
@@ -69,49 +70,6 @@ namespace Kalitte.Trading
         Current
     }
 
-    public class AlgoParameter<T> where T : IEquatable<T>
-    {
-        public string Name { get; set; }
-        public T Value { get; set; }
-
-        public AlgoParameter(string name, T value)
-        {
-            this.Name = name;
-            this.Value = value;
-        }
-    }
-
-    public class StringParameter : AlgoParameter<string>
-    {
-        public StringParameter(string name, string value) : base(name, value)
-        {
-
-        }
-    }
-
-    public class DecimalParameter : AlgoParameter<decimal>
-    {
-        public DecimalParameter(string name, decimal value) : base(name, value)
-        {
-
-        }
-    }
-
-    public class IntegerParameter : AlgoParameter<int>
-    {
-        public IntegerParameter(string name, int value) : base(name, value)
-        {
-
-        }
-    }
-
-    public class BoolParameter : AlgoParameter<bool>
-    {
-        public BoolParameter(string name, bool value) : base(name, value)
-        {
-
-        }
-    }
 
     public enum StartableState
     {

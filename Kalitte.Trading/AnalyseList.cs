@@ -16,16 +16,18 @@ namespace Kalitte.Trading
 
     public class AnalyseList
     {
-
-
+        public DateTime SpeedTime { get; set; }
+        public decimal? SpeedStart { get; set; }
         public Average Average { get; set; }
-        public FinanceList<IQuote> List { get; private set; }
+        public FinanceList<MyQuote> List { get; private set; }
+        public FinanceList<MyQuote> SpeedList { get; private set; }
         public CandlePart Candle { get; private set; }
 
         public AnalyseList(int size, Average average, CandlePart candle = CandlePart.Close)
         {
             this.Average = average;
-            this.List = new FinanceList<IQuote>(size);
+            this.List = new FinanceList<MyQuote>(size);
+            this.SpeedList = new FinanceList<MyQuote>(8);
             this.Candle = candle;
         }
 
@@ -78,8 +80,26 @@ namespace Kalitte.Trading
             }
         }
 
-
         public int Count => List.Count;
+
+        internal void ResetSpeed(DateTime t)
+        {            
+            var last = List.Last;
+            if (last == null) SpeedStart = null;
+            else SpeedStart = last.Get(Candle);
+            SpeedTime = t;
+            SpeedList.Clear();
+        }
+
+        internal decimal CalculateSpeed(DateTime time)
+        {
+            var seconds = (decimal)(time - this.SpeedTime).TotalSeconds;
+            var dif = List.Last.Get(Candle) - SpeedStart.Value;
+            decimal value = 0;
+            if (seconds > 0) value =  dif / seconds;
+            SpeedList.Push(new MyQuote() { Date = time, Close = value});
+            return SpeedList.List.GetEma(SpeedList.Count).Last().Ema.Value;
+        }
     }
 
 }

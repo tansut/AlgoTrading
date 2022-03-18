@@ -34,6 +34,7 @@ namespace Kalitte.Trading
         public decimal i1Val { get; set; }
         public decimal i2Val { get; set; }
         public decimal Dif { get; set; }
+        public decimal Speed { get; set; }
         public Sensitivity Sensitivity { get; set; }
         public decimal AveragePrice { get; set; }
         public decimal MarketPrice { get; set; }
@@ -291,15 +292,22 @@ namespace Kalitte.Trading
                 if (lastCross == 0 && cross != 0)
                 {
                     lastCross = cross;
-                    Log($"Cross identified: {lastCross}", LogLevel.Debug, t);
-                    AnalyseList.Clear();
+                    Log($"First cross identified: {cross}", LogLevel.Debug, t);
+                    //if (SpeedValues.Count > 0) SaveSpeed(time);
+                    AnalyseList.ResetSpeed(time);
+                } else if (cross != 0 && Math.Sign(lastCross) != Math.Sign(cross))
+                {
+                    lastCross = cross;
+                    //if (SpeedValues.Count > 0) SaveSpeed(time);
+                    AnalyseList.ResetSpeed(time);                    
                 }
 
                 if (AnalyseList.Ready && lastCross != 0)
                 {
                     lastAvg = AnalyseList.LastValue; 
                     result.Dif = lastAvg;
-
+                    result.Speed = AnalyseList.CalculateSpeed(time);
+                    TrackSpeed(time, result.Speed);
                     if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
                     else if (lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
                 }

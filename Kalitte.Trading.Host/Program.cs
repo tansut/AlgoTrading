@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 3, 17);
+        settings.Start = new DateTime(2022, 3, 16);
+        settings.Finish = new DateTime(2022, 3, 16);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
@@ -52,16 +52,17 @@ public class Program
         alternates.Set("DataAnalysisAverage", Average.Sma);
         
         // profit && loss
-        alternates.Set("Profit/InitialQuantity", 5);
-        alternates.Set("Profit/KeepQuantity", 2);
-        alternates.Set("Profit/QuantityStep", 1);
+        alternates.Set("Profit/InitialQuantity", 3,5,4);
+        alternates.Set("Profit/KeepQuantity", 2,1,3);
+        alternates.Set("Profit/QuantityStep", 1,2);
         alternates.Set("Profit/QuantityStepMultiplier", 0);
-        alternates.Set("Profit/Start", 10);        
-        alternates.Set("Profit/PriceStep", 2.0);
-        
+        alternates.Set("Profit/Start", 10,9);        
+        alternates.Set("Profit/PriceStep", 1,2.0);
+        alternates.Set("Profit/PriceMonitor", false);
 
-        alternates.Set("PriceLowLimit", 2200);
-        alternates.Set("PriceHighLimit", 2300);                   
+        // fibonachi
+        alternates.Set("PriceLowLimit", 2400);
+        alternates.Set("PriceHighLimit", 2500);                   
 
         alternates.Set("RsiLoss/Enabled", true);
         alternates.Set("RsiLoss/InitialQuantity", 9);
@@ -122,11 +123,11 @@ public class Program
         alternates.Set("LoggingLevel", LogLevel.Verbose);        
         alternates.Set("Symbol", "F_XU0300422");
         alternates.Set("LogConsole", false);
-        alternates.SaveToFile($"c:\\kalitte\\Bist30-test.json");
-
+        alternates.SaveToFile($"c:\\kalitte\\Bist30-test.json");    
         alternates.Set("LoggingLevel", LogLevel.Order);
-        alternates.Set("LogConsole", true);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
+        alternates.Set("LogConsole", true);
+        alternates.Set("UILoggingLevel", LogLevel.Order);
         return settings;
     }
 

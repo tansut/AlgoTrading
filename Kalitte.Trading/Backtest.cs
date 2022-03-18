@@ -225,11 +225,6 @@ namespace Kalitte.Trading
 
         private Backtest run(Dictionary<string, object> init, int index, int total, string[] configs, Backtest related = null)
         {
-            //var appDomain = AppDomain.CreateDomain("noname");
-            //var typeName = typeof(T).FullName;
-            //var handle = appDomain.CreateInstance(typeof(T).Assembly.FullName, typeName);
-            //var algo = (AlgoBase)handle.Unwrap();
-            //algo.ApplyProperties(init);
             var algo = (AlgoBase)Activator.CreateInstance(typeof(T), new Object[] { init });
             algo.SimulationFile = this.FileName;
             algo.SimulationFileFields = configs;

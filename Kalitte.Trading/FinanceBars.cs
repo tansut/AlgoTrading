@@ -48,6 +48,18 @@ namespace Kalitte.Trading
                 case CandlePart.Low: { this.Low = value; break; }
             }
         }
+
+        public decimal Get( CandlePart candle)
+        {
+            switch (candle)
+            {                
+                case CandlePart.Volume: { return this.Volume; }
+                case CandlePart.Open: { return this.Open; }
+                case CandlePart.High: { return this.High; }
+                case CandlePart.Low: { return this.Low; }
+                default: { return this.Close; }
+            }
+        }
     }
 
     [Serializable]
@@ -255,7 +267,7 @@ namespace Kalitte.Trading
                 rvl.AcquireReaderLock(timeOut);
                 try
                 {
-                    return items[items.Count - 1];
+                    return items.Count == 0 ? default(T): items[items.Count - 1];
                 }
                 finally
                 {

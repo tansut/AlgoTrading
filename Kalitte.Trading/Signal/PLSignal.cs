@@ -39,14 +39,14 @@ namespace Kalitte.Trading
         {
             this.Result = signalResult;
             this.Owner = signalResult.Signal as PLSignal;
-            var resistanceRatio = Owner.GradientTolerance;
-            var alpha = Owner.GradientLearnRate;
+            var resistanceRatio = Owner.Config.PriceMonitorTolerance;
+            var alpha = Owner.Config.PriceMonitorLearnRate;
             var l1 = Result.finalResult == BuySell.Buy ? Result.MarketPrice + Result.MarketPrice * resistanceRatio : Result.MarketPrice - Result.MarketPrice * resistanceRatio;
             var l2 = Result.finalResult == BuySell.Buy ? Result.MarketPrice - Result.MarketPrice * .1M : Result.MarketPrice + Result.MarketPrice * .1M;
             this.Grad = new Gradient(l1, l2, Owner.Algo);
             this.Grad.Tolerance = resistanceRatio;
             this.Grad.LearnRate = alpha;
-            this.Grad.FileName = this.Owner.Name + ".png";
+            this.Grad.FileName = Path.Combine(Owner.Algo.LogDir, this.Owner.Name + ".png");
             this.List = new AnalyseList(4, Average.Ema);
         }
 
@@ -118,10 +118,18 @@ namespace Kalitte.Trading
         public virtual decimal Start { get; set; }
 
         [AlgoParam(false)]
-        public bool UsePriceMonitor { get; set; }
+        public bool PriceMonitor { get; set; }
 
         [AlgoParam(true)]
-        public bool EnableLimitingSignalsOnStart { get; set; } 
+        public bool EnableLimitingSignalsOnStart { get; set; }
+
+        [AlgoParam(0)]
+        public virtual decimal PriceMonitorTolerance { get; set; }
+
+        [AlgoParam(0)]
+        public virtual decimal PriceMonitorLearnRate { get; set; }
+
+        
     }
 
 
@@ -137,8 +145,7 @@ namespace Kalitte.Trading
         public List<SignalBase> CostSignals { get; set; } = new List<SignalBase>();
 
 
-        public decimal GradientTolerance { get; set; }        
-        public decimal GradientLearnRate { get; set; }
+
 
 
         public PLSignal(string name, string symbol, AlgoBase owner, PLSignalConfig config) : base(name, symbol, owner, config)
@@ -253,7 +260,7 @@ namespace Kalitte.Trading
             result.Direction = SignalType;
             result.KeepQuantity = Config.KeepQuantity;
 
-            if (Config.UsePriceMonitor && result.finalResult.HasValue && result.Direction == ProfitOrLoss.Profit)
+            if (Config.PriceMonitor && result.finalResult.HasValue && result.Direction == ProfitOrLoss.Profit)
             {
                 PriceMonitor = PriceMonitor ?? CreatePriceMonitor(result);
                 if (!PriceMonitor.WorkingFor(result))

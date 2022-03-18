@@ -18,7 +18,7 @@ namespace Kalitte.Trading
 {
 
 
-    public class SignalConfig
+    public class SignalConfig: ConfigParameters
     {
         [AlgoParam(true)]
         public bool Enabled { get; set; }

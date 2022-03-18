@@ -15,7 +15,7 @@ namespace Kalitte.Trading.Algos
         ChangePosition
     }
 
-    public class RsiOrderConfig
+    public class RsiOrderConfig: ConfigParameters
     {
         [AlgoParam(0)]
         public decimal Quantity { get; set; }

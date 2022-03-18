@@ -92,6 +92,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(LogLevel.Verbose)]
         public LogLevel LoggingLevel { get; set; }
 
+        [AlgoParam(LogLevel.Info)]
+        public LogLevel UILoggingLevel { get; set; }
+
         [AlgoParam(false)]
         public bool Simulation { get; set; }
 
@@ -545,7 +548,7 @@ namespace Kalitte.Trading.Algos
                 var attr = (AlgoParam)prop.GetCustomAttributes(true).Where(p => p is AlgoParam).First();
                 if (prop.PropertyType.IsClass && prop.PropertyType != typeof(string))
                 {
-                    var subClassProps = GetConfigValues(prop.PropertyType);
+                    var subClassProps = GetConfigValues(prop.GetValue(target));
                     foreach (var subClassProp in subClassProps) result.Add($"{attr.Name ?? prop.Name}/{subClassProp.Key}", subClassProp.Value);
                 }
                 else result.Add(attr.Name ?? prop.Name, prop.GetValue(target));
@@ -604,7 +607,15 @@ namespace Kalitte.Trading.Algos
                             propValue = (BarPeriod)Convert.ToInt32(val);
                         }
                     }
-                    target.GetType().GetProperty(item.Name).SetValue(target, propValue);
+                    try
+                    {
+                        target.GetType().GetProperty(item.Name).SetValue(target, propValue);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"{item.Name} {propValue} set error", ex);
+                        
+                    }
                 }
                 else
                 {                    
@@ -902,7 +913,7 @@ namespace Kalitte.Trading.Algos
                         File.AppendAllText(LogFile, content + Environment.NewLine);
                     }                    
                 }
-                var showUser = ilevel >= (int)LogLevel.Debug;
+                var showUser = ilevel >= (int)UILoggingLevel;
                 if (LogConsole && showUser) Console.WriteLine(content);
                 if (Exchange != null && showUser) Exchange.Log(content, level, t);
             }

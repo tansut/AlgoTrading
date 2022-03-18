@@ -1,0 +1,374 @@
+{
+  "CrossOrderQuantity": [
+    9
+  ],
+  "RsiOrderL1/Quantity": [
+    1
+  ],
+  "RsiOrderL1/Action": [
+    0
+  ],
+  "RsiOrderL2/Quantity": [
+    3
+  ],
+  "RsiOrderL2/Action": [
+    1
+  ],
+  "RsiOrderL3/Quantity": [
+    4
+  ],
+  "RsiOrderL3/Action": [
+    2
+  ],
+  "MovPeriod": [
+    5
+  ],
+  "MovPeriod2": [
+    9
+  ],
+  "CrossRsiMin": [
+    45.2
+  ],
+  "CrossRsiMax": [
+    55.6
+  ],
+  "PriceLowLimit": [
+    2200
+  ],
+  "PriceHighLimit": [
+    2300
+  ],
+  "RsiLoss/InitialQuantity": [
+    9
+  ],
+  "RsiLoss/KeepQuantity": [
+    0
+  ],
+  "RsiLoss/QuantityStepMultiplier": [
+    0
+  ],
+  "RsiLoss/QuantityStep": [
+    0
+  ],
+  "RsiLoss/PriceStep": [
+    0
+  ],
+  "RsiLoss/Start": [
+    96
+  ],
+  "RsiLoss/UsePriceMonitor": [
+    false
+  ],
+  "RsiLoss/EnableLimitingSignalsOnStart": [
+    true
+  ],
+  "RsiLoss/Enabled": [
+    true
+  ],
+  "Profit/InitialQuantity": [
+    5
+  ],
+  "Profit/KeepQuantity": [
+    2
+  ],
+  "Profit/QuantityStepMultiplier": [
+    0
+  ],
+  "Profit/QuantityStep": [
+    1
+  ],
+  "Profit/PriceStep": [
+    2.0
+  ],
+  "Profit/Start": [
+    10
+  ],
+  "Profit/UsePriceMonitor": [
+    false
+  ],
+  "Profit/EnableLimitingSignalsOnStart": [
+    true
+  ],
+  "Profit/Enabled": [
+    true
+  ],
+  "RsiHighL1/Tolerance": [
+    0.01
+  ],
+  "RsiHighL1/LearnRate": [
+    0.005
+  ],
+  "RsiHighL1/L1": [
+    73.0
+  ],
+  "RsiHighL1/L2": [
+    76.0
+  ],
+  "RsiHighL1/AnalyseSize": [
+    0
+  ],
+  "RsiHighL1/CollectSize": [
+    0
+  ],
+  "RsiHighL1/CollectAverage": [
+    0
+  ],
+  "RsiHighL1/AnalyseAverage": [
+    1
+  ],
+  "RsiHighL1/Enabled": [
+    true
+  ],
+  "RsiHighL2/Tolerance": [
+    0.01
+  ],
+  "RsiHighL2/LearnRate": [
+    0.005
+  ],
+  "RsiHighL2/L1": [
+    76.01
+  ],
+  "RsiHighL2/L2": [
+    83.0
+  ],
+  "RsiHighL2/AnalyseSize": [
+    0
+  ],
+  "RsiHighL2/CollectSize": [
+    0
+  ],
+  "RsiHighL2/CollectAverage": [
+    0
+  ],
+  "RsiHighL2/AnalyseAverage": [
+    1
+  ],
+  "RsiHighL2/Enabled": [
+    true
+  ],
+  "RsiHighL3/Tolerance": [
+    0.01
+  ],
+  "RsiHighL3/LearnRate": [
+    0.005
+  ],
+  "RsiHighL3/L1": [
+    83.01
+  ],
+  "RsiHighL3/L2": [
+    100
+  ],
+  "RsiHighL3/AnalyseSize": [
+    0
+  ],
+  "RsiHighL3/CollectSize": [
+    0
+  ],
+  "RsiHighL3/CollectAverage": [
+    0
+  ],
+  "RsiHighL3/AnalyseAverage": [
+    1
+  ],
+  "RsiHighL3/Enabled": [
+    true
+  ],
+  "RsiLowL1/Tolerance": [
+    0.01
+  ],
+  "RsiLowL1/LearnRate": [
+    0.005
+  ],
+  "RsiLowL1/L1": [
+    33.0
+  ],
+  "RsiLowL1/L2": [
+    29.0
+  ],
+  "RsiLowL1/AnalyseSize": [
+    0
+  ],
+  "RsiLowL1/CollectSize": [
+    0
+  ],
+  "RsiLowL1/CollectAverage": [
+    0
+  ],
+  "RsiLowL1/AnalyseAverage": [
+    1
+  ],
+  "RsiLowL1/Enabled": [
+    true
+  ],
+  "RsiLowL2/Tolerance": [
+    0.01
+  ],
+  "RsiLowL2/LearnRate": [
+    0.005
+  ],
+  "RsiLowL2/L1": [
+    28.99
+  ],
+  "RsiLowL2/L2": [
+    23.0
+  ],
+  "RsiLowL2/AnalyseSize": [
+    0
+  ],
+  "RsiLowL2/CollectSize": [
+    0
+  ],
+  "RsiLowL2/CollectAverage": [
+    0
+  ],
+  "RsiLowL2/AnalyseAverage": [
+    1
+  ],
+  "RsiLowL2/Enabled": [
+    true
+  ],
+  "RsiLowL3/Tolerance": [
+    0.01
+  ],
+  "RsiLowL3/LearnRate": [
+    0.005
+  ],
+  "RsiLowL3/L1": [
+    22.99
+  ],
+  "RsiLowL3/L2": [
+    0
+  ],
+  "RsiLowL3/AnalyseSize": [
+    0
+  ],
+  "RsiLowL3/CollectSize": [
+    0
+  ],
+  "RsiLowL3/CollectAverage": [
+    0
+  ],
+  "RsiLowL3/AnalyseAverage": [
+    1
+  ],
+  "RsiLowL3/Enabled": [
+    true
+  ],
+  "MaCross/PowerThreshold": [
+    88
+  ],
+  "MaCross/PowerNegativeMultiplier": [
+    1.3
+  ],
+  "MaCross/PowerPositiveMultiplier": [
+    2.8
+  ],
+  "MaCross/Dynamic": [
+    true
+  ],
+  "MaCross/AvgChange": [
+    0.32
+  ],
+  "MaCross/AnalyseSize": [
+    0
+  ],
+  "MaCross/CollectSize": [
+    0
+  ],
+  "MaCross/CollectAverage": [
+    0
+  ],
+  "MaCross/AnalyseAverage": [
+    1
+  ],
+  "MaCross/Enabled": [
+    true
+  ],
+  "VolumePower/AnalyseSize": [
+    0
+  ],
+  "VolumePower/CollectSize": [
+    0
+  ],
+  "VolumePower/CollectAverage": [
+    0
+  ],
+  "VolumePower/AnalyseAverage": [
+    1
+  ],
+  "VolumePower/Enabled": [
+    true
+  ],
+  "RsiValue/AnalyseSize": [
+    0
+  ],
+  "RsiValue/CollectSize": [
+    0
+  ],
+  "RsiValue/CollectAverage": [
+    0
+  ],
+  "RsiValue/AnalyseAverage": [
+    1
+  ],
+  "RsiValue/Enabled": [
+    true
+  ],
+  "DailyClose/KeepQuantity": [
+    2
+  ],
+  "DailyClose/Enabled": [
+    true
+  ],
+  "Rsi": [
+    14
+  ],
+  "PowerLookback": [
+    5
+  ],
+  "DataCollectSize": [
+    8
+  ],
+  "DataAnalysisSize": [
+    80
+  ],
+  "DataCollectAverage": [
+    0
+  ],
+  "DataAnalysisAverage": [
+    1
+  ],
+  "RsiGradientTolerance": [
+    0.02
+  ],
+  "RsiGradientLearnRate": [
+    0.005
+  ],
+  "LoggingLevel": [
+    0
+  ],
+  "Simulation": [
+    false
+  ],
+  "LogConsole": [
+    false
+  ],
+  "LogDir": [
+    "c:\\kalitte\\log"
+  ],
+  "Symbol": [
+    "F_XU0300422"
+  ],
+  "UsePerformanceMonitor": [
+    false
+  ],
+  "SymbolPeriod": [
+    3
+  ],
+  "UseVirtualOrders": [
+    false
+  ],
+  "RsiValue/SignalSensitivity": [
+    4.0
+  ]
+}

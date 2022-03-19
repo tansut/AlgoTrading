@@ -170,7 +170,7 @@ namespace Kalitte.Trading.Algos
             maCrossL1.i2k = new Custom((q) => 0, periodData.Periods);
             maCrossL1.PowerSignal = powerSignal;
 
-            maCrossL2.i1k = maCrossL1.i1k;
+            maCrossL2.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, 9);
             maCrossL2.i2k = maCrossL1.i2k;
             maCrossL2.PowerSignal = powerSignal;
 
@@ -501,12 +501,12 @@ namespace Kalitte.Trading.Algos
                     var cancelCross = false;
                     var valueSet = 0M;
 
-                    if (config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi != 0 && currentRsi > config.RsiMax)
+                    if (config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi > config.RsiMax)
                     {
                         valueSet = config.RsiMax;
                         cancelCross = true;
                     }
-                    if (!signalResult.MorningSignal && config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi != 0 && currentRsi < config.RsiMin)
+                    if (!signalResult.MorningSignal && config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell  && currentRsi < config.RsiMin)
                     {
                         valueSet = config.RsiMin;
                         cancelCross = true;
@@ -538,7 +538,10 @@ namespace Kalitte.Trading.Algos
             {
                 orderQuantity = config.Quantity - portfolio.Quantity;
             }
-            if (orderQuantity > 0) sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{signal.AvgChange.ToCurrency()},{signal.AnalyseSize}, rsi:{currentRsi.ToCurrency()},{rsiSpeed.ToCurrency()},{rsiAcc.ToCurrency()}]", signalResult);
+            if (orderQuantity > 0)
+            {
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{signal.AvgChange.ToCurrency()},{signal.AnalyseSize}, rsi:{currentRsi.ToCurrency()},{rsiSpeed.ToCurrency()},{rsiAcc.ToCurrency()}]", signalResult);
+            }
         }
 
 

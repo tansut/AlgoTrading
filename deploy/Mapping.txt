@@ -2197,6 +2197,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_MorningSignal[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_MorningSignal[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::ToString[0]( ) skipped:  external base class or interface
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::GetHashCode[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::.ctor[2]( [Kalitte.Trading]Kalitte.Trading.SignalBase, [mscorlib]System.DateTime ) skipped:  special name
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<i1Val>k__BackingField -> A

@@ -13,6 +13,7 @@ using Matriks.Lean.Algotrader.Models;
 using Kalitte.Trading.Algos;
 using Skender.Stock.Indicators;
 using Kalitte.Trading.Indicators;
+using Kalitte.Trading.DataVisualization;
 
 namespace Kalitte.Trading
 {
@@ -97,7 +98,7 @@ namespace Kalitte.Trading
     {
         public StartableState State { get; set; } = StartableState.Stopped;
         protected System.Timers.Timer _timer = null;
-
+        public ChartList Charts  { get; set; } = new ChartList();
         protected object OperationLock = new object();
 
         public string Name { get; set; }
@@ -127,6 +128,22 @@ namespace Kalitte.Trading
         public override string ToString()
         {
             return $"{this.GetType().Name}[{this.Name}]";
+        }
+
+        public Chart Chart(string name, string title = "")
+        {
+            return Charts.Chart($"{this.Name}-{name}", title);
+        }
+
+        public void SaveChart(string name, string id = "", bool clear = true)
+        {
+            Chart(name).Save(Path.Combine(Algo.LogDir, $"{this.Name}-{name}{id}.png"), clear);            
+        }
+
+        public void SaveChart(string name, DateTime time, bool clear = true)
+        {
+            var id = time.ToString("dd-MM-yy-HH-mm-ss");
+            SaveChart(name, id, clear);
         }
 
         public void Pause(DateTime until)

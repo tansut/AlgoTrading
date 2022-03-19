@@ -1455,6 +1455,8 @@ Skipped Types:
 
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::get_State[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::set_State[1]( [Kalitte.Trading]Kalitte.Trading.StartableState ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.SignalBase::get_Charts[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.SignalBase::set_Charts[1]( [Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartList ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::get_Name[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::set_Name[1]( [mscorlib]System.String ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::get_Algo[0]( ) skipped:  skip by property
@@ -1491,6 +1493,9 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::Init[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::ResetInternal[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::CheckInternal[1]( [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.SignalBase::Chart[2]( [mscorlib]System.String, [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.SignalBase::SaveChart[3]( [mscorlib]System.String, [mscorlib]System.String, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.SignalBase::SaveChart[3]( [mscorlib]System.String, [mscorlib]System.DateTime, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::Pause[1]( [mscorlib]System.DateTime ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::ResetOrdersInternal[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::ResetOrders[0]( ) skipped:  KeepPublicApi option in configuration
@@ -1512,6 +1517,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::raiseSignal[1]( [Kalitte.Trading]Kalitte.Trading.SignalEventArgs ) skipped:  KeepPublicApi option in configuration
 
 	Kalitte.Trading.StartableState [Kalitte.Trading]Kalitte.Trading.StartableState Kalitte.Trading.SignalBase::<State>k__BackingField -> A
+	Kalitte.Trading.DataVisualization.ChartList [Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartList Kalitte.Trading.SignalBase::<Charts>k__BackingField -> A
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.SignalBase::<Name>k__BackingField -> A
 	Kalitte.Trading.Algos.AlgoBase [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase Kalitte.Trading.SignalBase::<Algo>k__BackingField -> A
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.SignalBase::<Enabled>k__BackingField -> A
@@ -1536,6 +1542,7 @@ Skipped Types:
 
 
 	Kalitte.Trading.StartableState [Kalitte.Trading]Kalitte.Trading.StartableState Kalitte.Trading.SignalBase::State skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.DataVisualization.ChartList [Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartList Kalitte.Trading.SignalBase::Charts skipped:  KeepPublicApi option in configuration
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.SignalBase::Name skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Algos.AlgoBase [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase Kalitte.Trading.SignalBase::Algo skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.SignalBase::Enabled skipped:  KeepPublicApi option in configuration
@@ -1989,6 +1996,59 @@ Skipped Types:
 
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Indicators.PriceResult::Price skipped:  KeepPublicApi option in configuration
+}
+
+[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie skipped:  KeepPublicApi option in configuration
+{
+
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::get_Name[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::set_Name[1]( [mscorlib]System.String ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::get_Title[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::set_Title[1]( [mscorlib]System.String ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::Add[2]( [mscorlib]System.DateTime, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::.ctor[0]( ) skipped:  special name
+
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.ChartSerie::<Name>k__BackingField -> A
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.ChartSerie::<Title>k__BackingField -> a
+
+	ZedGraph.PointPairList [Kalitte.Trading]ZedGraph.PointPairList Kalitte.Trading.DataVisualization.ChartSerie::Points skipped:  KeepPublicApi option in configuration
+
+
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.ChartSerie::Name skipped:  KeepPublicApi option in configuration
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.ChartSerie::Title skipped:  KeepPublicApi option in configuration
+}
+
+[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart skipped:  KeepPublicApi option in configuration
+{
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::Clear[0]( ) -> A
+
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::get_Name[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::set_Name[1]( [mscorlib]System.String ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::get_Title[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::set_Title[1]( [mscorlib]System.String ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::get_Series[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::set_Series[1]( [mscorlib]System.Collections.Generic.Dictionary`2<[mscorlib]System.String,[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie> ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::Serie[2]( [mscorlib]System.String, [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::Save[2]( [mscorlib]System.String, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart::.ctor[0]( ) skipped:  special name
+
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.Chart::<Name>k__BackingField -> A
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.Chart::<Title>k__BackingField -> a
+	System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.ChartSerie> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.ChartSerie> Kalitte.Trading.DataVisualization.Chart::<Series>k__BackingField -> A
+
+
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.Chart::Name skipped:  KeepPublicApi option in configuration
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.Chart::Title skipped:  KeepPublicApi option in configuration
+	System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.ChartSerie> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.ChartSerie> Kalitte.Trading.DataVisualization.Chart::Series skipped:  KeepPublicApi option in configuration
+}
+
+[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartList skipped:  KeepPublicApi option in configuration
+{
+
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartList::Chart[2]( [mscorlib]System.String, [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartList::.ctor[0]( ) skipped:  special name
+
+	System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.Chart> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.Chart> Kalitte.Trading.DataVisualization.ChartList::charts -> A
 }
 
 [Kalitte.Trading]Kalitte.Trading.Algos.DelayedOrder skipped:  KeepPublicApi option in configuration

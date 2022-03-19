@@ -991,7 +991,7 @@ namespace Kalitte.Trading.Algos
 
             }
             else result = Exchange.GetVolume(symbol, period, t);
-            if (result == 0) Log($"Market volume got zero", LogLevel.Warning, t);
+            if (result == 0) Log($"Market volume got zero", LogLevel.Debug);
             return result;
         }
 
@@ -1005,7 +1005,7 @@ namespace Kalitte.Trading.Algos
                 
             }
             else result = Exchange.GetMarketPrice(symbol, t);
-            if (result == 0) Log($"Market price got zero", LogLevel.Warning, t);
+            if (result == 0) Log($"Market price got zero", LogLevel.Debug);
             return result;
         }
 

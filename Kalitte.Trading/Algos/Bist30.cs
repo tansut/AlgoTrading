@@ -465,6 +465,8 @@ namespace Kalitte.Trading.Algos
             }
 
             var currentRsi = 0M;
+            var rsiSpeed = 0M;
+            var rsiAcc = 0M;
             if (orderQuantity > 0)
             {
                 var cross = (CrossSignal)signalResult.Signal;
@@ -475,29 +477,41 @@ namespace Kalitte.Trading.Algos
                     if (rsi != null && rsi.Value.HasValue)
                     {
                         currentRsi = rsi.Value.Value;
+                        rsiSpeed = rsi.Speed;
+                        rsiAcc = rsi.Acceleration;
                         var cancelCross = false;
-                        
+                        var valueSet = 0M;
 
                         if (CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi != 0 && currentRsi > CrossRsiMax)
-                        {
-                            Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                        {                            
+                            valueSet = CrossRsiMax;
                             cancelCross = true;
                         }
                         if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi != 0 && currentRsi < CrossRsiMin)
-                        {
-                            Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                        {                            
+                            valueSet = CrossRsiMin;
                             cancelCross = true;
                         }
 
                         if (cancelCross)
                         {
-                            //Console.WriteLine($"{signalResult.SignalTime}, speed: {rsi.Speed} value: {rsi.Value}");
-                            //if (rsi.Speed < 1.5M) return;
-                            return;
+                            var offSetMax = valueSet + 0.1M * valueSet;
+                            var offSetMin = valueSet - 0.1M * valueSet;
+                            var discardRsi = currentRsi > offSetMin && currentRsi < offSetMax && rsi.Speed > 1 && rsi.Acceleration > 0.1M;
+                            //Console.WriteLine($"{discardRsi} {signalResult.SignalTime}, speed: {rsi.Speed} acceleration:{rsi.Acceleration} value: {rsi.Value}");
+                            if (!discardRsi)
+                            {
+                                Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Debug);
+
+                                return;
+                            } else
+                            {
+                                Log($"Rsi Limit cancelled: {signalResult.SignalTime}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Warning);
+                            }
                         }
                     }
                 }
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, {currentRsi.ToCurrency()}]", signalResult);
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, rsi:{currentRsi.ToCurrency()},{rsiSpeed.ToCurrency()},{rsiAcc.ToCurrency()}]", signalResult);
             }
         }
 

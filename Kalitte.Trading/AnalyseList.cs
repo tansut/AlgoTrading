@@ -17,7 +17,7 @@ namespace Kalitte.Trading
     public class AnalyseList
     {
         public decimal SpeedMinutes { get; set; } = 1M;
-        public int SpeedAnalyse { get; set; } = 48 * 5;
+        public int SpeedAnalyse { get; set; } = 48 * 4;
 
         public Average Average { get; set; }
         public FinanceList<MyQuote> List { get; private set; }
@@ -32,7 +32,6 @@ namespace Kalitte.Trading
             this.Average = average;
             this.List = new FinanceList<MyQuote>(size);
             this.SpeedHistory = new FinanceList<MyQuote>(60 * (int)SpeedMinutes + 1);
-            //this.SpeedValues = new FinanceList<MyQuote>(SpeedAnalyse);
             this.Candle = candle;
         }
 

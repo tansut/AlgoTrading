@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 3, 9);
+        settings.Start = new DateTime(2022, 3, 1);
+        settings.Finish = new DateTime(2022, 3, 16);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
@@ -35,8 +35,8 @@ public class Program
         alternates.Set("UsePerformanceMonitor", false);
 
         // analyser defaults
-        alternates.Set("DataCollectSize", 8);
-        alternates.Set("DataAnalysisSize", 80);
+        alternates.Set("DataCollectSize", 16);
+        alternates.Set("DataAnalysisSize", 96);
         alternates.Set("DataCollectAverage", Average.Ema);
         alternates.Set("DataAnalysisAverage", Average.Sma);
 
@@ -109,8 +109,8 @@ public class Program
         alternates.Set("MaCross/PowerPositiveMultiplier", 2.8);
 
         // cross rsi
-        alternates.Set("CrossRsiMax",  55.6);
-        alternates.Set("CrossRsiMin",  45.2);
+        alternates.Set("CrossRsiMax",  54.0);
+        alternates.Set("CrossRsiMin",  46.0);
         alternates.Set("RsiValue/SignalSensitivity", 4M);
 
 
@@ -125,8 +125,9 @@ public class Program
         alternates.SaveToFile($"c:\\kalitte\\Bist30-test.json");    
         alternates.Set("LoggingLevel", LogLevel.Order);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
+        alternates.Set("LoggingLevel", LogLevel.Debug);
         alternates.Set("LogConsole", true);
-        alternates.Set("UILoggingLevel", LogLevel.Order);
+        alternates.Set("UILoggingLevel", LogLevel.Warning);
         return settings;
     }
 

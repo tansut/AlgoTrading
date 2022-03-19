@@ -2005,17 +2005,22 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::set_Name[1]( [mscorlib]System.String ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::get_Title[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::set_Title[1]( [mscorlib]System.String ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::get_Color[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::set_Color[1]( [System.Drawing]System.Drawing.Color ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::SetColor[1]( [System.Drawing]System.Drawing.Color ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::Add[2]( [mscorlib]System.DateTime, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartSerie::.ctor[0]( ) skipped:  special name
 
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.ChartSerie::<Name>k__BackingField -> A
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.ChartSerie::<Title>k__BackingField -> a
+	System.Drawing.Color [Kalitte.Trading]System.Drawing.Color Kalitte.Trading.DataVisualization.ChartSerie::<Color>k__BackingField -> A
 
 	ZedGraph.PointPairList [Kalitte.Trading]ZedGraph.PointPairList Kalitte.Trading.DataVisualization.ChartSerie::Points skipped:  KeepPublicApi option in configuration
 
 
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.ChartSerie::Name skipped:  KeepPublicApi option in configuration
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.DataVisualization.ChartSerie::Title skipped:  KeepPublicApi option in configuration
+	System.Drawing.Color [Kalitte.Trading]System.Drawing.Color Kalitte.Trading.DataVisualization.ChartSerie::Color skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.DataVisualization.Chart skipped:  KeepPublicApi option in configuration

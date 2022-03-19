@@ -15,6 +15,13 @@ namespace Kalitte.Trading.DataVisualization
         public string Name { get; set; }
         public string Title { get; set; }
         public PointPairList Points = new PointPairList();
+        public Color Color { get; set; } = Color.Black;
+
+        public ChartSerie SetColor(Color color)
+        {
+            this.Color = color;
+            return this;
+        }
 
         public void Add(DateTime t, decimal value)
         {
@@ -27,7 +34,7 @@ namespace Kalitte.Trading.DataVisualization
         public string Name { get; set; }
         public string Title { get; set; }
         public Dictionary<string, ChartSerie> Series { get; set; } = new Dictionary<string, ChartSerie>();
-
+        
         public ChartSerie Serie(string name, string title = "")
         {
             if (Series.TryGetValue(name, out ChartSerie serie)) return serie;
@@ -45,8 +52,7 @@ namespace Kalitte.Trading.DataVisualization
             GraphPane myPane = new GraphPane(new RectangleF(0, 0, 3200, 2400), Title ?? Name, "Time", "Value");
             foreach (var item in Series)
             {
-                myPane.AddCurve(item.Value.Title ?? item.Value.Name, item.Value.Points, Color.Green, SymbolType.None);
-
+                myPane.AddCurve(item.Value.Title ?? item.Value.Name, item.Value.Points, item.Value.Color, SymbolType.None);
             }
             myPane.XAxis.Type = AxisType.Date;
             myPane.XAxis.Scale.Format = "hh:mm";

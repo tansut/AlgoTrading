@@ -4,6 +4,7 @@ using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -82,8 +83,8 @@ namespace Kalitte.Trading
                 if (time.Second % 5 == 0)
                 {
                     //Console.WriteLine($"{AnalyseList.SpeedStart}/{AnalyseList.SpeedInitialValue} - {result.SignalTime}, {result.Speed} {result.Value}");
-                    Charts.Chart("Derivs").Serie("Speed").Add(time, result.Speed);
-                    Chart("Derivs").Serie("Acceleration").Add(time, result.Acceleration);                    
+                    Chart("Derivs").Serie("Speed").SetColor(Color.Black).Add(time, result.Speed);
+                    Chart("Derivs").Serie("Acceleration").SetColor(Color.Green).Add(time, result.Acceleration);                    
                 }
 
                 if (time.Minute == 1 && time.Second == 1)

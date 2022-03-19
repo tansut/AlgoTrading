@@ -56,10 +56,10 @@ public class Program
         // loss
         alternates.Set("RsiLoss/Enabled", true);
         alternates.Set("RsiLoss/InitialQuantity", 25);
-        alternates.Set("Profit/QuantityStep", 10);
-        alternates.Set("Profit/KeepQuantity", 10);
+        alternates.Set("RsiLoss/QuantityStep", 10);
+        alternates.Set("RsiLoss/KeepQuantity", 10);
         alternates.Set("RsiLoss/StartAt", 1.0);
-        alternates.Set("Profit/Step", 0.5);
+        alternates.Set("RsiLoss/Step", 0.1);
 
 
 

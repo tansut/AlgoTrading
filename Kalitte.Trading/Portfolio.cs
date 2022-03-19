@@ -165,7 +165,6 @@ namespace Kalitte.Trading
             {
                 this.AvgCost = (((this.Total + position.Total) / (this.Quantity + position.FilledQuantity))).ToCurrency();
                 this.Quantity += position.FilledQuantity;
-
             }
             else
             {
@@ -179,6 +178,9 @@ namespace Kalitte.Trading
                     if (this.Quantity == 0)
                     {
                         this.AvgCost = 0;
+                    } else
+                    {
+                        // ? new avgcost?
                     }
                 }
                 else
@@ -266,6 +268,7 @@ namespace Kalitte.Trading
                     if (result.Count > 0) break;
                     continue;
                 }
+                if (types.Length == 0) result.Add(CompletedOrders[i]);
                 else if (types.Any(t => t.IsAssignableFrom(type))) result.Add(CompletedOrders[i]);
                 else break;
             }
@@ -284,7 +287,8 @@ namespace Kalitte.Trading
                     if (result.Count > 0) break;
                     continue;
                 }
-                else if (signals.Any(s => s == CompletedOrders[i].SignalResult.Signal)) result.Add(CompletedOrders[i]);
+                if (signals.Length == 0) result.Add(CompletedOrders[i]);
+                else if (signals.Any(s => s == CompletedOrders[i].SignalResult.Signal)) result.Add(CompletedOrders[i]);                
                 else break;
             }
             return result;

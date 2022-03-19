@@ -335,10 +335,10 @@ namespace Kalitte.Trading.Algos
 
 
 
-            decimal keep = result.KeepQuantity; // portfolio.IsLastOrderInstanceOf(typeof(TrendSignal)) ? 0: result.KeepQuantity;
+            decimal keep = result.KeepQuantity;
             decimal quantity = result.Quantity;
             decimal remaining = portfolio.Quantity - quantity;
-            quantity = Math.Min(portfolio.Quantity, remaining >= signal.Config.KeepQuantity ? quantity : portfolio.Quantity - keep);
+            quantity = Math.Min(portfolio.Quantity, remaining > signal.Config.KeepQuantity ? quantity : portfolio.Quantity - keep);
 
             if (quantity > 0)
             {

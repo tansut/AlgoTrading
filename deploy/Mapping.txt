@@ -1646,6 +1646,7 @@ Skipped Types:
 
 [Kalitte.Trading]Kalitte.Trading.PLSignal skipped:  KeepPublicApi option in configuration
 {
+	[Kalitte.Trading]Kalitte.Trading.PLSignal::RoundQuantity[1]( [mscorlib]System.Decimal ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.PLSignal::get_UsedPriceChange[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PLSignal::set_UsedPriceChange[1]( [mscorlib]System.Decimal ) skipped:  skip by property
@@ -1667,7 +1668,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.PLSignal::IncrementParams[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.PLSignal::CreatePriceMonitor[1]( [Kalitte.Trading]Kalitte.Trading.ProfitLossResult ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.PLSignal::GetQuantity[0]( ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.PLSignal::getResult[3]( [Kalitte.Trading]Kalitte.Trading.PortfolioItem, [mscorlib]System.Decimal, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.PLSignal::getResult[4]( [Kalitte.Trading]Kalitte.Trading.PortfolioItem, [Kalitte.Trading]Kalitte.Trading.AverageCostResult, [mscorlib]System.Decimal, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignal::<UsedPriceChange>k__BackingField -> A
 	Kalitte.Trading.PriceMonitor [Kalitte.Trading]Kalitte.Trading.PriceMonitor Kalitte.Trading.PLSignal::<PriceMonitor>k__BackingField -> A
@@ -2541,10 +2542,10 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::set_QuantityStepMultiplier[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::get_QuantityStep[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::set_QuantityStep[1]( [mscorlib]System.Decimal ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::get_PriceStep[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::set_PriceStep[1]( [mscorlib]System.Decimal ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::get_Start[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::set_Start[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::get_Step[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::set_Step[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::get_StartAt[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::set_StartAt[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::get_PriceMonitor[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::set_PriceMonitor[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PLSignalConfig::get_EnableLimitingSignalsOnStart[0]( ) skipped:  skip by property
@@ -2559,8 +2560,8 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::<KeepQuantity>k__BackingField -> a
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::<QuantityStepMultiplier>k__BackingField -> B
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::<QuantityStep>k__BackingField -> b
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::<PriceStep>k__BackingField -> C
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::<Start>k__BackingField -> c
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::<Step>k__BackingField -> C
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::<StartAt>k__BackingField -> c
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.PLSignalConfig::<PriceMonitor>k__BackingField -> A
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.PLSignalConfig::<EnableLimitingSignalsOnStart>k__BackingField -> a
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::<PriceMonitorTolerance>k__BackingField -> D
@@ -2571,8 +2572,8 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::KeepQuantity skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::QuantityStepMultiplier skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::QuantityStep skipped:  KeepPublicApi option in configuration
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::PriceStep skipped:  KeepPublicApi option in configuration
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::Start skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::Step skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::StartAt skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.PLSignalConfig::PriceMonitor skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.PLSignalConfig::EnableLimitingSignalsOnStart skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::PriceMonitorTolerance skipped:  KeepPublicApi option in configuration

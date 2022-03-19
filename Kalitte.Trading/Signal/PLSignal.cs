@@ -111,11 +111,11 @@ namespace Kalitte.Trading
         [AlgoParam(1)]
         public virtual decimal QuantityStep { get; set; }
 
-        [AlgoParam(1)]
-        public virtual decimal PriceStep { get; set; }
+        [AlgoParam(0)]
+        public virtual decimal Step { get; set; }
 
         [AlgoParam(0)]
-        public virtual decimal Start { get; set; }
+        public virtual decimal StartAt { get; set; }
 
         [AlgoParam(false)]
         public bool PriceMonitor { get; set; }
@@ -150,12 +150,12 @@ namespace Kalitte.Trading
 
         public PLSignal(string name, string symbol, AlgoBase owner, PLSignalConfig config) : base(name, symbol, owner, config)
         {
-            UsedPriceChange = config.Start;
+            UsedPriceChange = config.StartAt;
         }
 
         public override void ResetOrdersInternal()
         {
-            UsedPriceChange = Config.Start;
+            UsedPriceChange = Config.StartAt;
             if (PriceMonitor != null)
             {
                 Log($"Destroying price monitor: {PriceMonitor.Result}", LogLevel.Verbose);  
@@ -170,7 +170,7 @@ namespace Kalitte.Trading
             Monitor.Enter(OperationLock);
             try
             {
-                UsedPriceChange += Config.PriceStep;
+                UsedPriceChange += Config.Step;
             }
             finally
             {
@@ -187,64 +187,42 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{base.ToString()}: {Config.InitialQuantity}/{Config.Start}";
+            return $"{base.ToString()}: {Config.InitialQuantity}/{Config.StartAt}";
         }
 
 
         public virtual decimal GetQuantity()
         {
-            return this.CompletedOrder == 0 ? Config.InitialQuantity : Config.QuantityStep + (this.CompletedOrder) * Config.QuantityStepMultiplier;
+            return this.CompletedOrder == 0 ? Config.InitialQuantity : Config.QuantityStep + (this.CompletedOrder-1) * Config.QuantityStepMultiplier;
         }
 
 
-        protected virtual ProfitLossResult getResult(PortfolioItem portfolio, decimal marketPrice, decimal quantity)
+        protected virtual ProfitLossResult getResult(PortfolioItem portfolio, AverageCostResult costStatus,  decimal marketPrice, decimal quantity)
         {
-            if (this.LimitingSignalTypes.Any())
-            {
-                var valid = (portfolio.CompletedOrders.Count == 0 && Config.EnableLimitingSignalsOnStart) || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignalTypes.ToArray());
-                if (!valid) return null;
-            }
-
-            if (this.LimitingSignals.Any())
-            {
-                var valid = (portfolio.CompletedOrders.Count == 0 && Config.EnableLimitingSignalsOnStart) || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignals.ToArray());
-                if (!valid) return null;
-            }
-
-            var cost = portfolio.AvgCost;
-
-            if (CostSignals.Count > 0)
-            {
-                var costDetail = portfolio.LastAverageCost(CostSignals.ToArray());
-                quantity = costDetail.TotalQuantity;
-                cost = costDetail.AverageCost;
-            }
-
-            if (cost == 0) return null;
-
+           
             BuySell? bs = null;
-            var unitPl = marketPrice - cost;
-            var totalPl = unitPl * portfolio.Quantity;
+            var unitPl = marketPrice - costStatus.AverageCost;
+            var targetChange = (costStatus.AverageCost * (UsedPriceChange / 100M)).ToCurrency();
 
 
             if (this.SignalType == ProfitOrLoss.Profit)
             {
-                if (Config.InitialQuantity > 0 && portfolio.IsLong && unitPl >= this.UsedPriceChange)
+                if (portfolio.IsLong && unitPl >= targetChange)
                 {
                     bs = BuySell.Sell;
                 }
-                else if (Config.InitialQuantity > 0 && portfolio.IsShort && -unitPl >= this.UsedPriceChange)
+                else if (portfolio.IsShort && -unitPl >= targetChange)
                 {
                     bs = BuySell.Buy;
                 }
             }
             else if (this.SignalType == ProfitOrLoss.Loss)
             {               
-                if (Config.InitialQuantity > 0 && portfolio.IsLong && totalPl <= -this.UsedPriceChange)
+                if (portfolio.IsLong && unitPl <= -targetChange)
                 {
                     bs = BuySell.Sell;
                 }
-                else if (Config.InitialQuantity > 0 && portfolio.IsShort && totalPl >= this.UsedPriceChange)
+                else if (portfolio.IsShort && unitPl >= targetChange)
                 {
                     bs = BuySell.Buy;
                 }
@@ -258,7 +236,7 @@ namespace Kalitte.Trading
             result.OriginalPrice = marketPrice;
             result.PL = unitPl;
             result.Direction = SignalType;
-            result.KeepQuantity = Config.KeepQuantity;
+            result.KeepQuantity = RoundQuantity(costStatus.TotalQuantity * (Config.KeepQuantity / 100M));
 
             if (Config.PriceMonitor && result.finalResult.HasValue && result.Direction == ProfitOrLoss.Profit)
             {
@@ -282,12 +260,31 @@ namespace Kalitte.Trading
             return result;
         }
 
+        decimal RoundQuantity(decimal quantity)
+        {
+            var q = Math.Round(quantity);
+            q = q < 1M ? 1 : q;
+            return q;
+        }
+
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
             var portfolio = Algo.UserPortfolioList.GetPortfolio(this.Symbol);
 
             if (!portfolio.IsEmpty)
             {
+                if (this.LimitingSignalTypes.Any())
+                {
+                    var valid = (portfolio.CompletedOrders.Count == 0 && Config.EnableLimitingSignalsOnStart) || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignalTypes.ToArray());
+                    if (!valid) return null;
+                }
+
+                if (this.LimitingSignals.Any())
+                {
+                    var valid = (portfolio.CompletedOrders.Count == 0 && Config.EnableLimitingSignalsOnStart) || portfolio.IsLastPositionOrderInstanceOf(this.LimitingSignals.ToArray());
+                    if (!valid) return null;
+                }
+
                 var price = Algo.GetMarketPrice(Symbol, t);
                 if (price == 0)
                 {
@@ -295,8 +292,10 @@ namespace Kalitte.Trading
                 }
                 else
                 {
-                    var quantity = this.CompletedOrder == 0 ? Config.InitialQuantity : Config.QuantityStep + (this.CompletedOrder) * Config.QuantityStepMultiplier;
-                    return this.getResult(portfolio, price, quantity);
+                    var portfolioStatus = portfolio.LastAverageCost(CostSignals.ToArray());
+                    var quantityRatio = this.CompletedOrder == 0 ? Config.InitialQuantity : Config.QuantityStep + Config.QuantityStep * (this.CompletedOrder-1) * Config.QuantityStepMultiplier;
+                    var quantity = RoundQuantity(portfolioStatus.TotalQuantity * quantityRatio / 100M);
+                    return quantity == 0 || portfolioStatus.AverageCost == 0 ? null: this.getResult(portfolio, portfolioStatus, price, quantity);
                 }
             }
             else return null;

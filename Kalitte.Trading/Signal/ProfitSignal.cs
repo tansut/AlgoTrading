@@ -12,6 +12,7 @@ namespace Kalitte.Trading
     {
         public ProfitSignal(string name, string symbol, AlgoBase owner, PLSignalConfig config) : base(name, symbol, owner, config)
         {
+
         }
 
         public override ProfitOrLoss SignalType => ProfitOrLoss.Profit;

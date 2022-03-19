@@ -67,19 +67,24 @@ namespace Kalitte.Trading
                 var l1 = i1k.NextValue(mpAverage).Value.Value;
                 AnalyseList.Collect(l1, time);
 
-                if (!AnalyseList.SpeedInitialized || time.Second % 60 == 0)
+                if (!AnalyseList.SpeedInitialized)
                 {
-                    AnalyseList.ResetSpeed(AnalyseList.LastValue, time);
-                    SaveSpeed(time); 
-                }
+                    AnalyseList.ResetSpeed(AnalyseList.LastValue, time);                    
+                }                
 
                 result.Value = AnalyseList.LastValue;
+                AnalyseList.UpdateSpeed(time, result.Value.Value);
                 result.Speed = AnalyseList.CalculateSpeed(time);
 
-                if (time.Second % 10 == 0)
+                if (time.Second % 5 == 0)
                 {
-                    Console.WriteLine($"{AnalyseList.SpeedStart}/{AnalyseList.SpeedInitialValue} - {result.SignalTime}, {result.Speed} {result.Value}");
+                    //Console.WriteLine($"{AnalyseList.SpeedStart}/{AnalyseList.SpeedInitialValue} - {result.SignalTime}, {result.Speed} {result.Value}");
                     TrackSpeed(time, result.Speed);
+                }
+
+                if (time.Minute == 1 && time.Second == 1)
+                {
+                    SaveSpeed(time);                                        
                 }
             }
 

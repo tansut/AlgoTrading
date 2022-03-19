@@ -18,17 +18,20 @@ namespace Kalitte.Trading
     {
         public DateTime SpeedStart { get; set; } = DateTime.MinValue;
         public decimal SpeedInitialValue { get; set; }
+        public decimal SpeedMinutes { get; set; } = 1M;
 
         public Average Average { get; set; }
         public FinanceList<MyQuote> List { get; private set; }
-        public FinanceList<MyQuote> SpeedList { get; private set; }
+        public FinanceList<MyQuote> SpeedHistory { get; private set; }
+        public FinanceList<MyQuote> SpeedValues { get; private set; }
         public CandlePart Candle { get; private set; }
 
         public AnalyseList(int size, Average average, CandlePart candle = CandlePart.Close)
         {
             this.Average = average;
             this.List = new FinanceList<MyQuote>(size);
-            this.SpeedList = new FinanceList<MyQuote>(60 * 10);
+            this.SpeedHistory = new FinanceList<MyQuote>(60 * (int)SpeedMinutes + 1);
+            this.SpeedValues = new FinanceList<MyQuote>(60 * 10);
             this.Candle = candle;
         }
 
@@ -93,19 +96,30 @@ namespace Kalitte.Trading
         {
             SpeedInitialValue = value;
             SpeedStart = t;
-            SpeedList.Clear();
-            SpeedList.Push(new MyQuote() {  Date = t, Value = value });
+            SpeedHistory.Clear();
+            SpeedValues.Clear();
+            SpeedHistory.Push(new MyQuote() {  Date = t, Close = value });
+        }
+
+        internal void UpdateSpeed(DateTime time, decimal value)
+        {
+            SpeedHistory.Push(new MyQuote() { Date = time, Close = value });
         }
 
         internal decimal CalculateSpeed(DateTime time)
         {
-            var toBack = 60;            
-            var fDate = time.AddSeconds(toBack);
-            var prevBar = SpeedList.List.FirstOrDefault(p => p.Date == fDate);
+            
+            var fDate = time.AddMinutes(-(double)SpeedMinutes);
+            var prevBar = SpeedHistory.List.FirstOrDefault(p => p.Date == fDate);
+            if (prevBar != null)
+            {
+                
+            }
             var dif = (prevBar == null ? SpeedInitialValue : prevBar.Close) - LastValue;
-            decimal value =  dif / toBack;
-            SpeedList.Push(new MyQuote() { Date = time, Close = value});
-            return value; 
+            decimal value =  dif / SpeedMinutes;
+            SpeedValues.Push(new MyQuote() { Date = time, Close = value });
+            var speedList = SpeedValues.List;
+            return speedList.GetEma(speedList.Count).Last().Ema.Value; 
         }
     }
 

@@ -257,16 +257,29 @@ namespace Kalitte.Trading.Algos
         public virtual void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
         {
             var savePosition = this.positionRequest;
-            this.positionRequest.FilledUnitPrice = filledUnitPrice;
-            this.positionRequest.FilledQuantity = filledQuantity;
-            var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-            var port = UserPortfolioList.Where(p => p.Key == positionRequest.Symbol).First().Value;
-            Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost.ToCurrency()} NetPL:{port.NetPL.ToCurrency()}]: {this.positionRequest.ToString()}", LogLevel.Order);
-            CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
-            this.positionRequest = null;
-            orderCounter++;
-            CompletedOrder(savePosition);
-            orderWait.Set();
+            try
+            {
+                if (savePosition == null)
+                {
+                    Log("Received filled order signal but probably current order was cancelled before.", LogLevel.Warning);
+                }
+                else
+                {
+                    this.positionRequest.FilledUnitPrice = filledUnitPrice;
+                    this.positionRequest.FilledQuantity = filledQuantity;
+                    var portfolio = this.UserPortfolioList.Add(this.positionRequest);
+                    var port = UserPortfolioList.Where(p => p.Key == positionRequest.Symbol).First().Value;
+                    Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost.ToCurrency()} NetPL:{port.NetPL.ToCurrency()}]: {this.positionRequest.ToString()}", LogLevel.Order);
+                    CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
+                    this.positionRequest = null;
+                    orderCounter++;
+                    CompletedOrder(savePosition);
+                }
+            }
+            finally
+            {
+                orderWait.Set();
+            }
         }
 
         public void CancelCurrentOrder(string reason)
@@ -501,6 +514,14 @@ namespace Kalitte.Trading.Algos
             var result2 = orderWait.WaitOne(wait);
             if (!result2 && !Simulation) Log($"Waiting for last order to complete: {message}", LogLevel.Warning);
             return result2;
+        }
+
+        public bool WaitingOrderExpired()
+        {            
+            if (orderWait.WaitOne(1)) return false;
+            if (this.positionRequest == null) return false;
+            var timeOut = (Now - this.positionRequest.Sent).TotalSeconds;
+            return timeOut > 15;
         }
 
         public void SignalReceieved(SignalBase signal, SignalEventArgs data)

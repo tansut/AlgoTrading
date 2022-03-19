@@ -357,6 +357,7 @@ namespace Kalitte.Trading.Algos
             {
                 Log($"Process [{data.Result.Signal.Name}] using {data.Result} from ", LogLevel.Debug);
             }
+            if (WaitingOrderExpired()) CancelCurrentOrder("Cannot get a result from broker");
             if (!WaitForOrder("Decide")) return;
 
             var result = data.Result;

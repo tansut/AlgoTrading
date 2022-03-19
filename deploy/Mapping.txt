@@ -2388,7 +2388,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::SetPerformanceCounterValue[2]( [mscorlib]System.String, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::Stop[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::ClosePositions[2]( [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.SignalResult ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::sendOrder[9]( [mscorlib]System.String, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.BuySell, [mscorlib]System.String, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.OrderIcon, [mscorlib]System.Nullable`1<[mscorlib]System.DateTime>, [Kalitte.Trading]Kalitte.Trading.SignalResult, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::sendOrder[7]( [mscorlib]System.String, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.BuySell, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.SignalResult, [Kalitte.Trading]Kalitte.Trading.OrderIcon, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::GetSymbolPeriodSeconds[1]( [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::printPortfolio[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::CalculateVolumeBySecond[2]( [mscorlib]System.DateTime, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration

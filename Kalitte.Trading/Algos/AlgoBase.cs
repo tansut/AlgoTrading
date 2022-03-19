@@ -793,21 +793,21 @@ namespace Kalitte.Trading.Algos
 
         }
 
-        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", SignalResult signalResult, OrderIcon icon = OrderIcon.None,  bool disableDelay = false)
+        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment , SignalResult signalResult, OrderIcon icon = OrderIcon.None,  bool disableDelay = false)
         {
             orderWait.Reset();
             var time = Now;
             if (this.Watch != null)
             {
                 var monitored = this.Watch.Dump(true).ToString();
-                if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, t);
+                if (!string.IsNullOrEmpty(monitored)) Log($"\n*** ORDER DATA ***\n{monitored}\n******", LogLevel.Debug, time);
             }
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
             var portfolio = UserPortfolioList.GetPortfolio(symbol);
             var price = this.GetMarketPrice(symbol, time);
             if (price == 0)
             {
-                Log($"Unable to get a marketprice at {time}, using close {symbolData.Periods.Last.Close} from {symbolData.Periods.Last}", LogLevel.Warning, t);
+                Log($"Unable to get a marketprice at {time}, using close {symbolData.Periods.Last.Close} from {symbolData.Periods.Last}", LogLevel.Warning, time);
                 price = symbolData.Periods.Last.Close;
             }
             string orderid;
@@ -819,17 +819,17 @@ namespace Kalitte.Trading.Algos
             }
             else
             {
-                orderid = Simulation ? Exchange.CreateMarketOrder(symbol, quantity, side, icon.ToString(), (t ?? DateTime.Now).Hour >= 19) :
-                    Exchange.CreateLimitOrder(symbol, quantity, side, limitPrice, icon.ToString(), (t ?? DateTime.Now).Hour >= 19);
+                orderid = Simulation ? Exchange.CreateMarketOrder(symbol, quantity, side, icon.ToString(), time.Hour >= 19) :
+                    Exchange.CreateLimitOrder(symbol, quantity, side, limitPrice, icon.ToString(), time.Hour >= 19);
             }
-            var order = this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
+            var order = this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, time);
             order.SignalResult = signalResult;
             order.Sent = time;
             portfolio.AddRequestedOrder(order);
-            Log($"New order submitted. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info, t);
+            Log($"New order submitted. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info, time);
             if (order.SignalResult != null)
-                Log($"Signal [{order.SignalResult.Signal.Name}] result: {order.SignalResult}", LogLevel.Info, t);
-            Log($"Used bar: {symbolData.Periods.Last}", LogLevel.Debug, t);
+                Log($"Signal [{order.SignalResult.Signal.Name}] result: {order.SignalResult}", LogLevel.Info, time);
+            Log($"Used bar: {symbolData.Periods.Last}", LogLevel.Debug, time);
 
             if (this.UseVirtualOrders)
             {

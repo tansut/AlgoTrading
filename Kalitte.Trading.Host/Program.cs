@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 3, 18);
+        settings.Start = new DateTime(2022, 3, 17);
+        settings.Finish = new DateTime(2022, 3, 17);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
@@ -49,12 +49,11 @@ public class Program
         alternates.Set("Profit/KeepQuantity", 20);
         alternates.Set("Profit/QuantityStep", 10);
         alternates.Set("Profit/QuantityStepMultiplier", 1);
-        alternates.Set("Profit/StartAt", 0.4);        
+        alternates.Set("Profit/StartAt", 0.5);        
         alternates.Set("Profit/Step", 0.1);
 
         
-        // loss
-        alternates.Set("RsiLoss/Enabled", true);
+        // loss        
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);

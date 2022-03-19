@@ -254,9 +254,8 @@ namespace Kalitte.Trading
 
         decimal RoundQuantity(decimal quantity)
         {
-            var q = Math.Round(quantity);
-            q = q < 1M ? 1 : q;
-            return q;
+            var q = quantity > 0 && quantity < 1 ? 1 : quantity;
+            return Math.Round(q);
         }
 
         protected override SignalResult CheckInternal(DateTime? t = null)

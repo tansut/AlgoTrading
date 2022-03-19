@@ -120,6 +120,8 @@ namespace Kalitte.Trading
             }
         }
 
+        public override SignalUsage Usage { get => base.Usage == SignalUsage.Unknown ? SignalUsage.CreatePosition : base.Usage; protected set => base.Usage = value; }
+
         public override void Init()
         {
             AvgChange = Config.AvgChange;

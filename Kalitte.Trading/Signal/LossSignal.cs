@@ -14,7 +14,7 @@ namespace Kalitte.Trading
         {
         }
 
-        public override ProfitOrLoss SignalType => ProfitOrLoss.Loss;       
+        public override SignalUsage Usage { get => SignalUsage.StopLoss; protected set => base.Usage = value; }
 
 
     }

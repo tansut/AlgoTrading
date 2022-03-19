@@ -37,6 +37,8 @@ namespace Kalitte.Trading
 
         }
 
+        public override SignalUsage Usage { get => base.Usage == SignalUsage.Unknown ? SignalUsage.ClosePosition : base.Usage; protected set => base.Usage = value; }
+
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {

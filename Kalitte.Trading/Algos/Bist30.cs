@@ -328,7 +328,7 @@ namespace Kalitte.Trading.Algos
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
             var lastSignalTime = portfolio.LastPositionOrder == null ? DateTime.MinValue : portfolio.LastPositionOrder.SignalResult.SignalTime;
-            if (signal.SignalType == ProfitOrLoss.Loss && (result.SignalTime - lastSignalTime).TotalSeconds < 60)
+            if (signal.Usage == SignalUsage.StopLoss && (result.SignalTime - lastSignalTime).TotalSeconds < 60)
             {
                 Log($"{signal.Name} {result} received but there is no time dif between {lastSignalTime} and {result.SignalTime}", LogLevel.Warning);
             };
@@ -342,8 +342,8 @@ namespace Kalitte.Trading.Algos
 
             if (quantity > 0)
             {
-                Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, OriginalPrice: {result.OriginalPrice} MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Info, result.SignalTime);
-                sendOrder(Symbol, quantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result, result.Direction == ProfitOrLoss.Profit ? OrderIcon.TakeProfit : OrderIcon.StopLoss);
+                Log($"[{result.Signal.Name} received]: PL: {result.PL}, OriginalPrice: {result.OriginalPrice} MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Info, result.SignalTime);
+                sendOrder(Symbol, quantity, result.finalResult.Value, $"[{result.Signal.Name}], PL: {result.PL}", result);
             }
         }
 

@@ -13,11 +13,7 @@ using Kalitte.Trading.Algos;
 
 namespace Kalitte.Trading
 {
-    public enum ProfitOrLoss
-    {
-        Loss,
-        Profit
-    }
+
 
     public class PriceMonitor
     {
@@ -31,8 +27,7 @@ namespace Kalitte.Trading
         {
             return Result.Quantity == newResult.Quantity
                 && Result.finalResult == newResult.finalResult
-                && Result.KeepQuantity == newResult.KeepQuantity
-                && Result.Direction == newResult.Direction;
+                && Result.KeepQuantity == newResult.KeepQuantity;                
         }
 
         public PriceMonitor(ProfitLossResult signalResult)
@@ -75,10 +70,10 @@ namespace Kalitte.Trading
         public decimal PL { get; set; }
         public decimal OriginalPrice { get; set; }
         public decimal MarketPrice { get; set; }
-        public decimal PortfolioCost { get; set; }
-        public ProfitOrLoss Direction { get; set; }
+        public decimal PortfolioCost { get; set; }        
         public decimal Quantity { get; set; }
         public decimal KeepQuantity { get; set; }
+        
         
         public ProfitLossResult(SignalBase signal, DateTime t) : base(signal, t)
         {
@@ -138,8 +133,6 @@ namespace Kalitte.Trading
         public virtual decimal UsedPriceChange { get; set; }
         public PriceMonitor PriceMonitor { get; protected set; }
         public Fibonacci FibonacciLevels { get; set; } = null;
-        public abstract ProfitOrLoss SignalType { get;  }
-
         public List<Type> LimitingSignalTypes { get; set; } = new List<Type>();        
         public List<SignalBase> LimitingSignals { get; set; } = new List<SignalBase>();        
         public List<SignalBase> CostSignals { get; set; } = new List<SignalBase>();
@@ -181,7 +174,7 @@ namespace Kalitte.Trading
         protected virtual PriceMonitor CreatePriceMonitor(ProfitLossResult result)
         {
             var monitor = new PriceMonitor(result);            
-            Log($"Created price monitor for {result.Direction}/{result.finalResult} to get a better price than {result.MarketPrice}", LogLevel.Verbose);
+            Log($"Created price monitor for {result.finalResult} to get a better price than {result.MarketPrice}", LogLevel.Verbose);
             return monitor;
         }
 
@@ -205,7 +198,7 @@ namespace Kalitte.Trading
             var targetChange = (costStatus.AverageCost * (UsedPriceChange / 100M)).ToCurrency();
 
 
-            if (this.SignalType == ProfitOrLoss.Profit)
+            if (this.Usage == SignalUsage.TakeProfit)
             {
                 if (portfolio.IsLong && unitPl >= targetChange)
                 {
@@ -216,7 +209,7 @@ namespace Kalitte.Trading
                     bs = BuySell.Buy;
                 }
             }
-            else if (this.SignalType == ProfitOrLoss.Loss)
+            else if (this.Usage == SignalUsage.StopLoss)
             {               
                 if (portfolio.IsLong && unitPl <= -targetChange)
                 {
@@ -235,10 +228,9 @@ namespace Kalitte.Trading
             result.MarketPrice = marketPrice;
             result.OriginalPrice = marketPrice;
             result.PL = unitPl;
-            result.Direction = SignalType;
             result.KeepQuantity = RoundQuantity(costStatus.TotalQuantity * (Config.KeepQuantity / 100M));
 
-            if (Config.PriceMonitor && result.finalResult.HasValue && result.Direction == ProfitOrLoss.Profit)
+            if (Config.PriceMonitor && result.finalResult.HasValue && this.Usage == SignalUsage.TakeProfit)
             {
                 PriceMonitor = PriceMonitor ?? CreatePriceMonitor(result);
                 if (!PriceMonitor.WorkingFor(result))

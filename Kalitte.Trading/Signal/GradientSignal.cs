@@ -49,6 +49,8 @@ namespace Kalitte.Trading
         public Gradient grad { get; set; }
         public BuySell DefaultAction { get; set; }
 
+        public override SignalUsage Usage { get => base.Usage == SignalUsage.Unknown ? SignalUsage.CreatePosition : base.Usage; protected set => base.Usage = value; }
+
         public GradientSignal(string name, string symbol, AlgoBase owner, GradientSignalConfig config, BuySell defaultAction) : base(name, symbol, owner, config)
         {
             this.DefaultAction = defaultAction;

@@ -22,6 +22,19 @@ namespace Kalitte.Trading
     {
         [AlgoParam(true)]
         public bool Enabled { get; set; }
+
+        [AlgoParam(SignalUsage.Unknown)]
+        public SignalUsage Usage { get; internal set; }
+    }
+
+    public enum SignalUsage
+    {
+        Unknown = 0,
+        StopLoss = 1,
+        TakeProfit = 2,
+        CreatePosition = 4,
+        ClosePosition = 8,
+        Custom = 128,
     }
 
     public class SignalResult
@@ -66,6 +79,18 @@ namespace Kalitte.Trading
             this.Config = config;
             this.Enabled = config.Enabled;
         }
+
+        public override SignalUsage Usage
+        {
+            get
+            {
+                return Config.Usage;
+            }
+            protected set
+            {
+                // no action, can be set only by config?
+            }
+        }
     }
 
     public abstract class SignalBase
@@ -91,6 +116,7 @@ namespace Kalitte.Trading
         public DateTime FirstOrderDate { get; set; } = DateTime.MinValue;
         public DateTime LastOrderDate { get; set; } = DateTime.MinValue;
 
+        public virtual SignalUsage Usage { get; protected set; } = SignalUsage.Unknown;
 
         public PerformanceMonitor PerfMon { get; set; }
 

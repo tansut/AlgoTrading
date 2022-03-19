@@ -216,7 +216,7 @@ namespace Kalitte.Trading
             get
             {
                 var lastOrder = CompletedOrders.LastOrDefault();
-                return lastOrder != null && lastOrder.SignalResult.Signal is PLSignal && ((PLSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Loss;
+                return lastOrder != null && lastOrder.SignalResult.Signal.Usage == SignalUsage.StopLoss;
             }
         }
 
@@ -225,7 +225,7 @@ namespace Kalitte.Trading
             get
             {
                 var lastOrder = CompletedOrders.LastOrDefault();
-                return lastOrder != null && lastOrder.SignalResult.Signal is PLSignal && ((PLSignal)(lastOrder.SignalResult.Signal)).SignalType == ProfitOrLoss.Profit;
+                return lastOrder != null && lastOrder.SignalResult.Signal.Usage == SignalUsage.TakeProfit;
             }
         }
 
@@ -258,12 +258,11 @@ namespace Kalitte.Trading
 
         public List<ExchangeOrder> GetLastPositionOrders(params Type[] types)
         {
-            var result = new List<ExchangeOrder>();
-            var skipType = typeof(PLSignal);
+            var result = new List<ExchangeOrder>();            
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
                 var type = CompletedOrders[i].SignalResult.Signal.GetType();
-                if (skipType.IsAssignableFrom(type))
+                if (CompletedOrders[i].SignalResult.Signal.Usage != SignalUsage.CreatePosition)
                 {
                     if (result.Count > 0) break;
                     continue;
@@ -278,11 +277,11 @@ namespace Kalitte.Trading
         public List<ExchangeOrder> GetLastPositionOrders(params SignalBase[] signals)
         {
             var result = new List<ExchangeOrder>();
-            var skip = typeof(PLSignal);
+            
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
                 var type = CompletedOrders[i].SignalResult.Signal.GetType();
-                if (skip.IsAssignableFrom(type))
+                if (CompletedOrders[i].SignalResult.Signal.Usage != SignalUsage.CreatePosition)
                 {
                     if (result.Count > 0) break;
                     continue;
@@ -322,7 +321,12 @@ namespace Kalitte.Trading
         {
             get
             {
-                return GetLastOrderSkip(typeof(PLSignal));
+                for (var i = CompletedOrders.Count - 1; i >= 0; i--)
+                {
+                    var signal = CompletedOrders[i].SignalResult.Signal;
+                    if (signal.Usage == SignalUsage.CreatePosition) return CompletedOrders[i];
+                }
+                return null;
             }
         }
     }

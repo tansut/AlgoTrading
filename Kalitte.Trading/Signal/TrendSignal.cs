@@ -129,6 +129,7 @@ namespace Kalitte.Trading
         public bool UseSma = true;
         public ResetList HowToReset { get; set; } = ResetList.None;
 
+        public override SignalUsage Usage { get => base.Usage == SignalUsage.Unknown ? SignalUsage.Custom : base.Usage; protected set => base.Usage = value; }
 
         public TrendSignal(string name, string symbol, AlgoBase owner, TrendSignalConfig config, decimal? min = null, decimal? max  = null) : base(name, symbol, owner, config)
         {

@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 17);
-        settings.Finish = new DateTime(2022, 3, 17);
+        settings.Start = new DateTime(2022, 3, 15);
+        settings.Finish = new DateTime(2022, 3, 18);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
@@ -30,7 +30,7 @@ public class Program
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
         // options
-        alternates.Set("CrossOrderQuantity", 9);
+        alternates.Set("CrossOrderQuantity", 10);
 
         alternates.Set("UsePerformanceMonitor", false);
 
@@ -39,19 +39,19 @@ public class Program
         alternates.Set("DataAnalysisSize", 80);
         alternates.Set("DataCollectAverage", Average.Ema);
         alternates.Set("DataAnalysisAverage", Average.Sma);
-        
+
         // profit && loss
+
+        alternates.Set("PriceLowLimit", 2400);
+        alternates.Set("PriceHighLimit", 2500);
+
         alternates.Set("Profit/InitialQuantity", 50);
         alternates.Set("Profit/KeepQuantity", 20);
-        alternates.Set("Profit/QuantityStep", 20);
+        alternates.Set("Profit/QuantityStep", 10);
         alternates.Set("Profit/QuantityStepMultiplier", 1);
         alternates.Set("Profit/StartAt", 0.4);        
         alternates.Set("Profit/Step", 0.1);
-        alternates.Set("Profit/PriceMonitor", false);
 
-        // fibonachi
-        alternates.Set("PriceLowLimit", 2400);
-        alternates.Set("PriceHighLimit", 2500);      
         
         // loss
         alternates.Set("RsiLoss/Enabled", true);

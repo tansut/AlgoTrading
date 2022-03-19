@@ -279,7 +279,7 @@ namespace Kalitte.Trading.Algos
             finally
             {
                 orderWait.Set();
-            }
+            }            
         }
 
         public void CancelCurrentOrder(string reason)
@@ -817,6 +817,13 @@ namespace Kalitte.Trading.Algos
         public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment , SignalResult signalResult, OrderIcon icon = OrderIcon.None,  bool disableDelay = false)
         {
             orderWait.Reset();
+            var signal = signalResult.Signal;
+            if (icon == OrderIcon.None)
+            {
+                if (signal.Usage == SignalUsage.StopLoss) icon = OrderIcon.StopLoss;
+                else if (signal.Usage == SignalUsage.TakeProfit) icon = OrderIcon.TakeProfit;
+                else if (signal.Usage == SignalUsage.ClosePosition) icon = OrderIcon.PositionClose;
+            }
             var time = Now;
             if (this.Watch != null)
             {

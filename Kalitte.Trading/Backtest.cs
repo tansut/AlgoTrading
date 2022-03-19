@@ -57,8 +57,7 @@ namespace Kalitte.Trading
             Algo.Simulation = true;
             Algo.UseVirtualOrders = true;
             this.RelatedTest = related;
-            AutoClosePositions = false;
-            Algo.Init();
+            AutoClosePositions = false;            
         }
 
 
@@ -185,9 +184,8 @@ namespace Kalitte.Trading
             var days = Algo.TestFinish.Value - Algo.TestStart.Value;
 
             var prevDayLastBar = new DateTime(Algo.TestStart.Value.Year, Algo.TestStart.Value.Month, Algo.TestStart.Value.Day).AddDays(-1).AddHours(22).AddMinutes(50);
-            Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod, prevDayLastBar);
-            Algo.Start();
-            createParameters();
+            var algoInited = false;
+
 
             for (var d = 0; d <= days.Days; d++)
             {
@@ -195,10 +193,17 @@ namespace Kalitte.Trading
                 if (currentDay.DayOfWeek == DayOfWeek.Saturday || currentDay.DayOfWeek == DayOfWeek.Sunday) continue;
                 if (currentDay > DateTime.Now) break;
                 var periods = this.GetDates(currentDay, Algo.TestStart.Value, Algo.TestFinish.Value);
-
+                if (!algoInited)
+                {
+                    Algo.SetTime(periods.Item1.Item1);
+                    Algo.Init();
+                    Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod, prevDayLastBar);
+                    createParameters();
+                    Algo.Start();
+                    algoInited = true;
+                }
                 Run(periods.Item1.Item1, periods.Item1.Item2);
                 Run(periods.Item2.Item1, periods.Item2.Item2);
-                //if (Algo.ClosePositionsDaily) Algo.ClosePositions(Algo.Symbol, null);
                 Algo.Signals.ForEach(p => p.Reset());
             }
             if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, null);

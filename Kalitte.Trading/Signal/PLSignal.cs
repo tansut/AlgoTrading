@@ -51,9 +51,9 @@ namespace Kalitte.Trading
             this.List.Clear();
         }
 
-        public ProfitLossResult Check(decimal mp)
+        public ProfitLossResult Check(decimal mp, DateTime t)
         {            
-            var price = List.Collect(mp).LastValue;
+            var price = List.Collect(mp, t).LastValue;
             var gradResult = this.Grad.Step(price);
             if (gradResult.FinalResult.HasValue)
             {
@@ -238,7 +238,7 @@ namespace Kalitte.Trading
                     Log($"Creating new PriceMonitor since there is a new result. {PriceMonitor.Result} vs {result}", LogLevel.Debug);
                     PriceMonitor = CreatePriceMonitor(result);
                 }
-                var monitorResult = PriceMonitor.Check(marketPrice);
+                var monitorResult = PriceMonitor.Check(marketPrice, Algo.Now);
                 if (monitorResult != null && monitorResult.finalResult.HasValue)
                 {
                     //Log($"price monitor resulted: [{monitorResult.finalResult} {monitorResult.Direction}]: original: {monitorResult.MarketPrice} current: {marketPrice}", LogLevel.Warning);

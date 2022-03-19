@@ -215,11 +215,11 @@ namespace Kalitte.Trading.Algos
 
         public void CreateSignals()
         {
-            //DateTime? trackStart = new DateTime(2022, 03, 17, 9, 30, 0);
-            //DateTime? trackFinish = new DateTime(2022, 03, 17, 11, 0, 0);
+            DateTime? trackStart = new DateTime(2022, 03, 16, 9, 30, 0);
+            DateTime? trackFinish = new DateTime(2022, 03, 16, 17, 0, 0);
 
-            DateTime? trackStart = null;
-            DateTime? trackFinish = null;
+            //DateTime? trackStart = null;
+            //DateTime? trackFinish = null;
 
 
             SetAnalyserDefaults(this.GetType().GetProperties().Where(p => typeof(AnalyserConfig).IsAssignableFrom(p.PropertyType)).Select(p => p.GetValue(this)).Select(p=>(AnalyserConfig)p).ToArray());
@@ -438,8 +438,6 @@ namespace Kalitte.Trading.Algos
         public void HandleDailyCloseSignal(ClosePositionsSignal signal, ClosePositionsSignalResult result)
         {
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
-
-
             if (result.Quantity == 0 && !portfolio.IsEmpty) ClosePositions(Symbol, result);
             else
             {
@@ -465,27 +463,33 @@ namespace Kalitte.Trading.Algos
                 orderQuantity = CrossOrderQuantity - portfolio.Quantity;
             }
 
-
+            var currentRsi = 0M;
             if (orderQuantity > 0)
             {
                 var cross = (CrossSignal)signalResult.Signal;
-                var currentRsi = rsiValue.GetCurrentValue();
 
-                if (currentRsi.HasValue)
+                if (!signalResult.MorningSignal)
                 {
-                    if (!signalResult.MorningSignal && CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi != 0 && currentRsi > CrossRsiMax)
+                    var rsi = rsiValue.LastSignalResult as IndicatorAnalyserResult;
+                    if (rsi != null && rsi.Value.HasValue)
                     {
-                        Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
-                        return;
-                    };
-                    if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi != 0 && currentRsi < CrossRsiMin)
-                    {
-                        Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
-                        return;
-                    };
-                }
+                        currentRsi = rsi.Value.Value;
 
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, {(currentRsi.HasValue ? currentRsi.Value.ToCurrency() : 0)}]", signalResult);
+                        //Console.WriteLine($"{signalResult.SignalTime}, {rsi.Speed}");
+
+                        if (CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi != 0 && currentRsi > CrossRsiMax)
+                        {
+                            Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                            return;
+                        };
+                        if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi != 0 && currentRsi < CrossRsiMin)
+                        {
+                            Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                            return;
+                        };
+                    }
+                }
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, {currentRsi.ToCurrency()}]", signalResult);
             }
         }
 

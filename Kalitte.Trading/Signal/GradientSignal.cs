@@ -74,7 +74,7 @@ namespace Kalitte.Trading
 
             var mp = Algo.GetMarketPrice(Symbol, t);
 
-            if (mp > 0) CollectList.Collect(mp);
+            if (mp > 0) CollectList.Collect(mp, time);
 
             if (CollectList.Ready && mp > 0)
             {
@@ -82,7 +82,7 @@ namespace Kalitte.Trading
                 var iVal = Indicator.NextValue(mpAverage).Value.Value;
                 result.IndicatorValue = iVal;
 
-                AnalyseList.Collect(iVal);
+                AnalyseList.Collect(iVal, time);
                 
                 if (AnalyseList.Ready)
                 { 

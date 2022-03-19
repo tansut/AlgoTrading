@@ -277,7 +277,7 @@ namespace Kalitte.Trading
             var mp = Algo.GetMarketPrice(Symbol, t);
             result.MarketPrice = mp;
 
-            if (mp > 0) CollectList.Collect(mp);
+            if (mp > 0) CollectList.Collect(mp, time);
 
             if (CollectList.Ready && mp > 0)
             {                
@@ -287,7 +287,7 @@ namespace Kalitte.Trading
                 result.i1Val = l1 = i1k.NextValue(mpAverage).Value.Value;
                 result.i2Val = l2 = i2k.NextValue(mpAverage).Value.Value;
 
-                AnalyseList.Collect(l1 - l2);
+                AnalyseList.Collect(l1 - l2, time);
                 crossBars.Push(l1 - l2);
                 var cross = Helper.Cross(crossBars.ToArray, 0);
 
@@ -296,12 +296,12 @@ namespace Kalitte.Trading
                     lastCross = cross;
                     Log($"First cross identified: {cross}", LogLevel.Debug, t);
                     //if (SpeedValues.Count > 0) SaveSpeed(time);
-                    AnalyseList.ResetSpeed(time);
+                    AnalyseList.ResetSpeed(AnalyseList.LastValue, time);
                 } else if (cross != 0 && Math.Sign(lastCross) != Math.Sign(cross))
                 {
                     lastCross = cross;
                     //if (SpeedValues.Count > 0) SaveSpeed(time);
-                    AnalyseList.ResetSpeed(time);                    
+                    AnalyseList.ResetSpeed(AnalyseList.LastValue,time);                    
                 }
 
                 if (AnalyseList.Ready && lastCross != 0)

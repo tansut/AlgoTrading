@@ -231,7 +231,7 @@ namespace Kalitte.Trading
                     return null;
                 }
 
-                var time = t ?? DateTime.Now;
+                var time = t ?? Algo.Now;
                 try
                 {
                     if (this.State == StartableState.Paused) return null;
@@ -245,7 +245,7 @@ namespace Kalitte.Trading
                     var result = CheckInternal(t);
                     if (result != null)
                     {
-                        result.SignalTime = t ?? DateTime.Now;
+                        result.SignalTime = Algo.Now;
                         raiseSignal(new SignalEventArgs() { Result = result });
                         LastSignalResult = result;
                     }

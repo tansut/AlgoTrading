@@ -156,14 +156,14 @@ namespace Kalitte.Trading.Algos
         {
             get
             {
-                timeReaderLock.AcquireReaderLock(1000);
+                //timeReaderLock.AcquireReaderLock(1000);
                 try
                 {
                     return time ?? DateTime.Now;
                 }
                 finally
                 {
-                    timeReaderLock.ReleaseReaderLock();
+                    //timeReaderLock.ReleaseReaderLock();
                 }
                 
             }

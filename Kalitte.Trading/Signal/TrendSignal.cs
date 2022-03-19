@@ -225,12 +225,13 @@ namespace Kalitte.Trading
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
+            var time = t ?? Algo.Now;
             var result = new TrendSignalResult(this, t ?? DateTime.Now);
             result.Trend = new TrendResult();
 
             var mp = Algo.GetMarketPrice(Symbol, t);
 
-            if (mp > 0) CollectList.Collect(mp);
+            if (mp > 0) CollectList.Collect(mp, time);
 
             if (CollectList.Ready && mp >= 0)
             {
@@ -238,7 +239,7 @@ namespace Kalitte.Trading
 
                 var l1 = i1k.NextValue(mpAverage).Value.Value;
 
-                AnalyseList.Collect(l1);
+                AnalyseList.Collect(l1, time);
 
                 if (AnalyseList.Ready && BarTrendResults.Count > 0)
                 {

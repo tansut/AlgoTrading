@@ -186,7 +186,7 @@ namespace Kalitte.Trading
 
         public static bool SymbolSeconds(string period, out int value)
         {
-            return symbolPeriodCache.TryGetValue(period.ToString(), out value);
+            return symbolPeriodCache.TryGetValue(period, out value);
             ;
         }
     }

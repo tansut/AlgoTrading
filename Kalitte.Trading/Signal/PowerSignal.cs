@@ -124,7 +124,7 @@ namespace Kalitte.Trading
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
 
-            var time = t ?? DateTime.Now;
+            var time = t ?? Algo.Now;
 
             var result = new PowerSignalResult(this, time);
 
@@ -134,7 +134,7 @@ namespace Kalitte.Trading
                 var volume = Algo.CalculateVolumeBySecond(time, mp);
                 if (volume > 0)
                 {
-                    CollectList.Collect((decimal)volume);                    
+                    CollectList.Collect((decimal)volume, time);                    
                 }
                 else
                 {
@@ -145,7 +145,7 @@ namespace Kalitte.Trading
                 if (CollectList.Ready)
                 {
                     var collectValue = CollectList.LastValue;
-                    AnalyseList.Collect(collectValue);
+                    AnalyseList.Collect(collectValue, time);
                 }
             }
             else return result;

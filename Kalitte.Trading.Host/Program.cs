@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 16);
-        settings.Finish = new DateTime(2022, 3, 16);
+        settings.Start = new DateTime(2022, 3, 18);
+        settings.Finish = new DateTime(2022, 3, 18);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
@@ -31,17 +31,6 @@ public class Program
 
         // options
         alternates.Set("CrossOrderQuantity", 9);
-
-        alternates.Set("RsiOrderL1/Quantity", 1);
-        alternates.Set("RsiOrderL1/Action", RsiPositionAction.OpenIfEmpty);
-
-        alternates.Set("RsiOrderL2/Quantity", 3);
-        alternates.Set("RsiOrderL2/Action", RsiPositionAction.BuyAdditional);
-
-        alternates.Set("RsiOrderL3/Quantity", 4);
-        alternates.Set("RsiOrderL3/Action", RsiPositionAction.ChangePosition);
-
-
 
         alternates.Set("UsePerformanceMonitor", false);
 
@@ -52,18 +41,19 @@ public class Program
         alternates.Set("DataAnalysisAverage", Average.Sma);
         
         // profit && loss
-        alternates.Set("Profit/InitialQuantity", 3,5,4);
-        alternates.Set("Profit/KeepQuantity", 2,1,3);
-        alternates.Set("Profit/QuantityStep", 1,2);
+        alternates.Set("Profit/InitialQuantity", 5);
+        alternates.Set("Profit/KeepQuantity", 2);
+        alternates.Set("Profit/QuantityStep", 1);
         alternates.Set("Profit/QuantityStepMultiplier", 0);
-        alternates.Set("Profit/Start", 10,9);        
-        alternates.Set("Profit/PriceStep", 1,2.0);
+        alternates.Set("Profit/Start", 10);        
+        alternates.Set("Profit/PriceStep", 2.0);
         alternates.Set("Profit/PriceMonitor", false);
 
         // fibonachi
         alternates.Set("PriceLowLimit", 2400);
-        alternates.Set("PriceHighLimit", 2500);                   
-
+        alternates.Set("PriceHighLimit", 2500);      
+        
+        // loss
         alternates.Set("RsiLoss/Enabled", true);
         alternates.Set("RsiLoss/InitialQuantity", 9);
         alternates.Set("RsiLoss/KeepQuantity", 0);
@@ -76,7 +66,17 @@ public class Program
         // rsi
         alternates.Set("Rsi", 14);
 
-        alternates.Set("RsiHighL1/L1", 73.00);        
+        alternates.Set("RsiOrderL1/Make", 1);
+        alternates.Set("RsiOrderL1/Action", RsiPositionAction.IfEmpty);
+
+        alternates.Set("RsiOrderL2/Keep", 1);
+        alternates.Set("RsiOrderL2/Make", 3);
+        alternates.Set("RsiOrderL2/Action", RsiPositionAction.Additional);
+
+        alternates.Set("RsiOrderL3/Make", 4);
+        alternates.Set("RsiOrderL3/Action", RsiPositionAction.Radical);
+            
+        alternates.Set("RsiHighL1/L1", 73.00);
         alternates.Set("RsiHighL1/L2", 76.00);
 
         alternates.Set("RsiHighL2/L1", 76.01);

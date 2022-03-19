@@ -1997,9 +1997,10 @@ Skipped Types:
 {
 
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Algos.RsiPositionAction::value__ skipped:  special name
-	Kalitte.Trading.Algos.RsiPositionAction [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction Kalitte.Trading.Algos.RsiPositionAction::OpenIfEmpty skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.Algos.RsiPositionAction [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction Kalitte.Trading.Algos.RsiPositionAction::BuyAdditional skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.Algos.RsiPositionAction [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction Kalitte.Trading.Algos.RsiPositionAction::ChangePosition skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.Algos.RsiPositionAction [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction Kalitte.Trading.Algos.RsiPositionAction::None skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.Algos.RsiPositionAction [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction Kalitte.Trading.Algos.RsiPositionAction::IfEmpty skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.Algos.RsiPositionAction [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction Kalitte.Trading.Algos.RsiPositionAction::Additional skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.Algos.RsiPositionAction [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction Kalitte.Trading.Algos.RsiPositionAction::Radical skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.FileLogger skipped:  KeepPublicApi option in configuration
@@ -2472,17 +2473,21 @@ Skipped Types:
 [Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig skipped:  KeepPublicApi option in configuration
 {
 
-	[Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig::get_Quantity[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig::set_Quantity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig::get_Keep[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig::set_Keep[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig::get_Make[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig::set_Make[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig::get_Action[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig::set_Action[1]( [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.RsiOrderConfig::.ctor[0]( ) skipped:  special name
 
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.RsiOrderConfig::<Quantity>k__BackingField -> A
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.RsiOrderConfig::<Keep>k__BackingField -> A
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.RsiOrderConfig::<Make>k__BackingField -> a
 	Kalitte.Trading.Algos.RsiPositionAction [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction Kalitte.Trading.Algos.RsiOrderConfig::<Action>k__BackingField -> A
 
 
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.RsiOrderConfig::Quantity skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.RsiOrderConfig::Keep skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.RsiOrderConfig::Make skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Algos.RsiPositionAction [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction Kalitte.Trading.Algos.RsiOrderConfig::Action skipped:  KeepPublicApi option in configuration
 }
 

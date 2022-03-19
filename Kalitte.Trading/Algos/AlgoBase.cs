@@ -793,9 +793,10 @@ namespace Kalitte.Trading.Algos
 
         }
 
-        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", decimal lprice = 0, OrderIcon icon = OrderIcon.None, DateTime? t = null, SignalResult signalResult = null, bool disableDelay = false)
+        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment = "", SignalResult signalResult, OrderIcon icon = OrderIcon.None,  bool disableDelay = false)
         {
-            orderWait.Reset();           
+            orderWait.Reset();
+            var time = Now;
             if (this.Watch != null)
             {
                 var monitored = this.Watch.Dump(true).ToString();
@@ -803,10 +804,10 @@ namespace Kalitte.Trading.Algos
             }
             var symbolData = GetSymbolData(symbol, this.SymbolPeriod);
             var portfolio = UserPortfolioList.GetPortfolio(symbol);
-            var price = lprice > 0 ? lprice : this.GetMarketPrice(symbol, t);
+            var price = this.GetMarketPrice(symbol, time);
             if (price == 0)
             {
-                Log($"Unable to get a marketprice at {t}, using close {symbolData.Periods.Last.Close} from {symbolData.Periods.Last}", LogLevel.Warning, t);
+                Log($"Unable to get a marketprice at {time}, using close {symbolData.Periods.Last.Close} from {symbolData.Periods.Last}", LogLevel.Warning, t);
                 price = symbolData.Periods.Last.Close;
             }
             string orderid;
@@ -823,7 +824,7 @@ namespace Kalitte.Trading.Algos
             }
             var order = this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, t);
             order.SignalResult = signalResult;
-            order.Sent = t ?? DateTime.Now;
+            order.Sent = time;
             portfolio.AddRequestedOrder(order);
             Log($"New order submitted. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info, t);
             if (order.SignalResult != null)

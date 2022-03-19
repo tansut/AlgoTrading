@@ -10,16 +10,21 @@ namespace Kalitte.Trading.Algos
 
     public enum RsiPositionAction
     {
-        OpenIfEmpty,
-        BuyAdditional,
-        ChangePosition
+        None = 0,
+        IfEmpty = 1,
+        Additional = 2,
+        Radical = 4
     }
 
     public class RsiOrderConfig: ConfigParameters
     {
         [AlgoParam(0)]
-        public decimal Quantity { get; set; }
-        [AlgoParam(RsiPositionAction.OpenIfEmpty)]
+        public decimal Keep { get; set; }
+
+        [AlgoParam(0)]
+        public decimal Make { get; set; }
+
+        [AlgoParam(RsiPositionAction.IfEmpty)]
         public RsiPositionAction Action { get; set; }
     }
 
@@ -284,7 +289,7 @@ namespace Kalitte.Trading.Algos
                 if (!item.Value.IsEmpty)
                 {
                     Log($"Closing positions for {symbol} at {time}", LogLevel.Info, time);
-                    sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", 0, OrderIcon.PositionClose, time, signalResult, true);
+                    sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", signalResult, OrderIcon.PositionClose, true);
                 }
             }
         }
@@ -338,7 +343,7 @@ namespace Kalitte.Trading.Algos
             if (quantity > 0)
             {
                 Log($"[{result.Signal.Name}:{result.Direction}] received: PL: {result.PL}, OriginalPrice: {result.OriginalPrice} MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Info, result.SignalTime);
-                sendOrder(Symbol, quantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result.MarketPrice, result.Direction == ProfitOrLoss.Profit ? OrderIcon.TakeProfit : OrderIcon.StopLoss, result.SignalTime, result);
+                sendOrder(Symbol, quantity, result.finalResult.Value, $"[{result.Signal.Name}:{result.Direction}], PL: {result.PL}", result, result.Direction == ProfitOrLoss.Profit ? OrderIcon.TakeProfit : OrderIcon.StopLoss);
             }
         }
 
@@ -380,7 +385,6 @@ namespace Kalitte.Trading.Algos
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
             
-
             var rsiOrders = portfolio.GetLastPositionOrders(typeof(GradientSignal));
             var lastOrderIsLoss = portfolio.LastOrderIsLoss;
             if (lastOrderIsLoss && rsiOrders.Count > 0) return;
@@ -393,23 +397,23 @@ namespace Kalitte.Trading.Algos
 
             RsiOrderConfig config = signal == rsiHighL1 || signal == rsiLowL1 ? RsiOrderL1: 
                 (signal == rsiHighL2 || signal == rsiLowL2 ? RsiOrderL2 : RsiOrderL3);
+            
+            var portfolioSide = portfolio.IsEmpty ? signalResult.finalResult.Value : portfolio.Side;
+            if (config.Action == RsiPositionAction.None) return;
+            if (config.Action == RsiPositionAction.IfEmpty && !portfolio.IsEmpty) return;
 
-            if (config.Action == RsiPositionAction.OpenIfEmpty && !portfolio.IsEmpty) return;
+            decimal finalQuantity = config.Make;
+            BuySell finalPosition = portfolioSide;
 
-            if (config.Action == RsiPositionAction.BuyAdditional && !portfolio.IsEmpty && portfolio.Side != signalResult.finalResult) return;
-            if (config.Action == RsiPositionAction.BuyAdditional && portfolio.Quantity >= config.Quantity) return;
+            if (config.Action == RsiPositionAction.Additional && portfolioSide != signalResult.finalResult.Value && config.Keep >= 0)
+                finalQuantity = config.Keep;
+            else if (config.Action == RsiPositionAction.Additional && portfolioSide == signalResult.finalResult.Value)
+                finalQuantity = Math.Max(portfolio.Quantity, config.Make);
+            else if (config.Action == RsiPositionAction.Radical)
+                finalPosition = signalResult.finalResult.Value;
 
-            var orderQuantity = (config.Action == RsiPositionAction.BuyAdditional || config.Action == RsiPositionAction.OpenIfEmpty) ? config.Quantity: portfolio.Quantity + config.Quantity;
+            MakePortfolio(Symbol, finalQuantity, finalPosition, $"{signal.Name}[{signalResult}]", signalResult);
 
-            if (!keepPosition && !portfolio.IsEmpty && portfolio.Side == signalResult.finalResult)
-            {
-                orderQuantity = config.Quantity - portfolio.Quantity;
-            }
-
-            if (orderQuantity > 0)
-            {
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"{signal.Name}[{signalResult}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
-            }
         }
 
         public void MakePortfolio(string symbol, decimal quantity, BuySell side, string comment, SignalResult result)
@@ -426,7 +430,7 @@ namespace Kalitte.Trading.Algos
                 }
             }
 
-            if (orderQuantity > 0) sendOrder(Symbol, orderQuantity, side, comment, 0, OrderIcon.PositionClose, Now, result, false);
+            if (orderQuantity > 0) sendOrder(Symbol, orderQuantity, side, comment, result, OrderIcon.PositionClose);
 
         }
 
@@ -480,7 +484,7 @@ namespace Kalitte.Trading.Algos
                     };
                 }
 
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, {(currentRsi.HasValue ? currentRsi.Value.ToCurrency() : 0)}]", 0, OrderIcon.None, signalResult.SignalTime, signalResult);
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, {(currentRsi.HasValue ? currentRsi.Value.ToCurrency() : 0)}]", signalResult);
             }
         }
 

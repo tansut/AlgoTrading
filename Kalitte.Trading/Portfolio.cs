@@ -242,6 +242,7 @@ namespace Kalitte.Trading
         public ExchangeOrder GetLastPositionOrder(params SignalBase[] signals)
         {
             var last = this.LastPositionOrder;
+            if (last == null) return null;
             foreach (var signal in signals)
             {
                 if (last.SignalResult.Signal == signal) return last;
@@ -302,6 +303,12 @@ namespace Kalitte.Trading
                 if (type.IsAssignableFrom(last.SignalResult.Signal.GetType())) return true;
             }
             return false;
+        }
+
+        public bool IsLastPositionOrder(params SignalBase[] signals)
+        {
+            var last = GetLastPositionOrder(signals);
+            return last != null;
         }
 
         public ExchangeOrder GetLastOrderSkip(Type skip)

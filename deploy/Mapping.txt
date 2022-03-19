@@ -1317,6 +1317,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::GetLastPositionOrders[1]( [mscorlib]System.Type[] ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::GetLastPositionOrders[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase[] ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::IsLastPositionOrderInstanceOf[1]( [mscorlib]System.Type[] ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::IsLastPositionOrder[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase[] ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.PortfolioItem::GetLastOrderSkip[1]( [mscorlib]System.Type ) skipped:  KeepPublicApi option in configuration
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PortfolioItem::<Commission>k__BackingField -> A

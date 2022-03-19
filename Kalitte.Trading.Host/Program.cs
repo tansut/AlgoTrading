@@ -75,13 +75,6 @@ public class Program
         alternates.Set("RsiOrderL3/Make", 4);
         alternates.Set("RsiOrderL3/Action", RsiPositionAction.Radical);
 
-        //alternates.Set("CrossOrderL1/Quantity", 4);
-        //alternates.Set("CrossOrderL1/RsiMax", 53);
-        //alternates.Set("CrossOrderL1/RsiMin", 47);
-
-        //alternates.Set("CrossOrderL2/Quantity", 6);
-        //alternates.Set("CrossOrderL2/RsiMax", 57);
-        //alternates.Set("CrossOrderL2/RsiMin", 43);
 
 
         alternates.Set("RsiHighL1/L1", 73.00);
@@ -112,23 +105,24 @@ public class Program
         
         alternates.Set("MovPeriod", 5);
         alternates.Set("MovPeriod2", 9);
+
         alternates.Set("CrossL1/AvgChange", 0.32M);
         alternates.Set("CrossL1/Dynamic", true);
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL1/Quantity", 4);
-        alternates.Set("CrossL1/RsiMax", 530);
-        alternates.Set("CrossL1/RsiMin", 470);
+        alternates.Set("CrossL1/Quantity", 6);
+        alternates.Set("CrossL1/RsiMax", 55);
+        alternates.Set("CrossL1/RsiMin", 45);
 
         alternates.Set("CrossL2/AvgChange", 0.32M);
         alternates.Set("CrossL2/Dynamic", true);
         alternates.Set("CrossL2/PowerThreshold", 88);
         alternates.Set("CrossL2/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL2/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL2/Quantity", 4);
-        alternates.Set("CrossL2/RsiMax", 57);
-        alternates.Set("CrossL2/RsiMin", 43);
+        alternates.Set("CrossL2/Quantity", 10);
+        alternates.Set("CrossL2/RsiMax", 60);
+        alternates.Set("CrossL2/RsiMin", 40);
 
         // cross rsi
         alternates.Set("RsiValue/SignalSensitivity", 4M);

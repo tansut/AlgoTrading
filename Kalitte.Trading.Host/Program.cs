@@ -22,7 +22,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 2, 28);
-        settings.Finish = new DateTime(2022, 3, 16);
+        settings.Finish = new DateTime(2022, 3, 9);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 

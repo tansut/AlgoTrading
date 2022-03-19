@@ -16,14 +16,15 @@ namespace Kalitte.Trading
 
     public class AnalyseList
     {
-        public DateTime SpeedStart { get; set; } = DateTime.MinValue;
-        public decimal SpeedInitialValue { get; set; }
         public decimal SpeedMinutes { get; set; } = 1M;
+        public int SpeedAnalyse { get; set; } = 48 * 5;
 
         public Average Average { get; set; }
         public FinanceList<MyQuote> List { get; private set; }
+        public AnalyseList Speed { get; set; }
         public FinanceList<MyQuote> SpeedHistory { get; private set; }
-        public FinanceList<MyQuote> SpeedValues { get; private set; }
+        //public FinanceList<MyQuote> SpeedValues { get; private set; }
+
         public CandlePart Candle { get; private set; }
 
         public AnalyseList(int size, Average average, CandlePart candle = CandlePart.Close)
@@ -31,18 +32,22 @@ namespace Kalitte.Trading
             this.Average = average;
             this.List = new FinanceList<MyQuote>(size);
             this.SpeedHistory = new FinanceList<MyQuote>(60 * (int)SpeedMinutes + 1);
-            this.SpeedValues = new FinanceList<MyQuote>(60 * 10);
+            //this.SpeedValues = new FinanceList<MyQuote>(SpeedAnalyse);
             this.Candle = candle;
         }
+
+
 
         public AnalyseList Collect(decimal val, DateTime t)
         {
             return this.Collect(t, val);
         }
 
-        public bool SpeedInitialized { get
+        public bool SpeedInitialized
+        {
+            get
             {
-                return this.SpeedStart != DateTime.MinValue;
+                return this.Speed != null;
             }
         }
 
@@ -94,11 +99,10 @@ namespace Kalitte.Trading
 
         internal void ResetSpeed(decimal value, DateTime t)
         {
-            SpeedInitialValue = value;
-            SpeedStart = t;
-            SpeedHistory.Clear();
-            SpeedValues.Clear();
-            SpeedHistory.Push(new MyQuote() {  Date = t, Close = value });
+            Speed = new AnalyseList(SpeedAnalyse, Average.Ema);
+            Speed.Collect(value, t);
+            SpeedHistory.Clear();            
+            SpeedHistory.Push(new MyQuote() { Date = t, Close = value });
         }
 
         internal void UpdateSpeed(DateTime time, decimal value)
@@ -108,18 +112,12 @@ namespace Kalitte.Trading
 
         internal decimal CalculateSpeed(DateTime time)
         {
-            
             var fDate = time.AddMinutes(-(double)SpeedMinutes);
             var prevBar = SpeedHistory.List.FirstOrDefault(p => p.Date == fDate);
-            if (prevBar != null)
-            {
-                
-            }
-            var dif = (prevBar == null ? SpeedInitialValue : prevBar.Close) - LastValue;
-            decimal value =  dif / SpeedMinutes;
-            SpeedValues.Push(new MyQuote() { Date = time, Close = value });
-            var speedList = SpeedValues.List;
-            return speedList.GetEma(speedList.Count).Last().Ema.Value; 
+            var dif = (prevBar == null ? Speed.List.First.Close : prevBar.Close) - LastValue;
+            decimal value = Math.Abs(dif) / SpeedMinutes;
+            Speed.Collect(time, value);
+            return Speed.LastValue;
         }
     }
 

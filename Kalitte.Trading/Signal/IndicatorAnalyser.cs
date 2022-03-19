@@ -19,6 +19,7 @@ namespace Kalitte.Trading
 
         public decimal? Value { get; set; }
         public decimal Speed { get; set; }
+        public decimal Acceleration { get; set; }
     }
 
     internal class IndicatorAnalyser : AnalyserBase<AnalyserConfig>
@@ -69,17 +70,19 @@ namespace Kalitte.Trading
 
                 if (!AnalyseList.SpeedInitialized)
                 {
-                    AnalyseList.ResetSpeed(AnalyseList.LastValue, time);                    
+                    AnalyseList.ResetSpeed(AnalyseList.LastValue, time);
+                    AnalyseList.Speed.ResetSpeed(0, time);
                 }                
 
                 result.Value = AnalyseList.LastValue;
-                AnalyseList.UpdateSpeed(time, result.Value.Value);
                 result.Speed = AnalyseList.CalculateSpeed(time);
-
+                AnalyseList.UpdateSpeed(time, result.Value.Value);
+                AnalyseList.Speed.UpdateSpeed(time, result.Speed);
+                result.Acceleration = AnalyseList.Speed.CalculateSpeed(time);
                 if (time.Second % 5 == 0)
                 {
                     //Console.WriteLine($"{AnalyseList.SpeedStart}/{AnalyseList.SpeedInitialValue} - {result.SignalTime}, {result.Speed} {result.Value}");
-                    TrackSpeed(time, result.Speed);
+                    TrackSpeed(time, result.Acceleration);
                 }
 
                 if (time.Minute == 1 && time.Second == 1)

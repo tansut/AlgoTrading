@@ -59,7 +59,7 @@ namespace Kalitte.Trading
         public override void Init()
         {
             grad = new Gradient(Config.L1, Config.L2, this.Algo);
-            grad.FileName = Algo.MultipleTestOptimization ? "": Path.Combine(Algo.LogDir, this.Name + ".png");
+            //grad.FileName = Algo.MultipleTestOptimization ? "": Path.Combine(Algo.LogDir, this.Name + ".png");
             grad.Tolerance = Config.Tolerance;
             grad.LearnRate = Config.LearnRate;
             base.Init();

@@ -215,11 +215,12 @@ namespace Kalitte.Trading.Algos
 
         public void CreateSignals()
         {
-            DateTime? trackStart = new DateTime(2022, 03, 16, 9, 30, 0);
-            DateTime? trackFinish = new DateTime(2022, 03, 16, 17, 0, 0);
+            DateTime? trackStart = null;
+            DateTime? trackFinish = null;
 
-            //DateTime? trackStart = null;
-            //DateTime? trackFinish = null;
+            //trackStart = new DateTime(2022, 03, 16, 9, 30, 0);
+            //trackFinish = new DateTime(2022, 03, 16, 17, 0, 0);
+
 
 
             SetAnalyserDefaults(this.GetType().GetProperties().Where(p => typeof(AnalyserConfig).IsAssignableFrom(p.PropertyType)).Select(p => p.GetValue(this)).Select(p=>(AnalyserConfig)p).ToArray());
@@ -474,19 +475,26 @@ namespace Kalitte.Trading.Algos
                     if (rsi != null && rsi.Value.HasValue)
                     {
                         currentRsi = rsi.Value.Value;
-
-                        //Console.WriteLine($"{signalResult.SignalTime}, {rsi.Speed}");
+                        var cancelCross = false;
+                        
 
                         if (CrossRsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi != 0 && currentRsi > CrossRsiMax)
                         {
                             Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
-                            return;
-                        };
+                            cancelCross = true;
+                        }
                         if (!signalResult.MorningSignal && CrossRsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi != 0 && currentRsi < CrossRsiMin)
                         {
                             Log($"Ignoring cross {signalResult.finalResult} signal since currentRsi is {currentRsi}", LogLevel.Debug);
+                            cancelCross = true;
+                        }
+
+                        if (cancelCross)
+                        {
+                            //Console.WriteLine($"{signalResult.SignalTime}, speed: {rsi.Speed} value: {rsi.Value}");
+                            //if (rsi.Speed < 1.5M) return;
                             return;
-                        };
+                        }
                     }
                 }
                 sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{cross.AvgChange.ToCurrency()},{cross.AnalyseSize}, {currentRsi.ToCurrency()}]", signalResult);

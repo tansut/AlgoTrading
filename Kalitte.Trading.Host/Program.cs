@@ -122,8 +122,8 @@ public class Program
         alternates.Set("CrossL2/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL2/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL2/Quantity", 10);
-        alternates.Set("CrossL2/RsiMax", 52);
-        alternates.Set("CrossL2/RsiMin", 48);
+        alternates.Set("CrossL2/RsiMax", 55.6);
+        alternates.Set("CrossL2/RsiMin", 45.4);
 
         // cross rsi
         alternates.Set("RsiValue/SignalSensitivity", 4M);

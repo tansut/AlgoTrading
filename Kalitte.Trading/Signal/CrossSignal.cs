@@ -49,10 +49,10 @@ namespace Kalitte.Trading
             return $"{base.ToString()} | i1:{i1Val} i2:{i2Val} dif:{Dif} ap:{AveragePrice} mp:{MarketPrice}";
         }
 
-        public override int GetHashCode()
-        {
-            return SignalTime.GetHashCode();
-        }
+        //public override int GetHashCode()
+        //{
+        //    return SignalTime.GetHashCode();
+        //}
     }
 
     public class CrossSignalConfig : AnalyserConfig

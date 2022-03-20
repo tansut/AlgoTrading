@@ -63,35 +63,39 @@ public class Program
         // rsi
         alternates.Set("Rsi", 14);
 
-        alternates.Set("RsiOrderL1/Make", 1);
-        alternates.Set("RsiOrderL1/Action", RsiPositionAction.IfEmpty);
+        alternates.Set("RsiOrderHighL1/Make", 1);
+        alternates.Set("RsiOrderHighL1/Action", RsiPositionAction.IfEmpty);
+        alternates.Set("RsiOrderHighL1/L1", 73.00);
+        alternates.Set("RsiOrderHighL1/L2", 76.50);
 
-        alternates.Set("RsiOrderL2/Keep", 1);
-        alternates.Set("RsiOrderL2/Make", 3);
-        alternates.Set("RsiOrderL2/Action", RsiPositionAction.Additional);
+        alternates.Set("RsiOrderHighL2/Keep", 1);
+        alternates.Set("RsiOrderHighL2/Make", 3);
+        alternates.Set("RsiOrderHighL2/Action", RsiPositionAction.Additional);
+        alternates.Set("RsiOrderHighL2/L1", 76.51);
+        alternates.Set("RsiOrderHighL2/L2", 82.50);
 
-        alternates.Set("RsiOrderL3/Make", 4);
-        alternates.Set("RsiOrderL3/Action", RsiPositionAction.Radical);
+        alternates.Set("RsiOrderHighL3/Make", 4);
+        alternates.Set("RsiOrderHighL3/Action", RsiPositionAction.Radical);
+        alternates.Set("RsiOrderHighL3/L1", 82.51);
+        alternates.Set("RsiOrderHighL3/L2", 100);
 
 
+        alternates.Set("RsiOrderLowL1/Make", 1);
+        alternates.Set("RsiOrderLowL1/Action", RsiPositionAction.IfEmpty);
+        alternates.Set("RsiOrderLowL1/L1", 33.00);
+        alternates.Set("RsiOrderLowL1/L2", 29.00);
 
-        alternates.Set("RsiHighL1/L1", 73.00);
-        alternates.Set("RsiHighL1/L2", 76.50);
+        alternates.Set("RsiOrderLowL2/Keep", 1);
+        alternates.Set("RsiOrderLowL2/Make", 3);
+        alternates.Set("RsiOrderLowL2/Action", RsiPositionAction.Additional);
+        alternates.Set("RsiOrderLowL2/L1", 28.99);
+        alternates.Set("RsiOrderLowL2/L2", 23.00);
 
-        alternates.Set("RsiHighL2/L1", 76.51);
-        alternates.Set("RsiHighL2/L2", 82.50);
+        alternates.Set("RsiOrderLowL3/Make", 4);
+        alternates.Set("RsiOrderLowL3/Action", RsiPositionAction.Radical);
+        alternates.Set("RsiOrderLowL3/L1", 22.99);
+        alternates.Set("RsiOrderLowL3/L2", 0);
 
-        alternates.Set("RsiHighL3/L1", 82.51);
-        alternates.Set("RsiHighL3/L2", 100);
-
-        alternates.Set("RsiLowL1/L1", 33.00);
-        alternates.Set("RsiLowL1/L2", 29.00);
-
-        alternates.Set("RsiLowL2/L1", 28.99);
-        alternates.Set("RsiLowL2/L2", 23.00);
-
-        alternates.Set("RsiLowL3/L1", 22.99);
-        alternates.Set("RsiLowL3/L2", 0);
 
         alternates.Set("RsiGradientTolerance", 0.02);
         alternates.Set("RsiGradientLearnRate", 0.005);

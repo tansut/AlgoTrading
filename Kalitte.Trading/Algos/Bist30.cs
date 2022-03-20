@@ -26,6 +26,9 @@ namespace Kalitte.Trading.Algos
 
         [AlgoParam(RsiPositionAction.IfEmpty)]
         public RsiPositionAction Action { get; set; }
+
+        [AlgoParam(OrderUsage.TakeProfit)]
+        public OrderUsage Usage { get; set; }
     }
 
     public class CrossOrderConfig : CrossSignalConfig
@@ -423,11 +426,11 @@ namespace Kalitte.Trading.Algos
             else if (config.Action == RsiPositionAction.Radical)
                 finalPosition = signalResult.finalResult.Value;
 
-            MakePortfolio(Symbol, finalQuantity, finalPosition, $"{signal.Name}[{signalResult}]", signalResult);
+            MakePortfolio(Symbol, finalQuantity, finalPosition, $"{signal.Name}[{signalResult}]", signalResult, config.Usage);
 
         }
 
-        public void MakePortfolio(string symbol, decimal quantity, BuySell side, string comment, SignalResult result)
+        public void MakePortfolio(string symbol, decimal quantity, BuySell side, string comment, SignalResult result, OrderUsage usage = OrderUsage.Unknown)
         {
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
             var orderQuantity = quantity;
@@ -442,7 +445,10 @@ namespace Kalitte.Trading.Algos
                 }
             }
 
-            if (orderQuantity > 0) sendOrder(Symbol, orderQuantity, side, comment, result);
+            if (orderQuantity > 0)
+            {
+                sendOrder(Symbol, orderQuantity, side, comment, result, usage);
+            }
 
         }
 

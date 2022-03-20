@@ -78,6 +78,7 @@ public class Program
         alternates.Set("RsiOrderHighL3/Action", RsiPositionAction.Radical);
         alternates.Set("RsiOrderHighL3/L1", 82.51);
         alternates.Set("RsiOrderHighL3/L2", 100);
+        alternates.Set("RsiOrderHighL3/Usage", OrderUsage.CreatePosition);
 
 
         alternates.Set("RsiOrderLowL1/Make", 1);
@@ -95,6 +96,7 @@ public class Program
         alternates.Set("RsiOrderLowL3/Action", RsiPositionAction.Radical);
         alternates.Set("RsiOrderLowL3/L1", 22.99);
         alternates.Set("RsiOrderLowL3/L2", 0);
+        alternates.Set("RsiOrderowL3/Usage", OrderUsage.CreatePosition);
 
 
         alternates.Set("RsiGradientTolerance", 0.02);

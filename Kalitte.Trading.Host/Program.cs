@@ -21,22 +21,20 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 16);
+        settings.Start = new DateTime(2022, 3, 14);
+        settings.Finish = new DateTime(2022, 3, 18);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
         var alternates = settings.Alternates = new AlternateValues(initValues);
 
-        // options
-        alternates.Set("CrossOrderQuantity", 10);
 
         alternates.Set("UsePerformanceMonitor", false);
 
         // analyser defaults
-        alternates.Set("DataCollectSize", 16);
-        alternates.Set("DataAnalysisSize", 96);
+        alternates.Set("DataCollectSize", 8);
+        alternates.Set("DataAnalysisSize", 80);
         alternates.Set("DataCollectAverage", Average.Ema);
         alternates.Set("DataAnalysisAverage", Average.Sma);
 
@@ -121,7 +119,7 @@ public class Program
         alternates.Set("CrossL2/PowerThreshold", 88);
         alternates.Set("CrossL2/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL2/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL2/Quantity", 10);
+        alternates.Set("CrossL2/Quantity", 4);
         alternates.Set("CrossL2/RsiMax", 55.6);
         alternates.Set("CrossL2/RsiMin", 45.4);
 

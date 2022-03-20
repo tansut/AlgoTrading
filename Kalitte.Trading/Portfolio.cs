@@ -216,7 +216,7 @@ namespace Kalitte.Trading
             get
             {
                 var lastOrder = CompletedOrders.LastOrDefault();
-                return lastOrder != null && lastOrder.SignalResult.Signal.Usage == SignalUsage.StopLoss;
+                return lastOrder != null && lastOrder.Usage == OrderUsage.StopLoss;
             }
         }
 
@@ -225,7 +225,7 @@ namespace Kalitte.Trading
             get
             {
                 var lastOrder = CompletedOrders.LastOrDefault();
-                return lastOrder != null && lastOrder.SignalResult.Signal.Usage == SignalUsage.TakeProfit;
+                return lastOrder != null && lastOrder.Usage == OrderUsage.TakeProfit;
             }
         }
 
@@ -263,7 +263,7 @@ namespace Kalitte.Trading
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
                 var type = CompletedOrders[i].SignalResult.Signal.GetType();
-                if (CompletedOrders[i].SignalResult.Signal.Usage != SignalUsage.CreatePosition)
+                if (CompletedOrders[i].Usage != OrderUsage.CreatePosition)
                 {
                     if (result.Count > 0) break;
                     continue;
@@ -282,7 +282,7 @@ namespace Kalitte.Trading
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
                 var type = CompletedOrders[i].SignalResult.Signal.GetType();
-                if (CompletedOrders[i].SignalResult.Signal.Usage != SignalUsage.CreatePosition)
+                if (CompletedOrders[i].Usage != OrderUsage.CreatePosition)
                 {
                     if (result.Count > 0) break;
                     continue;
@@ -330,8 +330,8 @@ namespace Kalitte.Trading
             {
                 for (var i = CompletedOrders.Count - 1; i >= 0; i--)
                 {
-                    var signal = CompletedOrders[i].SignalResult.Signal;
-                    if (signal.Usage == SignalUsage.CreatePosition) return CompletedOrders[i];
+                    var order = CompletedOrders[i];
+                    if (order.Usage == OrderUsage.CreatePosition) return CompletedOrders[i];
                 }
                 return null;
             }

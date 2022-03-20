@@ -14,7 +14,7 @@ namespace Kalitte.Trading
         {
         }
 
-        public override SignalUsage Usage { get => SignalUsage.StopLoss; protected set => base.Usage = value; }
+        public override OrderUsage Usage { get => OrderUsage.StopLoss; protected set => base.Usage = value; }
 
 
     }

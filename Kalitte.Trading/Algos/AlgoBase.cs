@@ -60,11 +60,11 @@ namespace Kalitte.Trading.Algos
         }
     }
 
-    public abstract class AlgoBase: ILogProvider
+    public abstract class AlgoBase : ILogProvider
     {
         private object signalLock = new object();
         private object decideLock = new object();
-        private object orderLock = new object();        
+        private object orderLock = new object();
 
         Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");
 
@@ -113,7 +113,7 @@ namespace Kalitte.Trading.Algos
 
         [AlgoParam(false)]
         public bool UsePerformanceMonitor { get; set; }
-         
+
 
         [AlgoParam(BarPeriod.Min10)]
         public BarPeriod SymbolPeriod { get; set; }
@@ -149,7 +149,7 @@ namespace Kalitte.Trading.Algos
             {
                 timeReaderLock.ReleaseWriterLock();
             }
-            
+
         }
 
         public DateTime Now
@@ -165,7 +165,7 @@ namespace Kalitte.Trading.Algos
                 {
                     //timeReaderLock.ReleaseReaderLock();
                 }
-                
+
             }
         }
 
@@ -182,7 +182,7 @@ namespace Kalitte.Trading.Algos
 
         internal Task[] RunSignals(DateTime time)
         {
-            var tasks = new List<Task<SignalResult>>();            
+            var tasks = new List<Task<SignalResult>>();
             foreach (var signal in Signals)
             {
                 var sd = new SignalData(time, signal);
@@ -191,7 +191,7 @@ namespace Kalitte.Trading.Algos
             var result = tasks.ToArray();
             Task.WaitAll(result);
             return result;
-            
+
         }
 
         public Dictionary<string, PerformanceCounter> perfCounters = new Dictionary<string, PerformanceCounter>();
@@ -251,7 +251,7 @@ namespace Kalitte.Trading.Algos
 
         public virtual void CompletedOrder(ExchangeOrder order)
         {
-            
+
         }
 
         public virtual void FillCurrentOrder(decimal filledUnitPrice, decimal filledQuantity)
@@ -279,7 +279,7 @@ namespace Kalitte.Trading.Algos
             finally
             {
                 orderWait.Set();
-            }            
+            }
         }
 
         public void CancelCurrentOrder(string reason)
@@ -331,7 +331,7 @@ namespace Kalitte.Trading.Algos
             SignalsState = StartableState.StartInProgress;
             try
             {
-                foreach (var signal in Signals.Where(p=>p.Enabled))
+                foreach (var signal in Signals.Where(p => p.Enabled))
                 {
                     signal.Start();
                     Log($"Started signal {signal}", LogLevel.Info);
@@ -386,7 +386,7 @@ namespace Kalitte.Trading.Algos
                 var roundDown = Helper.RoundDown(time, TimeSpan.FromSeconds(sec.Key));
             }
 
-                
+
             foreach (var sd in Symbols)
             {
                 var p = sd.Periods;
@@ -517,7 +517,7 @@ namespace Kalitte.Trading.Algos
         }
 
         public bool WaitingOrderExpired()
-        {            
+        {
             if (orderWait.WaitOne(1)) return false;
             if (this.positionRequest == null) return false;
             var timeOut = (Now - this.positionRequest.Sent).TotalSeconds;
@@ -551,7 +551,7 @@ namespace Kalitte.Trading.Algos
                     finally
                     {
                         Monitor.Exit(decideLock);
-                    }                    
+                    }
                 }
             }
         }
@@ -565,7 +565,7 @@ namespace Kalitte.Trading.Algos
             Dictionary<string, object> result = new Dictionary<string, object>();
             var properties = target.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
             foreach (var prop in properties)
-            {               
+            {
                 var attr = (AlgoParam)prop.GetCustomAttributes(true).Where(p => p is AlgoParam).First();
                 if (prop.PropertyType.IsClass && prop.PropertyType != typeof(string))
                 {
@@ -574,7 +574,7 @@ namespace Kalitte.Trading.Algos
                 }
                 else result.Add(attr.Name ?? prop.Name, prop.GetValue(target));
 
-                
+
             }
             return result;
         }
@@ -622,7 +622,8 @@ namespace Kalitte.Trading.Algos
                         }
                         else if (item.PropertyType.IsEnum)
                         {
-                            propValue = Enum.ToObject(item.PropertyType, Convert.ToInt32(val));                        }
+                            propValue = Enum.ToObject(item.PropertyType, Convert.ToInt32(val));
+                        }
                         else if (item.PropertyType == typeof(BarPeriod))
                         {
                             propValue = (BarPeriod)Convert.ToInt32(val);
@@ -635,27 +636,31 @@ namespace Kalitte.Trading.Algos
                     catch (Exception ex)
                     {
                         throw new Exception($"{item.Name} {propValue} set error", ex);
-                        
+
                     }
                 }
                 else
-                {                    
+                {
                     var paramVal = item.GetCustomAttributes(typeof(AlgoParam), true).Cast<AlgoParam>().FirstOrDefault();
-                    
+
                     if (paramVal != null && (!item.PropertyType.IsClass || item.PropertyType == typeof(string))) item.SetValue(target, paramVal.Value);
                     else if (paramVal != null)
                     {
                         var subProps = init.Where(p => p.Key.StartsWith($"{paramVal.Name ?? item.Name}/")).ToList();
                         var dict = new Dictionary<string, object>();
                         subProps.ForEach(p => dict.Add(p.Key.Split('/')[1], p.Value));
-                        if (item.GetValue(target) == null) {
-                            try {
+                        if (item.GetValue(target) == null)
+                        {
+                            try
+                            {
                                 var instance = Activator.CreateInstance(item.PropertyType);
                                 item.SetValue(target, instance);
-                            } catch(Exception ex) {
+                            }
+                            catch (Exception ex)
+                            {
                                 throw new Exception($"{item.Name}/{item.PropertyType.FullName} property error while creating instance", ex);
                             }
-                        } 
+                        }
                         if (subProps.Any()) ApplyProperties(item.GetValue(target), dict);
                     }
                 }
@@ -697,13 +702,13 @@ namespace Kalitte.Trading.Algos
                 this.Watch = new PerformanceMonitor();
                 ConfigureMonitor();
             }
-            
+
         }
 
 
 
         public virtual void Start()
-        {            
+        {
             if (this.Watch != null) this.Watch.Start();
             if (!Simulation)
             {
@@ -781,7 +786,7 @@ namespace Kalitte.Trading.Algos
 
             var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
 
-            
+
             if (Simulation) File.AppendAllText(LogFile, LogContent.ToString());
             if (Simulation && string.IsNullOrEmpty(SimulationFile)) Process.Start(LogFile);
             if (!string.IsNullOrEmpty(SimulationFile))
@@ -814,16 +819,16 @@ namespace Kalitte.Trading.Algos
 
         }
 
-        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment , SignalResult signalResult, OrderIcon icon = OrderIcon.None,  bool disableDelay = false)
+        public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment, SignalResult signalResult, OrderUsage usage = OrderUsage.Unknown, bool disableDelay = false)
         {
             orderWait.Reset();
             var signal = signalResult.Signal;
-            if (icon == OrderIcon.None)
-            {
-                if (signal.Usage == SignalUsage.StopLoss) icon = OrderIcon.StopLoss;
-                else if (signal.Usage == SignalUsage.TakeProfit) icon = OrderIcon.TakeProfit;
-                else if (signal.Usage == SignalUsage.ClosePosition) icon = OrderIcon.PositionClose;
-            }
+            usage = usage == OrderUsage.Unknown ? signal.Usage : usage;
+            var icon = OrderIcon.None;
+            if (usage == OrderUsage.StopLoss) icon = OrderIcon.StopLoss;
+            else if (usage == OrderUsage.TakeProfit) icon = OrderIcon.TakeProfit;
+            else if (usage == OrderUsage.ClosePosition) icon = OrderIcon.PositionClose;
+
             var time = Now;
             if (this.Watch != null)
             {
@@ -851,6 +856,7 @@ namespace Kalitte.Trading.Algos
                     Exchange.CreateLimitOrder(symbol, quantity, side, limitPrice, icon.ToString(), time.Hour >= 19);
             }
             var order = this.positionRequest = new ExchangeOrder(symbol, orderid, side, quantity, price, comment, time);
+            order.Usage = usage;
             order.SignalResult = signalResult;
             order.Sent = time;
             portfolio.AddRequestedOrder(order);
@@ -937,10 +943,10 @@ namespace Kalitte.Trading.Algos
                 if (Simulation) LogContent.AppendLine(content);
                 else
                 {
-                    lock(this)
+                    lock (this)
                     {
                         File.AppendAllText(LogFile, content + Environment.NewLine);
-                    }                    
+                    }
                 }
                 var showUser = ilevel >= (int)UILoggingLevel;
                 if (LogConsole && showUser) Console.WriteLine(content);
@@ -987,7 +993,7 @@ namespace Kalitte.Trading.Algos
             {
                 var list = GetMarketData(symbol, SymbolPeriod, t);
                 result = list.Length > 0 ? list[1] : 0;
-                
+
 
             }
             else result = Exchange.GetVolume(symbol, period, t);
@@ -1002,7 +1008,7 @@ namespace Kalitte.Trading.Algos
             {
                 var list = GetMarketData(symbol, SymbolPeriod, t ?? Now);
                 result = list.Length > 0 ? list[0] : 0;
-                
+
             }
             else result = Exchange.GetMarketPrice(symbol, t);
             if (result == 0) Log($"Market price got zero", LogLevel.Debug);

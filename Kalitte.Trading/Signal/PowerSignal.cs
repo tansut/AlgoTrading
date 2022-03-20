@@ -83,7 +83,7 @@ namespace Kalitte.Trading
             base.Init();
         }
 
-        public override SignalUsage Usage { get => base.Usage == SignalUsage.Unknown ? SignalUsage.Custom: base.Usage; protected set => base.Usage = value; }
+        public override OrderUsage Usage { get => base.Usage == OrderUsage.Unknown ? OrderUsage.Custom: base.Usage; protected set => base.Usage = value; }
 
 
         public PowerSignal(string name, string symbol, AlgoBase owner, PowerSignalConfig config) : base(name, symbol, owner, config)

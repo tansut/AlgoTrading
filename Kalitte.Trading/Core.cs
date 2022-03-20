@@ -52,6 +52,16 @@ namespace Kalitte.Trading
         }
     }
 
+    public enum OrderUsage
+    {
+        Unknown = 0,
+        StopLoss = 1,
+        TakeProfit = 2,
+        CreatePosition = 4,
+        ClosePosition = 8,
+        Custom = 128,
+    }
+
     public class ConfigParameters
     {
         public override string ToString()

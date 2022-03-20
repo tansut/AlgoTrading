@@ -309,7 +309,7 @@ namespace Kalitte.Trading.Algos
                 if (!item.Value.IsEmpty)
                 {
                     Log($"Closing positions for {symbol} at {time}", LogLevel.Info, time);
-                    sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", signalResult, OrderIcon.PositionClose, true);
+                    sendOrder(symbol, item.Value.Quantity, item.Value.Side == BuySell.Buy ? BuySell.Sell : BuySell.Buy, "close position", signalResult, OrderUsage.ClosePosition, true);
                 }
             }
         }
@@ -348,7 +348,7 @@ namespace Kalitte.Trading.Algos
             if (result.finalResult == BuySell.Sell && portfolio.IsShort) return;
 
             var lastSignalTime = portfolio.LastPositionOrder == null ? DateTime.MinValue : portfolio.LastPositionOrder.SignalResult.SignalTime;
-            if (signal.Usage == SignalUsage.StopLoss && (result.SignalTime - lastSignalTime).TotalSeconds < 60)
+            if (signal.Usage == OrderUsage.StopLoss && (result.SignalTime - lastSignalTime).TotalSeconds < 60)
             {
                 Log($"{signal.Name} {result} received but there is no time dif between {lastSignalTime} and {result.SignalTime}", LogLevel.Warning);
             };
@@ -452,7 +452,7 @@ namespace Kalitte.Trading.Algos
                 }
             }
 
-            if (orderQuantity > 0) sendOrder(Symbol, orderQuantity, side, comment, result, OrderIcon.PositionClose);
+            if (orderQuantity > 0) sendOrder(Symbol, orderQuantity, side, comment, result, OrderUsage.ClosePosition);
 
         }
 

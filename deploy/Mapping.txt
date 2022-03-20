@@ -470,11 +470,11 @@ Renamed Types:
 {
 
 	[Kalitte.Trading]Kalitte.Trading.LossSignal::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.LossSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.LossSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.LossSignal::.ctor[4]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase, [Kalitte.Trading]Kalitte.Trading.PLSignalConfig ) skipped:  special name
 
 
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.LossSignal::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.LossSignal::Usage skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]<PrivateImplementationDetails>/__StaticArrayInitTypeSize=40 -> [Kalitte.Trading]A.a/A
@@ -640,6 +640,18 @@ Skipped Types:
 
 	System.Object [Kalitte.Trading]System.Object Kalitte.Trading.AlgoParam::Value skipped:  KeepPublicApi option in configuration
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.AlgoParam::Name skipped:  KeepPublicApi option in configuration
+}
+
+[Kalitte.Trading]Kalitte.Trading.OrderUsage skipped:  KeepPublicApi option in configuration
+{
+
+	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.OrderUsage::value__ skipped:  special name
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.OrderUsage::Unknown skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.OrderUsage::StopLoss skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.OrderUsage::TakeProfit skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.OrderUsage::CreatePosition skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.OrderUsage::ClosePosition skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.OrderUsage::Custom skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.DataTime skipped:  KeepPublicApi option in configuration
@@ -1079,6 +1091,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_Sent[1]( [mscorlib]System.DateTime ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_Resulted[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_Resulted[1]( [mscorlib]System.DateTime ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_Usage[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_FilledUnitPrice[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_FilledUnitPrice[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_FilledQuantity[0]( ) skipped:  skip by property
@@ -1095,6 +1109,7 @@ Skipped Types:
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Created>k__BackingField -> A
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Sent>k__BackingField -> a
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Resulted>k__BackingField -> B
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.ExchangeOrder::<Usage>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::<FilledUnitPrice>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::<FilledQuantity>k__BackingField -> a
 	Kalitte.Trading.SignalResult [Kalitte.Trading]Kalitte.Trading.SignalResult Kalitte.Trading.ExchangeOrder::<SignalResult>k__BackingField -> A
@@ -1112,6 +1127,7 @@ Skipped Types:
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::Created skipped:  KeepPublicApi option in configuration
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::Sent skipped:  KeepPublicApi option in configuration
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::Resulted skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.ExchangeOrder::Usage skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::FilledUnitPrice skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::FilledQuantity skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::CommissionPaid skipped:  KeepPublicApi option in configuration
@@ -1404,18 +1420,6 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyserBase`1::SignalSensitivity skipped:  KeepPublicApi option in configuration
 }
 
-[Kalitte.Trading]Kalitte.Trading.SignalUsage skipped:  KeepPublicApi option in configuration
-{
-
-	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.SignalUsage::value__ skipped:  special name
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalUsage::Unknown skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalUsage::StopLoss skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalUsage::TakeProfit skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalUsage::CreatePosition skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalUsage::ClosePosition skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalUsage::Custom skipped:  KeepPublicApi option in configuration
-}
-
 [Kalitte.Trading]Kalitte.Trading.SignalResult skipped:  KeepPublicApi option in configuration
 {
 
@@ -1483,7 +1487,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::get_LastOrderDate[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::set_LastOrderDate[1]( [mscorlib]System.DateTime ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.SignalBase::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.SignalBase::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::get_PerfMon[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::set_PerfMon[1]( [Kalitte.Trading]Kalitte.Trading.PerformanceMonitor ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::get_Indicators[0]( ) skipped:  skip by property
@@ -1531,7 +1535,7 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.SignalBase::<CompletedQuantity>k__BackingField -> A
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.SignalBase::<FirstOrderDate>k__BackingField -> A
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.SignalBase::<LastOrderDate>k__BackingField -> a
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalBase::<Usage>k__BackingField -> A
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.SignalBase::<Usage>k__BackingField -> A
 	Kalitte.Trading.PerformanceMonitor [Kalitte.Trading]Kalitte.Trading.PerformanceMonitor Kalitte.Trading.SignalBase::<PerfMon>k__BackingField -> A
 	System.Collections.Generic.List`1<Kalitte.Trading.Indicators.ITechnicalIndicator> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.Indicators.ITechnicalIndicator> Kalitte.Trading.SignalBase::<Indicators>k__BackingField -> A
 	Kalitte.Trading.SignalEventHandler [Kalitte.Trading]Kalitte.Trading.SignalEventHandler Kalitte.Trading.SignalBase::OnSignal -> A
@@ -1556,7 +1560,7 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.SignalBase::CompletedQuantity skipped:  KeepPublicApi option in configuration
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.SignalBase::FirstOrderDate skipped:  KeepPublicApi option in configuration
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.SignalBase::LastOrderDate skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalBase::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.SignalBase::Usage skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.PerformanceMonitor [Kalitte.Trading]Kalitte.Trading.PerformanceMonitor Kalitte.Trading.SignalBase::PerfMon skipped:  KeepPublicApi option in configuration
 	System.Collections.Generic.List`1<Kalitte.Trading.Indicators.ITechnicalIndicator> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.Indicators.ITechnicalIndicator> Kalitte.Trading.SignalBase::Indicators skipped:  KeepPublicApi option in configuration
 
@@ -1605,7 +1609,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::get_LastCalculatedSensitivity[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_LastCalculatedSensitivity[1]( [Kalitte.Trading]Kalitte.Trading.Sensitivity ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::ToString[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::AdjustSensitivityInternal[2]( [mscorlib]System.Double, [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::Init[0]( ) skipped:  KeepPublicApi option in configuration
@@ -1626,7 +1630,7 @@ Skipped Types:
 
 	Kalitte.Trading.PowerSignal [Kalitte.Trading]Kalitte.Trading.PowerSignal Kalitte.Trading.CrossSignal::PowerSignal skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignal::LastCalculatedSensitivity skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.CrossSignal::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.CrossSignal::Usage skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.GradientSignal skipped:  KeepPublicApi option in configuration
@@ -1639,7 +1643,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.GradientSignal::get_DefaultAction[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.GradientSignal::set_DefaultAction[1]( [Kalitte.Trading]Kalitte.Trading.BuySell ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.GradientSignal::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.GradientSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.GradientSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.GradientSignal::Init[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.GradientSignal::CheckInternal[1]( [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.GradientSignal::.ctor[5]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase, [Kalitte.Trading]Kalitte.Trading.GradientSignalConfig, [Kalitte.Trading]Kalitte.Trading.BuySell ) skipped:  special name
@@ -1652,7 +1656,7 @@ Skipped Types:
 	Kalitte.Trading.Indicators.ITechnicalIndicator [Kalitte.Trading]Kalitte.Trading.Indicators.ITechnicalIndicator Kalitte.Trading.GradientSignal::Indicator skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Gradient [Kalitte.Trading]Kalitte.Trading.Gradient Kalitte.Trading.GradientSignal::grad skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BuySell [Kalitte.Trading]Kalitte.Trading.BuySell Kalitte.Trading.GradientSignal::DefaultAction skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.GradientSignal::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.GradientSignal::Usage skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.PriceMonitor skipped:  KeepPublicApi option in configuration
@@ -1743,7 +1747,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.PowerSignal::get_Indicator[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PowerSignal::set_Indicator[1]( [Kalitte.Trading]Kalitte.Trading.Indicators.ITechnicalIndicator ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PowerSignal::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.PowerSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.PowerSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.PowerSignal::Init[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.PowerSignal::CheckInternal[1]( [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.PowerSignal::.ctor[4]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase, [Kalitte.Trading]Kalitte.Trading.PowerSignalConfig ) skipped:  special name
@@ -1752,7 +1756,7 @@ Skipped Types:
 
 
 	Kalitte.Trading.Indicators.ITechnicalIndicator [Kalitte.Trading]Kalitte.Trading.Indicators.ITechnicalIndicator Kalitte.Trading.PowerSignal::Indicator skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.PowerSignal::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.PowerSignal::Usage skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.TrendDirection skipped:  KeepPublicApi option in configuration
@@ -1834,7 +1838,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.TrendSignal::get_HowToReset[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.TrendSignal::set_HowToReset[1]( [Kalitte.Trading]Kalitte.Trading.ResetList ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.TrendSignal::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.TrendSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.TrendSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.TrendSignal::ToString[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.TrendSignal::Init[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.TrendSignal::ResetInternal[0]( ) skipped:  KeepPublicApi option in configuration
@@ -1857,7 +1861,7 @@ Skipped Types:
 	System.Nullable`1<System.Decimal> [Kalitte.Trading]System.Nullable`1<System.Decimal> Kalitte.Trading.TrendSignal::Max skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.TrendReference [Kalitte.Trading]Kalitte.Trading.TrendReference Kalitte.Trading.TrendSignal::ReferenceType skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.ResetList [Kalitte.Trading]Kalitte.Trading.ResetList Kalitte.Trading.TrendSignal::HowToReset skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.TrendSignal::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.TrendSignal::Usage skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.SystemTime skipped:  KeepPublicApi option in configuration
@@ -2150,15 +2154,15 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.SignalConfig::get_Enabled[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalConfig::set_Enabled[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalConfig::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.SignalConfig::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.SignalConfig::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.SignalConfig::.ctor[0]( ) skipped:  special name
 
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.SignalConfig::<Enabled>k__BackingField -> A
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalConfig::<Usage>k__BackingField -> A
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.SignalConfig::<Usage>k__BackingField -> A
 
 
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.SignalConfig::Enabled skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.SignalConfig::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.SignalConfig::Usage skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.Signal`1 skipped:  KeepPublicApi option in configuration
@@ -2167,14 +2171,14 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Signal`1::get_Config[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Signal`1::set_Config[1]( !0 ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Signal`1::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Signal`1::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Signal`1::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Signal`1::.ctor[4]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase, !0 ) skipped:  special name
 
 	C [Kalitte.Trading]C Kalitte.Trading.Signal`1::<Config>k__BackingField -> A
 
 
 	C [Kalitte.Trading]C Kalitte.Trading.Signal`1::Config skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.Signal`1::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.Signal`1::Usage skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.CrossSignalResult skipped:  KeepPublicApi option in configuration
@@ -2501,7 +2505,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::SetPerformanceCounterValue[2]( [mscorlib]System.String, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::Stop[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::ClosePositions[2]( [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.SignalResult ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::sendOrder[7]( [mscorlib]System.String, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.BuySell, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.SignalResult, [Kalitte.Trading]Kalitte.Trading.OrderIcon, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::sendOrder[7]( [mscorlib]System.String, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.BuySell, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.SignalResult, [Kalitte.Trading]Kalitte.Trading.OrderUsage, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::GetSymbolPeriodSeconds[1]( [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::printPortfolio[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::CalculateVolumeBySecond[2]( [mscorlib]System.DateTime, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration
@@ -2987,12 +2991,12 @@ Skipped Types:
 {
 
 	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignal::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignal::CheckInternal[1]( [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignal::.ctor[4]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase, [Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalConfig ) skipped:  special name
 
 
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.ClosePositionsSignal::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.ClosePositionsSignal::Usage skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.Indicators.ITechnicalIndicator skipped:  KeepPublicApi option in configuration
@@ -3033,11 +3037,11 @@ Skipped Types:
 {
 
 	[Kalitte.Trading]Kalitte.Trading.ProfitSignal::get_Usage[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.ProfitSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.SignalUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ProfitSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitSignal::.ctor[4]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase, [Kalitte.Trading]Kalitte.Trading.PLSignalConfig ) skipped:  special name
 
 
-	Kalitte.Trading.SignalUsage [Kalitte.Trading]Kalitte.Trading.SignalUsage Kalitte.Trading.ProfitSignal::Usage skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.ProfitSignal::Usage skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.IMarketDataProvider skipped:  KeepPublicApi option in configuration

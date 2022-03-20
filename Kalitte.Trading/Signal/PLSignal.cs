@@ -198,7 +198,7 @@ namespace Kalitte.Trading
             var targetChange = (costStatus.AverageCost * (UsedPriceChange / 100M)).ToCurrency();
 
 
-            if (this.Usage == SignalUsage.TakeProfit)
+            if (this.Usage == OrderUsage.TakeProfit)
             {
                 if (portfolio.IsLong && unitPl >= targetChange)
                 {
@@ -209,7 +209,7 @@ namespace Kalitte.Trading
                     bs = BuySell.Buy;
                 }
             }
-            else if (this.Usage == SignalUsage.StopLoss)
+            else if (this.Usage == OrderUsage.StopLoss)
             {               
                 if (portfolio.IsLong && unitPl <= -targetChange)
                 {
@@ -230,7 +230,7 @@ namespace Kalitte.Trading
             result.PL = unitPl;
             result.KeepQuantity = RoundQuantity(costStatus.TotalQuantity * (Config.KeepQuantity / 100M));
 
-            if (Config.PriceMonitor && result.finalResult.HasValue && this.Usage == SignalUsage.TakeProfit)
+            if (Config.PriceMonitor && result.finalResult.HasValue && this.Usage == OrderUsage.TakeProfit)
             {
                 PriceMonitor = PriceMonitor ?? CreatePriceMonitor(result);
                 if (!PriceMonitor.WorkingFor(result))

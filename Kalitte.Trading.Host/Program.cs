@@ -76,7 +76,7 @@ public class Program
         alternates.Set("RsiOrderHighL3/Action", RsiPositionAction.Radical);
         alternates.Set("RsiOrderHighL3/L1", 82.51);
         alternates.Set("RsiOrderHighL3/L2", 100);
-        alternates.Set("RsiOrderHighL3/Usage", OrderUsage.CreatePosition);
+
 
         alternates.Set("RsiOrderLowL1/Make", 1);
         alternates.Set("RsiOrderLowL1/Action", RsiPositionAction.IfEmpty);

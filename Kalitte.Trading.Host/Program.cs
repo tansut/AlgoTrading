@@ -55,7 +55,7 @@ public class Program
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);
-        alternates.Set("RsiLoss/StartAt", 0.5);
+        alternates.Set("RsiLoss/StartAt", 0.8);
         alternates.Set("RsiLoss/Step", 0.2);
 
         // rsi

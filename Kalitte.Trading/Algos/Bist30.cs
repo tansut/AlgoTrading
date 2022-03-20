@@ -452,7 +452,7 @@ namespace Kalitte.Trading.Algos
                 }
             }
 
-            if (orderQuantity > 0) sendOrder(Symbol, orderQuantity, side, comment, result, OrderUsage.ClosePosition);
+            if (orderQuantity > 0) sendOrder(Symbol, orderQuantity, side, comment, result);
 
         }
 

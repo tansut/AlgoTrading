@@ -449,7 +449,6 @@ namespace Kalitte.Trading.Algos
             {
                 sendOrder(Symbol, orderQuantity, side, comment, result, usage);
             }
-
         }
 
         public void HandleDailyCloseSignal(ClosePositionsSignal signal, ClosePositionsSignalResult result)

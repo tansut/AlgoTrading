@@ -40,7 +40,7 @@ public class Program
 
         // profit && loss
 
-        alternates.Set("PriceLowLimit", 2400);
+        alternates.Set("PriceLowLimit", 2300);
         alternates.Set("PriceHighLimit", 2500);
 
         alternates.Set("Profit/InitialQuantity", 50);
@@ -51,14 +51,12 @@ public class Program
         alternates.Set("Profit/Step", 0.1);
 
         
-        // loss        
+        // loss
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);
         alternates.Set("RsiLoss/StartAt", 0.5);
         alternates.Set("RsiLoss/Step", 0.2);
-
-
 
         // rsi
         alternates.Set("Rsi", 14);
@@ -80,7 +78,6 @@ public class Program
         alternates.Set("RsiOrderHighL3/L2", 100);
         alternates.Set("RsiOrderHighL3/Usage", OrderUsage.CreatePosition);
 
-
         alternates.Set("RsiOrderLowL1/Make", 1);
         alternates.Set("RsiOrderLowL1/Action", RsiPositionAction.IfEmpty);
         alternates.Set("RsiOrderLowL1/L1", 33.00);
@@ -98,14 +95,13 @@ public class Program
         alternates.Set("RsiOrderLowL3/L2", 0);
         alternates.Set("RsiOrderowL3/Usage", OrderUsage.CreatePosition);
 
-
         alternates.Set("RsiGradientTolerance", 0.02);
         alternates.Set("RsiGradientLearnRate", 0.005);
 
         // volume power signal
         alternates.Set("PowerLookback", 5);
 
-        // ma cross        
+        // ma cross
         
         alternates.Set("MovPeriod", 5);
         alternates.Set("MovPeriod2", 9);

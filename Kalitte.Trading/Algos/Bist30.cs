@@ -45,12 +45,6 @@ namespace Kalitte.Trading.Algos
     public class Bist30 : AlgoBase
     {
 
-        // order params
-        [AlgoParam(null)]
-        public CrossOrderConfig CrossOrderL1 { get; set; }
-
-        [AlgoParam(null)]
-        public CrossOrderConfig CrossOrderL2 { get; set; }
 
         [AlgoParam(null)]
         public RsiOrderConfig RsiOrderHighL1 { get; set; }
@@ -93,11 +87,11 @@ namespace Kalitte.Trading.Algos
 
 
 
-        [AlgoParam(null)]
-        public CrossOrderConfig CrossL1 { get; set; } = new CrossOrderConfig();
+        [AlgoParam(null, "CrossL1")]
+        public CrossOrderConfig CrossL1Config { get; set; } = new CrossOrderConfig();
 
-        [AlgoParam(null)]
-        public CrossOrderConfig CrossL2 { get; set; } = new CrossOrderConfig();
+        [AlgoParam(null, "CrossL2")]
+        public CrossOrderConfig CrossL2Config { get; set; } = new CrossOrderConfig();
 
         [AlgoParam(null, "VolumePower")]
         public PowerSignalConfig VolumePowerConfig { get; set; } = new PowerSignalConfig();
@@ -247,8 +241,8 @@ namespace Kalitte.Trading.Algos
             this.Signals.Add(this.rsiLowL2 = CreateRsiPositionSignal("rsi-low-l2", Symbol, RsiOrderLowL2, BuySell.Buy));
             this.Signals.Add(this.rsiLowL3 = CreateRsiPositionSignal("rsi-low-l3", Symbol, RsiOrderLowL3, BuySell.Buy));
 
-            this.Signals.Add(this.maCrossL1 = new CrossSignal("ema59-L1", Symbol, this, CrossL1));
-            this.Signals.Add(this.maCrossL2 = new CrossSignal("ema59-L2", Symbol, this, CrossL2));
+            this.Signals.Add(this.maCrossL1 = new CrossSignal("ema59-L1", Symbol, this, CrossL1Config));
+            this.Signals.Add(this.maCrossL2 = new CrossSignal("ema59-L2", Symbol, this, CrossL2Config));
 
 
             this.Signals.Add(this.profitSignal = CreateProfitSignal("profit", Symbol, ProfitConfig));
@@ -461,30 +455,36 @@ namespace Kalitte.Trading.Algos
             {
                 var macd = maCrossL1.i1k.Results.Last().Value.Value;
                 var expectedSide = macd > 0 ? BuySell.Buy : BuySell.Sell;
-                MakePortfolio(Symbol, result.Quantity, expectedSide, $"daily close macd:{macd}", result);
+                var usage = expectedSide == portfolio.Side ? signal.Usage : OrderUsage.CreatePosition;
+                MakePortfolio(Symbol, result.Quantity, expectedSide, $"daily close macd:{macd}", result, usage);
             }
         }
 
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)
         {
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
-            var keepPosition = portfolio.IsLastPositionOrder(signal); 
+            var lastOrder = portfolio.CompletedOrders.LastOrDefault();
+            var lastPositionOrder = portfolio.LastPositionOrder;
+
+            var keepPosition = lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal;
+
+            //if (!keepPosition && lastOrder != null &&
+            //    lastOrder == lastPositionOrder &&
+            //    portfolio.IsLastPositionOrderInstanceOf(typeof(CrossSignal)))
+            //{
+            //    keepPosition = true;
+            //}
+
 
             Log($"HandleCross: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-
-
-
-
             var currentRsi = 0M;
             var rsiSpeed = 0M;
             var rsiAcc = 0M;
 
-
             var config = (CrossOrderConfig)signal.Config;
-            
 
             if (!signalResult.MorningSignal)
             {
@@ -518,7 +518,6 @@ namespace Kalitte.Trading.Algos
                         if (!discardRsi)
                         {
                             Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Debug);
-
                             return;
                         }
                         else

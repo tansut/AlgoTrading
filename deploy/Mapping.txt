@@ -2099,15 +2099,19 @@ Skipped Types:
 
 	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::get_LastCost[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::set_LastCost[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::get_LastQuantity[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::set_LastQuantity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::get_LastSignal[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::set_LastSignal[1]( [mscorlib]System.String ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::.ctor[0]( ) skipped:  special name
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.StateSettings::<LastCost>k__BackingField -> A
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.StateSettings::<LastQuantity>k__BackingField -> a
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.StateSettings::<LastSignal>k__BackingField -> A
 
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.StateSettings::LastCost skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.StateSettings::LastQuantity skipped:  KeepPublicApi option in configuration
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.StateSettings::LastSignal skipped:  KeepPublicApi option in configuration
 }
 
@@ -2435,22 +2439,18 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::set_Quantity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::get_Side[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::set_Side[1]( [Kalitte.Trading]Kalitte.Trading.BuySell ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::get_Cost[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::set_Cost[1]( [mscorlib]System.Decimal ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::get_Signal[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::set_Signal[1]( [mscorlib]System.String ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::get_AvgCost[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::set_AvgCost[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::.ctor[0]( ) skipped:  special name
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::<Quantity>k__BackingField -> A
 	Kalitte.Trading.BuySell [Kalitte.Trading]Kalitte.Trading.BuySell Kalitte.Trading.Algos.PotfolioConfig::<Side>k__BackingField -> A
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::<Cost>k__BackingField -> a
-	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.PotfolioConfig::<Signal>k__BackingField -> A
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::<AvgCost>k__BackingField -> a
 
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::Quantity skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BuySell [Kalitte.Trading]Kalitte.Trading.BuySell Kalitte.Trading.Algos.PotfolioConfig::Side skipped:  KeepPublicApi option in configuration
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::Cost skipped:  KeepPublicApi option in configuration
-	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.PotfolioConfig::Signal skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::AvgCost skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase skipped:  KeepPublicApi option in configuration

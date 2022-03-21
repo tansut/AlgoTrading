@@ -337,7 +337,7 @@ namespace Kalitte.Trading.Algos
             if (signal.Usage == OrderUsage.StopLoss && (result.SignalTime - lastSignalTime).TotalSeconds < 60)
             {
                 Log($"{signal.Name} {result} received but there is no time dif between {lastSignalTime} and {result.SignalTime}", LogLevel.Warning);
-            };
+            }
 
 
 

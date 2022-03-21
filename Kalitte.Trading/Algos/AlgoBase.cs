@@ -34,10 +34,7 @@ namespace Kalitte.Trading.Algos
         public BuySell Side { get; set; }
 
         [AlgoParam(0)]
-        public decimal Cost { get; set; }
-
-        [AlgoParam("")]
-        public string Signal { get; set; }
+        public decimal AvgCost { get; set; }
     }
 
     [Serializable]
@@ -69,6 +66,7 @@ namespace Kalitte.Trading.Algos
     public class StateSettings
     {
         public decimal LastCost { get; set; }
+        public decimal LastQuantity { get; set; }
         public string LastSignal { get; set; }
     }
 
@@ -207,6 +205,7 @@ namespace Kalitte.Trading.Algos
             var portfolio = portfolioItems.FirstOrDefault(p => p.Symbol == Symbol);
             if (!string.IsNullOrEmpty(state.LastSignal) && portfolio != null)
             {
+                if (state.LastQuantity > 0 && state.LastQuantity != portfolio.Quantity) throw new Exception($"Portfolio quantity seems {portfolio.Quantity}, last time it was {state.LastQuantity}. Update state file or reload Algo.");
                 var signal = this.Signals.FirstOrDefault(p=>p.Name == state.LastSignal);
                 if (signal == null) throw new Exception("Unknown signal in state file");
                 var order = new ExchangeOrder(this.Symbol, "-1", portfolio.Side, portfolio.Quantity, state.LastCost, "Loaded from file", Now);
@@ -215,6 +214,7 @@ namespace Kalitte.Trading.Algos
                 order.FilledUnitPrice = order.UnitPrice;
                 order.Usage = OrderUsage.CreatePosition;
                 order.SignalResult = new SignalResult(signal, Now);
+                order.SignalResult.finalResult = order.Side;
                 UserPortfolioList.Add(order);
             }
             else portfolioItems.ForEach(p => this.UserPortfolioList.Add(p.Symbol, p));
@@ -328,6 +328,7 @@ namespace Kalitte.Trading.Algos
                         newState.LastSignal = this.positionRequest.SignalResult.Signal.Name;
                         var avgCost = portfolio.LastAverageCost(this.positionRequest.SignalResult.Signal);
                         newState.LastCost = avgCost.AverageCost;
+                        newState.LastQuantity = portfolio.Quantity;
                         SaveStateSettings(newState);
                     }
                     this.positionRequest = null;
@@ -758,7 +759,7 @@ namespace Kalitte.Trading.Algos
             if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
             if (Simulation && InitialPortfolio.Quantity > 0)
             {
-                var item = new PortfolioItem(this.Symbol, InitialPortfolio.Side, InitialPortfolio.Quantity, InitialPortfolio.Cost);
+                var item = new PortfolioItem(this.Symbol, InitialPortfolio.Side, InitialPortfolio.Quantity, InitialPortfolio.AvgCost);
                 InitializePositions(new List<PortfolioItem> { item });                
             }
             if (this.UsePerformanceMonitor)

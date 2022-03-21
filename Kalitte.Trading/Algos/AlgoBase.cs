@@ -521,7 +521,7 @@ namespace Kalitte.Trading.Algos
             if (orderWait.WaitOne(1)) return false;
             if (this.positionRequest == null) return false;
             var timeOut = (Now - this.positionRequest.Sent).TotalSeconds;
-            return timeOut > 15;
+            return timeOut > 10;
         }
 
         public void SignalReceieved(SignalBase signal, SignalEventArgs data)

@@ -484,7 +484,8 @@ namespace Kalitte.Trading.Algos
             var rsiSpeed = 0M;
             var rsiAcc = 0M;
 
-            var config = (CrossOrderConfig)signal.Config;
+            var config = (CrossOrderConfig)signal.Config;            
+
 
             if (!signalResult.MorningSignal)
             {
@@ -498,15 +499,28 @@ namespace Kalitte.Trading.Algos
                     var cancelCross = false;
                     var valueSet = 0M;
 
+
+
                     if (config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi > config.RsiMax)
                     {
                         valueSet = config.RsiMax;
                         cancelCross = true;
                     }
-                    if (!signalResult.MorningSignal && config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell  && currentRsi < config.RsiMin)
+                    else if (config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi < config.RsiMin)
                     {
                         valueSet = config.RsiMin;
                         cancelCross = true;
+                    }
+                    else if (config == CrossL1Config)
+                    {
+                        if (config.RsiMax != 0 && CrossL1Config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi <= CrossL2Config.RsiMax)
+                        {
+                            config = CrossL2Config;
+
+                        } else if (config.RsiMin != 0 && CrossL1Config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi >= CrossL2Config.RsiMin)
+                        {
+                            config = CrossL2Config;
+                        }
                     }
 
                     if (cancelCross)
@@ -527,6 +541,7 @@ namespace Kalitte.Trading.Algos
                     }
                 }
             }
+            else config = CrossL2Config;
 
             var orderQuantity = portfolio.Quantity + config.Quantity;
 
@@ -536,7 +551,7 @@ namespace Kalitte.Trading.Algos
             }
             if (orderQuantity > 0)
             {
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}/{signal.AvgChange.ToCurrency()},{signal.AnalyseSize}, rsi:{currentRsi.ToCurrency()},{rsiSpeed.ToCurrency()},{rsiAcc.ToCurrency()}]", signalResult);
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*":"")}/{signal.AvgChange.ToCurrency()},{signal.AnalyseSize}, rsi:{currentRsi.ToCurrency()},{rsiSpeed.ToCurrency()},{rsiAcc.ToCurrency()}]", signalResult);
             }
         }
 

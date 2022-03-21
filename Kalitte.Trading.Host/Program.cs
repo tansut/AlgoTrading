@@ -41,7 +41,7 @@ public class Program
         // profit && loss
 
         alternates.Set("PriceLowLimit", 2300);
-        alternates.Set("PriceHighLimit", 2500);
+        alternates.Set("PriceHighLimit", 2400);
 
         alternates.Set("Profit/InitialQuantity", 50);
         alternates.Set("Profit/KeepQuantity", 20);
@@ -55,8 +55,8 @@ public class Program
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);
-        alternates.Set("RsiLoss/StartAt", 0.8);
-        alternates.Set("RsiLoss/Step", 0.2);
+        alternates.Set("RsiLoss/StartAt", 0.9);
+        alternates.Set("RsiLoss/Step", 0.1);
 
         // rsi
         alternates.Set("Rsi", 14);
@@ -112,7 +112,7 @@ public class Program
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL1/Quantity", 5);
+        alternates.Set("CrossL1/Quantity", 4);
         alternates.Set("CrossL1/RsiMax", 55.6);
         alternates.Set("CrossL1/RsiMin", 45.4);
 
@@ -122,7 +122,7 @@ public class Program
         alternates.Set("CrossL2/PowerThreshold", 88);
         alternates.Set("CrossL2/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL2/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL2/Quantity", 10);
+        alternates.Set("CrossL2/Quantity", 8);
         alternates.Set("CrossL2/RsiMax", 52.6);
         alternates.Set("CrossL2/RsiMin", 48.4);
 

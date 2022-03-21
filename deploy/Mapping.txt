@@ -2293,6 +2293,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossResult::set_Quantity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossResult::get_KeepQuantity[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossResult::set_KeepQuantity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ProfitLossResult::get_UsedPriceChange[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ProfitLossResult::set_UsedPriceChange[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossResult::ToString[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossResult::GetHashCode[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.ProfitLossResult::.ctor[2]( [Kalitte.Trading]Kalitte.Trading.SignalBase, [mscorlib]System.DateTime ) skipped:  special name
@@ -2303,6 +2305,7 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossResult::<PortfolioCost>k__BackingField -> b
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossResult::<Quantity>k__BackingField -> C
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossResult::<KeepQuantity>k__BackingField -> c
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossResult::<UsedPriceChange>k__BackingField -> D
 
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossResult::PL skipped:  KeepPublicApi option in configuration
@@ -2311,6 +2314,7 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossResult::PortfolioCost skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossResult::Quantity skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossResult::KeepQuantity skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ProfitLossResult::UsedPriceChange skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.PowerSignalResult skipped:  KeepPublicApi option in configuration

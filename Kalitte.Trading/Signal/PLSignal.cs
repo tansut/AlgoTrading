@@ -73,8 +73,9 @@ namespace Kalitte.Trading
         public decimal PortfolioCost { get; set; }        
         public decimal Quantity { get; set; }
         public decimal KeepQuantity { get; set; }
-        
-        
+        public decimal UsedPriceChange { get; set; }
+
+
         public ProfitLossResult(SignalBase signal, DateTime t) : base(signal, t)
         {
 
@@ -228,6 +229,7 @@ namespace Kalitte.Trading
             result.MarketPrice = marketPrice;
             result.OriginalPrice = marketPrice;
             result.PL = unitPl;
+            result.UsedPriceChange = UsedPriceChange;
             result.KeepQuantity = RoundQuantity(costStatus.TotalQuantity * (Config.KeepQuantity / 100M));
 
             if (Config.PriceMonitor && result.finalResult.HasValue && this.Usage == OrderUsage.TakeProfit)

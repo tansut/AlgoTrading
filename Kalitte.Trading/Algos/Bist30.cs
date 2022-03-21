@@ -349,7 +349,7 @@ namespace Kalitte.Trading.Algos
             if (quantity > 0)
             {
                 Log($"[{result.Signal.Name} received]: PL: {result.PL}, OriginalPrice: {result.OriginalPrice} MarketPrice: {result.MarketPrice}, Average Cost: {result.PortfolioCost}", LogLevel.Info, result.SignalTime);
-                sendOrder(Symbol, quantity, result.finalResult.Value, $"[{result.Signal.Name}], PL: {result.PL}", result);
+                sendOrder(Symbol, quantity, result.finalResult.Value, $"[{result.Signal.Name}], Change:{result.UsedPriceChange}% PL: {Math.Abs(result.PL)}", result);
             }
         }
 

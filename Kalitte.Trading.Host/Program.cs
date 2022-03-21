@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 18);
+        settings.Start = new DateTime(2022, 3, 21);
+        settings.Finish = new DateTime(2022, 3, 21);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
@@ -50,10 +50,10 @@ public class Program
         alternates.Set("PriceHighLimit", 2400);
 
         alternates.Set("Profit/InitialQuantity", 50);
-        alternates.Set("Profit/KeepQuantity", 20);
+        alternates.Set("Profit/KeepQuantity", 30);
         alternates.Set("Profit/QuantityStep", 10);
         alternates.Set("Profit/QuantityStepMultiplier", 1);
-        alternates.Set("Profit/StartAt", 0.5);        
+        alternates.Set("Profit/StartAt", 0.42);        
         alternates.Set("Profit/Step", 0.1);
 
         
@@ -61,7 +61,7 @@ public class Program
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);
-        alternates.Set("RsiLoss/StartAt", 0.9);
+        alternates.Set("RsiLoss/StartAt", 0.8);
         alternates.Set("RsiLoss/Step", 0.1);
 
         // rsi
@@ -76,11 +76,11 @@ public class Program
         alternates.Set("RsiOrderHighL2/Make", 3);
         alternates.Set("RsiOrderHighL2/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderHighL2/L1", 76.51);
-        alternates.Set("RsiOrderHighL2/L2", 82.50);
+        alternates.Set("RsiOrderHighL2/L2", 84.50);
 
         alternates.Set("RsiOrderHighL3/Make", 4);
         alternates.Set("RsiOrderHighL3/Action", RsiPositionAction.Radical);
-        alternates.Set("RsiOrderHighL3/L1", 82.51);
+        alternates.Set("RsiOrderHighL3/L1", 84.51);
         alternates.Set("RsiOrderHighL3/L2", 100);
 
 

@@ -32,6 +32,14 @@ public class Program
 
         alternates.Set("UsePerformanceMonitor", false);
 
+        // initial portfolio
+        alternates.Set("Portfolio/Cost", 2300);
+        alternates.Set("Portfolio/Quantity", 2);
+        alternates.Set("Portfolio/Side", BuySell.Buy);
+        alternates.Set("Portfolio/Signal", "ema59-l1");
+
+
+
         // analyser defaults
         alternates.Set("DataCollectSize", 8);
         alternates.Set("DataAnalysisSize", 80);
@@ -112,7 +120,7 @@ public class Program
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL1/Quantity", 4);
+        alternates.Set("CrossL1/Quantity", 5);
         alternates.Set("CrossL1/RsiMax", 55.6);
         alternates.Set("CrossL1/RsiMin", 45.4);
 
@@ -122,7 +130,7 @@ public class Program
         alternates.Set("CrossL2/PowerThreshold", 88);
         alternates.Set("CrossL2/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL2/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL2/Quantity", 8);
+        alternates.Set("CrossL2/Quantity", 10);
         alternates.Set("CrossL2/RsiMax", 52.6);
         alternates.Set("CrossL2/RsiMin", 48.4);
 

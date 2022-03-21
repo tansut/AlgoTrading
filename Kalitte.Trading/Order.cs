@@ -38,6 +38,7 @@ namespace Kalitte.Trading
         public string Comment;
         public decimal ComissionRate = 0.0002M;
         public OrderUsage Usage { get; set; }
+        public bool ExtenallyLoaded { get; set; } = false;
         public decimal FilledUnitPrice
         {
             get; set;
@@ -92,14 +93,14 @@ namespace Kalitte.Trading
             return $"id: {this.Id} {this.Symbol}/{Usage}:{this.SideStr}/{this.Quantity}:{this.FilledQuantity}/{this.UnitPrice}:{this.FilledUnitPrice} {this.Comment} Commission: {CommissionPaid}";
         }
 
-        public ExchangeOrder Clone()
-        {
-            var clone = new ExchangeOrder(this.Symbol, "", this.Side, this.Quantity, this.UnitPrice);
-            clone.ComissionRate = this.ComissionRate;
-            clone.FilledUnitPrice = this.FilledUnitPrice;
-            clone.FilledQuantity = this.FilledQuantity;
-            return clone;
-        }
+        //public ExchangeOrder Clone()
+        //{
+        //    var clone = new ExchangeOrder(this.Symbol, "", this.Side, this.Quantity, this.UnitPrice);
+        //    clone.ComissionRate = this.ComissionRate;
+        //    clone.FilledUnitPrice = this.FilledUnitPrice;
+        //    clone.FilledQuantity = this.FilledQuantity;
+        //    return clone;
+        //}
     }
 
 }

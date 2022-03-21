@@ -25,6 +25,21 @@ namespace Kalitte.Trading.Algos
         public DateTime created;
     }
 
+    public class PotfolioConfig: ConfigParameters
+    {
+        [AlgoParam(0)]
+        public decimal Quantity { get; set; }
+
+        [AlgoParam(BuySell.Sell)]
+        public BuySell Side { get; set; }
+
+        [AlgoParam(0)]
+        public decimal Cost { get; set; }
+
+        [AlgoParam("")]
+        public string Signal { get; set; }
+    }
+
     [Serializable]
     public class SymbolData
     {
@@ -32,19 +47,10 @@ namespace Kalitte.Trading.Algos
         public FinanceBars Periods { get; private set; }
 
 
-        //public SymbolData(string symbol, BarPeriod period)
-        //{
-        //    Symbol = symbol;
-        //    Periods = new FinanceBars();
-        //    Periods.Period = period;
-        //}
-
         public SymbolData(string symbol, FinanceBars periods)
         {
             Symbol = symbol;
             Periods = periods;
-            //Periods = new FinanceBars();
-            //Periods.Period = period;
         }
     }
 
@@ -60,6 +66,12 @@ namespace Kalitte.Trading.Algos
         }
     }
 
+    public class StateSettings
+    {
+        public decimal LastCost { get; set; }
+        public string LastSignal { get; set; }
+    }
+
     public abstract class AlgoBase : ILogProvider
     {
         private object signalLock = new object();
@@ -69,8 +81,9 @@ namespace Kalitte.Trading.Algos
         Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");
 
         Dictionary<string, MarketDataFileLogger> dataProviders = new Dictionary<string, MarketDataFileLogger>();
-
-        public static AlgoBase Current;
+        
+        [AlgoParam(null, "Portfolio")]
+        public PotfolioConfig InitialPortfolio { get; set; }
 
         public List<SymbolData> Symbols { get; set; } = new List<SymbolData>();
 
@@ -101,8 +114,27 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(true)]
         public bool LogConsole { get; set; }
 
-        [AlgoParam(@"c:\kalitte\log")]
-        public string LogDir { get; set; }
+        public StateSettings LoadStateSettings()
+        {
+            if (File.Exists(Path.Combine(LogDir, Symbol, $"state.json"))) {
+                return JsonConvert.DeserializeObject<StateSettings>(File.ReadAllText(Path.Combine(LogDir, Symbol, $"state.json")));
+            } else return new StateSettings();
+        }
+
+        public void SaveStateSettings(StateSettings settings)
+        {
+            var content =JsonConvert.SerializeObject(settings);
+            File.WriteAllText(Path.Combine(LogDir, Symbol, $"state.json"), content);
+        }
+
+        public string LogDir { get
+            {
+                return Path.Combine(Appdir, "log");
+            }
+        }
+
+        [AlgoParam(@"c:\kalitte")]
+        public string Appdir { get; set; }
 
         public MarketDataFileLogger PriceLogger;
         public string InstanceName { get; set; }
@@ -167,6 +199,25 @@ namespace Kalitte.Trading.Algos
                 }
 
             }
+        }
+
+        internal void InitializePositions(List<PortfolioItem> portfolioItems)
+        {
+            var state = LoadStateSettings();
+            var portfolio = portfolioItems.FirstOrDefault(p => p.Symbol == Symbol);
+            if (!string.IsNullOrEmpty(state.LastSignal) && portfolio != null)
+            {
+                var signal = this.Signals.FirstOrDefault(p=>p.Name == state.LastSignal);
+                if (signal == null) throw new Exception("Unknown signal in state file");
+                var order = new ExchangeOrder(this.Symbol, "-1", portfolio.Side, portfolio.Quantity, state.LastCost, "Loaded from file", Now);
+                order.ExtenallyLoaded = true;
+                order.FilledQuantity = order.Quantity;
+                order.FilledUnitPrice = order.UnitPrice;
+                order.Usage = OrderUsage.CreatePosition;
+                order.SignalResult = new SignalResult(signal, Now);
+                UserPortfolioList.Add(order);
+            }
+            else portfolioItems.ForEach(p => this.UserPortfolioList.Add(p.Symbol, p));
         }
 
         public PerformanceMonitor Watch;
@@ -271,8 +322,16 @@ namespace Kalitte.Trading.Algos
                     var port = UserPortfolioList.Where(p => p.Key == positionRequest.Symbol).First().Value;
                     Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost.ToCurrency()} NetPL:{port.NetPL.ToCurrency()}]: {this.positionRequest.ToString()}", LogLevel.Order);
                     CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
+                    if (this.positionRequest.Usage == OrderUsage.CreatePosition)
+                    {
+                        var newState = new StateSettings();
+                        newState.LastSignal = this.positionRequest.SignalResult.Signal.Name;
+                        var avgCost = portfolio.LastAverageCost(this.positionRequest.SignalResult.Signal);
+                        newState.LastCost = avgCost.AverageCost;
+                        SaveStateSettings(newState);
+                    }
                     this.positionRequest = null;
-                    orderCounter++;
+                    orderCounter++;                    
                     CompletedOrder(savePosition);
                 }
             }
@@ -505,7 +564,7 @@ namespace Kalitte.Trading.Algos
             this.ApplyProperties(initValues);
             RandomGenerator random = new RandomGenerator();
             this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));
-            Current = this;
+            //if (Simulation && )
         }
 
         public Boolean WaitForOrder(string message)
@@ -697,6 +756,11 @@ namespace Kalitte.Trading.Algos
         public virtual void Init()
         {
             if (!Directory.Exists(Path.GetDirectoryName(LogFile))) Directory.CreateDirectory(Path.GetDirectoryName(LogFile));
+            if (Simulation && InitialPortfolio.Quantity > 0)
+            {
+                var item = new PortfolioItem(this.Symbol, InitialPortfolio.Side, InitialPortfolio.Quantity, InitialPortfolio.Cost);
+                InitializePositions(new List<PortfolioItem> { item });                
+            }
             if (this.UsePerformanceMonitor)
             {
                 this.Watch = new PerformanceMonitor();

@@ -79,21 +79,7 @@ namespace Kalitte.Trading.Matrix
                 if (Algo.positionRequest != null && Algo.positionRequest.Id == order.CliOrdID)
                 {
                     Algo.positionRequest.Resulted = order.TradeDate;
-                    //if (Simulation)
-                    //{
-                    //    if (Algo.positionRequest.UnitPrice > 0 && Algo.positionRequest.UnitPrice != order.Price)
-                    //    {
-                    //        var gain = ((order.Price - Algo.positionRequest.UnitPrice) * (Algo.positionRequest.Side == BuySell.Buy ? 1 : -1) * Algo.positionRequest.Quantity);
-                    //        Algo.simulationPriceDif += gain;
-                    //        //Algo.Log($"Filled price difference for order {order.CliOrdID}: Potential: {Algo.positionRequest.UnitPrice}, Backtest: {order.Price} Difference: [{gain}]", LogLevel.Warning, Algo.positionRequest.Resulted);
-                    //        //this.FillCurrentOrder(positionRequest.UnitPrice, this.positionRequest.Quantity);
-                    //    }
-                    //    Algo.FillCurrentOrder(order.Price, Algo.positionRequest.Quantity);
-                    //}
-                    //else
-                    //{
                     Algo.FillCurrentOrder((order.FilledAmount / order.FilledQty) / 10M, order.FilledQty);
-                    //}
                 }
             }
             else if (order.OrdStatus.Obj == OrdStatus.Rejected || order.OrdStatus.Obj == OrdStatus.Canceled)
@@ -137,9 +123,14 @@ namespace Kalitte.Trading.Matrix
                 {
                     Algo.Log($"Using ---- VIRTUAL ORDERS ----", LogLevel.Warning);
                 }
-                LoadRealPositions(Algo.Symbol);
+                var portfolioItems = LoadRealPositions(GetRealPositions(), p => p.Symbol == Algo.Symbol);
+                Algo.InitializePositions(portfolioItems);
                 Algo.InitializeBars(Algo.Symbol, Algo.SymbolPeriod);
                 Algo.Start();
+                Algo.Log($"- STARTED -");
+                if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
+                else Algo.Log("!! Portfolio is empty !!");
+
             }
         }
 
@@ -154,46 +145,21 @@ namespace Kalitte.Trading.Matrix
             base.OnStopped();
         }
 
-        public void SetAlgoProperties()
+
+
+        internal List<PortfolioItem> LoadRealPositions(Dictionary<string, AlgoTraderPosition> positions, Func<AlgoTraderPosition, bool> filter)
         {
-
-
-
-            //var file = File.ReadAllText(@$"c:\kalitte\{this.GetType().Name}.json");
-            //var obj = JsonConvert.DeserializeObject<Dictionary<string, object>>(file);
-
-            return;
-
-
-            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(ParameterAttribute), true));
-            Debug($"Setting Algo Properties({properties.Count()})");
-            foreach (var item in properties)
-            {
-                Debug($"{item.Name} -> {item.GetValue(this)}");
-                Algo.GetType().GetProperty(item.Name).SetValue(Algo, item.GetValue(this));
-
-                //try
-                //{
-
-                //} catch (Exception exc) {
-                //    Debug($"{item.Name} {} {exc.Message} {exc.StackTrace}");
-                //}
-            }
-        }
-
-
-
-        internal void LoadRealPositions(Dictionary<string, AlgoTraderPosition> positions, Func<AlgoTraderPosition, bool> filter)
-        {
-            Algo.UserPortfolioList.Clear();
+           var list = new List<PortfolioItem>();
+            //Algo.UserPortfolioList.Clear();
             foreach (var position in positions)
             {
                 if (position.Value.IsSymbol)
                 {
                     if (filter(position.Value))
-                        Algo.UserPortfolioList.Add(position.Key, FromTraderPosition(position.Value));
+                        list.Add(FromTraderPosition(position.Value));
                 }
             }
+            return list;
         }
 
         public PortfolioItem FromTraderPosition(AlgoTraderPosition p)
@@ -224,26 +190,7 @@ namespace Kalitte.Trading.Matrix
             return Algo.ToString();
         }
 
-        public void LoadRealPositions(string symbol)
-        {
-            var positions = GetRealPositions();
-            LoadRealPositions(positions, p => p.Symbol == symbol);
 
-            Algo.Log($"- PORTFOLIO -");
-            if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
-            else Algo.Log("!! Portfolio is empty !!");
-            Algo.Log($"- END PORTFOLIO -");
-
-            //var positions = Simulation ? new Dictionary<string, AlgoTraderPosition>() : GetRealPositions();
-            //LoadRealPositions(positions, p => p.Symbol == symbol);
-            //if (!Simulation)
-            //{
-            //    Algo.Log($"- PORTFOLIO -");
-            //    if (Algo.UserPortfolioList.Count > 0) Algo.Log($"{Algo.UserPortfolioList.Print()}");
-            //    else Algo.Log("!! Portfolio is empty !!");
-            //    Algo.Log($"- END PORTFOLIO -");
-            //}
-        }
 
         public decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null)
         {

@@ -382,8 +382,7 @@ namespace Kalitte.Trading
         public PortfolioItem Add(ExchangeOrder position)
         {
             var portfolio = this.GetPortfolio(position.Symbol);
-            portfolio.OrderCompleted(position);
-            //this.CompletedOrders.Add(position);
+            portfolio.OrderCompleted(position);            
             return portfolio;
         }
 

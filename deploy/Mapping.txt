@@ -328,100 +328,92 @@ Renamed Types:
 
 [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/A
 {
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<StartSignals>b__120_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<StopSignals>b__121_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> a
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<SeansTimer_Elapsed>b__124_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> B
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<.ctor>b__130_0[1]( [mscorlib]System.Object ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__135_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__135_1[1]( [mscorlib]System.Object ) -> a
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__136_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> a
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__136_1[1]( [mscorlib]System.Object ) -> B
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<ApplyProperties>b__137_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> B
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<PropSummary>b__139_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> b
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<Stop>b__144_2[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[mscorlib]System.Object> ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<StartSignals>b__128_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<StopSignals>b__129_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> a
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<SeansTimer_Elapsed>b__132_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> B
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<.ctor>b__138_0[1]( [mscorlib]System.Object ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__143_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__143_1[1]( [mscorlib]System.Object ) -> a
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__144_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> a
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__144_1[1]( [mscorlib]System.Object ) -> B
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<ApplyProperties>b__145_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> B
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<PropSummary>b__147_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> b
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<Stop>b__152_2[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[mscorlib]System.Object> ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::.ctor[0]( ) skipped:  special name
 
 	Kalitte.Trading.Algos.AlgoBase/<>c [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c Kalitte.Trading.Algos.AlgoBase/<>c::<>9 -> A
-	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__120_0 -> A
-	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__121_0 -> a
-	System.Action`1<Kalitte.Trading.SignalBase> [Kalitte.Trading]System.Action`1<Kalitte.Trading.SignalBase> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__124_0 -> A
-	System.Func`2<System.Object,Kalitte.Trading.SignalResult> [Kalitte.Trading]System.Func`2<System.Object,Kalitte.Trading.SignalResult> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__130_0 -> A
-	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__135_0 -> A
-	System.Func`2<System.Object,System.Boolean> [Kalitte.Trading]System.Func`2<System.Object,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__135_1 -> A
-	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__136_0 -> a
-	System.Func`2<System.Object,System.Boolean> [Kalitte.Trading]System.Func`2<System.Object,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__136_1 -> a
-	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__137_0 -> B
-	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__139_0 -> b
-	System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,System.Object>,System.Collections.Generic.KeyValuePair`2<System.String,System.Object>> [Kalitte.Trading]System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,System.Object>,System.Collections.Generic.KeyValuePair`2<System.String,System.Object>> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__144_2 -> A
+	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__128_0 -> A
+	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__129_0 -> a
+	System.Action`1<Kalitte.Trading.SignalBase> [Kalitte.Trading]System.Action`1<Kalitte.Trading.SignalBase> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__132_0 -> A
+	System.Func`2<System.Object,Kalitte.Trading.SignalResult> [Kalitte.Trading]System.Func`2<System.Object,Kalitte.Trading.SignalResult> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__138_0 -> A
+	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__143_0 -> A
+	System.Func`2<System.Object,System.Boolean> [Kalitte.Trading]System.Func`2<System.Object,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__143_1 -> A
+	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__144_0 -> a
+	System.Func`2<System.Object,System.Boolean> [Kalitte.Trading]System.Func`2<System.Object,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__144_1 -> a
+	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__145_0 -> B
+	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__147_0 -> b
+	System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,System.Object>,System.Collections.Generic.KeyValuePair`2<System.String,System.Object>> [Kalitte.Trading]System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,System.Object>,System.Collections.Generic.KeyValuePair`2<System.String,System.Object>> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__152_2 -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass123_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/a
+[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass104_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/a
 {
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass123_0::<SetBarCurrentValues>b__0[1]( [Kalitte.Trading]Kalitte.Trading.Algos.SymbolData ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass104_0::<InitializePositions>b__0[1]( [Kalitte.Trading]Kalitte.Trading.PortfolioItem ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass104_0::<InitializePositions>b__2[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass104_0::<InitializePositions>b__1[1]( [Kalitte.Trading]Kalitte.Trading.PortfolioItem ) -> a
 
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass123_0::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass104_0::.ctor[0]( ) skipped:  special name
 
-	System.Collections.Generic.Dictionary`2<System.Int32,Kalitte.Trading.BarPeriod> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.Int32,Kalitte.Trading.BarPeriod> Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass123_0::secDict -> A
-	Kalitte.Trading.Algos.AlgoBase [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass123_0::<>4__this -> A
+	Kalitte.Trading.Algos.AlgoBase [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass104_0::<>4__this -> A
+	Kalitte.Trading.Algos.StateSettings [Kalitte.Trading]Kalitte.Trading.Algos.StateSettings Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass104_0::state -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass126_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/B
+[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass131_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/B
 {
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass126_0::<GetSymbolData>b__0[1]( [Kalitte.Trading]Kalitte.Trading.Algos.SymbolData ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass131_0::<SetBarCurrentValues>b__0[1]( [Kalitte.Trading]Kalitte.Trading.Algos.SymbolData ) -> A
 
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass126_0::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass131_0::.ctor[0]( ) skipped:  special name
 
-	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass126_0::symbol -> A
-	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass126_0::period -> A
+	System.Collections.Generic.Dictionary`2<System.Int32,Kalitte.Trading.BarPeriod> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.Int32,Kalitte.Trading.BarPeriod> Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass131_0::secDict -> A
+	Kalitte.Trading.Algos.AlgoBase [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass131_0::<>4__this -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/b
+[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass134_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/b
 {
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass134_0::<GetSymbolData>b__0[1]( [Kalitte.Trading]Kalitte.Trading.Algos.SymbolData ) -> A
 
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_0::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass134_0::.ctor[0]( ) skipped:  special name
 
-	System.Reflection.PropertyInfo [Kalitte.Trading]System.Reflection.PropertyInfo Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_0::item -> A
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass134_0::symbol -> A
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass134_0::period -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_1 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/C
+[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/C
 {
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_1::<ApplyProperties>b__1[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[mscorlib]System.Object> ) -> A
 
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_1::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_0::.ctor[0]( ) skipped:  special name
 
-	Kalitte.Trading.AlgoParam [Kalitte.Trading]Kalitte.Trading.AlgoParam Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_1::paramVal -> A
-	Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_0 [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_0 Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_1::CS$<>8__locals1 -> A
+	System.Reflection.PropertyInfo [Kalitte.Trading]System.Reflection.PropertyInfo Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_0::item -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_2 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/c
+[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_1 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/c
 {
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_2::<ApplyProperties>b__2[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[mscorlib]System.Object> ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_1::<ApplyProperties>b__1[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[mscorlib]System.Object> ) -> A
 
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_2::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_1::.ctor[0]( ) skipped:  special name
 
-	System.Collections.Generic.Dictionary`2<System.String,System.Object> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.String,System.Object> Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass137_2::dict -> A
+	Kalitte.Trading.AlgoParam [Kalitte.Trading]Kalitte.Trading.AlgoParam Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_1::paramVal -> A
+	Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_0 [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_0 Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_1::CS$<>8__locals1 -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c -> [Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/A`1
+[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_2 -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/D
 {
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c::<SetAlgoProperties>b__15_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_2::<ApplyProperties>b__2[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[mscorlib]System.Object> ) -> A
 
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c::.cctor[0]( ) skipped:  special name
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_2::.ctor[0]( ) skipped:  special name
 
-	Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c<T> [Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c<T> Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c::<>9 -> A
-	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c::<>9__15_0 -> A
-}
-
-[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c__DisplayClass21_0 -> [Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/a`1
-{
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c__DisplayClass21_0::<LoadRealPositions>b__0[1]( [Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition ) -> A
-
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c__DisplayClass21_0::.ctor[0]( ) skipped:  special name
-
-	System.String [Kalitte.Trading]System.String Kalitte.Trading.Matrix.MatrixAlgoBase`1/<>c__DisplayClass21_0::symbol -> A
+	System.Collections.Generic.Dictionary`2<System.String,System.Object> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.String,System.Object> Kalitte.Trading.Algos.AlgoBase/<>c__DisplayClass145_2::dict -> A
 }
 
 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c -> [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/A
@@ -1093,6 +1085,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_Resulted[1]( [mscorlib]System.DateTime ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_Usage[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_ExtenallyLoaded[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_ExtenallyLoaded[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_FilledUnitPrice[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_FilledUnitPrice[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_FilledQuantity[0]( ) skipped:  skip by property
@@ -1104,12 +1098,12 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_SideStr[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::ToString[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::.ctor[7]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.BuySell, [mscorlib]System.Decimal, [mscorlib]System.Decimal, [mscorlib]System.String, [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  special name
-	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::Clone[0]( ) skipped:  KeepPublicApi option in configuration
 
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Created>k__BackingField -> A
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Sent>k__BackingField -> a
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Resulted>k__BackingField -> B
 	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.ExchangeOrder::<Usage>k__BackingField -> A
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.ExchangeOrder::<ExtenallyLoaded>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::<FilledUnitPrice>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::<FilledQuantity>k__BackingField -> a
 	Kalitte.Trading.SignalResult [Kalitte.Trading]Kalitte.Trading.SignalResult Kalitte.Trading.ExchangeOrder::<SignalResult>k__BackingField -> A
@@ -1128,6 +1122,7 @@ Skipped Types:
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::Sent skipped:  KeepPublicApi option in configuration
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::Resulted skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.ExchangeOrder::Usage skipped:  KeepPublicApi option in configuration
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.ExchangeOrder::ExtenallyLoaded skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::FilledUnitPrice skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::FilledQuantity skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::CommissionPaid skipped:  KeepPublicApi option in configuration
@@ -2099,6 +2094,23 @@ Skipped Types:
 	Kalitte.Trading.SignalBase [Kalitte.Trading]Kalitte.Trading.SignalBase Kalitte.Trading.Algos.SignalData::signal skipped:  KeepPublicApi option in configuration
 }
 
+[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings skipped:  KeepPublicApi option in configuration
+{
+
+	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::get_LastCost[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::set_LastCost[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::get_LastSignal[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::set_LastSignal[1]( [mscorlib]System.String ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.StateSettings::.ctor[0]( ) skipped:  special name
+
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.StateSettings::<LastCost>k__BackingField -> A
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.StateSettings::<LastSignal>k__BackingField -> A
+
+
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.StateSettings::LastCost skipped:  KeepPublicApi option in configuration
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.StateSettings::LastSignal skipped:  KeepPublicApi option in configuration
+}
+
 [Kalitte.Trading]Kalitte.Trading.Algos.RsiPositionAction skipped:  KeepPublicApi option in configuration
 {
 
@@ -2416,18 +2428,46 @@ Skipped Types:
 	System.Collections.Generic.List`1<Kalitte.Trading.Indicators.IndicatorResult> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.Indicators.IndicatorResult> Kalitte.Trading.Indicators.IndicatorBase`1::Results skipped:  KeepPublicApi option in configuration
 }
 
+[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig skipped:  KeepPublicApi option in configuration
+{
+
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::get_Quantity[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::set_Quantity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::get_Side[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::set_Side[1]( [Kalitte.Trading]Kalitte.Trading.BuySell ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::get_Cost[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::set_Cost[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::get_Signal[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::set_Signal[1]( [mscorlib]System.String ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig::.ctor[0]( ) skipped:  special name
+
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::<Quantity>k__BackingField -> A
+	Kalitte.Trading.BuySell [Kalitte.Trading]Kalitte.Trading.BuySell Kalitte.Trading.Algos.PotfolioConfig::<Side>k__BackingField -> A
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::<Cost>k__BackingField -> a
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.PotfolioConfig::<Signal>k__BackingField -> A
+
+
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::Quantity skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.BuySell [Kalitte.Trading]Kalitte.Trading.BuySell Kalitte.Trading.Algos.PotfolioConfig::Side skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.PotfolioConfig::Cost skipped:  KeepPublicApi option in configuration
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.PotfolioConfig::Signal skipped:  KeepPublicApi option in configuration
+}
+
 [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase skipped:  KeepPublicApi option in configuration
 {
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_time[0]( ) -> A
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::set_time[1]( [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) -> A
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::SetTime[1]( [mscorlib]System.DateTime ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::InitializePositions[1]( [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.PortfolioItem> ) -> A
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::RunSignals[1]( [mscorlib]System.DateTime ) -> a
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::SeansTimer_Elapsed[2]( [mscorlib]System.Object, [System]System.Timers.ElapsedEventArgs ) -> A
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::CreatePerformanceCounters[0]( ) -> a
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::<FillCurrentOrder>b__116_0[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[Kalitte.Trading]Kalitte.Trading.PortfolioItem> ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::<Stop>b__144_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::<Stop>b__144_1[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[mscorlib]System.Object> ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::<FillCurrentOrder>b__124_0[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[Kalitte.Trading]Kalitte.Trading.PortfolioItem> ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::<Stop>b__152_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::<Stop>b__152_1[1]( [mscorlib]System.Collections.Generic.KeyValuePair`2<[mscorlib]System.String,[mscorlib]System.Object> ) -> A
 
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_InitialPortfolio[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::set_InitialPortfolio[1]( [Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_Symbols[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::set_Symbols[1]( [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.Algos.SymbolData> ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_VolatileRatio[0]( ) skipped:  skip by property
@@ -2453,7 +2493,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_LogConsole[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::set_LogConsole[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_LogDir[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::set_LogDir[1]( [mscorlib]System.String ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_Appdir[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::set_Appdir[1]( [mscorlib]System.String ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_InstanceName[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::set_InstanceName[1]( [mscorlib]System.String ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_Symbol[0]( ) skipped:  skip by property
@@ -2471,6 +2512,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::set_SignalsState[1]( [Kalitte.Trading]Kalitte.Trading.StartableState ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::get_LogFile[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::Log[3]( [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.LogLevel, [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::LoadStateSettings[0]( ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::SaveStateSettings[1]( [Kalitte.Trading]Kalitte.Trading.Algos.StateSettings ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::AddSymbol[1]( [Kalitte.Trading]Kalitte.Trading.Algos.SymbolData ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::Decide[2]( [Kalitte.Trading]Kalitte.Trading.SignalBase, [Kalitte.Trading]Kalitte.Trading.SignalEventArgs ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase::CheckDelayedOrders[1]( [mscorlib]System.DateTime ) skipped:  KeepPublicApi option in configuration
@@ -2519,6 +2562,7 @@ Skipped Types:
 	System.Object [Kalitte.Trading]System.Object Kalitte.Trading.Algos.AlgoBase::orderLock -> B
 	System.Threading.Mutex [Kalitte.Trading]System.Threading.Mutex Kalitte.Trading.Algos.AlgoBase::simulationFileMutext -> A
 	System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.MarketDataFileLogger> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.MarketDataFileLogger> Kalitte.Trading.Algos.AlgoBase::dataProviders -> A
+	Kalitte.Trading.Algos.PotfolioConfig [Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig Kalitte.Trading.Algos.AlgoBase::<InitialPortfolio>k__BackingField -> A
 	System.Collections.Generic.List`1<Kalitte.Trading.Algos.SymbolData> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.Algos.SymbolData> Kalitte.Trading.Algos.AlgoBase::<Symbols>k__BackingField -> A
 	Kalitte.Trading.VolatileRatio [Kalitte.Trading]Kalitte.Trading.VolatileRatio Kalitte.Trading.Algos.AlgoBase::<VolatileRatio>k__BackingField -> A
 	Kalitte.Trading.IExchange [Kalitte.Trading]Kalitte.Trading.IExchange Kalitte.Trading.Algos.AlgoBase::<Exchange>k__BackingField -> A
@@ -2534,7 +2578,7 @@ Skipped Types:
 	Kalitte.Trading.LogLevel [Kalitte.Trading]Kalitte.Trading.LogLevel Kalitte.Trading.Algos.AlgoBase::<UILoggingLevel>k__BackingField -> a
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.AlgoBase::<Simulation>k__BackingField -> a
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.AlgoBase::<LogConsole>k__BackingField -> B
-	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase::<LogDir>k__BackingField -> a
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase::<Appdir>k__BackingField -> a
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase::<InstanceName>k__BackingField -> B
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase::<Symbol>k__BackingField -> b
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.AlgoBase::<UsePerformanceMonitor>k__BackingField -> b
@@ -2548,7 +2592,6 @@ Skipped Types:
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Algos.AlgoBase::virtualOrderCounter -> a
 	Kalitte.Trading.StartableState [Kalitte.Trading]Kalitte.Trading.StartableState Kalitte.Trading.Algos.AlgoBase::<SignalsState>k__BackingField -> A
 
-	Kalitte.Trading.Algos.AlgoBase [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase Kalitte.Trading.Algos.AlgoBase::Current skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.MarketDataFileLogger [Kalitte.Trading]Kalitte.Trading.MarketDataFileLogger Kalitte.Trading.Algos.AlgoBase::PriceLogger skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.PortfolioList [Kalitte.Trading]Kalitte.Trading.PortfolioList Kalitte.Trading.Algos.AlgoBase::UserPortfolioList skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.AlgoBase::simulationPriceDif skipped:  KeepPublicApi option in configuration
@@ -2563,6 +2606,7 @@ Skipped Types:
 
 	System.Nullable`1<System.DateTime> [Kalitte.Trading]System.Nullable`1<System.DateTime> Kalitte.Trading.Algos.AlgoBase::time -> dropped
 
+	Kalitte.Trading.Algos.PotfolioConfig [Kalitte.Trading]Kalitte.Trading.Algos.PotfolioConfig Kalitte.Trading.Algos.AlgoBase::InitialPortfolio skipped:  KeepPublicApi option in configuration
 	System.Collections.Generic.List`1<Kalitte.Trading.Algos.SymbolData> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.Algos.SymbolData> Kalitte.Trading.Algos.AlgoBase::Symbols skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.VolatileRatio [Kalitte.Trading]Kalitte.Trading.VolatileRatio Kalitte.Trading.Algos.AlgoBase::VolatileRatio skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.IExchange [Kalitte.Trading]Kalitte.Trading.IExchange Kalitte.Trading.Algos.AlgoBase::Exchange skipped:  KeepPublicApi option in configuration
@@ -2576,6 +2620,7 @@ Skipped Types:
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.AlgoBase::Simulation skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.AlgoBase::LogConsole skipped:  KeepPublicApi option in configuration
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase::LogDir skipped:  KeepPublicApi option in configuration
+	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase::Appdir skipped:  KeepPublicApi option in configuration
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase::InstanceName skipped:  KeepPublicApi option in configuration
 	System.String [Kalitte.Trading]System.String Kalitte.Trading.Algos.AlgoBase::Symbol skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.AlgoBase::UsePerformanceMonitor skipped:  KeepPublicApi option in configuration
@@ -2677,6 +2722,7 @@ Skipped Types:
 [Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1 skipped:  KeepPublicApi option in configuration
 {
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::LoadRealPositions[2]( [mscorlib]System.Collections.Generic.Dictionary`2<[mscorlib]System.String,[Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition>, [mscorlib]System.Func`2<[Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition,[mscorlib]System.Boolean> ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::<OnInitComplated>b__12_0[1]( [Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::get_Algo[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::set_Algo[1]( !0 ) skipped:  skip by property
@@ -2693,11 +2739,9 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::.ctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::OnInitComplated[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::OnStopped[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::SetAlgoProperties[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::FromTraderPosition[1]( [Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::LoadFromTraderPosition[2]( [Kalitte.Trading]Kalitte.Trading.PortfolioItem, [Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::UpdateFromTrade[1]( [Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::LoadRealPositions[1]( [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
 
 	Matriks.Indicators.VOLUME [Kalitte.Trading]Matriks.Indicators.VOLUME Kalitte.Trading.Matrix.MatrixAlgoBase`1::volume -> A
 	T [Kalitte.Trading]T Kalitte.Trading.Matrix.MatrixAlgoBase`1::<Algo>k__BackingField -> A

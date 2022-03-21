@@ -34,7 +34,6 @@ namespace Kalitte.Trading.Matrix
             WorkWithPermanentSignal(true);
             SendOrderSequential(false);
             AddSymbolMarketData(Algo.Symbol);
-            SetAlgoProperties();
             base.OnInit();
         }
 

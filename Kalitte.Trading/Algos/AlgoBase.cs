@@ -767,7 +767,6 @@ namespace Kalitte.Trading.Algos
                 this.Watch = new PerformanceMonitor();
                 ConfigureMonitor();
             }
-
         }
 
 

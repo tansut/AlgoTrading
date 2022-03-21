@@ -122,7 +122,7 @@ namespace Kalitte.Trading
             return $"{this.GetType().Name}[{this.Name}]";
         }
 
-        public Chart Chart(string name, string title = "")
+        public Kalitte.Trading.DataVisualization.Chart Chart(string name, string title = "")
         {
             return Charts.Chart($"{this.Name}-{name}", title);
         }

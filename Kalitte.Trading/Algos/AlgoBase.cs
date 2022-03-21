@@ -322,7 +322,7 @@ namespace Kalitte.Trading.Algos
                     var port = UserPortfolioList.Where(p => p.Key == positionRequest.Symbol).First().Value;
                     Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost.ToCurrency()} NetPL:{port.NetPL.ToCurrency()}]: {this.positionRequest.ToString()}", LogLevel.Order);
                     CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
-                    if (this.positionRequest.Usage == OrderUsage.CreatePosition)
+                    if (this.positionRequest.Usage == OrderUsage.CreatePosition && !this.MultipleTestOptimization)
                     {
                         var newState = new StateSettings();
                         newState.LastSignal = this.positionRequest.SignalResult.Signal.Name;

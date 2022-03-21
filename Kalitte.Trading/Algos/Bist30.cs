@@ -511,7 +511,7 @@ namespace Kalitte.Trading.Algos
                         valueSet = config.RsiMin;
                         cancelCross = true;
                     }
-                    else if (config == CrossL1Config)
+                    else if (config == CrossL1Config && CrossL2Config.Enabled)
                     {
                         if (config.RsiMax != 0 && CrossL1Config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi <= CrossL2Config.RsiMax)
                         {
@@ -541,7 +541,7 @@ namespace Kalitte.Trading.Algos
                     }
                 }
             }
-            else config = CrossL2Config;
+            else if (CrossL2Config.Enabled) config = CrossL2Config;
 
             var orderQuantity = portfolio.Quantity + config.Quantity;
 

@@ -21,7 +21,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 21);
+        settings.Start = new DateTime(2022, 3, 1);
         settings.Finish = new DateTime(2022, 3, 21);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
@@ -99,7 +99,7 @@ public class Program
         alternates.Set("RsiOrderLowL3/Action", RsiPositionAction.Radical);
         alternates.Set("RsiOrderLowL3/L1", 22.99);
         alternates.Set("RsiOrderLowL3/L2", 0);
-        alternates.Set("RsiOrderowL3/Usage", OrderUsage.CreatePosition);
+        alternates.Set("RsiOrderLowL3/Usage", OrderUsage.CreatePosition);
 
         alternates.Set("RsiGradientTolerance", 0.02);
         alternates.Set("RsiGradientLearnRate", 0.005);

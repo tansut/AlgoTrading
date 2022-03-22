@@ -22,7 +22,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 16);
+        settings.Finish = new DateTime(2022, 3, 21);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
@@ -137,7 +137,7 @@ public class Program
 
         // general
         alternates.Set("DailyClose/Enabled", true);     
-        alternates.Set("DailyClose/KeepQuantity", 2);
+        alternates.Set("DailyClose/KeepQuantity", 3);
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);        

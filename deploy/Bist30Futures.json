@@ -32,6 +32,9 @@
   "RsiOrderHighL1/AnalyseAverage": [
     1
   ],
+  "RsiOrderHighL1/SignalSensitivity": [
+    1.0
+  ],
   "RsiOrderHighL1/Enabled": [
     true
   ],
@@ -70,6 +73,9 @@
   ],
   "RsiOrderHighL2/AnalyseAverage": [
     1
+  ],
+  "RsiOrderHighL2/SignalSensitivity": [
+    1.0
   ],
   "RsiOrderHighL2/Enabled": [
     true
@@ -110,6 +116,9 @@
   "RsiOrderHighL3/AnalyseAverage": [
     1
   ],
+  "RsiOrderHighL3/SignalSensitivity": [
+    1.0
+  ],
   "RsiOrderHighL3/Enabled": [
     true
   ],
@@ -148,6 +157,9 @@
   ],
   "RsiOrderLowL1/AnalyseAverage": [
     1
+  ],
+  "RsiOrderLowL1/SignalSensitivity": [
+    1.0
   ],
   "RsiOrderLowL1/Enabled": [
     true
@@ -188,6 +200,9 @@
   "RsiOrderLowL2/AnalyseAverage": [
     1
   ],
+  "RsiOrderLowL2/SignalSensitivity": [
+    1.0
+  ],
   "RsiOrderLowL2/Enabled": [
     true
   ],
@@ -226,6 +241,9 @@
   ],
   "RsiOrderLowL3/AnalyseAverage": [
     1
+  ],
+  "RsiOrderLowL3/SignalSensitivity": [
+    1.0
   ],
   "RsiOrderLowL3/Enabled": [
     true
@@ -353,6 +371,9 @@
   "CrossL1/AnalyseAverage": [
     1
   ],
+  "CrossL1/SignalSensitivity": [
+    1.0
+  ],
   "CrossL1/Enabled": [
     true
   ],
@@ -395,6 +416,9 @@
   "CrossL2/AnalyseAverage": [
     1
   ],
+  "CrossL2/SignalSensitivity": [
+    1.0
+  ],
   "CrossL2/Enabled": [
     false
   ],
@@ -412,6 +436,9 @@
   ],
   "VolumePower/AnalyseAverage": [
     1
+  ],
+  "VolumePower/SignalSensitivity": [
+    1.0
   ],
   "VolumePower/Enabled": [
     true
@@ -431,6 +458,9 @@
   "RsiValue/AnalyseAverage": [
     1
   ],
+  "RsiValue/SignalSensitivity": [
+    4.0
+  ],
   "RsiValue/Enabled": [
     true
   ],
@@ -438,7 +468,7 @@
     0
   ],
   "DailyClose/KeepQuantity": [
-    2
+    3
   ],
   "DailyClose/Enabled": [
     true
@@ -474,7 +504,7 @@
     0
   ],
   "Portfolio/Side": [
-    1
+    2
   ],
   "Portfolio/AvgCost": [
     0
@@ -505,8 +535,5 @@
   ],
   "UseVirtualOrders": [
     false
-  ],
-  "RsiValue/SignalSensitivity": [
-    4.0
   ]
 }

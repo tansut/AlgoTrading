@@ -222,9 +222,7 @@ namespace Kalitte.Trading
             Algo = owner;
             Enabled = true;
             TimerEnabled = false;
-            Simulation = false;
             LastSignalResult = null;
-            //CheckCount = 0;
         }
 
 

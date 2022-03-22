@@ -21,8 +21,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 21);
+        settings.Start = new DateTime(2022, 3, 22);
+        settings.Finish = new DateTime(2022, 3, 22);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
@@ -34,7 +34,7 @@ public class Program
 
         // initial portfolio
         alternates.Set("Portfolio/Quantity", 0);
-        alternates.Set("Portfolio/Side", BuySell.Buy);
+        alternates.Set("Portfolio/Side", BuySell.Sell);
 
 
 

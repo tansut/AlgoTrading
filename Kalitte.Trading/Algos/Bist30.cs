@@ -264,7 +264,6 @@ namespace Kalitte.Trading.Algos
             Signals.ForEach(p =>
             {
                 p.TimerEnabled = !Simulation;
-                p.Simulation = Simulation;
                 p.OnSignal += SignalReceieved;
                 p.PerfMon = this.Watch;
 
@@ -586,7 +585,18 @@ namespace Kalitte.Trading.Algos
             base.CompletedOrder(order);
         }
 
-
+        public override void InitializePositions(List<PortfolioItem> portfolioItems)
+        {
+            base.InitializePositions(portfolioItems);
+            var portfolio = UserPortfolioList.GetPortfolio(Symbol);
+            var lastOrder = portfolio.CompletedOrders.LastOrDefault();
+            if (lastOrder != null && lastOrder.SignalResult.Signal is CrossSignal)
+            {
+                ((CrossSignal)lastOrder.SignalResult.Signal).FirstCrossRequired = false;
+                Log($"First cross disabled since last order was cross", LogLevel.Debug);
+                
+            }
+        }
 
 
         public Bist30() : base()

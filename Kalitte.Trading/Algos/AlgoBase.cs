@@ -199,7 +199,7 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-        internal void InitializePositions(List<PortfolioItem> portfolioItems)
+        public virtual void InitializePositions(List<PortfolioItem> portfolioItems)
         {
             var state = LoadStateSettings();
             var portfolio = portfolioItems.FirstOrDefault(p => p.Symbol == Symbol);

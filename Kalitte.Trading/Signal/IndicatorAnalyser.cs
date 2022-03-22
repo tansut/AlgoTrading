@@ -80,15 +80,14 @@ namespace Kalitte.Trading
                 AnalyseList.UpdateSpeed(time, result.Value.Value);
                 AnalyseList.Speed.UpdateSpeed(time, result.Speed);
                 result.Acceleration = AnalyseList.Speed.CalculateSpeed(time);
-                if (time.Second % 5 == 0)
+                if (time.Second % 5 == 0 && Algo.Simulation)
                 {
-                    //Console.WriteLine($"{AnalyseList.SpeedStart}/{AnalyseList.SpeedInitialValue} - {result.SignalTime}, {result.Speed} {result.Value}");
                     Chart("Derivs").Serie("Speed").SetColor(Color.Black).Add(time, result.Speed);
                     Chart("Derivs").Serie("Acceleration").SetColor(Color.Green).Add(time, result.Acceleration);
                     Chart("Value").Serie("Value").SetColor(Color.Green).Add(time, result.Value.Value);                    
                 }
 
-                if (time.Minute == 1 && time.Second == 1)
+                if (time.Minute == 1 && time.Second == 1 && Algo.Simulation)
                 {
                     SaveCharts(time);                                                        
                 }

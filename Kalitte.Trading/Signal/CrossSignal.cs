@@ -78,7 +78,7 @@ namespace Kalitte.Trading
     {
         
         public PowerSignal PowerSignal { get; set; }
-
+        public decimal InitialCross { get; set; }
 
 
         public ITechnicalIndicator i1k;
@@ -89,8 +89,9 @@ namespace Kalitte.Trading
 
         private FinanceList<decimal> crossBars;
 
+        public bool FirstCrossRequired { get; set; } = true;
 
-        private decimal lastCross = 0;
+        public decimal LastCross { get; private set; } = 0;
 
         public CrossSignal(string name, string symbol, AlgoBase owner, CrossSignalConfig config) : base(name, symbol, owner, config)
         {
@@ -105,7 +106,7 @@ namespace Kalitte.Trading
         protected override void ResetInternal()
         {
             crossBars.Clear();
-            lastCross = 0;
+            LastCross = 0;
             AvgChange = Config.AvgChange;
             base.ResetInternal();
         }
@@ -116,7 +117,8 @@ namespace Kalitte.Trading
             try
             {
                 crossBars.Clear();
-                lastCross = 0;
+                LastCross = 0;
+                FirstCrossRequired = true;
                 Log($"Cross reset", LogLevel.Debug);
             }
             finally
@@ -224,9 +226,9 @@ namespace Kalitte.Trading
                 if (powerRatio != 0) divide++;
                 var average = divide > 0 ? (powerRatio + dtRatio) / divide : 0;
 
-                if (Algo.IsMorningStart() && lastCross != 0)
+                if (Algo.IsMorningStart() && LastCross != 0)
                 {
-                    var difRatio =  (double)(Math.Abs(lastCross) / Config.AvgChange);
+                    var difRatio =  (double)(Math.Abs(LastCross) / Config.AvgChange);
                     if (difRatio > 2.0)
                     {
                         average = -(decimal)(1 / (1 + Math.Pow(Math.E, -(1*difRatio))));
@@ -294,27 +296,20 @@ namespace Kalitte.Trading
 
                 AnalyseList.Collect(l1 - l2, time);
                 crossBars.Push(l1 - l2);
+
                 var cross = Helper.Cross(crossBars.ToArray, 0);
 
-                if (lastCross == 0 && cross != 0)
+                if (LastCross == 0 && cross != 0)
                 {
-                    lastCross = cross;
+                    LastCross = cross;
                     Log($"First cross identified: {cross}", LogLevel.Debug, t);
-                    //if (SpeedValues.Count > 0) SaveSpeed(time);
-                    AnalyseList.ResetSpeed(AnalyseList.LastValue, time);
-                } else if (cross != 0 && Math.Sign(lastCross) != Math.Sign(cross))
-                {
-                    lastCross = cross;
-                    //if (SpeedValues.Count > 0) SaveSpeed(time);
-                    //AnalyseList.ResetSpeed(AnalyseList.LastValue,time);                    
-                }
+                } 
 
-                if (AnalyseList.Ready && lastCross != 0)
+                if (AnalyseList.Ready && (LastCross != 0 || !FirstCrossRequired))
                 {
                     lastAvg = AnalyseList.LastValue; 
-                    result.Dif = lastAvg;
-                    result.Speed = AnalyseList.CalculateSpeed(time);
-                    //TrackSpeed(time, result.Speed);
+                    result.Dif = lastAvg;                    
+                    
                     if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
                     else if (lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
                 }
@@ -324,7 +319,7 @@ namespace Kalitte.Trading
 
             if (time.Second % 10 == 0)
             {
-                Log($"Report: lc:{lastCross}, cs:{CollectList.Count}, as:{AnalyseList.Count}, asz:{AnalyseList.List.QueSize} {result}", LogLevel.Verbose, time);
+                Log($"Report: lc:{LastCross}, cs:{CollectList.Count}, as:{AnalyseList.Count}, asz:{AnalyseList.List.QueSize} {result}", LogLevel.Verbose, time);
             }
 
             if (mp > 0)

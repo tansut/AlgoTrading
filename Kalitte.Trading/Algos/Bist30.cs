@@ -85,6 +85,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(null, "Profit")]
         public PLSignalConfig ProfitConfig { get; set; } = new PLSignalConfig();
 
+        [AlgoParam(null, "GlobalLoss")]
+        public PLSignalConfig GlobalLossConfig { get; set; } = new PLSignalConfig();
 
 
         [AlgoParam(null, "CrossL1")]
@@ -133,6 +135,7 @@ namespace Kalitte.Trading.Algos
 
         ProfitSignal profitSignal = null;
         LossSignal rsiLossSignal = null;
+        LossSignal globalLossSignal = null;
 
         IndicatorAnalyser rsiValue = null;
         PowerSignal powerSignal = null;
@@ -249,6 +252,7 @@ namespace Kalitte.Trading.Algos
             this.Signals.Add(this.rsiLossSignal = new LossSignal("rsi-loss", Symbol, this, RsiLossConfig));
             this.rsiLossSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
 
+            this.Signals.Add(this.globalLossSignal = new LossSignal("global-loss", Symbol, this, GlobalLossConfig));
 
             if (rsiHighL1.Enabled) this.rsiLossSignal.CostSignals.Add(rsiHighL1);
             if (rsiHighL2.Enabled) this.rsiLossSignal.CostSignals.Add(rsiHighL2);

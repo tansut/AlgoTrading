@@ -56,8 +56,14 @@ public class Program
         alternates.Set("Profit/StartAt", 0.42);        
         alternates.Set("Profit/Step", 0.1);
 
-        
-        // loss
+        alternates.Set("GlobalLoss/InitialQuantity", 50);
+        alternates.Set("GlobalLoss/QuantityStep", 50);
+        alternates.Set("GlobalLoss/KeepQuantity", 0);
+        alternates.Set("GlobalLoss/StartAt", 1.2);
+        alternates.Set("GlobalLoss/Step", 0.3);
+
+
+        // rsi loss
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);

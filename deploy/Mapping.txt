@@ -1081,6 +1081,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_Created[1]( [mscorlib]System.DateTime ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_Sent[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_Sent[1]( [mscorlib]System.DateTime ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_LastUpdate[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_LastUpdate[1]( [mscorlib]System.DateTime ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_Resulted[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::set_Resulted[1]( [mscorlib]System.DateTime ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ExchangeOrder::get_Usage[0]( ) skipped:  skip by property
@@ -1101,7 +1103,8 @@ Skipped Types:
 
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Created>k__BackingField -> A
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Sent>k__BackingField -> a
-	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Resulted>k__BackingField -> B
+	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<LastUpdate>k__BackingField -> B
+	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::<Resulted>k__BackingField -> b
 	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.ExchangeOrder::<Usage>k__BackingField -> A
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.ExchangeOrder::<ExtenallyLoaded>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ExchangeOrder::<FilledUnitPrice>k__BackingField -> A
@@ -1120,6 +1123,7 @@ Skipped Types:
 
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::Created skipped:  KeepPublicApi option in configuration
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::Sent skipped:  KeepPublicApi option in configuration
+	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::LastUpdate skipped:  KeepPublicApi option in configuration
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.ExchangeOrder::Resulted skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.ExchangeOrder::Usage skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.ExchangeOrder::ExtenallyLoaded skipped:  KeepPublicApi option in configuration

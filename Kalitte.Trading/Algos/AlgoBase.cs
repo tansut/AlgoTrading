@@ -205,7 +205,7 @@ namespace Kalitte.Trading.Algos
             var portfolio = portfolioItems.FirstOrDefault(p => p.Symbol == Symbol);
             if (!string.IsNullOrEmpty(state.LastSignal) && portfolio != null)
             {
-                if (state.LastQuantity > 0 && state.LastQuantity != portfolio.Quantity) throw new Exception($"Portfolio quantity seems {portfolio.Quantity}, last time it was {state.LastQuantity}. Update state file or reload Algo.");
+                if (state.LastQuantity != portfolio.Quantity) throw new Exception($"Portfolio quantity seems {portfolio.Quantity}, last time it was {state.LastQuantity}. Update state file or reload Algo.");
                 var signal = this.Signals.FirstOrDefault(p=>p.Name == state.LastSignal);
                 if (signal == null) throw new Exception("Unknown signal in state file");
                 var order = new ExchangeOrder(this.Symbol, "-1", portfolio.Side, portfolio.Quantity, state.LastCost, "Loaded from file", Now);
@@ -215,6 +215,7 @@ namespace Kalitte.Trading.Algos
                 order.Usage = OrderUsage.CreatePosition;
                 order.SignalResult = new SignalResult(signal, Now);
                 order.SignalResult.finalResult = order.Side;
+                UserPortfolioList.Add(order);
                 UserPortfolioList.Add(order);
             }
             else portfolioItems.ForEach(p => this.UserPortfolioList.Add(p.Symbol, p));
@@ -344,7 +345,7 @@ namespace Kalitte.Trading.Algos
 
         public void CancelCurrentOrder(string reason)
         {
-            Log($"Order rejected/cancelled [{reason}]", LogLevel.Warning, this.positionRequest.Created);
+            Log($"Order rejected/cancelled [{reason}]", LogLevel.Warning);
             this.positionRequest = null;
             orderWait.Set();
         }
@@ -580,8 +581,8 @@ namespace Kalitte.Trading.Algos
         {
             if (orderWait.WaitOne(1)) return false;
             if (this.positionRequest == null) return false;
-            var timeOut = (Now - this.positionRequest.Sent).TotalSeconds;
-            return timeOut > 10;
+            var timeOut = (Now - this.positionRequest.LastUpdate).TotalSeconds;
+            return timeOut > 30;
         }
 
         public void SignalReceieved(SignalBase signal, SignalEventArgs data)
@@ -923,6 +924,7 @@ namespace Kalitte.Trading.Algos
             order.Usage = usage;
             order.SignalResult = signalResult;
             order.Sent = time;
+            order.LastUpdate = time;
             portfolio.AddRequestedOrder(order);
             Log($"New order submitted. Market price was: {price}: {this.positionRequest.ToString()}", LogLevel.Info, time);
             if (order.SignalResult != null)

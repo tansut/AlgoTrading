@@ -1,24 +1,237 @@
 {
-  "CrossOrderQuantity": [
-    9
-  ],
-  "RsiOrderL1/Quantity": [
-    1
-  ],
-  "RsiOrderL1/Action": [
+  "RsiOrderHighL1/Keep": [
     0
   ],
-  "RsiOrderL2/Quantity": [
-    3
-  ],
-  "RsiOrderL2/Action": [
+  "RsiOrderHighL1/Make": [
     1
   ],
-  "RsiOrderL3/Quantity": [
+  "RsiOrderHighL1/Action": [
+    1
+  ],
+  "RsiOrderHighL1/Tolerance": [
+    0.01
+  ],
+  "RsiOrderHighL1/LearnRate": [
+    0.005
+  ],
+  "RsiOrderHighL1/L1": [
+    73.0
+  ],
+  "RsiOrderHighL1/L2": [
+    76.5
+  ],
+  "RsiOrderHighL1/AnalyseSize": [
+    0
+  ],
+  "RsiOrderHighL1/CollectSize": [
+    0
+  ],
+  "RsiOrderHighL1/CollectAverage": [
+    0
+  ],
+  "RsiOrderHighL1/AnalyseAverage": [
+    1
+  ],
+  "RsiOrderHighL1/Enabled": [
+    true
+  ],
+  "RsiOrderHighL1/Usage": [
+    0
+  ],
+  "RsiOrderHighL2/Keep": [
+    1
+  ],
+  "RsiOrderHighL2/Make": [
+    3
+  ],
+  "RsiOrderHighL2/Action": [
+    2
+  ],
+  "RsiOrderHighL2/Tolerance": [
+    0.01
+  ],
+  "RsiOrderHighL2/LearnRate": [
+    0.005
+  ],
+  "RsiOrderHighL2/L1": [
+    76.51
+  ],
+  "RsiOrderHighL2/L2": [
+    84.5
+  ],
+  "RsiOrderHighL2/AnalyseSize": [
+    0
+  ],
+  "RsiOrderHighL2/CollectSize": [
+    0
+  ],
+  "RsiOrderHighL2/CollectAverage": [
+    0
+  ],
+  "RsiOrderHighL2/AnalyseAverage": [
+    1
+  ],
+  "RsiOrderHighL2/Enabled": [
+    true
+  ],
+  "RsiOrderHighL2/Usage": [
+    0
+  ],
+  "RsiOrderHighL3/Keep": [
+    0
+  ],
+  "RsiOrderHighL3/Make": [
     4
   ],
-  "RsiOrderL3/Action": [
+  "RsiOrderHighL3/Action": [
+    4
+  ],
+  "RsiOrderHighL3/Tolerance": [
+    0.01
+  ],
+  "RsiOrderHighL3/LearnRate": [
+    0.005
+  ],
+  "RsiOrderHighL3/L1": [
+    84.51
+  ],
+  "RsiOrderHighL3/L2": [
+    100
+  ],
+  "RsiOrderHighL3/AnalyseSize": [
+    0
+  ],
+  "RsiOrderHighL3/CollectSize": [
+    0
+  ],
+  "RsiOrderHighL3/CollectAverage": [
+    0
+  ],
+  "RsiOrderHighL3/AnalyseAverage": [
+    1
+  ],
+  "RsiOrderHighL3/Enabled": [
+    true
+  ],
+  "RsiOrderHighL3/Usage": [
+    0
+  ],
+  "RsiOrderLowL1/Keep": [
+    0
+  ],
+  "RsiOrderLowL1/Make": [
+    1
+  ],
+  "RsiOrderLowL1/Action": [
+    1
+  ],
+  "RsiOrderLowL1/Tolerance": [
+    0.01
+  ],
+  "RsiOrderLowL1/LearnRate": [
+    0.005
+  ],
+  "RsiOrderLowL1/L1": [
+    33.0
+  ],
+  "RsiOrderLowL1/L2": [
+    29.0
+  ],
+  "RsiOrderLowL1/AnalyseSize": [
+    0
+  ],
+  "RsiOrderLowL1/CollectSize": [
+    0
+  ],
+  "RsiOrderLowL1/CollectAverage": [
+    0
+  ],
+  "RsiOrderLowL1/AnalyseAverage": [
+    1
+  ],
+  "RsiOrderLowL1/Enabled": [
+    true
+  ],
+  "RsiOrderLowL1/Usage": [
+    0
+  ],
+  "RsiOrderLowL2/Keep": [
+    1
+  ],
+  "RsiOrderLowL2/Make": [
+    3
+  ],
+  "RsiOrderLowL2/Action": [
     2
+  ],
+  "RsiOrderLowL2/Tolerance": [
+    0.01
+  ],
+  "RsiOrderLowL2/LearnRate": [
+    0.005
+  ],
+  "RsiOrderLowL2/L1": [
+    28.99
+  ],
+  "RsiOrderLowL2/L2": [
+    23.0
+  ],
+  "RsiOrderLowL2/AnalyseSize": [
+    0
+  ],
+  "RsiOrderLowL2/CollectSize": [
+    0
+  ],
+  "RsiOrderLowL2/CollectAverage": [
+    0
+  ],
+  "RsiOrderLowL2/AnalyseAverage": [
+    1
+  ],
+  "RsiOrderLowL2/Enabled": [
+    true
+  ],
+  "RsiOrderLowL2/Usage": [
+    0
+  ],
+  "RsiOrderLowL3/Keep": [
+    0
+  ],
+  "RsiOrderLowL3/Make": [
+    4
+  ],
+  "RsiOrderLowL3/Action": [
+    4
+  ],
+  "RsiOrderLowL3/Tolerance": [
+    0.01
+  ],
+  "RsiOrderLowL3/LearnRate": [
+    0.005
+  ],
+  "RsiOrderLowL3/L1": [
+    22.99
+  ],
+  "RsiOrderLowL3/L2": [
+    0
+  ],
+  "RsiOrderLowL3/AnalyseSize": [
+    0
+  ],
+  "RsiOrderLowL3/CollectSize": [
+    0
+  ],
+  "RsiOrderLowL3/CollectAverage": [
+    0
+  ],
+  "RsiOrderLowL3/AnalyseAverage": [
+    1
+  ],
+  "RsiOrderLowL3/Enabled": [
+    true
+  ],
+  "RsiOrderLowL3/Usage": [
+    4
   ],
   "MovPeriod": [
     5
@@ -26,20 +239,14 @@
   "MovPeriod2": [
     9
   ],
-  "CrossRsiMin": [
-    45.2
-  ],
-  "CrossRsiMax": [
-    55.6
-  ],
   "PriceLowLimit": [
-    2200
-  ],
-  "PriceHighLimit": [
     2300
   ],
+  "PriceHighLimit": [
+    2400
+  ],
   "RsiLoss/InitialQuantity": [
-    9
+    80
   ],
   "RsiLoss/KeepQuantity": [
     0
@@ -48,241 +255,151 @@
     0
   ],
   "RsiLoss/QuantityStep": [
-    0
+    10
   ],
-  "RsiLoss/PriceStep": [
-    0
+  "RsiLoss/Step": [
+    0.1
   ],
-  "RsiLoss/Start": [
-    96
+  "RsiLoss/StartAt": [
+    0.8
   ],
-  "RsiLoss/UsePriceMonitor": [
+  "RsiLoss/PriceMonitor": [
     false
   ],
   "RsiLoss/EnableLimitingSignalsOnStart": [
     true
   ],
+  "RsiLoss/PriceMonitorTolerance": [
+    0
+  ],
+  "RsiLoss/PriceMonitorLearnRate": [
+    0
+  ],
   "RsiLoss/Enabled": [
     true
   ],
-  "Profit/InitialQuantity": [
-    5
-  ],
-  "Profit/KeepQuantity": [
-    2
-  ],
-  "Profit/QuantityStepMultiplier": [
+  "RsiLoss/Usage": [
     0
   ],
-  "Profit/QuantityStep": [
+  "Profit/InitialQuantity": [
+    50
+  ],
+  "Profit/KeepQuantity": [
+    30
+  ],
+  "Profit/QuantityStepMultiplier": [
     1
   ],
-  "Profit/PriceStep": [
-    2.0
-  ],
-  "Profit/Start": [
+  "Profit/QuantityStep": [
     10
   ],
-  "Profit/UsePriceMonitor": [
+  "Profit/Step": [
+    0.1
+  ],
+  "Profit/StartAt": [
+    0.42
+  ],
+  "Profit/PriceMonitor": [
     false
   ],
   "Profit/EnableLimitingSignalsOnStart": [
     true
   ],
+  "Profit/PriceMonitorTolerance": [
+    0
+  ],
+  "Profit/PriceMonitorLearnRate": [
+    0
+  ],
   "Profit/Enabled": [
     true
   ],
-  "RsiHighL1/Tolerance": [
-    0.01
-  ],
-  "RsiHighL1/LearnRate": [
-    0.005
-  ],
-  "RsiHighL1/L1": [
-    73.0
-  ],
-  "RsiHighL1/L2": [
-    76.0
-  ],
-  "RsiHighL1/AnalyseSize": [
+  "Profit/Usage": [
     0
   ],
-  "RsiHighL1/CollectSize": [
-    0
+  "CrossL1/RsiMax": [
+    55.6
   ],
-  "RsiHighL1/CollectAverage": [
-    0
+  "CrossL1/RsiMin": [
+    45.4
   ],
-  "RsiHighL1/AnalyseAverage": [
-    1
+  "CrossL1/Quantity": [
+    10
   ],
-  "RsiHighL1/Enabled": [
-    true
-  ],
-  "RsiHighL2/Tolerance": [
-    0.01
-  ],
-  "RsiHighL2/LearnRate": [
-    0.005
-  ],
-  "RsiHighL2/L1": [
-    76.01
-  ],
-  "RsiHighL2/L2": [
-    83.0
-  ],
-  "RsiHighL2/AnalyseSize": [
-    0
-  ],
-  "RsiHighL2/CollectSize": [
-    0
-  ],
-  "RsiHighL2/CollectAverage": [
-    0
-  ],
-  "RsiHighL2/AnalyseAverage": [
-    1
-  ],
-  "RsiHighL2/Enabled": [
-    true
-  ],
-  "RsiHighL3/Tolerance": [
-    0.01
-  ],
-  "RsiHighL3/LearnRate": [
-    0.005
-  ],
-  "RsiHighL3/L1": [
-    83.01
-  ],
-  "RsiHighL3/L2": [
-    100
-  ],
-  "RsiHighL3/AnalyseSize": [
-    0
-  ],
-  "RsiHighL3/CollectSize": [
-    0
-  ],
-  "RsiHighL3/CollectAverage": [
-    0
-  ],
-  "RsiHighL3/AnalyseAverage": [
-    1
-  ],
-  "RsiHighL3/Enabled": [
-    true
-  ],
-  "RsiLowL1/Tolerance": [
-    0.01
-  ],
-  "RsiLowL1/LearnRate": [
-    0.005
-  ],
-  "RsiLowL1/L1": [
-    33.0
-  ],
-  "RsiLowL1/L2": [
-    29.0
-  ],
-  "RsiLowL1/AnalyseSize": [
-    0
-  ],
-  "RsiLowL1/CollectSize": [
-    0
-  ],
-  "RsiLowL1/CollectAverage": [
-    0
-  ],
-  "RsiLowL1/AnalyseAverage": [
-    1
-  ],
-  "RsiLowL1/Enabled": [
-    true
-  ],
-  "RsiLowL2/Tolerance": [
-    0.01
-  ],
-  "RsiLowL2/LearnRate": [
-    0.005
-  ],
-  "RsiLowL2/L1": [
-    28.99
-  ],
-  "RsiLowL2/L2": [
-    23.0
-  ],
-  "RsiLowL2/AnalyseSize": [
-    0
-  ],
-  "RsiLowL2/CollectSize": [
-    0
-  ],
-  "RsiLowL2/CollectAverage": [
-    0
-  ],
-  "RsiLowL2/AnalyseAverage": [
-    1
-  ],
-  "RsiLowL2/Enabled": [
-    true
-  ],
-  "RsiLowL3/Tolerance": [
-    0.01
-  ],
-  "RsiLowL3/LearnRate": [
-    0.005
-  ],
-  "RsiLowL3/L1": [
-    22.99
-  ],
-  "RsiLowL3/L2": [
-    0
-  ],
-  "RsiLowL3/AnalyseSize": [
-    0
-  ],
-  "RsiLowL3/CollectSize": [
-    0
-  ],
-  "RsiLowL3/CollectAverage": [
-    0
-  ],
-  "RsiLowL3/AnalyseAverage": [
-    1
-  ],
-  "RsiLowL3/Enabled": [
-    true
-  ],
-  "MaCross/PowerThreshold": [
+  "CrossL1/PowerThreshold": [
     88
   ],
-  "MaCross/PowerNegativeMultiplier": [
+  "CrossL1/PowerNegativeMultiplier": [
     1.3
   ],
-  "MaCross/PowerPositiveMultiplier": [
+  "CrossL1/PowerPositiveMultiplier": [
     2.8
   ],
-  "MaCross/Dynamic": [
+  "CrossL1/Dynamic": [
     true
   ],
-  "MaCross/AvgChange": [
+  "CrossL1/AvgChange": [
     0.32
   ],
-  "MaCross/AnalyseSize": [
+  "CrossL1/AnalyseSize": [
     0
   ],
-  "MaCross/CollectSize": [
+  "CrossL1/CollectSize": [
     0
   ],
-  "MaCross/CollectAverage": [
+  "CrossL1/CollectAverage": [
     0
   ],
-  "MaCross/AnalyseAverage": [
+  "CrossL1/AnalyseAverage": [
     1
   ],
-  "MaCross/Enabled": [
+  "CrossL1/Enabled": [
     true
+  ],
+  "CrossL1/Usage": [
+    0
+  ],
+  "CrossL2/RsiMax": [
+    52.6
+  ],
+  "CrossL2/RsiMin": [
+    48.4
+  ],
+  "CrossL2/Quantity": [
+    10
+  ],
+  "CrossL2/PowerThreshold": [
+    88
+  ],
+  "CrossL2/PowerNegativeMultiplier": [
+    1.3
+  ],
+  "CrossL2/PowerPositiveMultiplier": [
+    2.8
+  ],
+  "CrossL2/Dynamic": [
+    true
+  ],
+  "CrossL2/AvgChange": [
+    0.32
+  ],
+  "CrossL2/AnalyseSize": [
+    0
+  ],
+  "CrossL2/CollectSize": [
+    0
+  ],
+  "CrossL2/CollectAverage": [
+    0
+  ],
+  "CrossL2/AnalyseAverage": [
+    1
+  ],
+  "CrossL2/Enabled": [
+    false
+  ],
+  "CrossL2/Usage": [
+    0
   ],
   "VolumePower/AnalyseSize": [
     0
@@ -299,6 +416,9 @@
   "VolumePower/Enabled": [
     true
   ],
+  "VolumePower/Usage": [
+    0
+  ],
   "RsiValue/AnalyseSize": [
     0
   ],
@@ -314,11 +434,17 @@
   "RsiValue/Enabled": [
     true
   ],
+  "RsiValue/Usage": [
+    0
+  ],
   "DailyClose/KeepQuantity": [
     2
   ],
   "DailyClose/Enabled": [
     true
+  ],
+  "DailyClose/Usage": [
+    0
   ],
   "Rsi": [
     14
@@ -344,8 +470,20 @@
   "RsiGradientLearnRate": [
     0.005
   ],
+  "Portfolio/Quantity": [
+    0
+  ],
+  "Portfolio/Side": [
+    1
+  ],
+  "Portfolio/AvgCost": [
+    0
+  ],
   "LoggingLevel": [
     0
+  ],
+  "UILoggingLevel": [
+    1
   ],
   "Simulation": [
     false
@@ -353,8 +491,8 @@
   "LogConsole": [
     false
   ],
-  "LogDir": [
-    "c:\\kalitte\\log"
+  "Appdir": [
+    "c:\\kalitte"
   ],
   "Symbol": [
     "F_XU0300422"

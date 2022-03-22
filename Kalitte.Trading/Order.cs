@@ -28,6 +28,7 @@ namespace Kalitte.Trading
     {
         public DateTime Created { get; set; } 
         public DateTime Sent { get; set; }
+        public DateTime LastUpdate { get; set; }
         public DateTime Resulted { get; set; }
         public string Symbol;
         public string Id;
@@ -78,6 +79,7 @@ namespace Kalitte.Trading
             this.Comment = comment;
             this.FilledUnitPrice = 0M;
             this.Created = t ?? DateTime.Now;
+            this.LastUpdate = this.Created;
         }
 
         public string SideStr

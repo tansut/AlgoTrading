@@ -88,6 +88,9 @@ namespace Kalitte.Trading.Matrix
                 {
                     Algo.CancelCurrentOrder(order.OrdStatus.Obj.ToString());
                 }
+            } else if (Algo.positionRequest != null && Algo.positionRequest.Id == order.CliOrdID)
+            {
+                Algo.positionRequest.LastUpdate = Algo.Now;
             }
         }
 

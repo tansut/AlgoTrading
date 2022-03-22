@@ -143,6 +143,7 @@ public class Program
         alternates.Set("LoggingLevel", LogLevel.Verbose);        
         alternates.Set("Symbol", "F_XU0300422");
         alternates.Set("LogConsole", false);
+        alternates.Set("UILoggingLevel", LogLevel.Debug);
         alternates.SaveToFile($"c:\\kalitte\\Bist30-test.json");    
         alternates.Set("LoggingLevel", LogLevel.Order);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");

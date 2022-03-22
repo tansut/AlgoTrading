@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<SignAssembly>False</SignAssembly>
+		<AssemblyVersion>1.1.1.12</AssemblyVersion>
+		<FileVersion>1.1.1.12</FileVersion>
+		<LangVersion>8.0</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Kalitte.Trading\Kalitte.Trading.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="Matriks.Core">
+	    <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Core.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Matriks.Indicators">
+	    <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Indicators.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Matriks.Lean.Algorithm">
+	    <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Lean.Algorithm.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Matriks.Lean.Algotrader">
+	    <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Lean.Algotrader.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Matriks.Trader">
+	    <HintPath>..\..\borsabot2\Third.Party\Matriks.Trader.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Matriks.Trader.Core">
+	    <HintPath>..\..\borsabot2\Third.Party\Matriks.Trader.Core.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Newtonsoft.Json">
+	    <HintPath>..\third.party\Newtonsoft.Json.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Skender.Stock.Indicators">
+	    <HintPath>..\third.party\Skender.Stock.Indicators.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+</Project>

@@ -8,7 +8,6 @@ using Matriks.Trader.Core;
 using Matriks.Trader.Core.Fields;
 using Matriks.Trader.Core.TraderModels;
 using Newtonsoft.Json;
-using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

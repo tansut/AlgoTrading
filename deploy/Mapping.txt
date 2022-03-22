@@ -10,11 +10,6 @@ Renamed Types:
 	Kalitte.Trading.Indicators.ITechnicalIndicator [Kalitte.Trading]Kalitte.Trading.Indicators.ITechnicalIndicator Kalitte.Trading.IndicatorAnalyser::i1k -> A
 }
 
-[Kalitte.Trading]<PrivateImplementationDetails> -> [Kalitte.Trading]A.a
-{
-	<PrivateImplementationDetails>/__StaticArrayInitTypeSize=40 [Kalitte.Trading]<PrivateImplementationDetails>/__StaticArrayInitTypeSize=40 <PrivateImplementationDetails>::272BC3456B7CE85DE2CE18D1964316879E840A1201A4664E967EF42BA3F76B96 -> A
-}
-
 [Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass43_0 -> [Kalitte.Trading]Kalitte.Trading.AnalyseList/A
 {
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass43_0::<CalculateSpeed>b__0[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) -> A
@@ -228,34 +223,6 @@ Renamed Types:
 	System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,Kalitte.Trading.PortfolioItem>,System.Decimal> [Kalitte.Trading]System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,Kalitte.Trading.PortfolioItem>,System.Decimal> Kalitte.Trading.PortfolioList/<>c::<>9__5_0 -> a
 }
 
-[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass10_0 -> [Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/A
-{
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass10_0::<LogBardata>b__0[1]( [Matriks.Lean.Algotrader]Matriks.Lean.Algotrader.Models.SymbolPeriod ) -> A
-
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass10_0::.ctor[0]( ) skipped:  special name
-
-	Matriks.Symbols.ISymbolBarData [Kalitte.Trading]Matriks.Symbols.ISymbolBarData Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass10_0::bd -> A
-}
-
-[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass11_0 -> [Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/a
-{
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass11_0::<OnDataUpdate>b__0[1]( [Matriks.Lean.Algotrader]Matriks.Lean.Algotrader.Models.SymbolPeriod ) -> A
-
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass11_0::.ctor[0]( ) skipped:  special name
-
-	Matriks.Engines.BarDataEventArgs [Kalitte.Trading]Matriks.Engines.BarDataEventArgs Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass11_0::barDataEventArgs -> A
-}
-
-[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass8_0 -> [Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/B
-{
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass8_0::<OnInitCompleted>b__0[1]( [Matriks.Lean.Algotrader]Matriks.Lean.Algotrader.Models.SymbolPeriod ) -> A
-
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass8_0::.ctor[0]( ) skipped:  special name
-
-	Matriks.Symbols.ISymbolBarData [Kalitte.Trading]Matriks.Symbols.ISymbolBarData Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass8_0::fbd -> A
-	System.Predicate`1<Matriks.Lean.Algotrader.Models.SymbolPeriod> [Kalitte.Trading]System.Predicate`1<Matriks.Lean.Algotrader.Models.SymbolPeriod> Kalitte.Trading.Matrix.BarDataLogger/<>c__DisplayClass8_0::<>9__0 -> A
-}
-
 [Kalitte.Trading]Kalitte.Trading.Indicators.Custom/<GetResults>d__3 -> [Kalitte.Trading]Kalitte.Trading.Indicators.Custom/A
 {
 	[Kalitte.Trading]Kalitte.Trading.Indicators.Custom/<GetResults>d__3::System.IDisposable.Dispose[0]( ) -> A
@@ -458,7 +425,7 @@ Renamed Types:
 	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.Algos.Bist30/<>c__DisplayClass123_0::fib -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.K
+[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.j
 {
 
 	[Kalitte.Trading]Kalitte.Trading.LossSignal::get_Usage[0]( ) skipped:  skip by property
@@ -467,10 +434,6 @@ Renamed Types:
 
 
 	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.LossSignal::Usage skipped:  KeepPublicApi option in configuration
-}
-
-[Kalitte.Trading]<PrivateImplementationDetails>/__StaticArrayInitTypeSize=40 -> [Kalitte.Trading]A.a/A
-{
 }
 
 Skipped Types:
@@ -1892,27 +1855,6 @@ Skipped Types:
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.SystemTime::Now2 skipped:  KeepPublicApi option in configuration
 }
 
-[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger skipped:  KeepPublicApi option in configuration
-{
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger::LogBardata[2]( [Matriks.Core]Matriks.Symbols.ISymbolBarData, [mscorlib]System.Int32 ) -> A
-
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger::OnTimer[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger::OnInitCompleted[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger::OnInit[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger::OnDataUpdate[1]( [Matriks.Core]Matriks.Engines.BarDataEventArgs ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger::createAlgoInstance[0]( ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.BarDataLogger::.ctor[0]( ) skipped:  special name
-
-	Kalitte.Trading.MarketDataFileLogger [Kalitte.Trading]Kalitte.Trading.MarketDataFileLogger Kalitte.Trading.Matrix.BarDataLogger::priceLogger -> A
-	Matriks.Indicators.VOLUME [Kalitte.Trading]Matriks.Indicators.VOLUME Kalitte.Trading.Matrix.BarDataLogger::volume -> A
-	System.Collections.Generic.List`1<Matriks.Lean.Algotrader.Models.SymbolPeriod> [Kalitte.Trading]System.Collections.Generic.List`1<Matriks.Lean.Algotrader.Models.SymbolPeriod> Kalitte.Trading.Matrix.BarDataLogger::periodList -> A
-	System.Collections.Generic.List`1<Matriks.Indicators.IIndicator> [Kalitte.Trading]System.Collections.Generic.List`1<Matriks.Indicators.IIndicator> Kalitte.Trading.Matrix.BarDataLogger::indicatorList -> A
-	System.Collections.Generic.List`1<Kalitte.Trading.MarketDataFileLogger> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.MarketDataFileLogger> Kalitte.Trading.Matrix.BarDataLogger::loggerList -> A
-
-	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Matrix.BarDataLogger::LogSeconds skipped:  KeepPublicApi option in configuration
-	System.String [Kalitte.Trading]System.String Kalitte.Trading.Matrix.BarDataLogger::Symbol skipped:  KeepPublicApi option in configuration
-}
-
 [Kalitte.Trading]Kalitte.Trading.Indicators.CustomResult skipped:  KeepPublicApi option in configuration
 {
 
@@ -2740,37 +2682,6 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.PLSignalConfig::PriceMonitorLearnRate skipped:  KeepPublicApi option in configuration
 }
 
-[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1 skipped:  KeepPublicApi option in configuration
-{
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::LoadRealPositions[2]( [mscorlib]System.Collections.Generic.Dictionary`2<[mscorlib]System.String,[Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition>, [mscorlib]System.Func`2<[Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition,[mscorlib]System.Boolean> ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::<OnInitComplated>b__12_0[1]( [Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition ) -> A
-
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::get_Algo[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::set_Algo[1]( !0 ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::GetMarketPrice[2]( [mscorlib]System.String, [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::GetVolume[3]( [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.BarPeriod, [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::ToString[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::Log[3]( [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.LogLevel, [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::OnInit[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::createAlgoInstance[0]( ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::CreateMarketOrder[5]( [mscorlib]System.String, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.BuySell, [mscorlib]System.String, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::CreateLimitOrder[6]( [mscorlib]System.String, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.BuySell, [mscorlib]System.Decimal, [mscorlib]System.String, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::GetPeriodBars[3]( [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.BarPeriod, [mscorlib]System.DateTime ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::OnOrderUpdate[1]( [Matriks.Trader.Core]Matriks.Trader.Core.IOrder ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::.ctor[0]( ) skipped:  special name
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::OnInitComplated[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::OnStopped[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::FromTraderPosition[1]( [Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::LoadFromTraderPosition[2]( [Kalitte.Trading]Kalitte.Trading.PortfolioItem, [Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixAlgoBase`1::UpdateFromTrade[1]( [Matriks.Trader.Core]Matriks.Trader.Core.AlgoTraderPosition ) skipped:  KeepPublicApi option in configuration
-
-	Matriks.Indicators.VOLUME [Kalitte.Trading]Matriks.Indicators.VOLUME Kalitte.Trading.Matrix.MatrixAlgoBase`1::volume -> A
-	T [Kalitte.Trading]T Kalitte.Trading.Matrix.MatrixAlgoBase`1::<Algo>k__BackingField -> A
-
-
-	T [Kalitte.Trading]T Kalitte.Trading.Matrix.MatrixAlgoBase`1::Algo skipped:  KeepPublicApi option in configuration
-}
-
 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30 skipped:  KeepPublicApi option in configuration
 {
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::HandleProfitLossSignal[2]( [Kalitte.Trading]Kalitte.Trading.PLSignal, [Kalitte.Trading]Kalitte.Trading.ProfitLossResult ) -> A
@@ -3203,27 +3114,6 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.SignalEventHandler::Invoke[2]( [Kalitte.Trading]Kalitte.Trading.SignalBase, [Kalitte.Trading]Kalitte.Trading.SignalEventArgs ) skipped:  runtime method
 	[Kalitte.Trading]Kalitte.Trading.SignalEventHandler::BeginInvoke[4]( [Kalitte.Trading]Kalitte.Trading.SignalBase, [Kalitte.Trading]Kalitte.Trading.SignalEventArgs, [mscorlib]System.AsyncCallback, [mscorlib]System.Object ) skipped:  runtime method
 	[Kalitte.Trading]Kalitte.Trading.SignalEventHandler::EndInvoke[1]( [mscorlib]System.IAsyncResult ) skipped:  runtime method
-}
-
-[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixBist30 skipped:  KeepPublicApi option in configuration
-{
-
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixBist30::OnInit[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixBist30::createAlgoInstance[0]( ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixBist30::OnDataUpdate[1]( [Matriks.Lean.Algotrader]Matriks.Lean.Algotrader.Models.BarDataCurrentValues ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.Matrix.MatrixBist30::.ctor[0]( ) skipped:  special name
-}
-
-[Kalitte.Trading]Matriks.Lean.Algotrader.Bist30 skipped:  KeepPublicApi option in configuration
-{
-
-	[Kalitte.Trading]Matriks.Lean.Algotrader.Bist30::.ctor[0]( ) skipped:  special name
-}
-
-[Kalitte.Trading]Matriks.Lean.Algotrader.bardatalogger skipped:  KeepPublicApi option in configuration
-{
-
-	[Kalitte.Trading]Matriks.Lean.Algotrader.bardatalogger::.ctor[0]( ) skipped:  special name
 }
 
 [Kalitte.Trading]Kalitte.Trading.IExchange skipped:  KeepPublicApi option in configuration

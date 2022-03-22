@@ -9,7 +9,6 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Matriks.Lean.Algotrader.Models;
 using Kalitte.Trading.Algos;
 using Skender.Stock.Indicators;
 using Kalitte.Trading.Indicators;

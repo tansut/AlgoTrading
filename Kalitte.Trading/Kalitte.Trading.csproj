@@ -16,78 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Matriks.AI">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.AI.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Calculus.Core">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Calculus.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Calculus.Spreadsheet">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Calculus.Spreadsheet.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Connection">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Connection.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Core">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Data.StreamUtils">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Data.StreamUtils.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Database">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Database.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Engines">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Engines.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Indicators">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Indicators.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Injection">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Injection.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Lean.Algorithm">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Lean.Algorithm.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Lean.Algotrader">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Lean.Algotrader.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Logger">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Logger.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Terminal.Database">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Terminal.Database.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Trader">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Trader.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Trader.Core">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Trader.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Trader.Messaging">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Trader.Messaging.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Wpf.Chart">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Chart.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Wpf.Controls">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Wpf.Price">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Price.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Wpf.PriceSheet">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.PriceSheet.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Wpf.Splash">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Splash.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Wpf.Templates">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Templates.dll</HintPath>
-    </Reference>
-    <Reference Include="Matriks.Wpf.Trader">
-      <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Wpf.Trader.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Client">
       <HintPath>..\third.party\Microsoft.AspNet.SignalR.Client.dll</HintPath>
     </Reference>
@@ -102,8 +30,12 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Matrix\" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="C:\Users\tansu\source\repos\borsabot\Merge\bin\Debug\net472\merge.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading&#xD;&#xA;C:\Users\tansu\source\repos\borsabot\third.party\obfuscar\Obfuscar.Console.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading\obfuscar.xml" />
+    <Exec Command="C:\Users\tansu\source\repos\borsabot\Merge\bin\Debug\net472\merge.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading C:\Users\tansu\source\repos\borsabot\Kalitte.Trading.Matrix&#xD;&#xA;C:\Users\tansu\source\repos\borsabot\third.party\obfuscar\Obfuscar.Console.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading\obfuscar.xml" />
   </Target>
 
 </Project>

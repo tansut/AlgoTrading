@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -10,15 +11,24 @@ public class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        var dir = args.Length > 0 ? args[0] : Environment.CurrentDirectory;
-        DirectoryInfo d = new DirectoryInfo(dir);
+        if (args.Length == 0) return ;
+        var dirs = new List<string>();
+        var files = new List<FileInfo>();
 
-        FileInfo[] Files = d.GetFiles("*.cs", SearchOption.AllDirectories);
+        foreach (var dir in args)
+        {
+            DirectoryInfo d = new DirectoryInfo(dir);
+
+            FileInfo[] Files = d.GetFiles("*.cs", SearchOption.AllDirectories);
+
+            files.AddRange(Files);
+        }
+        
 
         StringBuilder sb = new StringBuilder();
 
         var usingList = new List<string>();
-        foreach (FileInfo file in Files)
+        foreach (FileInfo file in files)
         {
             var lines = File.ReadAllLines(file.FullName);
             if (lines.Length <= 0 || lines[0].Trim() != "// algo") continue;

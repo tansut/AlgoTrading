@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client.Transports;
 using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
-using Kalitte.Trading.Matrix;
+
 using Kalitte.Trading.Algos;
 using System.Reflection;
 using System.IO;

@@ -306,7 +306,7 @@ namespace Kalitte.Trading
                 {
                     lastCross = cross;
                     //if (SpeedValues.Count > 0) SaveSpeed(time);
-                    AnalyseList.ResetSpeed(AnalyseList.LastValue,time);                    
+                    //AnalyseList.ResetSpeed(AnalyseList.LastValue,time);                    
                 }
 
                 if (AnalyseList.Ready && lastCross != 0)
@@ -314,7 +314,7 @@ namespace Kalitte.Trading
                     lastAvg = AnalyseList.LastValue; 
                     result.Dif = lastAvg;
                     result.Speed = AnalyseList.CalculateSpeed(time);
-                    TrackSpeed(time, result.Speed);
+                    //TrackSpeed(time, result.Speed);
                     if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
                     else if (lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
                 }

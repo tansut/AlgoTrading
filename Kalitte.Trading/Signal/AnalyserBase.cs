@@ -30,6 +30,9 @@ namespace Kalitte.Trading
 
         [AlgoParam(Average.Sma)]
         public Average AnalyseAverage { get; set; }
+
+        [AlgoParam(1.0)]
+        public decimal SignalSensitivity { get; set; }
     }
 
     public class AnalyserBase<C> : Signal<C> where C : AnalyserConfig
@@ -55,7 +58,7 @@ namespace Kalitte.Trading
         public AnalyseList CollectList { get; set; }
         public AnalyseList AnalyseList { get; set; }
 
-        public virtual decimal SignalSensitivity { get; set; } = 1.0M;
+        
 
         public AnalyserBase(string name, string symbol, AlgoBase owner, C config) : base(name, symbol, owner, config)
         {
@@ -181,8 +184,8 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            CollectSize = Convert.ToInt32(Config.InitialCollectSize * SignalSensitivity);
-            AnalyseSize = Convert.ToInt32(Config.InitialAnalyseSize * SignalSensitivity);
+            CollectSize = Convert.ToInt32(Config.InitialCollectSize * Config.SignalSensitivity);
+            AnalyseSize = Convert.ToInt32(Config.InitialAnalyseSize * Config.SignalSensitivity);
             CollectList = new AnalyseList(CollectSize, Config.CollectAverage);
             AnalyseList = new AnalyseList(AnalyseSize, Config.AnalyseAverage);
             ResetInternal();

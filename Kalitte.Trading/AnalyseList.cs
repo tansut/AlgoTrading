@@ -17,7 +17,7 @@ namespace Kalitte.Trading
     public class AnalyseList
     {
         public decimal SpeedMinutes { get; set; } = 1M;
-        public int SpeedAnalyse { get; set; } = 48 * 4;
+        public int SpeedAnalyse { get; set; } = 0;
 
         public Average Average { get; set; }
         public FinanceList<MyQuote> List { get; private set; }
@@ -98,7 +98,7 @@ namespace Kalitte.Trading
 
         internal void ResetSpeed(decimal value, DateTime t)
         {
-            Speed = new AnalyseList(SpeedAnalyse, Average.Ema);
+            Speed = new AnalyseList(this.List.QueSize, Average.Sma);
             Speed.Collect(value, t);
             SpeedHistory.Clear();            
             SpeedHistory.Push(new MyQuote() { Date = t, Close = value });

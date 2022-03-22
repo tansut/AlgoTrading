@@ -83,13 +83,14 @@ namespace Kalitte.Trading
                 if (time.Second % 5 == 0)
                 {
                     //Console.WriteLine($"{AnalyseList.SpeedStart}/{AnalyseList.SpeedInitialValue} - {result.SignalTime}, {result.Speed} {result.Value}");
-                    //Chart("Derivs").Serie("Speed").SetColor(Color.Black).Add(time, result.Speed);
-                    //Chart("Derivs").Serie("Acceleration").SetColor(Color.Green).Add(time, result.Acceleration);                    
+                    Chart("Derivs").Serie("Speed").SetColor(Color.Black).Add(time, result.Speed);
+                    Chart("Derivs").Serie("Acceleration").SetColor(Color.Green).Add(time, result.Acceleration);
+                    Chart("Value").Serie("Value").SetColor(Color.Green).Add(time, result.Value.Value);                    
                 }
 
                 if (time.Minute == 1 && time.Second == 1)
                 {
-                    //SaveChart("Derivs", time);                                                        
+                    SaveCharts(time);                                                        
                 }
             }
 

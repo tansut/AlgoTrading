@@ -9,15 +9,15 @@ namespace Kalitte.Trading.DataVisualization
 {
     public class ChartList
     {
-        Dictionary<string, Chart> charts = new Dictionary<string, Chart>();
+        public Dictionary<string, Chart> Items = new Dictionary<string, Chart>();
 
         public Chart Chart(string name, string title = "")
         {
-            if (charts.TryGetValue(name, out Chart chart))  return chart;
+            if (Items.TryGetValue(name, out Chart chart))  return chart;
             chart = new Chart();
             chart.Name = name;
             chart.Title = title;
-            charts.Add(name, chart);
+            Items.Add(name, chart);
             return chart;
         }
     }

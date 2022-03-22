@@ -124,12 +124,14 @@ namespace Kalitte.Trading
 
         public Kalitte.Trading.DataVisualization.Chart Chart(string name, string title = "")
         {
-            return Charts.Chart($"{this.Name}-{name}", title);
+            return Charts.Chart($"{name}", title);
         }
 
         public void SaveChart(string name, string id = "", bool clear = true)
         {
-            Chart(name).Save(Path.Combine(Algo.LogDir, $"{this.Name}-{name}{id}.png"), clear);            
+            var dir =  Path.Combine(Algo.Appdir, "charts", this.Name);
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            Chart(name).Save(Path.Combine(dir, $"{name}{id}.png"), clear);            
         }
 
         public void SaveChart(string name, DateTime time, bool clear = true)
@@ -137,6 +139,16 @@ namespace Kalitte.Trading
             var id = time.ToString("dd-MM-yy-HH-mm-ss");
             SaveChart(name, id, clear);
         }
+
+        public void SaveCharts(DateTime time, bool clear = true)
+        {
+            foreach (var c in Charts.Items)
+            {
+                SaveChart(c.Key, time, clear);
+            }
+        }
+
+
 
         public void Pause(DateTime until)
         {

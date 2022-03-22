@@ -1381,8 +1381,6 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.AnalyserBase`1::set_CollectList[1]( [Kalitte.Trading]Kalitte.Trading.AnalyseList ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyserBase`1::get_AnalyseList[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyserBase`1::set_AnalyseList[1]( [Kalitte.Trading]Kalitte.Trading.AnalyseList ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.AnalyserBase`1::get_SignalSensitivity[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.AnalyserBase`1::set_SignalSensitivity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyserBase`1::.ctor[4]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase, !0 ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.AnalyserBase`1::TrackSpeed[2]( [mscorlib]System.DateTime, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyserBase`1::SaveSpeed[1]( [mscorlib]System.DateTime ) skipped:  KeepPublicApi option in configuration
@@ -1404,7 +1402,6 @@ Skipped Types:
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyserBase`1::<AnalyseSize>k__BackingField -> B
 	Kalitte.Trading.AnalyseList [Kalitte.Trading]Kalitte.Trading.AnalyseList Kalitte.Trading.AnalyserBase`1::<CollectList>k__BackingField -> A
 	Kalitte.Trading.AnalyseList [Kalitte.Trading]Kalitte.Trading.AnalyseList Kalitte.Trading.AnalyserBase`1::<AnalyseList>k__BackingField -> a
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyserBase`1::<SignalSensitivity>k__BackingField -> A
 
 	ZedGraph.PointPairList [Kalitte.Trading]ZedGraph.PointPairList Kalitte.Trading.AnalyserBase`1::SpeedValues skipped:  KeepPublicApi option in configuration
 
@@ -1416,7 +1413,6 @@ Skipped Types:
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyserBase`1::AnalyseSize skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.AnalyseList [Kalitte.Trading]Kalitte.Trading.AnalyseList Kalitte.Trading.AnalyserBase`1::CollectList skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.AnalyseList [Kalitte.Trading]Kalitte.Trading.AnalyseList Kalitte.Trading.AnalyserBase`1::AnalyseList skipped:  KeepPublicApi option in configuration
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyserBase`1::SignalSensitivity skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.SignalResult skipped:  KeepPublicApi option in configuration
@@ -1500,6 +1496,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::Chart[2]( [mscorlib]System.String, [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::SaveChart[3]( [mscorlib]System.String, [mscorlib]System.String, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::SaveChart[3]( [mscorlib]System.String, [mscorlib]System.DateTime, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.SignalBase::SaveCharts[2]( [mscorlib]System.DateTime, [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::Pause[1]( [mscorlib]System.DateTime ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::ResetOrdersInternal[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.SignalBase::ResetOrders[0]( ) skipped:  KeepPublicApi option in configuration
@@ -2057,7 +2054,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartList::Chart[2]( [mscorlib]System.String, [mscorlib]System.String ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.DataVisualization.ChartList::.ctor[0]( ) skipped:  special name
 
-	System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.Chart> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.Chart> Kalitte.Trading.DataVisualization.ChartList::charts -> A
+
+	System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.Chart> [Kalitte.Trading]System.Collections.Generic.Dictionary`2<System.String,Kalitte.Trading.DataVisualization.Chart> Kalitte.Trading.DataVisualization.ChartList::Items skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.Algos.DelayedOrder skipped:  KeepPublicApi option in configuration
@@ -2651,18 +2649,22 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::set_CollectAverage[1]( [Kalitte.Trading]Kalitte.Trading.Average ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::get_AnalyseAverage[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::set_AnalyseAverage[1]( [Kalitte.Trading]Kalitte.Trading.Average ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::get_SignalSensitivity[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::set_SignalSensitivity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::.ctor[0]( ) skipped:  special name
 
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyserConfig::<InitialAnalyseSize>k__BackingField -> A
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyserConfig::<InitialCollectSize>k__BackingField -> a
 	Kalitte.Trading.Average [Kalitte.Trading]Kalitte.Trading.Average Kalitte.Trading.AnalyserConfig::<CollectAverage>k__BackingField -> A
 	Kalitte.Trading.Average [Kalitte.Trading]Kalitte.Trading.Average Kalitte.Trading.AnalyserConfig::<AnalyseAverage>k__BackingField -> a
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyserConfig::<SignalSensitivity>k__BackingField -> A
 
 
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyserConfig::InitialAnalyseSize skipped:  KeepPublicApi option in configuration
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyserConfig::InitialCollectSize skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Average [Kalitte.Trading]Kalitte.Trading.Average Kalitte.Trading.AnalyserConfig::CollectAverage skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Average [Kalitte.Trading]Kalitte.Trading.Average Kalitte.Trading.AnalyserConfig::AnalyseAverage skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyserConfig::SignalSensitivity skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalConfig skipped:  KeepPublicApi option in configuration

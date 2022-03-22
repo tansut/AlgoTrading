@@ -22,7 +22,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 21);
+        settings.Finish = new DateTime(2022, 3, 16);
         settings.AutoClosePositions = true;
         settings.AutoClosePositions = true;
 
@@ -133,7 +133,7 @@ public class Program
         alternates.Set("CrossL2/RsiMin", 48.4);
 
         // cross rsi
-        alternates.Set("RsiValue/SignalSensitivity", 4M);
+        alternates.Set("RsiValue/SignalSensitivity", 4.0);
 
         // general
         alternates.Set("DailyClose/Enabled", true);     

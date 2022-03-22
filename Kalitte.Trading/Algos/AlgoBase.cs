@@ -214,7 +214,7 @@ namespace Kalitte.Trading.Algos
                 order.FilledUnitPrice = order.UnitPrice;
                 order.Usage = OrderUsage.CreatePosition;
                 order.SignalResult = new SignalResult(signal, Now);
-                order.SignalResult.finalResult = order.Side;
+                order.SignalResult.finalResult = order.Side;                
                 UserPortfolioList.Add(order);
             }
             else portfolioItems.ForEach(p => this.UserPortfolioList.Add(p.Symbol, p));

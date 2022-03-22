@@ -530,7 +530,9 @@ namespace Kalitte.Trading.Algos
                     {
                         var offSetMax = valueSet + 0.1M * valueSet;
                         var offSetMin = valueSet - 0.1M * valueSet;
-                        var discardRsi = false; // currentRsi > offSetMin && currentRsi < offSetMax && rsi.Speed > 1 && rsi.Acceleration > 0.1M;
+                        //var discardRsi = currentRsi > offSetMin && currentRsi < offSetMax && rsi.Speed > 1.5M && rsi.Acceleration > 0.02M;
+                        //var discardRsi = rsi.Speed > 1.5M && rsi.Acceleration > 0.1M;
+                        var discardRsi = false;
                         //Console.WriteLine($"{discardRsi} {signalResult.SignalTime}, speed: {rsi.Speed} acceleration:{rsi.Acceleration} value: {rsi.Value}");
                         if (!discardRsi)
                         {

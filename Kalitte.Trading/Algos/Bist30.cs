@@ -29,14 +29,34 @@ namespace Kalitte.Trading.Algos
 
     public class DailyCloseConfig : ClosePositionsSignalConfig
     {
-        [AlgoParam(ClosePositionSide.KeepSide)]
-        public ClosePositionSide Side { get; set; }
+
     }
 
     public class OrderConfig : ConfigParameters
     {
         [AlgoParam(10)]
         public decimal Total { get; set; }
+
+        [AlgoParam(100)]
+        public decimal ProfitLimit { get; set; }
+
+        [AlgoParam(0.5)]
+        public decimal ProfitRatio { get; set; }
+
+        [AlgoParam(100)]
+        public decimal LossLimit { get; set; }
+
+        [AlgoParam(0.5)]
+        public decimal LossRatio { get; set; }
+
+        [AlgoParam(0.5)]
+        public decimal NightRatio { get; set; }
+
+        [AlgoParam(0.5)]
+        public decimal KeepRatio { get; set; }
+
+        [AlgoParam(ClosePositionSide.KeepSide)]
+        public ClosePositionSide KeepSide { get; set; }
     }
 
     public class RsiOrderConfig : GradientSignalConfig, IAlgoParameter
@@ -509,13 +529,13 @@ namespace Kalitte.Trading.Algos
             if (!Simulation) StopSignals();
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
             var expectedSide = portfolio.Side;
-            if (DailyCloseConfig.Side == ClosePositionSide.UseCross)
+            if (OrderConfig.KeepSide == ClosePositionSide.UseCross)
             {
                 var macd = maCrossL1.i1k.Results.Last().Value.Value;
                 expectedSide = macd > 0 ? BuySell.Buy : BuySell.Sell;
             }
             var usage = expectedSide == portfolio.Side ? OrderUsage.CreatePosition : OrderUsage.CreatePosition;
-            MakePortfolio(Symbol, result.Quantity, expectedSide, $"daily close", result, usage);
+            MakePortfolio(Symbol, RoundQuantity(this.InitialQuantity * OrderConfig.KeepRatio), expectedSide, $"daily close", result, usage);
         }
 
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)
@@ -645,18 +665,35 @@ namespace Kalitte.Trading.Algos
                 else Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
             }
 
-            var thisDayProfit = portfolio.DailtNetPls[Now.Date];
-            if (thisDayProfit > 100)
+            var stats = portfolio.GetDailyStats(Now.Date);
+            decimal target = this.OrderConfig.Total;
+            if (OrderConfig.ProfitLimit > 0 && stats.NetPl > OrderConfig.ProfitLimit && OrderConfig.Total == InitialQuantity)
             {
-                var target = RoundQuantity(InitialQuantity / 2);
-                if (OrderConfig.Total != target)
-                {
-                    Log($"Daily profit reached {thisDayProfit} for {Now.Date}, dropping orders to {target}", LogLevel.Test);
-                }
+                target = RoundQuantity(InitialQuantity * OrderConfig.ProfitRatio);                
+            }
+            else if (OrderConfig.LossLimit > 0 && stats.NetPl < -OrderConfig.LossLimit && OrderConfig.Total == InitialQuantity)
+            {
+                target = RoundQuantity(InitialQuantity * OrderConfig.LossRatio);               
+            }
+            
+            if (OrderConfig.Total != target)
+            {
+                Log($"Daily order adjusted to {target} for {Now.Date}, Orders: {stats.Total}, NetPL: {stats.NetPl}", LogLevel.Test);
                 this.OrderConfig.Total = target;
             }
-            else this.OrderConfig.Total = InitialQuantity;
+
             base.CompletedOrder(order);
+        }
+
+        public override void StopSignals()
+        {
+            base.StopSignals();            
+        }
+
+
+        public override void DayStart()
+        {
+            this.OrderConfig.Total = InitialQuantity;
         }
 
         public override void InitializePositions(List<PortfolioItem> portfolioItems)

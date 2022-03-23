@@ -42,7 +42,7 @@ namespace Kalitte.Trading
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
-            var time = t ?? DateTime.Now;
+            var time = t ?? Algo.Now;
 
             var result = new ClosePositionsSignalResult(this, time);
             var portfolio = Algo.UserPortfolioList.GetPortfolio(this.Symbol);

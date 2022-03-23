@@ -49,10 +49,16 @@ namespace Kalitte.Trading
         }
     }
 
+    public class Statistics
+    {
+        public decimal NetPl { get; set; }
+        public decimal Total { get; set; }
+    }
+
     public class PortfolioItem
     {
 
-        public SortedDictionary<DateTime, decimal> DailtNetPls { get; set; } = new SortedDictionary<DateTime, decimal>();
+        public SortedDictionary<DateTime, Statistics> DailyStats { get; set; } = new SortedDictionary<DateTime, Statistics>();
 
         public decimal Commission { get; set; } = 0M;
 
@@ -151,11 +157,20 @@ namespace Kalitte.Trading
             this.RequestedOrders.Add(o);
         }
 
-        public void SetDailyProfit(decimal pl, ExchangeOrder order)
+        private void SetDailyStats(decimal pl, ExchangeOrder order)
         {            
-            DailtNetPls.TryGetValue(order.Sent.Date, out decimal profit);
-            DailtNetPls[order.Sent.Date] = profit + pl - order.CommissionPaid;
+            DailyStats.TryGetValue(order.Sent.Date, out Statistics stats);
+            if (stats == null) stats = new Statistics();
+            stats.NetPl = stats.NetPl + pl - order.CommissionPaid;
+            stats.Total++;
+            DailyStats[order.Sent.Date] = stats;
+        }
 
+        public Statistics GetDailyStats(DateTime time)
+        {
+            DailyStats.TryGetValue(time.Date, out Statistics stats);
+            if (stats == null) stats = new Statistics();
+            return stats;
         }
 
         public void OrderCompleted(ExchangeOrder position)
@@ -202,7 +217,7 @@ namespace Kalitte.Trading
                     position.DirectionChangedQuantity = delta;
                 }
             }
-            SetDailyProfit(profit, position);
+            SetDailyStats(profit, position);
             this.CompletedOrders.Add(position);
         }
 

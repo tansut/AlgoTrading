@@ -37,6 +37,13 @@ public class Program
 
         // global order
         alternates.Set("Orders/Total", 10);
+        alternates.Set("Orders/ProfitLimit", 125);
+        alternates.Set("Orders/ProfitRatio", 0.6);
+        alternates.Set("Orders/LossLimit", 200);
+        alternates.Set("Orders/LossRatio", 0.6);
+        alternates.Set("Orders/NightRatio", 0.5);        
+        alternates.Set("Orders/KeepRatio", 0.3);
+        alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);
 
         // analyser defaults
         alternates.Set("DataCollectSize", 8);
@@ -144,8 +151,7 @@ public class Program
 
         // general
         alternates.Set("DailyClose/Enabled", true);     
-        alternates.Set("DailyClose/Keep", 3);
-        alternates.Set("DailyClose/KeepSide", ClosePositionSide.KeepSide);
+
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);        

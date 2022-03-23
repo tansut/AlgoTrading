@@ -411,7 +411,7 @@ namespace Kalitte.Trading.Algos
             SignalsState = StartableState.Started; ;
         }
 
-        public void StopSignals()
+        public virtual void StopSignals()
         {
             SignalsState = StartableState.StopInProgress;
             try
@@ -526,6 +526,11 @@ namespace Kalitte.Trading.Algos
             //if (existing)
             this.Symbols.Add(new SymbolData(symbol, periodBars));
             Log($"Initialized total {periodBars.Count} for {symbol}/{period} using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
+        }
+
+        public virtual void DayStart()
+        {
+
         }
 
         public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime? t = null)
@@ -891,6 +896,8 @@ namespace Kalitte.Trading.Algos
 
         public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment, SignalResult signalResult, OrderUsage usage = OrderUsage.Unknown, bool disableDelay = false)
         {
+            var stats = this.UserPortfolioList.GetPortfolio(symbol).GetDailyStats(Now);
+            if (stats.Total <= 0) DayStart();
             orderWait.Reset();
             var signal = signalResult.Signal;
             usage = usage == OrderUsage.Unknown ? signal.Usage : usage;

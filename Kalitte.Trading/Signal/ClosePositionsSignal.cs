@@ -16,7 +16,7 @@ namespace Kalitte.Trading
     public class ClosePositionsSignalConfig : SignalConfig
     {
         [AlgoParam(0)]
-        public decimal KeepQuantity { get; set; }
+        public decimal Keep { get; set; }
     }
 
     public class ClosePositionsSignalResult : SignalResult
@@ -50,7 +50,7 @@ namespace Kalitte.Trading
             if (time.Hour == 22 && time.Minute >= 58)
             {
                 result.finalResult = BuySell.Sell;
-                result.Quantity = Config.KeepQuantity;
+                result.Quantity = Config.Keep;
             }
             return result;
         }

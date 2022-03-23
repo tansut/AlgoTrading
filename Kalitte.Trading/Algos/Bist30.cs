@@ -648,8 +648,12 @@ namespace Kalitte.Trading.Algos
             var thisDayProfit = portfolio.DailtNetPls[Now.Date];
             if (thisDayProfit > 100)
             {
-                Log($"Daily profit seems to be {thisDayProfit} for {Now.Date}", LogLevel.Info);
-                this.OrderConfig.Total = RoundQuantity(InitialQuantity / 2);
+                var target = RoundQuantity(InitialQuantity / 2);
+                if (OrderConfig.Total != target)
+                {
+                    Log($"Daily profit reached {thisDayProfit} for {Now.Date}, dropping orders to {target}", LogLevel.Test);
+                }
+                this.OrderConfig.Total = target;
             }
             else this.OrderConfig.Total = InitialQuantity;
             base.CompletedOrder(order);

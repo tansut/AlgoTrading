@@ -144,7 +144,7 @@ public class Program
 
         // general
         alternates.Set("DailyClose/Enabled", true);     
-        alternates.Set("DailyClose/KeepRatio", 0.3);
+        alternates.Set("DailyClose/Keep", 3);
         alternates.Set("DailyClose/KeepSide", ClosePositionSide.KeepSide);
 
         // System

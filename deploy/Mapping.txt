@@ -2679,14 +2679,14 @@ Skipped Types:
 [Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalConfig skipped:  KeepPublicApi option in configuration
 {
 
-	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalConfig::get_KeepQuantity[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalConfig::set_KeepQuantity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalConfig::get_Keep[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalConfig::set_Keep[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalConfig::.ctor[0]( ) skipped:  special name
 
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ClosePositionsSignalConfig::<KeepQuantity>k__BackingField -> A
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ClosePositionsSignalConfig::<Keep>k__BackingField -> A
 
 
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ClosePositionsSignalConfig::KeepQuantity skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.ClosePositionsSignalConfig::Keep skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.PLSignalConfig skipped:  KeepPublicApi option in configuration

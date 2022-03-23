@@ -37,17 +37,17 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(10)]
         public decimal Total { get; set; }
 
-        [AlgoParam(100)]
-        public decimal ProfitLimit { get; set; }
+        [AlgoParam(null)]
+        public decimal [] ProfitLimit { get; set; }
 
-        [AlgoParam(0.5)]
-        public decimal ProfitRatio { get; set; }
+        [AlgoParam(null)]
+        public decimal [] ProfitRatio { get; set; }
 
-        [AlgoParam(100)]
-        public decimal LossLimit { get; set; }
+        [AlgoParam(null)]
+        public decimal [] LossLimit { get; set; }
 
-        [AlgoParam(0.5)]
-        public decimal LossRatio { get; set; }
+        [AlgoParam(null)]
+        public decimal [] LossRatio { get; set; }
 
         [AlgoParam(0.5)]
         public decimal NightRatio { get; set; }
@@ -402,6 +402,15 @@ namespace Kalitte.Trading.Algos
             base.Init();
         }
 
+        public override void CheckBacktestBeforeRun(DateTime t)
+        {
+            base.CheckBacktestBeforeRun(t);
+            if (Now.Hour == 19 && Now.Minute <= 1 && OrderConfig.Total == InitialQuantity && OrderConfig.NightRatio != 0)
+            {
+                OrderConfig.Total = RoundQuantity(InitialQuantity * OrderConfig.NightRatio);
+            }
+        }
+
 
         private void HandleProfitLossSignal(PLSignal signal, ProfitLossResult result)
         {
@@ -667,13 +676,26 @@ namespace Kalitte.Trading.Algos
 
             var stats = portfolio.GetDailyStats(Now.Date);
             decimal target = this.OrderConfig.Total;
-            if (OrderConfig.ProfitLimit > 0 && stats.NetPl > OrderConfig.ProfitLimit && OrderConfig.Total == InitialQuantity)
+            
             {
-                target = RoundQuantity(InitialQuantity * OrderConfig.ProfitRatio);                
-            }
-            else if (OrderConfig.LossLimit > 0 && stats.NetPl < -OrderConfig.LossLimit && OrderConfig.Total == InitialQuantity)
-            {
-                target = RoundQuantity(InitialQuantity * OrderConfig.LossRatio);               
+                for (var i = OrderConfig.ProfitLimit.Length-1; i >=0; i--)
+                {
+                    if (stats.NetPl > OrderConfig.ProfitLimit[i])
+                    {
+                        var newtarget = RoundQuantity(InitialQuantity * OrderConfig.ProfitRatio[i]);
+                        if (newtarget < target) target = newtarget;
+                        break;
+                    }
+                }
+                for (var i = OrderConfig.LossLimit.Length - 1; i >= 0; i--)
+                {
+                    if (stats.NetPl < -OrderConfig.LossLimit[i])
+                    {
+                        var newtarget = RoundQuantity(InitialQuantity * OrderConfig.LossRatio[i]);
+                        if (newtarget < target) target = newtarget;
+                        break;
+                    }
+                }
             }
             
             if (OrderConfig.Total != target)

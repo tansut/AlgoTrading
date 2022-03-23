@@ -258,7 +258,7 @@ namespace Kalitte.Trading.Algos
         public abstract void Decide(SignalBase signal, SignalEventArgs data);
 
 
-        public void CheckDelayedOrders(DateTime t)
+        public virtual void CheckBacktestAfterRun(DateTime t)
         {
             if (this.delayedOrder != null)
             {
@@ -270,6 +270,13 @@ namespace Kalitte.Trading.Algos
                     this.delayedOrder = null;
                 }
             }
+
+        }
+
+        public virtual void CheckBacktestBeforeRun(DateTime t)
+        {
+            var stats = this.UserPortfolioList.GetPortfolio(this.Symbol).GetDailyStats(t);
+            if (stats.Total <= 0) DayStart();
         }
 
         //public bool OrderInProgress
@@ -714,7 +721,7 @@ namespace Kalitte.Trading.Algos
                 {
                     var paramVal = item.GetCustomAttributes(typeof(AlgoParam), true).Cast<AlgoParam>().FirstOrDefault();
 
-                    if (paramVal != null && (!item.PropertyType.IsClass || item.PropertyType == typeof(string))) item.SetValue(target, paramVal.Value);
+                    if (paramVal != null && (!item.PropertyType.IsClass || item.PropertyType.IsArray || item.PropertyType == typeof(string))) item.SetValue(target, paramVal.Value);
                     else if (paramVal != null)
                     {
                         var subProps = init.Where(p => p.Key.StartsWith($"{paramVal.Name ?? item.Name}/")).ToList();
@@ -896,8 +903,6 @@ namespace Kalitte.Trading.Algos
 
         public virtual void sendOrder(string symbol, decimal quantity, BuySell side, string comment, SignalResult signalResult, OrderUsage usage = OrderUsage.Unknown, bool disableDelay = false)
         {
-            var stats = this.UserPortfolioList.GetPortfolio(symbol).GetDailyStats(Now);
-            if (stats.Total <= 0) DayStart();
             orderWait.Reset();
             var signal = signalResult.Signal;
             usage = usage == OrderUsage.Unknown ? signal.Usage : usage;

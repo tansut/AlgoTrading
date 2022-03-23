@@ -103,8 +103,9 @@ namespace Kalitte.Trading
                     Algo.SetTime(p);
                     Algo.SetBarCurrentValues();
                     var time = Algo.Now;
+                    Algo.CheckBacktestBeforeRun(time);
                     Algo.RunSignals(time);
-                    Algo.CheckDelayedOrders(time);
+                    Algo.CheckBacktestAfterRun(time);
                     if (Algo.UsePerformanceMonitor) Algo.Watch.CheckMonitor();
                     Algo.simulationCount++;
                 }

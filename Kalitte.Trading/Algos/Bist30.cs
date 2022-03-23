@@ -404,7 +404,7 @@ namespace Kalitte.Trading.Algos
         public override void CheckBacktestBeforeRun(DateTime t)
         {
             base.CheckBacktestBeforeRun(t);
-            if (Now.Hour == 19 && Now.Minute <= 1 && OrderConfig.Total == InitialQuantity && OrderConfig.NightRatio != 0)
+            if (Now.Hour == 19 && Now.Minute <= 1 && OrderConfig.NightRatio != 0)
             {
                 var newTarget = RoundQuantity(InitialQuantity * OrderConfig.NightRatio);
                 OrderConfig.Total = Math.Min(OrderConfig.Total, newTarget);

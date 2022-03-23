@@ -38,9 +38,9 @@ public class Program
         // global order
         alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/ProfitLimit", new[] { 100M, 150M });
-        alternates.Set("Orders/ProfitRatio", new[] { 0.6M, 0M });
+        alternates.Set("Orders/ProfitRatio", new[] { 0.4M, 0M });
         alternates.Set("Orders/LossLimit", new[] { 100M, 150M });
-        alternates.Set("Orders/LossRatio", new[] { 0.8M, 0.4M });
+        alternates.Set("Orders/LossRatio", new[] { 1M, 0.8M });
         alternates.Set("Orders/NightRatio", 0.5);        
         alternates.Set("Orders/KeepRatio", 0.3);
         alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);

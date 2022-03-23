@@ -20,7 +20,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 14);
+        settings.Start = new DateTime(2022, 3, 1);
         settings.Finish = new DateTime(2022, 3, 23);
         settings.AutoClosePositions = true;
         
@@ -36,11 +36,11 @@ public class Program
         alternates.Set("Portfolio/Side", BuySell.Sell);
 
         // global order
-        alternates.Set("Orders/Total", 10);
-        alternates.Set("Orders/ProfitLimit", new decimal[] { 100, 150M });
-        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.4, 0 });
-        alternates.Set("Orders/LossLimit", new decimal[] { 100, 150 });
-        alternates.Set("Orders/LossRatio", new decimal[] { 1, 0.8 });
+        alternates.Set("Orders/Total", 20);
+        alternates.Set("Orders/ProfitLimit", new decimal[] { 100, 150, 200 });
+        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.5M, 0.2M, 0 });
+        alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 300 });
+        alternates.Set("Orders/LossRatio", new decimal[] { 1, 0.6M, 0.2M });
         alternates.Set("Orders/NightRatio", 0.5);        
         alternates.Set("Orders/KeepRatio", 0.3);
         alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);

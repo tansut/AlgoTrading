@@ -326,8 +326,9 @@ namespace Kalitte.Trading.Algos
                     this.positionRequest.FilledUnitPrice = filledUnitPrice;
                     this.positionRequest.FilledQuantity = filledQuantity;
                     var portfolio = this.UserPortfolioList.Add(this.positionRequest);
-                    var port = UserPortfolioList.Where(p => p.Key == positionRequest.Symbol).First().Value;
-                    Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost.ToCurrency()} NetPL:{port.NetPL.ToCurrency()}]: {this.positionRequest.ToString()}", LogLevel.Order);
+                    var port = UserPortfolioList.GetPortfolio(positionRequest.Symbol);
+                    var stat = port.GetDailyStats(positionRequest.Sent);
+                    Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost.ToCurrency()} NetPL:{stat.NetPl.ToCurrency()}/{port.NetPL.ToCurrency()}]: {this.positionRequest.ToString()}", LogLevel.Order);
                     CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
                     if (this.positionRequest.Usage == OrderUsage.CreatePosition && !this.MultipleTestOptimization)
                     {

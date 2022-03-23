@@ -18,7 +18,7 @@ namespace Kalitte.Trading
     {
         public decimal SpeedMinutes { get; set; } = 1M;
         public int SpeedAnalyse { get; set; } = 0;
-
+        public bool AbsoluteSpeed { get; set; } = true;
         public Average Average { get; set; }
         public FinanceList<MyQuote> List { get; private set; }
         public AnalyseList Speed { get; set; }
@@ -37,9 +37,12 @@ namespace Kalitte.Trading
 
 
 
-        public AnalyseList Collect(decimal val, DateTime t)
+        public AnalyseList Collect(decimal value, DateTime date)
         {
-            return this.Collect(t, val);
+            var q = new MyQuote() { Date = date };
+            q.Set(value, Candle);
+            this.List.Push(q);
+            return this;
         }
 
         public bool SpeedInitialized
@@ -50,13 +53,7 @@ namespace Kalitte.Trading
             }
         }
 
-        public AnalyseList Collect(DateTime date, decimal value)
-        {
-            var q = new MyQuote() { Date = date };
-            q.Set(value, Candle);
-            this.List.Push(q);
-            return this;
-        }
+
 
         public void Clear()
         {
@@ -99,7 +96,7 @@ namespace Kalitte.Trading
         internal void ResetSpeed(decimal value, DateTime t)
         {
             Speed = new AnalyseList(this.List.QueSize, Average.Sma);
-            Speed.Collect(value, t);
+            Speed.AbsoluteSpeed = false;
             SpeedHistory.Clear();            
             SpeedHistory.Push(new MyQuote() { Date = t, Close = value });
         }
@@ -113,10 +110,13 @@ namespace Kalitte.Trading
         {
             var fDate = time.AddMinutes(-(double)SpeedMinutes);
             var prevBar = SpeedHistory.List.FirstOrDefault(p => p.Date == fDate);
-            var dif = (prevBar == null ? Speed.List.First.Close : prevBar.Close) - LastValue;
-            decimal value = Math.Abs(dif) / SpeedMinutes;
-            Speed.Collect(time, value);
+            var dif = (prevBar == null ? SpeedHistory.First.Close : prevBar.Close) - LastValue;
+            var minutes = prevBar == null && SpeedHistory.Count > 0 ? SpeedHistory.Count / 60M : SpeedMinutes;
+            //decimal value = dif / minutes;
+            decimal value = (AbsoluteSpeed ? Math.Abs(dif): dif) / minutes;
+            Speed.Collect(value, time);
             return Speed.LastValue;
+            //return value;
         }
     }
 

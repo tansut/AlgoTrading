@@ -163,7 +163,8 @@ namespace Kalitte.Trading
         Order = 4,
         Error = 10,
         FinalResult = 15,
-        Critical = 20
+        Critical = 20,
+        Test = 32
     }
 
     public interface ILogProvider

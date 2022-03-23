@@ -32,13 +32,6 @@ namespace Kalitte.Trading
 
         }
 
-        //protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
-        //{
-        //    var seconds = Algo.GetSymbolPeriodSeconds(i1k.InputBars.Period.ToString());
-        //    AnalyseList.ResetSpeed(AnalyseList.LastValue, Algo.Now.AddSeconds(0));
-        //    SaveSpeed(Algo.Now);
-        //    Console.WriteLine($"BAR LOADED:  {i1k.Results.Last().Date}/{i1k.Results.Last().Value} { Algo.Now } - {AnalyseList.LastValue}");
-        //}
 
         public override void Init()
         {
@@ -46,11 +39,6 @@ namespace Kalitte.Trading
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
             var lastResult = i1k.Results.Last();            
             base.Init();            
-            //var seconds = Algo.GetSymbolPeriodSeconds(i1k.InputBars.Period.ToString());
-            //AnalyseList.ResetSpeed(lastResult.Value.Value, Algo.Now);
-
-
-
         }
 
 
@@ -84,7 +72,8 @@ namespace Kalitte.Trading
                 {
                     Chart("Derivs").Serie("Speed").SetColor(Color.Black).Add(time, result.Speed);
                     Chart("Derivs").Serie("Acceleration").SetColor(Color.Green).Add(time, result.Acceleration);
-                    Chart("Value").Serie("Value").SetColor(Color.Green).Add(time, result.Value.Value);                    
+                    Chart("Value").Serie("Sma").SetColor(Color.Green).Add(time, result.Value.Value);                    
+                    Chart("Value").Serie("Value").SetColor(Color.Black).Add(time, l1);
                 }
 
                 if (time.Minute == 1 && time.Second == 1 && Algo.Simulation)

@@ -23,6 +23,16 @@ namespace Kalitte.Trading
                 return Orders.Sum(p => (p.FilledQuantity - p.DirectionChangedQuantity));
             }
         }
+
+        public decimal AverageQuantity
+        {
+            get
+            {
+                if (Orders.Count == 0) return 0;
+                return TotalQuantity / Orders.Count;
+            }
+        }
+
         public decimal Total
         {
             get
@@ -42,7 +52,7 @@ namespace Kalitte.Trading
     public class PortfolioItem
     {
 
-
+        public SortedDictionary<DateTime, decimal> DailtNetPls { get; set; } = new SortedDictionary<DateTime, decimal>();
 
         public decimal Commission { get; set; } = 0M;
 
@@ -141,9 +151,17 @@ namespace Kalitte.Trading
             this.RequestedOrders.Add(o);
         }
 
+        public void SetDailyProfit(decimal pl, ExchangeOrder order)
+        {            
+            DailtNetPls.TryGetValue(order.Sent.Date, out decimal profit);
+            DailtNetPls[order.Sent.Date] = profit + pl - order.CommissionPaid;
+
+        }
+
         public void OrderCompleted(ExchangeOrder position)
         {
             this.Commission += position.CommissionPaid;
+            var profit = 0M;
             if (this.IsEmpty)
             {
                 this.Side = position.Side;
@@ -161,7 +179,7 @@ namespace Kalitte.Trading
                 {
                     var delta = position.FilledQuantity;
                     var direction = this.Side == BuySell.Buy ? 1 : -1;
-                    var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost));
+                    profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost));
                     PL += profit;
                     this.Quantity -= position.FilledQuantity;
                     if (this.Quantity == 0)
@@ -176,7 +194,7 @@ namespace Kalitte.Trading
                 {
                     var delta = this.Quantity;
                     var direction = this.Side == BuySell.Buy ? 1 : -1;
-                    var profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost));
+                    profit = (delta * direction * (position.FilledUnitPrice - this.AvgCost));
                     PL += profit;
                     this.Side = position.Side;
                     this.Quantity = position.FilledQuantity - this.Quantity;
@@ -184,6 +202,7 @@ namespace Kalitte.Trading
                     position.DirectionChangedQuantity = delta;
                 }
             }
+            SetDailyProfit(profit, position);
             this.CompletedOrders.Add(position);
         }
 
@@ -246,7 +265,7 @@ namespace Kalitte.Trading
             return res;
         }
 
-        public List<ExchangeOrder> GetLastPositionOrders(params Type[] types)
+        public List<ExchangeOrder> GetLastPositionOrders( Type[] types)
         {
             var result = new List<ExchangeOrder>();            
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)

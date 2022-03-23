@@ -138,8 +138,9 @@ namespace Kalitte.Trading
         public List<SignalBase> LimitingSignals { get; set; } = new List<SignalBase>();        
         public List<SignalBase> CostSignals { get; set; } = new List<SignalBase>();
 
-
-
+        public SortedDictionary<decimal, decimal> Prices { get; set; } = new SortedDictionary<decimal, decimal>();
+        public decimal HighPrice { get; protected set; }
+        public decimal LowPrice { get; protected set; }
 
 
         public PLSignal(string name, string symbol, AlgoBase owner, PLSignalConfig config) : base(name, symbol, owner, config)
@@ -150,6 +151,9 @@ namespace Kalitte.Trading
         public override void ResetOrdersInternal()
         {
             UsedPriceChange = Config.StartAt;
+            HighPrice = 0;
+            LowPrice = 0;
+            Prices.Clear();
             if (PriceMonitor != null)
             {
                 Log($"Destroying price monitor: {PriceMonitor.Result}", LogLevel.Verbose);  
@@ -159,12 +163,14 @@ namespace Kalitte.Trading
             base.ResetOrdersInternal();
         }
 
-        public void IncrementParams()
+        public void IncrementParams(ExchangeOrder order)
         {
             Monitor.Enter(OperationLock);
             try
             {
+                Prices[UsedPriceChange] = order.FilledUnitPrice;
                 UsedPriceChange += Config.Step;
+                
             }
             finally
             {
@@ -191,6 +197,8 @@ namespace Kalitte.Trading
         }
 
 
+
+
         protected virtual ProfitLossResult getResult(PortfolioItem portfolio, AverageCostResult costStatus,  decimal marketPrice, decimal quantity)
         {
            
@@ -209,6 +217,7 @@ namespace Kalitte.Trading
                 {
                     bs = BuySell.Buy;
                 }
+                //else bs = CheckReturnPrice(portfolio, marketPrice);
             }
             else if (this.Usage == OrderUsage.StopLoss)
             {               
@@ -230,7 +239,8 @@ namespace Kalitte.Trading
             result.OriginalPrice = marketPrice;
             result.PL = unitPl;
             result.UsedPriceChange = UsedPriceChange;
-            result.KeepQuantity = RoundQuantity(costStatus.TotalQuantity * (Config.KeepQuantity / 100M));
+            
+            result.KeepQuantity = Algo.RoundQuantity(Math.Max(portfolio.Quantity, costStatus.AverageQuantity) * (Config.KeepQuantity / 100M));
 
             if (Config.PriceMonitor && result.finalResult.HasValue && this.Usage == OrderUsage.TakeProfit)
             {
@@ -254,11 +264,30 @@ namespace Kalitte.Trading
             return result;
         }
 
-        decimal RoundQuantity(decimal quantity)
+        private BuySell? CheckReturnPrice(PortfolioItem portfolio, decimal marketPrice)
         {
-            var q = quantity > 0 && quantity < 1 ? 1 : quantity;
-            return Math.Round(q);
+            BuySell? result = null;
+            
+            if (Prices.Count > 0)
+            {
+                var lastItem = Prices.LastOrDefault();
+                if (lastItem.Key == UsedPriceChange - Config.Step)
+                {
+                    var usedPrice = lastItem.Value;
+                    if (portfolio.IsLong && usedPrice < marketPrice)
+                    {
+
+                    } else if (portfolio.IsShort && usedPrice > marketPrice)
+                    {
+
+                    }
+                }
+            }
+            return result;
+
         }
+
+
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
@@ -278,16 +307,18 @@ namespace Kalitte.Trading
                     if (!valid) return null;
                 }
 
-                var price = Algo.GetMarketPrice(Symbol, t);
+                var price = GetMarketPrice();
                 if (price == 0)
                 {
                     return null;
                 }
                 else
                 {
+                    HighPrice = Math.Max(HighPrice, price);
+                    LowPrice = Math.Min(LowPrice == 0 ? price: LowPrice, price);
                     var portfolioStatus = portfolio.LastAverageCost(CostSignals.ToArray());
                     var quantityRatio = this.CompletedOrder == 0 ? Config.InitialQuantity : Config.QuantityStep + Config.QuantityStep * (this.CompletedOrder-1) * Config.QuantityStepMultiplier;
-                    var quantity = RoundQuantity(portfolioStatus.TotalQuantity * quantityRatio / 100M);
+                    var quantity = Algo.RoundQuantity(Math.Max(portfolio.Quantity, portfolioStatus.AverageQuantity) * quantityRatio / 100M);
                     return quantity == 0 || portfolioStatus.AverageCost == 0 ? null: this.getResult(portfolio, portfolioStatus, price, quantity);
                 }
             }

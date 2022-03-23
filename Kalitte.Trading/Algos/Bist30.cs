@@ -7,6 +7,10 @@ using System.Linq;
 
 namespace Kalitte.Trading.Algos
 {
+    public interface IAlgoParameter
+    {
+        public Bist30 Algo { get; set; }
+    }
 
     public enum RsiPositionAction
     {
@@ -16,21 +20,59 @@ namespace Kalitte.Trading.Algos
         Radical = 4
     }
 
-    public class RsiOrderConfig : GradientSignalConfig
+
+    public enum ClosePositionSide
     {
-        [AlgoParam(0)]
-        public decimal Keep { get; set; }
+        UseCross,
+        KeepSide
+    }
+
+    public class DailyCloseConfig : ClosePositionsSignalConfig
+    {
+        [AlgoParam(ClosePositionSide.KeepSide)]
+        public ClosePositionSide Side { get; set; }
+    }
+
+    public class OrderConfig : ConfigParameters
+    {
+        [AlgoParam(10)]
+        public decimal Total { get; set; }
+    }
+
+    public class RsiOrderConfig : GradientSignalConfig, IAlgoParameter
+    {
+        public Bist30 Algo { get; set; }
 
         [AlgoParam(0)]
-        public decimal Make { get; set; }
+        public decimal KeepRatio { get; set; }
+
+        [AlgoParam(0)]
+        public decimal MakeRatio { get; set; }
+
+        public decimal Keep
+        {
+            get
+            {
+                return Algo.RoundQuantity(Algo.OrderConfig.Total * KeepRatio);
+            }
+        }
+
+        public decimal Make
+        {
+            get
+            {
+                return Algo.RoundQuantity(Algo.OrderConfig.Total * MakeRatio);
+            }
+        }
 
         [AlgoParam(RsiPositionAction.IfEmpty)]
         public RsiPositionAction Action { get; set; }
-
     }
 
-    public class CrossOrderConfig : CrossSignalConfig
+    public class CrossOrderConfig : CrossSignalConfig, IAlgoParameter
     {
+        public Bist30 Algo { get; set; }
+
         [AlgoParam(0)]
         public decimal RsiMax { get; set; }
 
@@ -38,13 +80,24 @@ namespace Kalitte.Trading.Algos
         public decimal RsiMin { get; set; }
 
         [AlgoParam(0)]
-        public decimal Quantity { get; set; }
+        public decimal QuantityRatio { get; set; }
+
+        public decimal Quantity
+        {
+            get
+            {
+                return Algo.RoundQuantity(Algo.OrderConfig.Total * QuantityRatio);
+            }
+        }
     }
 
 
     public class Bist30 : AlgoBase
     {
+        public decimal InitialQuantity { get; set; }
 
+        [AlgoParam(null, "Orders")]
+        public OrderConfig OrderConfig { get; set; }
 
         [AlgoParam(null)]
         public RsiOrderConfig RsiOrderHighL1 { get; set; }
@@ -90,7 +143,7 @@ namespace Kalitte.Trading.Algos
 
 
         [AlgoParam(null, "CrossL1")]
-        public CrossOrderConfig CrossL1Config { get; set; } = new CrossOrderConfig();
+        public CrossOrderConfig CrossL1Config { get; set; } = new CrossOrderConfig() { };
 
         [AlgoParam(null, "CrossL2")]
         public CrossOrderConfig CrossL2Config { get; set; } = new CrossOrderConfig();
@@ -102,7 +155,7 @@ namespace Kalitte.Trading.Algos
         public AnalyserConfig RsiValueConfig { get; set; } = new AnalyserConfig();
 
         [AlgoParam(null, "DailyClose")]
-        public ClosePositionsSignalConfig DailyCloseConfig { get; set; }
+        public DailyCloseConfig DailyCloseConfig { get; set; }
 
         // rsi
         [AlgoParam(14)]
@@ -322,6 +375,8 @@ namespace Kalitte.Trading.Algos
 
         public override void Init()
         {
+            this.GetType().GetProperties().Where(p => typeof(ConfigParameters).IsAssignableFrom(p.PropertyType)).Select(p => p.GetValue(this)).Where(c => c is IAlgoParameter).Select(p => (IAlgoParameter)p).ToList().ForEach(c => c.Algo = this);
+            this.InitialQuantity = OrderConfig.Total;
             this.PriceLogger = new MarketDataFileLogger(Symbol, LogDir, "price");
             CreateSignals();
             base.Init();
@@ -341,7 +396,6 @@ namespace Kalitte.Trading.Algos
             {
                 Log($"{signal.Name} {result} received but there is no time dif between {lastSignalTime} and {result.SignalTime}", LogLevel.Warning);
             }
-
 
 
             decimal keep = result.KeepQuantity;
@@ -395,7 +449,7 @@ namespace Kalitte.Trading.Algos
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
 
-            var rsiOrders = portfolio.GetLastPositionOrders(typeof(GradientSignal));
+            var rsiOrders = portfolio.GetLastPositionOrders(new[] { typeof(GradientSignal) });
             var lastOrderIsLoss = portfolio.LastOrderIsLoss;
             if (lastOrderIsLoss && rsiOrders.Count > 0) return;
             var keepPosition = false;
@@ -452,15 +506,16 @@ namespace Kalitte.Trading.Algos
 
         public void HandleDailyCloseSignal(ClosePositionsSignal signal, ClosePositionsSignalResult result)
         {
+            if (!Simulation) StopSignals();
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
-            if (result.Quantity == 0 && !portfolio.IsEmpty) ClosePositions(Symbol, result);
-            else
+            var expectedSide = portfolio.Side;
+            if (DailyCloseConfig.Side == ClosePositionSide.UseCross)
             {
                 var macd = maCrossL1.i1k.Results.Last().Value.Value;
-                var expectedSide = macd > 0 ? BuySell.Buy : BuySell.Sell;
-                var usage = expectedSide == portfolio.Side ? OrderUsage.CreatePosition : OrderUsage.CreatePosition;
-                MakePortfolio(Symbol, result.Quantity, expectedSide, $"daily close macd:{macd}", result, usage);
+                expectedSide = macd > 0 ? BuySell.Buy : BuySell.Sell;
             }
+            var usage = expectedSide == portfolio.Side ? OrderUsage.CreatePosition : OrderUsage.CreatePosition;
+            MakePortfolio(Symbol, result.Quantity, expectedSide, $"daily close", result, usage);
         }
 
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)
@@ -487,7 +542,7 @@ namespace Kalitte.Trading.Algos
             var rsiSpeed = 0M;
             var rsiAcc = 0M;
 
-            var config = (CrossOrderConfig)signal.Config;            
+            var config = (CrossOrderConfig)signal.Config;
 
 
             if (!signalResult.MorningSignal)
@@ -520,7 +575,8 @@ namespace Kalitte.Trading.Algos
                         {
                             config = CrossL2Config;
 
-                        } else if (config.RsiMin != 0 && CrossL1Config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi >= CrossL2Config.RsiMin)
+                        }
+                        else if (config.RsiMin != 0 && CrossL1Config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi >= CrossL2Config.RsiMin)
                         {
                             config = CrossL2Config;
                         }
@@ -528,10 +584,10 @@ namespace Kalitte.Trading.Algos
 
                     if (cancelCross)
                     {
-                        var offSetMax = valueSet + 0.1M * valueSet;
-                        var offSetMin = valueSet - 0.1M * valueSet;
-                        //var discardRsi = currentRsi > offSetMin && currentRsi < offSetMax && rsi.Speed > 1.5M && rsi.Acceleration > 0.02M;
-                        //var discardRsi = rsi.Speed > 1.5M && rsi.Acceleration > 0.1M;
+                        var offSetMax = valueSet + 0.05M * valueSet;
+                        var offSetMin = valueSet - 0.05M * valueSet;
+                        //var discardRsi = currentRsi > offSetMin && currentRsi < offSetMax && rsi.Speed > 0.2M;
+                        //if (!discardRsi) discardRsi = rsi.Speed >= 1M;
                         var discardRsi = false;
                         //Console.WriteLine($"{discardRsi} {signalResult.SignalTime}, speed: {rsi.Speed} acceleration:{rsi.Acceleration} value: {rsi.Value}");
                         if (!discardRsi)
@@ -556,7 +612,7 @@ namespace Kalitte.Trading.Algos
             }
             if (orderQuantity > 0)
             {
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*":"")}/{signal.AvgChange.ToCurrency()},{signal.AnalyseSize}, rsi:{currentRsi.ToCurrency()},{rsiSpeed.ToCurrency()},{rsiAcc.ToCurrency()}]", signalResult);
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*" : "")}/{signal.AvgChange.ToCurrency()},{signal.AnalyseSize}, rsi:{currentRsi.ToCurrency()},{rsiSpeed.ToCurrency()},{rsiAcc.ToCurrency()}]", signalResult);
             }
         }
 
@@ -574,7 +630,7 @@ namespace Kalitte.Trading.Algos
 
             if (tp != null)
             {
-                tp.IncrementParams();
+                tp.IncrementParams(order);
             }
             else
             {
@@ -588,6 +644,14 @@ namespace Kalitte.Trading.Algos
                 }
                 else Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
             }
+
+            var thisDayProfit = portfolio.DailtNetPls[Now.Date];
+            if (thisDayProfit > 100)
+            {
+                Log($"Daily profit seems to be {thisDayProfit} for {Now.Date}", LogLevel.Info);
+                this.OrderConfig.Total = RoundQuantity(InitialQuantity / 2);
+            }
+            else this.OrderConfig.Total = InitialQuantity;
             base.CompletedOrder(order);
         }
 
@@ -600,7 +664,7 @@ namespace Kalitte.Trading.Algos
             {
                 ((CrossSignal)lastOrder.SignalResult.Signal).FirstCrossRequired = false;
                 Log($"First cross disabled since last order was cross", LogLevel.Debug);
-                
+
             }
         }
 

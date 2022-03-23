@@ -342,6 +342,12 @@ namespace Kalitte.Trading.Algos
             }
         }
 
+        public decimal RoundQuantity(decimal quantity)
+        {
+            var q = quantity > 0 && quantity < 1 ? 1 : quantity;
+            return Math.Round(q);
+        }
+
         public void CancelCurrentOrder(string reason)
         {
             Log($"Order rejected/cancelled [{reason}]", LogLevel.Warning);
@@ -430,7 +436,7 @@ namespace Kalitte.Trading.Algos
         public bool IsMorningStart(DateTime? t = null)
         {
             var time = t ?? Now;
-            return time.Hour == 9 && time.Minute == 30;
+            return time.Hour == 9 && time.Minute <= 30;
         }
 
         public void SetBarCurrentValues()
@@ -1069,13 +1075,14 @@ namespace Kalitte.Trading.Algos
         public virtual decimal GetMarketPrice(string symbol, DateTime? t = null)
         {
             var result = 0M;
+            var time = t ?? Now;
             if (Simulation)
             {
-                var list = GetMarketData(symbol, SymbolPeriod, t ?? Now);
+                var list = GetMarketData(symbol, SymbolPeriod, time);
                 result = list.Length > 0 ? list[0] : 0;
 
             }
-            else result = Exchange.GetMarketPrice(symbol, t);
+            else result = Exchange.GetMarketPrice(symbol, time);
             if (result == 0) Log($"Market price got zero", LogLevel.Debug);
             return result;
         }

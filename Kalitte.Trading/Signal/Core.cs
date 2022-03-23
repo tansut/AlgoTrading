@@ -91,6 +91,7 @@ namespace Kalitte.Trading
         protected System.Timers.Timer _timer = null;
         public ChartList Charts  { get; set; } = new ChartList();
         protected object OperationLock = new object();
+        public AnalyseList PriceList { get; private set; } = new AnalyseList(4, Average.Ema);
 
         public string Name { get; set; }
         public AlgoBase Algo { get; set; }
@@ -130,12 +131,12 @@ namespace Kalitte.Trading
         {
             var dir =  Path.Combine(Algo.Appdir, "charts", this.Name);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-            Chart(name).Save(Path.Combine(dir, $"{name}{id}.png"), clear);            
+            Chart(name).Save(Path.Combine(dir, $"{id}{(!string.IsNullOrEmpty(id) ? "-" : "")}{name}.png"), clear);            
         }
 
         public void SaveChart(string name, DateTime time, bool clear = true)
         {
-            var id = time.ToString("dd-MM-yy-HH-mm-ss");
+            var id = time.ToString("dd-MM-yyyy-HH-mm-ss");
             SaveChart(name, id, clear);
         }
 
@@ -156,6 +157,21 @@ namespace Kalitte.Trading
             {
                 //this.Stop();
                 this.State = StartableState.Paused;
+            }
+        }
+
+        public decimal GetMarketPrice()
+        {
+            var price = Algo.GetMarketPrice(Symbol);
+            if (price == 0)
+            {
+                PriceList.Clear();
+                return price;
+            }
+            else
+            {
+                PriceList.Collect(price, Algo.Now);
+                return PriceList.LastValue;
             }
         }
 

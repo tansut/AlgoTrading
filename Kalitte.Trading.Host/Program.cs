@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client.Transports;
 using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
-
 using Kalitte.Trading.Algos;
 using System.Reflection;
 using System.IO;
@@ -21,10 +20,10 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 21);
-        settings.Finish = new DateTime(2022, 3, 21);
+        settings.Start = new DateTime(2022, 3, 14);
+        settings.Finish = new DateTime(2022, 3, 23);
         settings.AutoClosePositions = true;
-        settings.AutoClosePositions = true;
+        
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
         var alternates = settings.Alternates = new AlternateValues(initValues);
@@ -36,7 +35,8 @@ public class Program
         alternates.Set("Portfolio/Quantity", 0);
         alternates.Set("Portfolio/Side", BuySell.Sell);
 
-
+        // global order
+        alternates.Set("Orders/Total", 10);
 
         // analyser defaults
         alternates.Set("DataCollectSize", 8);
@@ -50,20 +50,21 @@ public class Program
         alternates.Set("PriceHighLimit", 2400);
 
         alternates.Set("Profit/InitialQuantity", 50);
-        alternates.Set("Profit/KeepQuantity", 30);
         alternates.Set("Profit/QuantityStep", 10);
+        alternates.Set("Profit/KeepQuantity", 30);        
         alternates.Set("Profit/QuantityStepMultiplier", 1);
-        alternates.Set("Profit/StartAt", 0.42);        
-        alternates.Set("Profit/Step", 0.1);
+        alternates.Set("Profit/StartAt", 0.45);        
+        alternates.Set("Profit/Step", 0.15);
 
         alternates.Set("GlobalLoss/InitialQuantity", 50);
-        alternates.Set("GlobalLoss/QuantityStep", 50);
+        alternates.Set("GlobalLoss/QuantityStep", 25);
         alternates.Set("GlobalLoss/KeepQuantity", 0);
-        alternates.Set("GlobalLoss/StartAt", 1.2);
-        alternates.Set("GlobalLoss/Step", 0.3);
+        alternates.Set("GlobalLoss/StartAt", 1.0);
+        alternates.Set("GlobalLoss/Step", 0.25);
 
 
         // rsi loss
+        alternates.Set("RsiLoss/Enabled", false);
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);
@@ -73,36 +74,36 @@ public class Program
         // rsi
         alternates.Set("Rsi", 14);
 
-        alternates.Set("RsiOrderHighL1/Make", 1);
+        alternates.Set("RsiOrderHighL1/MakeRatio", 0.1);
         alternates.Set("RsiOrderHighL1/Action", RsiPositionAction.IfEmpty);
         alternates.Set("RsiOrderHighL1/L1", 73.00);
         alternates.Set("RsiOrderHighL1/L2", 76.50);
 
-        alternates.Set("RsiOrderHighL2/Keep", 1);
-        alternates.Set("RsiOrderHighL2/Make", 3);
+        alternates.Set("RsiOrderHighL2/KeepRatio", 0.1);
+        alternates.Set("RsiOrderHighL2/MakeRatio", 0.3);
         alternates.Set("RsiOrderHighL2/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderHighL2/L1", 76.51);
         alternates.Set("RsiOrderHighL2/L2", 84.50);
 
-        alternates.Set("RsiOrderHighL3/Make", 4);
+        alternates.Set("RsiOrderHighL3/MakeRatio", 0.4);
         alternates.Set("RsiOrderHighL3/Action", RsiPositionAction.Radical);
         alternates.Set("RsiOrderHighL3/L1", 84.51);
         alternates.Set("RsiOrderHighL3/L2", 100);
 
 
-        alternates.Set("RsiOrderLowL1/Make", 1);
-        alternates.Set("RsiOrderLowL1/Action", RsiPositionAction.IfEmpty);
+        alternates.Set("RsiOrderLowL1/MakeRatio", 0.1);
+        alternates.Set("RsiOrderLowL1/ActionRatio", RsiPositionAction.IfEmpty);
         alternates.Set("RsiOrderLowL1/L1", 33.00);
         alternates.Set("RsiOrderLowL1/L2", 29.00);
 
-        alternates.Set("RsiOrderLowL2/Keep", 1);
-        alternates.Set("RsiOrderLowL2/Make", 3);
+        alternates.Set("RsiOrderLowL2/KeepRatio", 0.1);
+        alternates.Set("RsiOrderLowL2/MakeRatio", 0.3);
         alternates.Set("RsiOrderLowL2/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderLowL2/L1", 28.99);
         alternates.Set("RsiOrderLowL2/L2", 23.00);
 
-        alternates.Set("RsiOrderLowL3/Make", 4);
-        alternates.Set("RsiOrderLowL3/Action", RsiPositionAction.Radical);
+        alternates.Set("RsiOrderLowL3/MakeRatio", 0.4);
+        alternates.Set("RsiOrderLowL3/ActionRatio", RsiPositionAction.Radical);
         alternates.Set("RsiOrderLowL3/L1", 22.99);
         alternates.Set("RsiOrderLowL3/L2", 0);
         alternates.Set("RsiOrderLowL3/Usage", OrderUsage.CreatePosition);
@@ -124,7 +125,7 @@ public class Program
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL1/Quantity", 10);
+        alternates.Set("CrossL1/QuantityRatio", 1);
         alternates.Set("CrossL1/RsiMax", 55.6);
         alternates.Set("CrossL1/RsiMin", 45.4);
 
@@ -134,7 +135,7 @@ public class Program
         alternates.Set("CrossL2/PowerThreshold", 88);
         alternates.Set("CrossL2/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL2/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL2/Quantity", 10);
+        alternates.Set("CrossL2/QuantityRatio", 1);
         alternates.Set("CrossL2/RsiMax", 52.6);
         alternates.Set("CrossL2/RsiMin", 48.4);
 
@@ -143,11 +144,15 @@ public class Program
 
         // general
         alternates.Set("DailyClose/Enabled", true);     
-        alternates.Set("DailyClose/KeepQuantity", 3);
+        alternates.Set("DailyClose/KeepRatio", 0.3);
+        alternates.Set("DailyClose/KeepSide", ClosePositionSide.KeepSide);
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);        
         alternates.Set("Symbol", "F_XU0300422");
+        alternates.Set("SymbolPeriod", BarPeriod.Min10);
+
+        
         alternates.Set("LogConsole", false);
         alternates.Set("UILoggingLevel", LogLevel.Debug);
         alternates.SaveToFile($"c:\\kalitte\\Bist30-test.json");    

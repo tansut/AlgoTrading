@@ -38,16 +38,16 @@ namespace Kalitte.Trading.Algos
         public decimal Total { get; set; }
 
         [AlgoParam(null)]
-        public decimal [] ProfitLimit { get; set; }
+        public decimal[] ProfitLimit { get; set; }
 
         [AlgoParam(null)]
-        public decimal [] ProfitRatio { get; set; }
+        public decimal[] ProfitRatio { get; set; }
 
         [AlgoParam(null)]
-        public decimal [] LossLimit { get; set; }
+        public decimal[] LossLimit { get; set; }
 
         [AlgoParam(null)]
-        public decimal [] LossRatio { get; set; }
+        public decimal[] LossRatio { get; set; }
 
         [AlgoParam(0.5)]
         public decimal NightRatio { get; set; }
@@ -358,7 +358,6 @@ namespace Kalitte.Trading.Algos
                     profit.FibonacciLevels = fib;
                 }
             });
-
         }
 
 
@@ -407,7 +406,8 @@ namespace Kalitte.Trading.Algos
             base.CheckBacktestBeforeRun(t);
             if (Now.Hour == 19 && Now.Minute <= 1 && OrderConfig.Total == InitialQuantity && OrderConfig.NightRatio != 0)
             {
-                OrderConfig.Total = RoundQuantity(InitialQuantity * OrderConfig.NightRatio);
+                var newTarget = RoundQuantity(InitialQuantity * OrderConfig.NightRatio);
+                OrderConfig.Total = Math.Min(OrderConfig.Total, newTarget);
             }
         }
 
@@ -451,6 +451,11 @@ namespace Kalitte.Trading.Algos
             }
             if (WaitingOrderExpired()) CancelCurrentOrder("Cannot get a result from broker");
             if (!WaitForOrder("Decide")) return;
+            if (OrderConfig.Total == 0)
+            {
+                if (!UserPortfolioList.GetPortfolio(Symbol).IsEmpty) ClosePositions(Symbol, null);
+                return;
+            }
 
             var result = data.Result;
 
@@ -676,28 +681,29 @@ namespace Kalitte.Trading.Algos
 
             var stats = portfolio.GetDailyStats(Now.Date);
             decimal target = this.OrderConfig.Total;
-            
+
+
+            for (var i = OrderConfig.ProfitLimit.Length - 1; i >= 0; i--)
             {
-                for (var i = OrderConfig.ProfitLimit.Length-1; i >=0; i--)
+                if (stats.NetPl > OrderConfig.ProfitLimit[i])
                 {
-                    if (stats.NetPl > OrderConfig.ProfitLimit[i])
-                    {
-                        var newtarget = RoundQuantity(InitialQuantity * OrderConfig.ProfitRatio[i]);
-                        if (newtarget < target) target = newtarget;
-                        break;
-                    }
-                }
-                for (var i = OrderConfig.LossLimit.Length - 1; i >= 0; i--)
-                {
-                    if (stats.NetPl < -OrderConfig.LossLimit[i])
-                    {
-                        var newtarget = RoundQuantity(InitialQuantity * OrderConfig.LossRatio[i]);
-                        if (newtarget < target) target = newtarget;
-                        break;
-                    }
+                    var newtarget = RoundQuantity(InitialQuantity * OrderConfig.ProfitRatio[i]);
+                    if (newtarget < target) target = newtarget;
+                    break;
                 }
             }
-            
+
+            for (var i = OrderConfig.LossLimit.Length - 1; i >= 0; i--)
+            {
+                if (stats.NetPl < -OrderConfig.LossLimit[i])
+                {
+                    var newtarget = RoundQuantity(InitialQuantity * OrderConfig.LossRatio[i]);
+                    if (newtarget < target) target = newtarget;
+                    break;
+                }
+            }
+
+
             if (OrderConfig.Total != target)
             {
                 Log($"Daily order adjusted to {target} for {Now.Date}, Orders: {stats.Total}, NetPL: {stats.NetPl}", LogLevel.Test);
@@ -709,7 +715,7 @@ namespace Kalitte.Trading.Algos
 
         public override void StopSignals()
         {
-            base.StopSignals();            
+            base.StopSignals();
         }
 
 

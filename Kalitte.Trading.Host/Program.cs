@@ -37,10 +37,10 @@ public class Program
 
         // global order
         alternates.Set("Orders/Total", 10);
-        alternates.Set("Orders/ProfitLimit", new[] { 100M, 150M });
-        alternates.Set("Orders/ProfitRatio", new[] { 0.4M, 0M });
-        alternates.Set("Orders/LossLimit", new[] { 100M, 150M });
-        alternates.Set("Orders/LossRatio", new[] { 1M, 0.8M });
+        alternates.Set("Orders/ProfitLimit", new decimal[] { 100, 150M });
+        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.4, 0 });
+        alternates.Set("Orders/LossLimit", new decimal[] { 100, 150 });
+        alternates.Set("Orders/LossRatio", new decimal[] { 1, 0.8 });
         alternates.Set("Orders/NightRatio", 0.5);        
         alternates.Set("Orders/KeepRatio", 0.3);
         alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);

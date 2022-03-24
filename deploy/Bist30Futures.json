@@ -1,9 +1,21 @@
 {
-  "RsiOrderHighL1/Keep": [
+  "Orders/Total": [
+    10
+  ],
+  "Orders/NightRatio": [
+    0.5
+  ],
+  "Orders/KeepRatio": [
+    0.3
+  ],
+  "Orders/KeepSide": [
+    1
+  ],
+  "RsiOrderHighL1/KeepRatio": [
     0
   ],
-  "RsiOrderHighL1/Make": [
-    1
+  "RsiOrderHighL1/MakeRatio": [
+    0.1
   ],
   "RsiOrderHighL1/Action": [
     1
@@ -41,11 +53,11 @@
   "RsiOrderHighL1/Usage": [
     0
   ],
-  "RsiOrderHighL2/Keep": [
-    1
+  "RsiOrderHighL2/KeepRatio": [
+    0.1
   ],
-  "RsiOrderHighL2/Make": [
-    3
+  "RsiOrderHighL2/MakeRatio": [
+    0.3
   ],
   "RsiOrderHighL2/Action": [
     2
@@ -83,11 +95,11 @@
   "RsiOrderHighL2/Usage": [
     0
   ],
-  "RsiOrderHighL3/Keep": [
+  "RsiOrderHighL3/KeepRatio": [
     0
   ],
-  "RsiOrderHighL3/Make": [
-    4
+  "RsiOrderHighL3/MakeRatio": [
+    0.4
   ],
   "RsiOrderHighL3/Action": [
     4
@@ -125,11 +137,11 @@
   "RsiOrderHighL3/Usage": [
     0
   ],
-  "RsiOrderLowL1/Keep": [
+  "RsiOrderLowL1/KeepRatio": [
     0
   ],
-  "RsiOrderLowL1/Make": [
-    1
+  "RsiOrderLowL1/MakeRatio": [
+    0.1
   ],
   "RsiOrderLowL1/Action": [
     1
@@ -167,11 +179,11 @@
   "RsiOrderLowL1/Usage": [
     0
   ],
-  "RsiOrderLowL2/Keep": [
-    1
+  "RsiOrderLowL2/KeepRatio": [
+    0.1
   ],
-  "RsiOrderLowL2/Make": [
-    3
+  "RsiOrderLowL2/MakeRatio": [
+    0.3
   ],
   "RsiOrderLowL2/Action": [
     2
@@ -209,14 +221,14 @@
   "RsiOrderLowL2/Usage": [
     0
   ],
-  "RsiOrderLowL3/Keep": [
+  "RsiOrderLowL3/KeepRatio": [
     0
   ],
-  "RsiOrderLowL3/Make": [
-    4
+  "RsiOrderLowL3/MakeRatio": [
+    0.4
   ],
   "RsiOrderLowL3/Action": [
-    4
+    1
   ],
   "RsiOrderLowL3/Tolerance": [
     0.01
@@ -312,10 +324,10 @@
     10
   ],
   "Profit/Step": [
-    0.1
+    0.15
   ],
   "Profit/StartAt": [
-    0.42
+    0.45
   ],
   "Profit/PriceMonitor": [
     false
@@ -335,14 +347,50 @@
   "Profit/Usage": [
     0
   ],
+  "GlobalLoss/InitialQuantity": [
+    50
+  ],
+  "GlobalLoss/KeepQuantity": [
+    0
+  ],
+  "GlobalLoss/QuantityStepMultiplier": [
+    0
+  ],
+  "GlobalLoss/QuantityStep": [
+    25
+  ],
+  "GlobalLoss/Step": [
+    0.25
+  ],
+  "GlobalLoss/StartAt": [
+    1.01
+  ],
+  "GlobalLoss/PriceMonitor": [
+    false
+  ],
+  "GlobalLoss/EnableLimitingSignalsOnStart": [
+    true
+  ],
+  "GlobalLoss/PriceMonitorTolerance": [
+    0
+  ],
+  "GlobalLoss/PriceMonitorLearnRate": [
+    0
+  ],
+  "GlobalLoss/Enabled": [
+    true
+  ],
+  "GlobalLoss/Usage": [
+    0
+  ],
   "CrossL1/RsiMax": [
     55.6
   ],
   "CrossL1/RsiMin": [
     45.4
   ],
-  "CrossL1/Quantity": [
-    10
+  "CrossL1/QuantityRatio": [
+    1
   ],
   "CrossL1/PowerThreshold": [
     88
@@ -386,8 +434,8 @@
   "CrossL2/RsiMin": [
     48.4
   ],
-  "CrossL2/Quantity": [
-    10
+  "CrossL2/QuantityRatio": [
+    1
   ],
   "CrossL2/PowerThreshold": [
     88
@@ -467,8 +515,8 @@
   "RsiValue/Usage": [
     0
   ],
-  "DailyClose/KeepQuantity": [
-    3
+  "DailyClose/Keep": [
+    0
   ],
   "DailyClose/Enabled": [
     true
@@ -535,5 +583,39 @@
   ],
   "UseVirtualOrders": [
     false
+  ],
+  "Orders/ProfitLimit": [
+    [
+      100.0,
+      150.0,
+      200.0
+    ]
+  ],
+  "Orders/ProfitRatio": [
+    [
+      0.4,
+      0.2,
+      0.0
+    ]
+  ],
+  "Orders/LossLimit": [
+    [
+      150.0,
+      200.0,
+      2500.0
+    ]
+  ],
+  "Orders/LossRatio": [
+    [
+      1.0,
+      0.6,
+      0.2
+    ]
+  ],
+  "RsiOrderLowL1/ActionRatio": [
+    1
+  ],
+  "RsiOrderLowL3/ActionRatio": [
+    4
   ]
 }

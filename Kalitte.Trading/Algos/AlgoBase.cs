@@ -1,5 +1,6 @@
 ﻿// algo
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Concurrent;
@@ -706,6 +707,23 @@ namespace Kalitte.Trading.Algos
                         else if (item.PropertyType == typeof(BarPeriod))
                         {
                             propValue = (BarPeriod)Convert.ToInt32(val);
+                        } else if (item.PropertyType.IsArray)
+                        {
+                            var jarr = val as Newtonsoft.Json.Linq.JArray;
+                            if (jarr != null)
+                            {
+                                var list = new List<object>();
+                                foreach (var jitem in jarr)
+                                {
+                                    var jval = (jitem as JValue).Value;
+
+                                    if (jval.GetType() == typeof(double)) jval = Convert.ToDecimal(jval);
+                                    list.Add(jval);
+                                }
+                                propValue = Activator.CreateInstance(item.PropertyType, list.Count);
+                                for(int i = 0; i < list.Count; i++) ((Array)propValue).SetValue(list[i], i);
+                            }
+                            else propValue = val;
                         }
                     }
                     try

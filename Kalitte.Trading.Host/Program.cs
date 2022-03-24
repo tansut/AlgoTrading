@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 14);
-        settings.Finish = new DateTime(2022, 3, 23);
+        settings.Start = new DateTime(2022, 3, 24);
+        settings.Finish = new DateTime(2022, 3, 24);
         settings.AutoClosePositions = true;
         
 
@@ -38,7 +38,7 @@ public class Program
         // global order
         alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/ProfitLimit", new decimal[] { 100, 150, 200 });
-        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.6M, 0.2M, 0 });
+        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.4M, 0.2M, 0 });
         alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 2500 });
         alternates.Set("Orders/LossRatio", new decimal[] { 1, 0.6M, 0.2M });
         alternates.Set("Orders/NightRatio", 0.5);        
@@ -158,15 +158,18 @@ public class Program
         alternates.Set("Symbol", "F_XU0300422");
         alternates.Set("SymbolPeriod", BarPeriod.Min10);
 
-        
+        // save to read to use files.
         alternates.Set("LogConsole", false);
         alternates.Set("UILoggingLevel", LogLevel.Debug);
         alternates.SaveToFile($"c:\\kalitte\\Bist30-test.json");    
+
+        // lastrun
         alternates.Set("LoggingLevel", LogLevel.Order);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
-        alternates.Set("LoggingLevel", LogLevel.Debug);
-        alternates.Set("LogConsole", true);
-        alternates.Set("UILoggingLevel", LogLevel.Warning);
+        settings = OptimizerSettings.LoadFromFile("c:\\kalitte\\lastrun.json");
+        settings.Alternates.Set("LoggingLevel", LogLevel.Debug);
+        settings.Alternates.Set("LogConsole", true);
+        settings.Alternates.Set("UILoggingLevel", LogLevel.Warning);
         return settings;
     }
 

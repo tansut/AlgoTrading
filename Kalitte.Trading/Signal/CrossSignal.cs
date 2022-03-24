@@ -35,8 +35,8 @@ namespace Kalitte.Trading
     {
         public decimal i1Val { get; set; }
         public decimal i2Val { get; set; }
-        public decimal Dif { get; set; }
-        public decimal Speed { get; set; }
+        public decimal Dif { get; set; }                
+        public decimal Rsi { get; set; }
         public Sensitivity Sensitivity { get; set; }
         public decimal AveragePrice { get; set; }
         public decimal MarketPrice { get; set; }
@@ -318,16 +318,16 @@ namespace Kalitte.Trading
                     if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
                     else if (lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
 
-                    var rsi = AnalyseList.Rsi;
+                    var rsi = result.Rsi = AnalyseList.Rsi;
 
                     if (rsi != 0 && !result.finalResult.HasValue && PreChange != 0 && LastCross != 0)
                     {
                         var list = AnalyseList.List;                        
-                        if (Math.Abs(lastAvg) < PreChange && lastAvg > 0 && rsi < 50)
+                        if (Math.Abs(lastAvg) < PreChange && lastAvg > 0 && rsi < 30)
                         {
                             result.preResult = BuySell.Sell;
                         }
-                        else if (lastAvg > -PreChange && lastAvg < 0 && rsi > 50)
+                        else if (lastAvg > -PreChange && lastAvg < 0 && rsi > 70)
                         {
                             result.preResult = BuySell.Buy;
                         }
@@ -341,9 +341,8 @@ namespace Kalitte.Trading
                         Chart("Indicator").Serie("rsi").SetColor(Color.Black).Add(time, rsi);
 
                         Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol( result.preResult.HasValue ? ZedGraph.SymbolType.Plus: ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1): 0);
+                        Chart("Value").Serie("final").SetColor(Color.DarkGreen).SetSymbol(result.finalResult.HasValue ? ZedGraph.SymbolType.HDash : ZedGraph.SymbolType.None).Add(time, result.finalResult.HasValue ? (result.finalResult == BuySell.Buy ? 1 : -1) : 0);
 
-                        if (result.finalResult.HasValue)
-                            Chart("Value").Serie("result").SetColor(Color.DarkBlue).SetSymbol(ZedGraph.SymbolType.Diamond).Add(time, AvgChange);
 
                     }
 

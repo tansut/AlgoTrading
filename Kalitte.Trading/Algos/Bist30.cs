@@ -410,7 +410,7 @@ namespace Kalitte.Trading.Algos
                 if (newTarget < OrderConfig.Total)
                 {
                     OrderConfig.Total = newTarget;
-                    Log($"Set order count to {OrderConfig.Total}, night", LogLevel.Test);
+                    Log($"Set order count to {OrderConfig.Total}, night", LogLevel.Debug);
                 }
             }
         }
@@ -568,23 +568,19 @@ namespace Kalitte.Trading.Algos
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
             var lastPositionOrder = portfolio.LastPositionOrder;
 
-            if (signalResult.preResult.HasValue)
+            if (!signalResult.MorningSignal && signalResult.preResult.HasValue && lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal &&
+                lastPositionOrder.SignalResult is CrossSignalResult && !((CrossSignalResult)lastPositionOrder.SignalResult).preResult.HasValue &&  portfolio.Quantity >= OrderConfig.Total && portfolio.Side != signalResult.preResult)
             {
-                Log($"{signalResult.SignalTime} {signalResult.preResult}", LogLevel.Test);
-                if (portfolio.Quantity >= OrderConfig.Total && portfolio.Side != signalResult.preResult)
-                {
-                    //Log($"{signalResult.SignalTime} {signalResult.preResult}", LogLevel.Test);
-                    MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity / 2), portfolio.Side, "pre cross", signalResult);
-                    return;
-                }
-                
+                Log($"{signalResult.SignalTime} {signalResult.preResult} {signalResult.Rsi}", LogLevel.Debug);
+                MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity * 0.80M), portfolio.Side, $"[{signalResult.Signal.Name}/pre", signalResult);
+                return;               
             }
             if (!signalResult.finalResult.HasValue)
                 return;
 
             var keepPosition = lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal;
 
-            Log($"HandleCross: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
+            Log($"HandleCross: {signalResult.Rsi} {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);                        
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
@@ -722,7 +718,7 @@ namespace Kalitte.Trading.Algos
 
             if (OrderConfig.Total != target)
             {
-                Log($"Daily order limit adjusted to {target} for {Now.Date}, Todays orders: {stats.Total}, NetPL: {stats.NetPl}", LogLevel.Test);
+                Log($"Daily order limit adjusted to {target} for {Now.Date}, Todays orders: {stats.Total}, NetPL: {stats.NetPl}", LogLevel.Debug);
                 this.OrderConfig.Total = target;
             }
 

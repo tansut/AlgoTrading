@@ -2240,8 +2240,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_i2Val[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_Dif[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_Dif[1]( [mscorlib]System.Decimal ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_Speed[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_Speed[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_Rsi[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_Rsi[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_Sensitivity[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_Sensitivity[1]( [Kalitte.Trading]Kalitte.Trading.Sensitivity ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_AveragePrice[0]( ) skipped:  skip by property
@@ -2256,7 +2256,7 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<i1Val>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<i2Val>k__BackingField -> a
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<Dif>k__BackingField -> B
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<Speed>k__BackingField -> b
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<Rsi>k__BackingField -> b
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignalResult::<Sensitivity>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<AveragePrice>k__BackingField -> C
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<MarketPrice>k__BackingField -> c
@@ -2266,7 +2266,7 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::i1Val skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::i2Val skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::Dif skipped:  KeepPublicApi option in configuration
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::Speed skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::Rsi skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignalResult::Sensitivity skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::AveragePrice skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::MarketPrice skipped:  KeepPublicApi option in configuration

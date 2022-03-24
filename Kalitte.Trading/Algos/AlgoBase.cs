@@ -851,10 +851,6 @@ namespace Kalitte.Trading.Algos
             if (this.Watch != null) this.Watch.Stop();
 
             Log($"Completed {this}", LogLevel.FinalResult);
-            if (TestStart.HasValue)
-            {
-                Log($"For dates {TestStart} - {TestFinish}", LogLevel.FinalResult);
-            }
             Log(PropSummary().ToString(), LogLevel.FinalResult);
             Signals.ForEach(p => Log($"{p}", LogLevel.FinalResult));
             Log($"----------------------", LogLevel.FinalResult);
@@ -866,6 +862,15 @@ namespace Kalitte.Trading.Algos
             Log($"Total orders filled:: {this.orderCounter}", LogLevel.FinalResult);
             Log($"{printPortfolio()}", LogLevel.FinalResult);
             Log($"----------------------", LogLevel.FinalResult);
+            if (TestStart.HasValue)
+            {
+                Log($"For dates {TestStart} - {TestFinish}", LogLevel.FinalResult);
+                var portfolio = UserPortfolioList.GetPortfolio(Symbol);
+                foreach (var day in portfolio.DailyStats)
+                {
+                    Log($"{day.Key.ToString("dd/MM/yyyy")}\t{day.Value.Total}\t{day.Value.NetPl.ToCurrency()}", LogLevel.FinalResult);
+                }
+            }
 
             var netPL = simulationPriceDif + UserPortfolioList.PL - UserPortfolioList.Comission;
 

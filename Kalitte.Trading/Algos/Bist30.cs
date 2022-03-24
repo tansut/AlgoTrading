@@ -401,16 +401,19 @@ namespace Kalitte.Trading.Algos
             base.Init();
         }
 
-        public override void CheckBacktestBeforeRun(DateTime t)
+
+        public void CheckNightSettings()
         {
-            base.CheckBacktestBeforeRun(t);
-            if (Now.Hour == 19 && Now.Minute <= 1 && OrderConfig.NightRatio != 0)
+            if (Now.Hour >= 19 && OrderConfig.NightRatio != 0)
             {
                 var newTarget = RoundQuantity(InitialQuantity * OrderConfig.NightRatio);
-                OrderConfig.Total = Math.Min(OrderConfig.Total, newTarget);
+                if (newTarget < OrderConfig.Total)
+                {
+                    OrderConfig.Total = newTarget;
+                    Log($"Set order count to {OrderConfig.Total}, night", LogLevel.Debug);
+                }
             }
         }
-
 
         private void HandleProfitLossSignal(PLSignal signal, ProfitLossResult result)
         {
@@ -439,7 +442,19 @@ namespace Kalitte.Trading.Algos
             }
         }
 
+        public bool CheckBeforeDecide()
+        {
+            CheckNightSettings();
+            if (OrderConfig.Total == 0)
+            {
+                if (!UserPortfolioList.GetPortfolio(Symbol).IsEmpty) ClosePositions(Symbol, null);
+                return false;
+            }
+            if (WaitingOrderExpired()) CancelCurrentOrder("Cannot get a result from broker");
+            if (!WaitForOrder("Decide")) return false;
 
+            return true;
+        }
 
 
 
@@ -449,13 +464,8 @@ namespace Kalitte.Trading.Algos
             {
                 Log($"Process [{data.Result.Signal.Name}] using {data.Result} from ", LogLevel.Debug);
             }
-            if (WaitingOrderExpired()) CancelCurrentOrder("Cannot get a result from broker");
-            if (!WaitForOrder("Decide")) return;
-            if (OrderConfig.Total == 0)
-            {
-                if (!UserPortfolioList.GetPortfolio(Symbol).IsEmpty) ClosePositions(Symbol, null);
-                return;
-            }
+
+            if (!CheckBeforeDecide()) return;
 
             var result = data.Result;
 

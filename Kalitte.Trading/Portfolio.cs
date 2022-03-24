@@ -58,7 +58,7 @@ namespace Kalitte.Trading
     public class PortfolioItem
     {
 
-        public SortedDictionary<DateTime, Statistics> DailyStats { get; set; } = new SortedDictionary<DateTime, Statistics>();
+        public SortedDictionary<DateTime, Statistics> DailyStats { get; private set; } = new SortedDictionary<DateTime, Statistics>();
 
         public decimal Commission { get; set; } = 0M;
 

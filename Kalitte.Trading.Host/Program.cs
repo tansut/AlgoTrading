@@ -20,7 +20,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
+        settings.Start = new DateTime(2022, 3, 14);
         settings.Finish = new DateTime(2022, 3, 23);
         settings.AutoClosePositions = true;
         
@@ -36,10 +36,10 @@ public class Program
         alternates.Set("Portfolio/Side", BuySell.Sell);
 
         // global order
-        alternates.Set("Orders/Total", 20);
+        alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/ProfitLimit", new decimal[] { 100, 150, 200 });
-        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.5M, 0.2M, 0 });
-        alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 300 });
+        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.6M, 0.2M, 0 });
+        alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 2500 });
         alternates.Set("Orders/LossRatio", new decimal[] { 1, 0.6M, 0.2M });
         alternates.Set("Orders/NightRatio", 0.5);        
         alternates.Set("Orders/KeepRatio", 0.3);
@@ -66,12 +66,12 @@ public class Program
         alternates.Set("GlobalLoss/InitialQuantity", 50);
         alternates.Set("GlobalLoss/QuantityStep", 25);
         alternates.Set("GlobalLoss/KeepQuantity", 0);
-        alternates.Set("GlobalLoss/StartAt", 1.0);
+        alternates.Set("GlobalLoss/StartAt", 1.01);
         alternates.Set("GlobalLoss/Step", 0.25);
 
 
         // rsi loss
-        alternates.Set("RsiLoss/Enabled", false);
+        alternates.Set("RsiLoss/Enabled", true);
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);

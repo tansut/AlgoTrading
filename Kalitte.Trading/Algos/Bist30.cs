@@ -732,18 +732,30 @@ namespace Kalitte.Trading.Algos
         public override void DayStart()
         {
             this.OrderConfig.Total = InitialQuantity;
+            Signals.ForEach(p=>p.Reset());
+            var portfolio = UserPortfolioList.GetPortfolio(Symbol);
+            var state = LoadStateSettings();
+            //UserPortfolioList.Clear();
+            portfolio.CompletedOrders.Clear();
+            InitializePositions(new List<PortfolioItem> { portfolio }, true);
+            ////if (portfolio.Quantity != state.LastQuantity)
+            ////{
+            ////    state.LastQuantity = portfolio.Quantity;
+            ////    SaveStateSettings(state);
+            ////}
+            ////new List<PortfolioItem> { item }
+
         }
 
-        public override void InitializePositions(List<PortfolioItem> portfolioItems)
+        public override void InitializePositions(List<PortfolioItem> portfolioItems, bool keepPortfolio = false)
         {
-            base.InitializePositions(portfolioItems);
+            base.InitializePositions(portfolioItems, keepPortfolio);
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
             if (lastOrder != null && lastOrder.SignalResult.Signal is CrossSignal)
             {
                 ((CrossSignal)lastOrder.SignalResult.Signal).FirstCrossRequired = false;
                 Log($"First cross disabled since last order was cross", LogLevel.Debug);
-
             }
         }
 

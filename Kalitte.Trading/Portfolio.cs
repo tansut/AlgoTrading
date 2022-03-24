@@ -359,6 +359,15 @@ namespace Kalitte.Trading
                 return null;
             }
         }
+
+        internal void Reset()
+        {
+            CompletedOrders.Clear();
+            Quantity = 0;
+            AvgCost = 0;
+            Commission = 0;
+            PL = 0;
+        }
     }
     public class PortfolioList : Dictionary<string, PortfolioItem>
     {
@@ -402,10 +411,10 @@ namespace Kalitte.Trading
 
 
 
-        public PortfolioItem Add(ExchangeOrder position)
+        public PortfolioItem OrderCompleted(ExchangeOrder position, bool keepPortfolio = false)
         {
             var portfolio = this.GetPortfolio(position.Symbol);
-            portfolio.OrderCompleted(position);            
+            if (keepPortfolio) portfolio.CompletedOrders.Add(position); else portfolio.OrderCompleted(position);            
             return portfolio;
         }
 

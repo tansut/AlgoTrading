@@ -205,7 +205,7 @@ namespace Kalitte.Trading
                 }
                 Run(periods.Item1.Item1, periods.Item1.Item2);
                 Run(periods.Item2.Item1, periods.Item2.Item2);
-                Algo.Signals.ForEach(p => p.Reset());
+                Algo.DayStart();
             }
             if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, null);
             Algo.Stop();

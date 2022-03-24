@@ -205,7 +205,15 @@ namespace Kalitte.Trading
             BuySell? bs = null;
             var unitPl = marketPrice - costStatus.AverageCost;
             var targetChange = (costStatus.AverageCost * (UsedPriceChange / 100M)).ToCurrency();
+            var keepQuantity = costStatus.AverageQuantity;
 
+            var closePositions = costStatus.Orders.Where(p => p.SignalResult.Signal is ClosePositionsSignal).ToList();
+            var others = costStatus.Orders.Where(p => !(p.SignalResult.Signal is ClosePositionsSignal)).ToList();
+
+            if (others.Count > 0 && closePositions.Count > 0)
+            {
+                keepQuantity = others.Sum(p => (p.FilledQuantity - p.DirectionChangedQuantity)) / others.Count;
+            }
 
             if (this.Usage == OrderUsage.TakeProfit)
             {
@@ -240,7 +248,7 @@ namespace Kalitte.Trading
             result.PL = unitPl;
             result.UsedPriceChange = UsedPriceChange;
             
-            result.KeepQuantity = Algo.RoundQuantity(Math.Max(portfolio.Quantity, costStatus.AverageQuantity) * (Config.KeepQuantity / 100M));
+            result.KeepQuantity = Algo.RoundQuantity(Math.Max(portfolio.Quantity, keepQuantity) * (Config.KeepQuantity / 100M));
 
             if (Config.PriceMonitor && result.finalResult.HasValue && this.Usage == OrderUsage.TakeProfit)
             {

@@ -200,14 +200,14 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-        public virtual void InitializePositions(List<PortfolioItem> portfolioItems)
+        public virtual void InitializePositions(List<PortfolioItem> portfolioItems, bool keepPortfolio = false)
         {
             var state = LoadStateSettings();
             var portfolio = portfolioItems.FirstOrDefault(p => p.Symbol == Symbol);
             if (!string.IsNullOrEmpty(state.LastSignal) && portfolio != null)
             {
                 if (state.LastQuantity != portfolio.Quantity) throw new Exception($"Portfolio quantity seems {portfolio.Quantity}, last time it was {state.LastQuantity}. Update state file or reload Algo.");
-                var signal = this.Signals.FirstOrDefault(p=>p.Name == state.LastSignal);
+                var signal = this.Signals.FirstOrDefault(p => p.Name == state.LastSignal);
                 if (signal == null) throw new Exception("Unknown signal in state file");
                 var order = new ExchangeOrder(this.Symbol, "-1", portfolio.Side, portfolio.Quantity, state.LastCost, "Loaded from file", Now);
                 order.ExtenallyLoaded = true;
@@ -215,10 +215,10 @@ namespace Kalitte.Trading.Algos
                 order.FilledUnitPrice = order.UnitPrice;
                 order.Usage = OrderUsage.CreatePosition;
                 order.SignalResult = new SignalResult(signal, Now);
-                order.SignalResult.finalResult = order.Side;                
-                UserPortfolioList.Add(order);
+                order.SignalResult.finalResult = order.Side;
+                UserPortfolioList.OrderCompleted(order, keepPortfolio);
             }
-            else portfolioItems.ForEach(p => this.UserPortfolioList.Add(p.Symbol, p));
+            else portfolioItems.ForEach(p => this.UserPortfolioList[p.Symbol] = p);
         }
 
         public PerformanceMonitor Watch;
@@ -276,8 +276,8 @@ namespace Kalitte.Trading.Algos
 
         public virtual void CheckBacktestBeforeRun(DateTime t)
         {
-            var stats = this.UserPortfolioList.GetPortfolio(this.Symbol).GetDailyStats(t);
-            if (stats.Total <= 0) DayStart();
+            //var stats = this.UserPortfolioList.GetPortfolio(this.Symbol).GetDailyStats(t);
+            //if (stats.Total <= 0) DayStart();
         }
 
         //public bool OrderInProgress
@@ -326,7 +326,7 @@ namespace Kalitte.Trading.Algos
                 {
                     this.positionRequest.FilledUnitPrice = filledUnitPrice;
                     this.positionRequest.FilledQuantity = filledQuantity;
-                    var portfolio = this.UserPortfolioList.Add(this.positionRequest);
+                    var portfolio = this.UserPortfolioList.OrderCompleted(this.positionRequest);
                     var port = UserPortfolioList.GetPortfolio(positionRequest.Symbol);
                     var stat = port.GetDailyStats(positionRequest.Sent);
                     Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost.ToCurrency()} NetPL:{stat.NetPl.ToCurrency()}/{port.NetPL.ToCurrency()}]: {this.positionRequest.ToString()}", LogLevel.Order);
@@ -339,6 +339,16 @@ namespace Kalitte.Trading.Algos
                         newState.LastCost = avgCost.AverageCost;
                         newState.LastQuantity = portfolio.Quantity;
                         SaveStateSettings(newState);
+                    } else if (!MultipleTestOptimization)
+                    {
+                        var state = LoadStateSettings();
+                        if (!string.IsNullOrEmpty(state.LastSignal))
+                        {
+                            var avgCost = portfolio.LastAverageCost(this.positionRequest.SignalResult.Signal);
+                            state.LastQuantity = portfolio.Quantity;
+                            state.LastCost = avgCost.AverageCost;
+                            SaveStateSettings(state);
+                        }
                     }
                     this.positionRequest = null;
                     orderCounter++;                    

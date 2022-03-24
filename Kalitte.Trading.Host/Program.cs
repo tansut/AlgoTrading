@@ -42,8 +42,8 @@ public class Program
         alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 2500 });
         alternates.Set("Orders/LossRatio", new decimal[] { 1, 0.6M, 0.2M });
         alternates.Set("Orders/NightRatio", 0.4);        
-        alternates.Set("Orders/KeepRatio", 0.3);
-        alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide, ClosePositionSide.UseCross);
+        alternates.Set("Orders/KeepRatio", 0.4);
+        alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);
 
         // analyser defaults
         alternates.Set("DataCollectSize", 8);

@@ -435,7 +435,7 @@ namespace Kalitte.Trading
             Monitor.Enter(OperationLock);
             try
             {
-                if (Enabled && TimerEnabled)
+                if (_timer != null)
                 {
                     _timer.Stop();
                     _timer.Dispose();

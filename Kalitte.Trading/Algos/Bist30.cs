@@ -550,7 +550,6 @@ namespace Kalitte.Trading.Algos
 
         public void HandleDailyCloseSignal(ClosePositionsSignal signal, ClosePositionsSignalResult result)
         {
-            if (!Simulation) StopSignals();
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
             var expectedSide = portfolio.Side;
             if (OrderConfig.KeepSide == ClosePositionSide.UseCross)
@@ -725,10 +724,6 @@ namespace Kalitte.Trading.Algos
             base.CompletedOrder(order);
         }
 
-        public override void StopSignals()
-        {
-            base.StopSignals();
-        }
 
 
         public override void DayStart()

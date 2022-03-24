@@ -333,7 +333,7 @@ namespace Kalitte.Trading.Algos
                     var stat = port.GetDailyStats(positionRequest.Sent);
                     Log($"Filled[{port.SideStr}/{port.Quantity}/{port.AvgCost.ToCurrency()} NetPL:{stat.NetPl.ToCurrency()}/{port.NetPL.ToCurrency()}]: {this.positionRequest.ToString()}", LogLevel.Order);
                     CountOrder(this.positionRequest.SignalResult.Signal.Name, filledQuantity);
-                    if (this.positionRequest.Usage == OrderUsage.CreatePosition && !this.MultipleTestOptimization)
+                    if (this.positionRequest.Usage == OrderUsage.CreatePosition)
                     {
                         var newState = new StateSettings();
                         newState.LastSignal = this.positionRequest.SignalResult.Signal.Name;
@@ -341,7 +341,7 @@ namespace Kalitte.Trading.Algos
                         newState.LastCost = avgCost.AverageCost;
                         newState.LastQuantity = portfolio.Quantity;
                         SaveStateSettings(newState);
-                    } else if (!MultipleTestOptimization)
+                    } else 
                     {
                         var state = LoadStateSettings();
                         if (!string.IsNullOrEmpty(state.LastSignal))
@@ -457,7 +457,7 @@ namespace Kalitte.Trading.Algos
         public bool IsMorningStart(DateTime? t = null)
         {
             var time = t ?? Now;
-            return time.Hour == 9 && time.Minute <= 30;
+            return time.Hour == 9 && time.Minute <= 31;
         }
 
         public void SetBarCurrentValues()

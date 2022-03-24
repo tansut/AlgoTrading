@@ -115,15 +115,17 @@ namespace Kalitte.Trading.Algos
 
         public StateSettings LoadStateSettings()
         {
-            if (File.Exists(Path.Combine(LogDir, Symbol, $"state.json"))) {
-                return JsonConvert.DeserializeObject<StateSettings>(File.ReadAllText(Path.Combine(LogDir, Symbol, $"state.json")));
+            var file = Path.Combine(LogDir, Symbol, $"state{(MultipleTestOptimization ? Thread.CurrentThread.ManagedThreadId.ToString() : "")}.json");
+            if (File.Exists(file)) {
+                return JsonConvert.DeserializeObject<StateSettings>(File.ReadAllText(file));
             } else return new StateSettings();
         }
 
         public void SaveStateSettings(StateSettings settings)
         {
             var content =JsonConvert.SerializeObject(settings);
-            File.WriteAllText(Path.Combine(LogDir, Symbol, $"state.json"), content);
+            var file = Path.Combine(LogDir, Symbol, $"state{(MultipleTestOptimization ? Thread.CurrentThread.ManagedThreadId.ToString() : "")}.json");
+            File.WriteAllText(file, content);
         }
 
         public string LogDir { get

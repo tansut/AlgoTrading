@@ -569,18 +569,18 @@ namespace Kalitte.Trading.Algos
             var lastPositionOrder = portfolio.LastPositionOrder;
 
             if (!signalResult.MorningSignal && signalResult.preResult.HasValue && lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal &&
-                lastPositionOrder.SignalResult is CrossSignalResult && !((CrossSignalResult)lastPositionOrder.SignalResult).preResult.HasValue &&  portfolio.Quantity >= ((CrossOrderConfig)signal.Config).Quantity && portfolio.Side != signalResult.preResult)
+                lastPositionOrder.SignalResult is CrossSignalResult && !((CrossSignalResult)lastPositionOrder.SignalResult).preResult.HasValue && portfolio.Quantity >= ((CrossOrderConfig)signal.Config).Quantity && portfolio.Side != signalResult.preResult)
             {
                 Log($"{signalResult.SignalTime} {signalResult.preResult} {signalResult.Rsi}", LogLevel.Debug);
                 MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity * 0.80M), portfolio.Side, $"[{signalResult.Signal.Name}/pre", signalResult);
-                return;               
+                return;
             }
             if (!signalResult.finalResult.HasValue)
                 return;
 
             var keepPosition = lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal;
 
-            Log($"HandleCross: {signalResult.Rsi} {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);                        
+            Log($"HandleCross: {signalResult.Rsi} {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
@@ -734,26 +734,18 @@ namespace Kalitte.Trading.Algos
         public override void DayStart()
         {
             this.OrderConfig.Total = InitialQuantity;
-            Signals.ForEach(p=>p.Reset());
+            Signals.ForEach(p => p.Reset());
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
-            var state = LoadStateSettings();
-            //UserPortfolioList.Clear();
             portfolio.CompletedOrders.Clear();
             InitializePositions(new List<PortfolioItem> { portfolio }, true);
-            ////if (portfolio.Quantity != state.LastQuantity)
-            ////{
-            ////    state.LastQuantity = portfolio.Quantity;
-            ////    SaveStateSettings(state);
-            ////}
-            ////new List<PortfolioItem> { item }
 
         }
 
         public override void InitializePositions(List<PortfolioItem> portfolioItems, bool keepPortfolio = false)
         {
             base.InitializePositions(portfolioItems, keepPortfolio);
-            var portfolio = UserPortfolioList.GetPortfolio(Symbol);
-            var lastOrder = portfolio.CompletedOrders.LastOrDefault();
+            //var portfolio = UserPortfolioList.GetPortfolio(Symbol);
+            //var lastOrder = portfolio.CompletedOrders.LastOrDefault();
             //if (lastOrder != null && lastOrder.SignalResult.Signal is CrossSignal)
             //{
             //    ((CrossSignal)lastOrder.SignalResult.Signal).FirstCrossRequired = false;

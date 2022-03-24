@@ -225,7 +225,7 @@ namespace Kalitte.Trading
                 {
                     bs = BuySell.Buy;
                 }
-                //else bs = CheckReturnPrice(portfolio, marketPrice);
+                else bs = CheckReturnPrice(portfolio, costStatus, marketPrice, quantity);
             }
             else if (this.Usage == OrderUsage.StopLoss)
             {               
@@ -272,7 +272,7 @@ namespace Kalitte.Trading
             return result;
         }
 
-        private BuySell? CheckReturnPrice(PortfolioItem portfolio, decimal marketPrice)
+        private BuySell? CheckReturnPrice(PortfolioItem portfolio, AverageCostResult costStatus, decimal marketPrice, decimal quantity)
         {
             BuySell? result = null;
             

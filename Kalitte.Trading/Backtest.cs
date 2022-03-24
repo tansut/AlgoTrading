@@ -59,9 +59,7 @@ namespace Kalitte.Trading
             this.RelatedTest = related;
             AutoClosePositions = false;            
         }
-
-
-
+        
 
         private Dictionary<int, BarPeriod> secDict;
         private List<BarPeriod> secondsToStop;

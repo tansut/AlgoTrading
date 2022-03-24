@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
 using Kalitte.Trading.Algos;
+using System.Drawing;
+using Skender.Stock.Indicators;
 
 namespace Kalitte.Trading
 {
@@ -40,6 +42,7 @@ namespace Kalitte.Trading
         public decimal MarketPrice { get; set; }
         public bool MorningSignal { get; set; } = false;
 
+
         public CrossSignalResult(SignalBase signal, DateTime t) : base(signal, t)
         {
         }
@@ -58,7 +61,7 @@ namespace Kalitte.Trading
 
         [AlgoParam(0)]
         public decimal PowerNegativeMultiplier { get; set; }
-        
+
         [AlgoParam(0)]
         public decimal PowerPositiveMultiplier { get; set; }
 
@@ -67,12 +70,15 @@ namespace Kalitte.Trading
 
         [AlgoParam(0.3)]
         public decimal AvgChange { get; set; }
-        
+
+        [AlgoParam(0.3)]
+        public decimal PreChange { get; set; }
+
     }
 
     public class CrossSignal : AnalyserBase<CrossSignalConfig>
     {
-        
+
         public PowerSignal PowerSignal { get; set; }
         public decimal InitialCross { get; set; }
 
@@ -81,7 +87,8 @@ namespace Kalitte.Trading
         public ITechnicalIndicator i2k;
 
         public decimal AvgChange = 0.3M;
-        
+        public decimal PreChange = 0.1M;
+
 
         private FinanceList<decimal> crossBars;
 
@@ -104,6 +111,7 @@ namespace Kalitte.Trading
             crossBars.Clear();
             LastCross = 0;
             AvgChange = Config.AvgChange;
+            PreChange = Config.PreChange;
             base.ResetInternal();
         }
 
@@ -128,7 +136,8 @@ namespace Kalitte.Trading
         public override void Init()
         {
             AvgChange = Config.AvgChange;
-            crossBars = new FinanceList<decimal>(100);
+            PreChange = Config.PreChange;
+            crossBars = new FinanceList<decimal>(60);
             this.Indicators.Add(i1k);
             this.Indicators.Add(i2k);
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
@@ -224,10 +233,10 @@ namespace Kalitte.Trading
 
                 if (Algo.IsMorningStart() && LastCross != 0)
                 {
-                    var difRatio =  (double)(Math.Abs(LastCross) / Config.AvgChange);
+                    var difRatio = (double)(Math.Abs(LastCross) / Config.AvgChange);
                     if (difRatio > 2.0)
                     {
-                        average = -(decimal)(1 / (1 + Math.Pow(Math.E, -(1*difRatio))));
+                        average = -(decimal)(1 / (1 + Math.Pow(Math.E, -(1 * difRatio))));
                     }
                 }
 
@@ -283,7 +292,7 @@ namespace Kalitte.Trading
             if (mp > 0) CollectList.Collect(mp, time);
 
             if (CollectList.Ready && mp > 0)
-            {                
+            {
                 mpAverage = CollectList.LastValue;
                 result.AveragePrice = mpAverage;
 
@@ -299,15 +308,49 @@ namespace Kalitte.Trading
                 {
                     LastCross = cross;
                     Log($"First cross identified: {cross}", LogLevel.Debug, t);
-                } 
+                }
 
                 if (AnalyseList.Ready && (LastCross != 0 || !FirstCrossRequired))
                 {
-                    lastAvg = AnalyseList.LastValue; 
-                    result.Dif = lastAvg;                    
-                    
+                    lastAvg = AnalyseList.LastValue;
+                    result.Dif = lastAvg;
+
                     if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
                     else if (lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
+
+                    var rsi = AnalyseList.Rsi;
+
+                    if (rsi != 0 && !result.finalResult.HasValue && PreChange != 0 && LastCross != 0)
+                    {
+                        var list = AnalyseList.List;                        
+                        if (Math.Abs(lastAvg) < PreChange && lastAvg > 0 && rsi < 50)
+                        {
+                            result.preResult = BuySell.Sell;
+                        }
+                        else if (lastAvg > -PreChange && lastAvg < 0 && rsi > 50)
+                        {
+                            result.preResult = BuySell.Buy;
+                        }
+                    }
+
+                    if (time.Second % 1 == 0 && Algo.Simulation)
+                    {
+                        Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
+                        Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
+                        Chart("Value").Serie("i2").SetColor(Color.Black).Add(time, l2);
+                        Chart("Indicator").Serie("rsi").SetColor(Color.Black).Add(time, rsi);
+
+                        Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol( result.preResult.HasValue ? ZedGraph.SymbolType.Plus: ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1): 0);
+
+                        if (result.finalResult.HasValue)
+                            Chart("Value").Serie("result").SetColor(Color.DarkBlue).SetSymbol(ZedGraph.SymbolType.Diamond).Add(time, AvgChange);
+
+                    }
+
+                    if (time.Minute == 1 && time.Second == 1 && Algo.Simulation)
+                    {
+                        SaveCharts(time);
+                    }
                 }
             }
 
@@ -318,11 +361,11 @@ namespace Kalitte.Trading
                 Log($"Report: lc:{LastCross}, cs:{CollectList.Count}, as:{AnalyseList.Count}, asz:{AnalyseList.List.QueSize} {result}", LogLevel.Verbose, time);
             }
 
-            if (mp > 0)
-            {
-                TrackCollectList(time, mp);
-                TrackAnalyseList(time);
-            }
+            //if (mp > 0)
+            //{
+            //    TrackCollectList(time, mp);
+            //    TrackAnalyseList(time);
+            //}
 
             return result;
         }

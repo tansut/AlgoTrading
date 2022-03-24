@@ -58,6 +58,7 @@ namespace Kalitte.Trading
         public void Clear()
         {
             List.Clear();
+            if (Speed != null) Speed.Clear();
         }
 
         public virtual bool Ready
@@ -72,6 +73,16 @@ namespace Kalitte.Trading
         public void Resize(int newSize)
         {
             List.Resize(newSize);
+        }
+
+        public decimal Rsi
+        {
+            get
+            {
+                var list = this.List.List;
+                var count = list.Count;
+                return list.Count <= 1 ? 0: (decimal)list.GetRsi(list.Count-1).Last().Rsi.Value;
+            }
         }
 
         public decimal LastValue

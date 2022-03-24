@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 21);
-        settings.Finish = new DateTime(2022, 3, 24);
+        settings.Start = new DateTime(2022, 3, 14);
+        settings.Finish = new DateTime(2022, 3, 23);
         settings.AutoClosePositions = true;
         
 
@@ -66,12 +66,12 @@ public class Program
         alternates.Set("GlobalLoss/InitialQuantity", 50);
         alternates.Set("GlobalLoss/QuantityStep", 25);
         alternates.Set("GlobalLoss/KeepQuantity", 0);
-        alternates.Set("GlobalLoss/StartAt", 1.01);
+        alternates.Set("GlobalLoss/StartAt", 1.0);
         alternates.Set("GlobalLoss/Step", 0.25);
 
 
         // rsi loss
-        alternates.Set("RsiLoss/Enabled", true);
+        alternates.Set("RsiLoss/Enabled", false);
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);
@@ -128,6 +128,7 @@ public class Program
 
         alternates.Set("CrossL1/Enabled", true);
         alternates.Set("CrossL1/AvgChange", 0.32M);
+        alternates.Set("CrossL1/PreChange", 0.05M);
         alternates.Set("CrossL1/Dynamic", true);
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
@@ -167,7 +168,7 @@ public class Program
         alternates.Set("LoggingLevel", LogLevel.Order);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
         settings = OptimizerSettings.LoadFromFile("c:\\kalitte\\lastrun.json");
-        settings.Alternates.Set("LoggingLevel", LogLevel.Debug);
+        settings.Alternates.Set("LoggingLevel", LogLevel.Order);
         settings.Alternates.Set("LogConsole", true);
         settings.Alternates.Set("UILoggingLevel", LogLevel.Warning);
         return settings;

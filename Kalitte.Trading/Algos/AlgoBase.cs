@@ -631,7 +631,7 @@ namespace Kalitte.Trading.Algos
             if (oldHashCode != data.Result.GetHashCode())
             {
                 Log($"Signal {signal.Name} changed from {existing} -> {data.Result }", LogLevel.Verbose, data.Result.SignalTime);
-                if (data.Result.finalResult.HasValue)
+                if (data.Result.finalResult.HasValue || data.Result.preResult.HasValue)
                 {
                     Monitor.Enter(decideLock);
                     try
@@ -1055,8 +1055,8 @@ namespace Kalitte.Trading.Algos
             if (ilevel >= (int)this.LoggingLevel)
             {
                 var time = t ?? Now;
-                string opTime = time.ToString("yyyy.MM.dd HH:mm:sss");
-                var content = $"[{level}:{opTime}]: {text}";
+                string opTime = level == LogLevel.FinalResult ? "" : $"[{ level}:{time.ToString("yyyy.MM.dd HH:mm:sss")}]: "; 
+                var content = $"{opTime}{text}";
                 if (Simulation) LogContent.AppendLine(content);
                 else
                 {

@@ -82,11 +82,11 @@ namespace Kalitte.Trading
                 }
             }
 
-            if (mp > 0)
-            {
-                TrackAnalyseList(time);
-                TrackCollectList(time, mp);
-            }
+            //if (mp > 0)
+            //{
+            //    TrackAnalyseList(time);
+            //    TrackCollectList(time, mp);
+            //}
 
             return result;
         }

@@ -164,8 +164,6 @@ namespace Kalitte.Trading
             AnalyseList.Resize(AnalyseSize);
             Watch("sensitivity/collectsize", (decimal)CollectSize);
             Watch("sensitivity/analysesize", (decimal)AnalyseSize);
-            //Monitor("sensitivity/ratio", (decimal)ratio);
-            //Log($"{reason}: Adjusted to (%{((decimal)ratio * 100).ToCurrency()}): c:{CollectSize} a:{AnalyseSize}", LogLevel.Debug);
         }
 
         public void AdjustSensitivity(double ratio, string reason)
@@ -197,11 +195,12 @@ namespace Kalitte.Trading
 
         protected override void ResetInternal()
         {
-
-            CollectList.Resize(CollectSize);
-            AnalyseList.Resize(AnalyseSize);
             CollectList.Clear();
             AnalyseList.Clear();
+            CollectSize = Convert.ToInt32(Config.InitialCollectSize * Config.SignalSensitivity);
+            AnalyseSize = Convert.ToInt32(Config.InitialAnalyseSize * Config.SignalSensitivity);
+            CollectList.Resize(CollectSize);
+            AnalyseList.Resize(AnalyseSize);
             base.ResetInternal();
         }
 

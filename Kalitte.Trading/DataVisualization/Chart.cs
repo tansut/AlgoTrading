@@ -17,10 +17,17 @@ namespace Kalitte.Trading.DataVisualization
         public string Title { get; set; }
         public PointPairList Points = new PointPairList();
         public Color Color { get; set; } = Color.Black;
+        public SymbolType SymbolType { get; set; } = SymbolType.None;
 
         public ChartSerie SetColor(Color color)
         {
             this.Color = color;
+            return this;
+        }
+
+        public ChartSerie SetSymbol(SymbolType symbol)
+        {
+            this.SymbolType = symbol;
             return this;
         }
 
@@ -53,7 +60,8 @@ namespace Kalitte.Trading.DataVisualization
             GraphPane myPane = new GraphPane(new RectangleF(0, 0, 3200, 2400), Title ?? Name, "Time", "Value");
             foreach (var item in Series)
             {
-                myPane.AddCurve(item.Value.Title ?? item.Value.Name, item.Value.Points, item.Value.Color, SymbolType.None);
+                var li = myPane.AddCurve(item.Value.Title ?? item.Value.Name, item.Value.Points, item.Value.Color, item.Value.SymbolType);
+                
             }
             myPane.XAxis.Type = AxisType.Date;
             myPane.XAxis.Scale.Format = "hh:mm";

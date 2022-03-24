@@ -568,15 +568,21 @@ namespace Kalitte.Trading.Algos
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
             var lastPositionOrder = portfolio.LastPositionOrder;
 
+            if (signalResult.preResult.HasValue)
+            {
+                Log($"{signalResult.SignalTime} {signalResult.preResult}", LogLevel.Test);
+                if (portfolio.Quantity >= OrderConfig.Total && portfolio.Side != signalResult.preResult)
+                {
+                    //Log($"{signalResult.SignalTime} {signalResult.preResult}", LogLevel.Test);
+                    MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity / 2), portfolio.Side, "pre cross", signalResult);
+                    return;
+                }
+                
+            }
+            if (!signalResult.finalResult.HasValue)
+                return;
+
             var keepPosition = lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal;
-
-            //if (!keepPosition && lastOrder != null &&
-            //    lastOrder == lastPositionOrder &&
-            //    portfolio.IsLastPositionOrderInstanceOf(typeof(CrossSignal)))
-            //{
-            //    keepPosition = true;
-            //}
-
 
             Log($"HandleCross: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;

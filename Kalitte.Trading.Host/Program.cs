@@ -43,7 +43,7 @@ public class Program
         alternates.Set("Orders/LossRatio", new decimal[] { 1, 0.6M, 0.2M });
         alternates.Set("Orders/NightRatio", 0.4);        
         alternates.Set("Orders/KeepRatio", 0.3);
-        alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);
+        alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide, ClosePositionSide.UseCross);
 
         // analyser defaults
         alternates.Set("DataCollectSize", 8);
@@ -151,7 +151,7 @@ public class Program
         alternates.Set("RsiValue/SignalSensitivity", 4.0);
 
         // general
-        alternates.Set("DailyClose/Enabled", true);     
+        alternates.Set("DailyClose/Enabled", true, false);     
 
 
         // System
@@ -168,7 +168,7 @@ public class Program
         alternates.Set("LoggingLevel", LogLevel.Order);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
         settings = OptimizerSettings.LoadFromFile("c:\\kalitte\\lastrun.json");
-        settings.Alternates.Set("LoggingLevel", LogLevel.Order);
+        settings.Alternates.Set("LoggingLevel", LogLevel.Debug);
         settings.Alternates.Set("LogConsole", true);
         settings.Alternates.Set("UILoggingLevel", LogLevel.Warning);
         return settings;

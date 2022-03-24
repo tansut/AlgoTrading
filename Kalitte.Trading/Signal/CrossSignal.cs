@@ -318,7 +318,7 @@ namespace Kalitte.Trading
                     if (lastAvg > AvgChange) result.finalResult = BuySell.Buy;
                     else if (lastAvg < -AvgChange) result.finalResult = BuySell.Sell;
 
-                    var rsi = result.Rsi = AnalyseList.Rsi;
+                    var rsi = result.Rsi = PreChange != 0 ? AnalyseList.Rsi: 0;
 
                     if (rsi != 0 && !result.finalResult.HasValue && PreChange != 0 && LastCross != 0)
                     {
@@ -333,23 +333,23 @@ namespace Kalitte.Trading
                         }
                     }
 
-                    if (time.Second % 1 == 0 && Algo.Simulation)
-                    {
-                        Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
-                        Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
-                        Chart("Value").Serie("i2").SetColor(Color.Black).Add(time, l2);
-                        Chart("Indicator").Serie("rsi").SetColor(Color.Black).Add(time, rsi);
+                    //if (time.Second % 1 == 0 && Algo.Simulation)
+                    //{
+                    //    Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
+                    //    Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
+                    //    Chart("Value").Serie("i2").SetColor(Color.Black).Add(time, l2);
+                    //    Chart("Indicator").Serie("rsi").SetColor(Color.Black).Add(time, rsi);
 
-                        Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol( result.preResult.HasValue ? ZedGraph.SymbolType.Plus: ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1): 0);
-                        Chart("Value").Serie("final").SetColor(Color.DarkGreen).SetSymbol(result.finalResult.HasValue ? ZedGraph.SymbolType.HDash : ZedGraph.SymbolType.None).Add(time, result.finalResult.HasValue ? (result.finalResult == BuySell.Buy ? 1 : -1) : 0);
+                    //    Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol( result.preResult.HasValue ? ZedGraph.SymbolType.Plus: ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1): 0);
+                    //    Chart("Value").Serie("final").SetColor(Color.DarkGreen).SetSymbol(result.finalResult.HasValue ? ZedGraph.SymbolType.HDash : ZedGraph.SymbolType.None).Add(time, result.finalResult.HasValue ? (result.finalResult == BuySell.Buy ? 1 : -1) : 0);
 
 
-                    }
+                    //}
 
-                    if (time.Minute == 1 && time.Second == 1 && Algo.Simulation)
-                    {
-                        SaveCharts(time);
-                    }
+                    //if (time.Minute == 1 && time.Second == 1 && Algo.Simulation)
+                    //{
+                    //    SaveCharts(time);
+                    //}
                 }
             }
 

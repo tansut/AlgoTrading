@@ -569,7 +569,7 @@ namespace Kalitte.Trading.Algos
             var lastPositionOrder = portfolio.LastPositionOrder;
 
             if (!signalResult.MorningSignal && signalResult.preResult.HasValue && lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal &&
-                lastPositionOrder.SignalResult is CrossSignalResult && !((CrossSignalResult)lastPositionOrder.SignalResult).preResult.HasValue &&  portfolio.Quantity >= OrderConfig.Total && portfolio.Side != signalResult.preResult)
+                lastPositionOrder.SignalResult is CrossSignalResult && !((CrossSignalResult)lastPositionOrder.SignalResult).preResult.HasValue &&  portfolio.Quantity >= ((CrossOrderConfig)signal.Config).Quantity && portfolio.Side != signalResult.preResult)
             {
                 Log($"{signalResult.SignalTime} {signalResult.preResult} {signalResult.Rsi}", LogLevel.Debug);
                 MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity * 0.80M), portfolio.Side, $"[{signalResult.Signal.Name}/pre", signalResult);
@@ -754,11 +754,11 @@ namespace Kalitte.Trading.Algos
             base.InitializePositions(portfolioItems, keepPortfolio);
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
-            if (lastOrder != null && lastOrder.SignalResult.Signal is CrossSignal)
-            {
-                ((CrossSignal)lastOrder.SignalResult.Signal).FirstCrossRequired = false;
-                Log($"First cross disabled since last order was cross", LogLevel.Debug);
-            }
+            //if (lastOrder != null && lastOrder.SignalResult.Signal is CrossSignal)
+            //{
+            //    ((CrossSignal)lastOrder.SignalResult.Signal).FirstCrossRequired = false;
+            //    Log($"First cross disabled since last order was cross", LogLevel.Debug);
+            //}
         }
 
 

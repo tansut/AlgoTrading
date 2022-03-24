@@ -56,30 +56,31 @@ namespace Kalitte.Trading
                 decimal mpAverage = CollectList.LastValue;
                 var l1 = i1k.NextValue(mpAverage).Value.Value;
                 AnalyseList.Collect(l1, time);
-
-                if (!AnalyseList.SpeedInitialized)
-                {
-                    AnalyseList.ResetSpeed(AnalyseList.LastValue, time);
-                    AnalyseList.Speed.ResetSpeed(0, time);
-                }                
-
                 result.Value = AnalyseList.LastValue;
-                result.Speed = AnalyseList.CalculateSpeed(time);
-                AnalyseList.UpdateSpeed(time, result.Value.Value);
-                AnalyseList.Speed.UpdateSpeed(time, result.Speed);
-                result.Acceleration = AnalyseList.Speed.CalculateSpeed(time);
-                if (time.Second % 5 == 0 && Algo.Simulation)
-                {
-                    Chart("Derivs").Serie("Speed").SetColor(Color.Black).Add(time, result.Speed);
-                    Chart("Derivs").Serie("Acceleration").SetColor(Color.Green).Add(time, result.Acceleration);
-                    Chart("Value").Serie("Sma").SetColor(Color.Green).Add(time, result.Value.Value);                    
-                    Chart("Value").Serie("Value").SetColor(Color.Black).Add(time, l1);
-                }
 
-                if (time.Minute == 1 && time.Second == 1 && Algo.Simulation)
-                {
-                    SaveCharts(time);                                                        
-                }
+                //if (!AnalyseList.SpeedInitialized)
+                //{
+                //    AnalyseList.ResetSpeed(AnalyseList.LastValue, time);
+                //    AnalyseList.Speed.ResetSpeed(0, time);
+                //}                
+
+
+                //result.Speed = AnalyseList.CalculateSpeed(time);
+                //AnalyseList.UpdateSpeed(time, result.Value.Value);
+                //AnalyseList.Speed.UpdateSpeed(time, result.Speed);
+                //result.Acceleration = AnalyseList.Speed.CalculateSpeed(time);
+                //if (time.Second % 5 == 0 && Algo.Simulation)
+                //{
+                //    Chart("Derivs").Serie("Speed").SetColor(Color.Black).Add(time, result.Speed);
+                //    Chart("Derivs").Serie("Acceleration").SetColor(Color.Green).Add(time, result.Acceleration);
+                //    Chart("Value").Serie("Sma").SetColor(Color.Green).Add(time, result.Value.Value);                    
+                //    Chart("Value").Serie("Value").SetColor(Color.Black).Add(time, l1);
+                //}
+
+                //if (time.Minute == 1 && time.Second == 1 && Algo.Simulation)
+                //{
+                //    SaveCharts(time);                                                        
+                //}
             }
 
             //if (mp > 0)

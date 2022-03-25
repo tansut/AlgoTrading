@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 14);
-        settings.Finish = new DateTime(2022, 3, 23);
+        settings.Start = new DateTime(2022, 3, 24);
+        settings.Finish = new DateTime(2022, 3, 24);
         settings.AutoClosePositions = true;
         
 
@@ -41,8 +41,8 @@ public class Program
         alternates.Set("Orders/ProfitRatio", new decimal [] { 0.4M, 0.2M, 0 });
         alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 2500 });
         alternates.Set("Orders/LossRatio", new decimal[] { 1, 0.6M, 0.2M });
-        alternates.Set("Orders/NightRatio", 0.4);        
-        alternates.Set("Orders/KeepRatio", 0.4);
+        alternates.Set("Orders/NightRatio", 0.2);        
+        alternates.Set("Orders/KeepRatio", 0.2);
         alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);
 
         // analyser defaults
@@ -135,7 +135,7 @@ public class Program
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);
         alternates.Set("CrossL1/RsiMax", 55.6);
-        alternates.Set("CrossL1/RsiMin", 45.4);
+        alternates.Set("CrossL1/RsiMin",  45.4);
 
         alternates.Set("CrossL2/Enabled", false);
         alternates.Set("CrossL2/AvgChange", 0.32M);
@@ -151,7 +151,7 @@ public class Program
         alternates.Set("RsiValue/SignalSensitivity", 4.0);
 
         // general
-        alternates.Set("DailyClose/Enabled", true, false);     
+        alternates.Set("DailyClose/Enabled", true);     
 
 
         // System

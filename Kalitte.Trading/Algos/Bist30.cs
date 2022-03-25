@@ -9,7 +9,7 @@ namespace Kalitte.Trading.Algos
 {
     public interface IAlgoParameter
     {
-        public Bist30 Algo { get; set; }
+        Bist30 Algo { get; set; }
     }
 
     public enum RsiPositionAction

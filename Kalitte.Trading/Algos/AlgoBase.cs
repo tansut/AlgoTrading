@@ -413,13 +413,15 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-        public void StartSignals()
+        public void StartSignals(params SignalBase[] signals)
         {
             SignalsState = StartableState.StartInProgress;
             try
             {
-                foreach (var signal in Signals.Where(p => p.Enabled))
+                var list = signals.Length == 0 ? Signals.ToArray() : signals;
+                foreach (var signal in list)
                 {
+                    if (!signal.Enabled) continue;
                     signal.Start();
                     Log($"Started signal {signal}", LogLevel.Info);
                 }
@@ -429,17 +431,18 @@ namespace Kalitte.Trading.Algos
                 Log($"Error starting signals: {ex.Message}, {ex.Message}", LogLevel.Error);
             }
 
-            SignalsState = StartableState.Started; ;
+            SignalsState = StartableState.Started; 
         }
 
-        public virtual void StopSignals()
+        public virtual void StopSignals(params SignalBase[] signals)
         {
             SignalsState = StartableState.StopInProgress;
             try
             {
-                foreach (var signal in Signals.Where(p => p.Enabled))
+                var list = signals.Length == 0 ? Signals.ToArray() : signals;
+                foreach (var signal in list)
                 {
-
+                    if (!signal.Enabled) continue;
                     signal.Stop();
                     Log($"Stopped signal {signal}", LogLevel.Info);
                 }
@@ -490,7 +493,7 @@ namespace Kalitte.Trading.Algos
             var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
             var t2 = new DateTime(t.Year, t.Month, t.Day, 18, 15, 0);
             var t3 = new DateTime(t.Year, t.Month, t.Day, 19, 0, 0);
-            var t4 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
+            var t4 = new DateTime(t.Year, t.Month, t.Day, 22, 55, 0);
             try
             {
                 if ((t >= t1 && t <= t2) || (t >= t3 && t <= t4))
@@ -508,7 +511,7 @@ namespace Kalitte.Trading.Algos
                     if (SignalsState == StartableState.Started)
                     {
                         Log($"Time seems OK, stopping signals ...");
-                        StopSignals();
+                        StopSignals(Signals.Where(p=> !(p is ClosePositionsSignal)).ToArray());
                     }
                 }
             }

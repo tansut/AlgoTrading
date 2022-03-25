@@ -131,13 +131,13 @@ public class Program
         alternates.Set("CrossL1/Enabled", true);
         alternates.Set("CrossL1/AvgChange", 0.32M);
         alternates.Set("CrossL1/PreChange", 0);
-        alternates.Set("CrossL1/Dynamic", false);
+        alternates.Set("CrossL1/Dynamic", true);
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);        
-        alternates.Set("CrossL1/RsiMax", 0);
-        alternates.Set("CrossL1/RsiMin",  0);
+        alternates.Set("CrossL1/RsiMax", 55.6);
+        alternates.Set("CrossL1/RsiMin",  45.4);
         alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec5);
         alternates.Set("CrossL1/SignalSensitivity", 10);
 

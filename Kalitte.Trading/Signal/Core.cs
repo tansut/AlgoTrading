@@ -131,6 +131,8 @@ namespace Kalitte.Trading
             return Charts.Chart($"{name}", title);
         }
 
+        
+
         public void SaveChart(string name, string id = "", bool clear = true)
         {
             var dir =  Path.Combine(Algo.Appdir, "charts", this.Name);
@@ -331,7 +333,16 @@ namespace Kalitte.Trading
 
         public virtual void Init()
         {
+            var dir = Path.Combine(Algo.Appdir, "charts", this.Name);
 
+            if (Directory.Exists(dir))
+            {
+                System.IO.DirectoryInfo di = new DirectoryInfo(dir);
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
         }
 
         public bool BarDifferenceNegligible(DateTime t, DateTime expected, DateTime existing, BarPeriod period)

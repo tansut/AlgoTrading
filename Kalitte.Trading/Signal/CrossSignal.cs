@@ -335,11 +335,11 @@ namespace Kalitte.Trading
 
                 if (AnalyseList.Count > 0 /*&& (LastCross != 0 || !FirstCrossRequired)*/)
                 {
-                    var averages = AnalyseList.Averages(60, OHLCType.HL2);
+                    var averages = AnalyseList.Averages(120, OHLCType.Close);
                     lastAvg = averages.Last().Close;
                     result.Dif = lastAvg;
 
-                    var rsiList = averages.GetRsi(60);
+                    var rsiList = averages.GetRsi(120);
                     var rsiListLast = rsiList.Last();
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
@@ -397,7 +397,7 @@ namespace Kalitte.Trading
 
                     }
 
-                    if (time.Hour % 3 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                    if (time.Hour % 2 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         SaveCharts(time);
                     }

@@ -225,6 +225,17 @@ Renamed Types:
 	System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,Kalitte.Trading.PortfolioItem>,System.Decimal> [Kalitte.Trading]System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,Kalitte.Trading.PortfolioItem>,System.Decimal> Kalitte.Trading.PortfolioList/<>c::<>9__5_0 -> a
 }
 
+[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c -> [Kalitte.Trading]Kalitte.Trading.CrossSignal/A
+{
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::<CheckInternal>b__38_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.RsiResult ) -> A
+
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::.cctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::.ctor[0]( ) skipped:  special name
+
+	Kalitte.Trading.CrossSignal/<>c [Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c Kalitte.Trading.CrossSignal/<>c::<>9 -> A
+	System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> Kalitte.Trading.CrossSignal/<>c::<>9__38_0 -> A
+}
+
 [Kalitte.Trading]Kalitte.Trading.PLSignal/<>c -> [Kalitte.Trading]Kalitte.Trading.PLSignal/A
 {
 	[Kalitte.Trading]Kalitte.Trading.PLSignal/<>c::<getResult>b__42_0[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> A
@@ -448,7 +459,7 @@ Renamed Types:
 	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.Algos.Bist30/<>c__DisplayClass131_0::fib -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.j
+[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.K
 {
 
 	[Kalitte.Trading]Kalitte.Trading.LossSignal::get_Usage[0]( ) skipped:  skip by property
@@ -1639,6 +1650,16 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Sensitivity::Result skipped:  KeepPublicApi option in configuration
 }
 
+[Kalitte.Trading]Kalitte.Trading.CrossType skipped:  KeepPublicApi option in configuration
+{
+
+	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.CrossType::value__ skipped:  special name
+	Kalitte.Trading.CrossType [Kalitte.Trading]Kalitte.Trading.CrossType Kalitte.Trading.CrossType::BeforeDown skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.CrossType [Kalitte.Trading]Kalitte.Trading.CrossType Kalitte.Trading.CrossType::AfterDown skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.CrossType [Kalitte.Trading]Kalitte.Trading.CrossType Kalitte.Trading.CrossType::BeforeUp skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.CrossType [Kalitte.Trading]Kalitte.Trading.CrossType Kalitte.Trading.CrossType::AfterUp skipped:  KeepPublicApi option in configuration
+}
+
 [Kalitte.Trading]Kalitte.Trading.CrossSignal skipped:  KeepPublicApi option in configuration
 {
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::applySensitivity[1]( [Kalitte.Trading]Kalitte.Trading.Sensitivity ) -> A
@@ -2272,6 +2293,10 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_Dif[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_Rsi[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_Rsi[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_RsiOfRsi[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_RsiOfRsi[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_RsiReady[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_RsiReady[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_Sensitivity[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_Sensitivity[1]( [Kalitte.Trading]Kalitte.Trading.Sensitivity ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_AveragePrice[0]( ) skipped:  skip by property
@@ -2280,27 +2305,36 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_MarketPrice[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_MorningSignal[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_MorningSignal[1]( [mscorlib]System.Boolean ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_CrossType[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_CrossType[1]( [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.CrossType> ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::ToString[0]( ) skipped:  external base class or interface
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::GetHashCode[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::.ctor[2]( [Kalitte.Trading]Kalitte.Trading.SignalBase, [mscorlib]System.DateTime ) skipped:  special name
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<i1Val>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<i2Val>k__BackingField -> a
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<Dif>k__BackingField -> B
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<Rsi>k__BackingField -> b
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<RsiOfRsi>k__BackingField -> C
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignalResult::<RsiReady>k__BackingField -> A
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignalResult::<Sensitivity>k__BackingField -> A
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<AveragePrice>k__BackingField -> C
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<MarketPrice>k__BackingField -> c
-	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignalResult::<MorningSignal>k__BackingField -> A
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<AveragePrice>k__BackingField -> c
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<MarketPrice>k__BackingField -> D
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignalResult::<MorningSignal>k__BackingField -> a
+	System.Nullable`1<Kalitte.Trading.CrossType> [Kalitte.Trading]System.Nullable`1<Kalitte.Trading.CrossType> Kalitte.Trading.CrossSignalResult::<CrossType>k__BackingField -> A
 
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::i1Val skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::i2Val skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::Dif skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::Rsi skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::RsiOfRsi skipped:  KeepPublicApi option in configuration
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignalResult::RsiReady skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignalResult::Sensitivity skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::AveragePrice skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::MarketPrice skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignalResult::MorningSignal skipped:  KeepPublicApi option in configuration
+	System.Nullable`1<Kalitte.Trading.CrossType> [Kalitte.Trading]System.Nullable`1<Kalitte.Trading.CrossType> Kalitte.Trading.CrossSignalResult::CrossType skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.GradientSignalResult skipped:  KeepPublicApi option in configuration

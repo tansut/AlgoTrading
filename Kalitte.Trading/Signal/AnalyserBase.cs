@@ -185,7 +185,7 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            CollectSize = Convert.ToInt32(Config.InitialCollectSize * Config.SignalSensitivity);
+            CollectSize = Convert.ToInt32(Config.InitialCollectSize /** Config.SignalSensitivity*/);
             AnalyseSize = Convert.ToInt32(Config.InitialAnalyseSize * Config.SignalSensitivity);
             CollectList = new AnalyseList(CollectSize, Config.CollectAverage);
             AnalyseList = new AnalyseList(AnalyseSize, Config.AnalyseAverage);
@@ -201,7 +201,7 @@ namespace Kalitte.Trading
         {
             CollectList.Clear();
             AnalyseList.Clear();
-            CollectSize = Convert.ToInt32(Config.InitialCollectSize * Config.SignalSensitivity);
+            CollectSize = Convert.ToInt32(Config.InitialCollectSize /** Config.SignalSensitivity*/);
             AnalyseSize = Convert.ToInt32(Config.InitialAnalyseSize * Config.SignalSensitivity);
             CollectList.Resize(CollectSize);
             AnalyseList.Resize(AnalyseSize);

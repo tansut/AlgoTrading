@@ -235,7 +235,7 @@ namespace Kalitte.Trading
 
             if (CollectList.Ready && mp >= 0)
             {
-                decimal mpAverage = CollectList.LastValue; 
+                decimal mpAverage = CollectList.LastValue(); 
 
                 var l1 = i1k.NextValue(mpAverage).Value.Value;
 
@@ -243,7 +243,7 @@ namespace Kalitte.Trading
 
                 if (AnalyseList.Ready && BarTrendResults.Count > 0)
                 {
-                    var currentVal = AnalyseList.LastValue; 
+                    var currentVal = AnalyseList.LastValue(); 
                     var lastReference = i1k.Results.Last().Value.Value;
 
                     if (this.ReferenceType == TrendReference.LastCheck && lastValue.HasValue)

@@ -15,7 +15,7 @@ namespace Matriks.Lean.Algotrader
 {
     public class Bist30 : Kalitte.Trading.Matrix.MatrixBist30
     {
-
+        
     }
 
 

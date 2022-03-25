@@ -175,7 +175,7 @@ namespace Kalitte.Trading
             else
             {
                 PriceList.Collect(price, Algo.Now);
-                return PriceList.LastValue;
+                return PriceList.LastValue();
             }
         }
 

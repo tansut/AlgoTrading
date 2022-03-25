@@ -37,7 +37,7 @@ namespace Kalitte.Trading
         {
             this.Value = val;
             this.Name = name;
- 
+
         }
     }
 
@@ -55,7 +55,7 @@ namespace Kalitte.Trading
     {
         public override string ToString()
         {
-             var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
+            var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
             var sb = new StringBuilder();
             foreach (var prop in properties)
                 sb.Append($"{prop.Name}: {prop.GetValue(this)} ");
@@ -80,20 +80,6 @@ namespace Kalitte.Trading
 
     }
 
-    public enum OHLC
-    {
-        Open = 0,
-        High = 1,
-        Low = 2,
-        Close = 3,
-        Volume = 4,
-        WClose = 5,
-        Diff = 6,
-        DiffPercent = 7,
-        Undivided = 8,
-        Other = 9
-    }
-
     public enum BuySell
     {
         Buy = 1,
@@ -111,21 +97,46 @@ namespace Kalitte.Trading
 
     public enum BarPeriod
     {
-        Min = 1,
-        Min5 = 2,
-        Min10 = 3,
-        Min15 = 4,
-        Min20 = 5,
-        Min30 = 6,
-        Min60 = 7,
-        Min120 = 8,
-        Min180 = 9,
-        Min240 = 10,
-        Session = 11,
-        Day = 12,
-        Week = 13,
-        Month = 14,
-        Year = 15
+        Sec = 1,
+        Sec5 = 2,
+        Sec10 = 3,
+        Sec15 = 4,
+        Sec20 = 5,
+        Sec30 = 6,
+        Sec45 = 7,
+        Min = 10,
+        Min5 = 20,
+        Min10 = 30,
+        Min15 = 40,
+        Min20 = 50,
+        Min30 = 60,
+        Min60 = 70,
+        Min120 = 80,
+        Min180 = 90,
+        Min240 = 100,
+        Session = 110,
+        Day = 120,
+        Week = 130,
+        Month = 140,
+        Year = 150
+    }
+
+    public enum OHLCType
+    {
+        Open = 0,
+        High = 1,
+        Low = 2,
+        Close = 3,
+        Volume = 4,
+        HL2 = 5,
+        HLC3 = 6,
+        HL2C4 = 7,
+        WClose = 15,
+        Diff = 16,
+        DiffPercent = 17,
+        Undivided = 18,
+        Other = 19,
+  
     }
 
     public enum OrderIcon
@@ -226,7 +237,7 @@ namespace Kalitte.Trading
 
         }
 
-        public AlternateValues(Dictionary<string, object []> initValues = null)
+        public AlternateValues(Dictionary<string, object[]> initValues = null)
         {
             foreach (var item in initValues)
             {
@@ -236,7 +247,7 @@ namespace Kalitte.Trading
 
         public void Set(string key, params object[] val)
         {
-            this[key] = val ;
+            this[key] = val;
         }
 
 

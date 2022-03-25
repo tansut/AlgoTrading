@@ -567,15 +567,15 @@ namespace Kalitte.Trading.Algos
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
             var lastPositionOrder = portfolio.LastPositionOrder;
 
-            if (!signalResult.MorningSignal && signalResult.preResult.HasValue && lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal &&
-                lastPositionOrder.SignalResult is CrossSignalResult && !((CrossSignalResult)lastPositionOrder.SignalResult).preResult.HasValue && portfolio.Quantity >= ((CrossOrderConfig)signal.Config).Quantity && portfolio.Side != signalResult.preResult)
-            {
-                Log($"{signalResult.SignalTime} {signalResult.preResult} {signalResult.Rsi}", LogLevel.Debug);
-                MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity * 0.80M), portfolio.Side, $"[{signalResult.Signal.Name}/pre", signalResult);
-                return;
-            }
-            if (!signalResult.finalResult.HasValue)
-                return;
+            //if (!signalResult.MorningSignal && signalResult.preResult.HasValue && lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal &&
+            //    lastPositionOrder.SignalResult is CrossSignalResult && !((CrossSignalResult)lastPositionOrder.SignalResult).preResult.HasValue && portfolio.Quantity >= ((CrossOrderConfig)signal.Config).Quantity && portfolio.Side != signalResult.preResult)
+            //{
+            //    Log($"{signalResult.SignalTime} {signalResult.preResult} {signalResult.Rsi}", LogLevel.Debug);
+            //    MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity * 0.80M), portfolio.Side, $"[{signalResult.Signal.Name}/pre", signalResult);
+            //    return;
+            //}
+            //if (!signalResult.finalResult.HasValue)
+            //    return;
 
             var keepPosition = lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal;
 

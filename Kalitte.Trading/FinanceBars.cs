@@ -28,37 +28,70 @@ namespace Kalitte.Trading
     }
 
     [Serializable]
-    public class MyQuote : Quote, IValue
+    public class MyQuote : Quote 
     {
-        public decimal? Value { get => Close; set { Close = value.Value; } }
+        //public decimal? Value { get => Close; set { Close = value.Value; } }
 
         public override string ToString()
         {
             return $"d: {Date} o: {Open} h: {High} l: {Low} c:{Close} v:{Volume}";
         }
 
-        public void Set(decimal value, CandlePart candle)
+        public MyQuote(): base()
+        {
+
+        }
+
+        public static MyQuote Create(DateTime time, decimal value, OHLCType candle)
+        {
+            var q = new MyQuote();
+            q.Date = time;
+            q.High = value;
+            q.Low = value;
+            q.Open = value;
+            if (candle == OHLCType.Volume)
+                q.Volume = value;
+            else q.Close = value;
+            return q;
+        }
+
+
+        
+
+        public void Set(decimal value, OHLCType candle)
         {
             switch (candle)
             {
-                case CandlePart.Close: { this.Close = value; break; }
-                case CandlePart.Volume: { this.Volume = value; break; }
-                case CandlePart.Open: { this.Open = value; break; }
-                case CandlePart.High: { this.High = value; break; }
-                case CandlePart.Low: { this.Low = value; break; }
+                case OHLCType.Close: { this.Close = value; break; }
+                case OHLCType.Volume: { this.Volume = value; break; }
+                case OHLCType.Open: { this.Open = value; break; }
+                case OHLCType.High: { this.High = value; break; }
+                case OHLCType.Low: { this.Low = value; break; }
             }
         }
 
-        public decimal Get( CandlePart candle)
+
+        public decimal Get(OHLCType ohlc)
         {
-            switch (candle)
-            {                
-                case CandlePart.Volume: { return this.Volume; }
-                case CandlePart.Open: { return this.Open; }
-                case CandlePart.High: { return this.High; }
-                case CandlePart.Low: { return this.Low; }
+            switch (ohlc)
+            {
+                case OHLCType.Volume: { return this.Volume; }
+                case OHLCType.Open: { return this.Open; }
+                case OHLCType.High: { return this.High; }
+                case OHLCType.Low: { return this.Low; }
+                case OHLCType.Close: { return this.Close; }
+                case OHLCType.HL2: { return (this.High + this.Low) / 2; }
+                case OHLCType.HLC3: { return (this.High + this.Low + this.Close) / 3; }
+                case OHLCType.HL2C4: { return (this.High + this.Low + 2*this.Close) / 4; }
                 default: { return this.Close; }
             }
+        }
+
+        internal void Update(decimal value, OHLCType candle)
+        {
+            if (value > this.High) this.High = value;
+            if (value < this.Low) this.Low = value;
+            Set(value, candle);
         }
     }
 

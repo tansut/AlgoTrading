@@ -10,13 +10,26 @@ Renamed Types:
 	Kalitte.Trading.Indicators.ITechnicalIndicator [Kalitte.Trading]Kalitte.Trading.Indicators.ITechnicalIndicator Kalitte.Trading.IndicatorAnalyser::i1k -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass48_0 -> [Kalitte.Trading]Kalitte.Trading.AnalyseList/A
+[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c -> [Kalitte.Trading]Kalitte.Trading.AnalyseList/A
 {
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass48_0::<CalculateSpeed>b__0[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) -> A
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::<Averages>b__50_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.EmaResult ) -> A
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::<Averages>b__50_1[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.SmaResult ) -> A
 
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass48_0::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::.cctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::.ctor[0]( ) skipped:  special name
 
-	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.AnalyseList/<>c__DisplayClass48_0::fDate -> A
+	Kalitte.Trading.AnalyseList/<>c [Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c Kalitte.Trading.AnalyseList/<>c::<>9 -> A
+	System.Func`2<Skender.Stock.Indicators.EmaResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.EmaResult,Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList/<>c::<>9__50_0 -> A
+	System.Func`2<Skender.Stock.Indicators.SmaResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.SmaResult,Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList/<>c::<>9__50_1 -> A
+}
+
+[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass56_0 -> [Kalitte.Trading]Kalitte.Trading.AnalyseList/a
+{
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass56_0::<CalculateSpeed>b__0[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) -> A
+
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass56_0::.ctor[0]( ) skipped:  special name
+
+	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.AnalyseList/<>c__DisplayClass56_0::fDate -> A
 }
 
 [Kalitte.Trading]Kalitte.Trading.Backtest/<>c__DisplayClass17_0 -> [Kalitte.Trading]Kalitte.Trading.Backtest/A
@@ -435,7 +448,7 @@ Renamed Types:
 	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.Algos.Bist30/<>c__DisplayClass131_0::fib -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.J
+[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.j
 {
 
 	[Kalitte.Trading]Kalitte.Trading.LossSignal::get_Usage[0]( ) skipped:  skip by property
@@ -476,17 +489,23 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::set_Speed[1]( [Kalitte.Trading]Kalitte.Trading.AnalyseList ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_SpeedHistory[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::set_SpeedHistory[1]( [Kalitte.Trading]Kalitte.Trading.FinanceList`1<[Kalitte.Trading]Kalitte.Trading.MyQuote> ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_Period[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::set_Period[1]( [Kalitte.Trading]Kalitte.Trading.BarPeriod ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_Current[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::set_Current[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_Candle[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList::set_Candle[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.CandlePart ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::set_Candle[1]( [Kalitte.Trading]Kalitte.Trading.OHLCType ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_SpeedInitialized[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_Ready[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_Rsi[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_LastValue[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_Count[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList::.ctor[3]( [mscorlib]System.Int32, [Kalitte.Trading]Kalitte.Trading.Average, [Skender.Stock.Indicators]Skender.Stock.Indicators.CandlePart ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::.ctor[3]( [mscorlib]System.Int32, [Kalitte.Trading]Kalitte.Trading.Average, [Kalitte.Trading]Kalitte.Trading.OHLCType ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::SetPeriods[2]( [mscorlib]System.DateTime, [mscorlib]System.Nullable`1<[mscorlib]System.Decimal> ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Collect[2]( [mscorlib]System.Decimal, [mscorlib]System.DateTime ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Clear[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Resize[1]( [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Rsi[1]( [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Averages[2]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType> ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::LastValue[2]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType> ) skipped:  KeepPublicApi option in configuration
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyseList::<SpeedMinutes>k__BackingField -> A
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyseList::<SpeedAnalyse>k__BackingField -> A
@@ -495,7 +514,9 @@ Skipped Types:
 	Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> [Kalitte.Trading]Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList::<List>k__BackingField -> A
 	Kalitte.Trading.AnalyseList [Kalitte.Trading]Kalitte.Trading.AnalyseList Kalitte.Trading.AnalyseList::<Speed>k__BackingField -> A
 	Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> [Kalitte.Trading]Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList::<SpeedHistory>k__BackingField -> a
-	Skender.Stock.Indicators.CandlePart [Kalitte.Trading]Skender.Stock.Indicators.CandlePart Kalitte.Trading.AnalyseList::<Candle>k__BackingField -> A
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.AnalyseList::<Period>k__BackingField -> A
+	Kalitte.Trading.MyQuote [Kalitte.Trading]Kalitte.Trading.MyQuote Kalitte.Trading.AnalyseList::<Current>k__BackingField -> A
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.AnalyseList::<Candle>k__BackingField -> A
 
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyseList::SpeedMinutes skipped:  KeepPublicApi option in configuration
@@ -505,11 +526,11 @@ Skipped Types:
 	Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> [Kalitte.Trading]Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList::List skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.AnalyseList [Kalitte.Trading]Kalitte.Trading.AnalyseList Kalitte.Trading.AnalyseList::Speed skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> [Kalitte.Trading]Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList::SpeedHistory skipped:  KeepPublicApi option in configuration
-	Skender.Stock.Indicators.CandlePart [Kalitte.Trading]Skender.Stock.Indicators.CandlePart Kalitte.Trading.AnalyseList::Candle skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.AnalyseList::Period skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.MyQuote [Kalitte.Trading]Kalitte.Trading.MyQuote Kalitte.Trading.AnalyseList::Current skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.AnalyseList::Candle skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.AnalyseList::SpeedInitialized skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.AnalyseList::Ready skipped:  KeepPublicApi option in configuration
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyseList::Rsi skipped:  KeepPublicApi option in configuration
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyseList::LastValue skipped:  KeepPublicApi option in configuration
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyseList::Count skipped:  KeepPublicApi option in configuration
 }
 
@@ -643,22 +664,6 @@ Skipped Types:
 	Kalitte.Trading.StartableState [Kalitte.Trading]Kalitte.Trading.StartableState Kalitte.Trading.StartableState::Paused skipped:  KeepPublicApi option in configuration
 }
 
-[Kalitte.Trading]Kalitte.Trading.OHLC skipped:  KeepPublicApi option in configuration
-{
-
-	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.OHLC::value__ skipped:  special name
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::Open skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::High skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::Low skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::Close skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::Volume skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::WClose skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::Diff skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::DiffPercent skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::Undivided skipped:  KeepPublicApi option in configuration
-	Kalitte.Trading.OHLC [Kalitte.Trading]Kalitte.Trading.OHLC Kalitte.Trading.OHLC::Other skipped:  KeepPublicApi option in configuration
-}
-
 [Kalitte.Trading]Kalitte.Trading.BuySell skipped:  KeepPublicApi option in configuration
 {
 
@@ -682,6 +687,13 @@ Skipped Types:
 {
 
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.BarPeriod::value__ skipped:  special name
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec5 skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec10 skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec15 skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec20 skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec30 skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec45 skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Min skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Min5 skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Min10 skipped:  KeepPublicApi option in configuration
@@ -697,6 +709,25 @@ Skipped Types:
 	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Week skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Month skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Year skipped:  KeepPublicApi option in configuration
+}
+
+[Kalitte.Trading]Kalitte.Trading.OHLCType skipped:  KeepPublicApi option in configuration
+{
+
+	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.OHLCType::value__ skipped:  special name
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::Open skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::High skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::Low skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::Close skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::Volume skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::HL2 skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::HLC3 skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::HL2C4 skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::WClose skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::Diff skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::DiffPercent skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::Undivided skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.OHLCType [Kalitte.Trading]Kalitte.Trading.OHLCType Kalitte.Trading.OHLCType::Other skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.OrderIcon skipped:  KeepPublicApi option in configuration
@@ -1637,6 +1668,7 @@ Skipped Types:
 	Kalitte.Trading.PowerSignal [Kalitte.Trading]Kalitte.Trading.PowerSignal Kalitte.Trading.CrossSignal::<PowerSignal>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::<InitialCross>k__BackingField -> A
 	Kalitte.Trading.FinanceList`1<System.Decimal> [Kalitte.Trading]Kalitte.Trading.FinanceList`1<System.Decimal> Kalitte.Trading.CrossSignal::crossBars -> A
+	Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> [Kalitte.Trading]Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> Kalitte.Trading.CrossSignal::rsiBars -> A
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignal::<FirstCrossRequired>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::<LastCross>k__BackingField -> a
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignal::<LastCalculatedSensitivity>k__BackingField -> A
@@ -2724,6 +2756,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::set_AnalyseAverage[1]( [Kalitte.Trading]Kalitte.Trading.Average ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::get_SignalSensitivity[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::set_SignalSensitivity[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::get_AnalysePeriod[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::set_AnalysePeriod[1]( [Kalitte.Trading]Kalitte.Trading.BarPeriod ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyserConfig::.ctor[0]( ) skipped:  special name
 
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyserConfig::<InitialAnalyseSize>k__BackingField -> A
@@ -2731,6 +2765,7 @@ Skipped Types:
 	Kalitte.Trading.Average [Kalitte.Trading]Kalitte.Trading.Average Kalitte.Trading.AnalyserConfig::<CollectAverage>k__BackingField -> A
 	Kalitte.Trading.Average [Kalitte.Trading]Kalitte.Trading.Average Kalitte.Trading.AnalyserConfig::<AnalyseAverage>k__BackingField -> a
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyserConfig::<SignalSensitivity>k__BackingField -> A
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.AnalyserConfig::<AnalysePeriod>k__BackingField -> A
 
 
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyserConfig::InitialAnalyseSize skipped:  KeepPublicApi option in configuration
@@ -2738,6 +2773,7 @@ Skipped Types:
 	Kalitte.Trading.Average [Kalitte.Trading]Kalitte.Trading.Average Kalitte.Trading.AnalyserConfig::CollectAverage skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Average [Kalitte.Trading]Kalitte.Trading.Average Kalitte.Trading.AnalyserConfig::AnalyseAverage skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyserConfig::SignalSensitivity skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.AnalyserConfig::AnalysePeriod skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalConfig skipped:  KeepPublicApi option in configuration
@@ -3142,20 +3178,6 @@ Skipped Types:
 	Kalitte.Trading.Algos.Bist30 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30 Kalitte.Trading.Algos.IAlgoParameter::Algo skipped:  KeepPublicApi option in configuration
 }
 
-[Kalitte.Trading]Kalitte.Trading.MyQuote skipped:  KeepPublicApi option in configuration
-{
-
-	[Kalitte.Trading]Kalitte.Trading.MyQuote::get_Value[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.MyQuote::set_Value[1]( [mscorlib]System.Nullable`1<[mscorlib]System.Decimal> ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.MyQuote::ToString[0]( ) skipped:  external base class or interface
-	[Kalitte.Trading]Kalitte.Trading.MyQuote::Set[2]( [mscorlib]System.Decimal, [Skender.Stock.Indicators]Skender.Stock.Indicators.CandlePart ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.MyQuote::Get[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.CandlePart ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.MyQuote::.ctor[0]( ) skipped:  special name
-
-
-	System.Nullable`1<System.Decimal> [Kalitte.Trading]System.Nullable`1<System.Decimal> Kalitte.Trading.MyQuote::Value skipped:  KeepPublicApi option in configuration
-}
-
 [Kalitte.Trading]Kalitte.Trading.ProfitSignal skipped:  KeepPublicApi option in configuration
 {
 
@@ -3179,6 +3201,17 @@ Skipped Types:
 
 	[Kalitte.Trading]Kalitte.Trading.ConfigParameters::ToString[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.ConfigParameters::.ctor[0]( ) skipped:  special name
+}
+
+[Kalitte.Trading]Kalitte.Trading.MyQuote skipped:  KeepPublicApi option in configuration
+{
+	[Kalitte.Trading]Kalitte.Trading.MyQuote::Update[2]( [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.OHLCType ) -> A
+
+	[Kalitte.Trading]Kalitte.Trading.MyQuote::ToString[0]( ) skipped:  external base class or interface
+	[Kalitte.Trading]Kalitte.Trading.MyQuote::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.MyQuote::Create[3]( [mscorlib]System.DateTime, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.OHLCType ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.MyQuote::Set[2]( [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.OHLCType ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.MyQuote::Get[1]( [Kalitte.Trading]Kalitte.Trading.OHLCType ) skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.Indicators.Atrp skipped:  KeepPublicApi option in configuration

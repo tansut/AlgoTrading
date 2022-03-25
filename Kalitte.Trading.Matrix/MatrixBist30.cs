@@ -40,6 +40,7 @@ namespace Kalitte.Trading.Matrix
 
         public override void OnDataUpdate(BarDataCurrentValues barDataCurrentValues)
         {
+            
             var period = barDataCurrentValues.LastUpdate.SymbolPeriod;
             var bd = GetBarData(Algo.Symbol, period);
             var last = bd.BarDataIndexer.LastBarIndex;

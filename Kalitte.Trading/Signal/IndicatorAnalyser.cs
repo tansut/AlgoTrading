@@ -53,10 +53,10 @@ namespace Kalitte.Trading
 
             if (CollectList.Ready && mp > 0)
             {
-                decimal mpAverage = CollectList.LastValue;
+                decimal mpAverage = CollectList.LastValue();
                 var l1 = i1k.NextValue(mpAverage).Value.Value;
                 AnalyseList.Collect(l1, time);
-                result.Value = AnalyseList.LastValue;
+                result.Value = AnalyseList.LastValue();
 
                 //if (!AnalyseList.SpeedInitialized)
                 //{

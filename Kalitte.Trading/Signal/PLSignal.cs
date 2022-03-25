@@ -53,7 +53,7 @@ namespace Kalitte.Trading
 
         public ProfitLossResult Check(decimal mp, DateTime t)
         {            
-            var price = List.Collect(mp, t).LastValue;
+            var price = List.Collect(mp, t).LastValue();
             var gradResult = this.Grad.Step(price);
             if (gradResult.FinalResult.HasValue)
             {

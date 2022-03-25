@@ -78,7 +78,7 @@ namespace Kalitte.Trading
 
             if (CollectList.Ready && mp > 0)
             {
-                decimal mpAverage = CollectList.LastValue;
+                decimal mpAverage = CollectList.LastValue();
                 var iVal = Indicator.NextValue(mpAverage).Value.Value;
                 result.IndicatorValue = iVal;
 
@@ -86,7 +86,7 @@ namespace Kalitte.Trading
                 
                 if (AnalyseList.Ready)
                 { 
-                    result.Gradient = grad.Step(AnalyseList.LastValue);
+                    result.Gradient = grad.Step(AnalyseList.LastValue());
                 }
             }
 

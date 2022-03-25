@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 24);
-        settings.Finish = new DateTime(2022, 3, 24);
+        settings.Start = new DateTime(2022, 3, 25);
+        settings.Finish = new DateTime(2022, 3, 25);
         settings.AutoClosePositions = true;
         
 
@@ -37,6 +37,7 @@ public class Program
 
         // global order
         alternates.Set("Orders/Total", 10);
+        //alternates.Set("Orders/ProfitLimitEnabled", new decimal[] { 100, 150, 200 });
         alternates.Set("Orders/ProfitLimit", new decimal[] { 100, 150, 200 });
         alternates.Set("Orders/ProfitRatio", new decimal [] { 0.4M, 0.2M, 0 });
         alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 2500 });
@@ -44,10 +45,11 @@ public class Program
         alternates.Set("Orders/NightRatio", 0.2);        
         alternates.Set("Orders/KeepRatio", 0.2);
         alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);
+        alternates.Set("DailyClose/Enabled", true);
 
         // analyser defaults
-        alternates.Set("DataCollectSize", 8);
-        alternates.Set("DataAnalysisSize", 80);
+        alternates.Set("DataCollectSize", 6);
+        alternates.Set("DataAnalysisSize", 60);
         alternates.Set("DataCollectAverage", Average.Ema);
         alternates.Set("DataAnalysisAverage", Average.Sma);
 
@@ -127,31 +129,33 @@ public class Program
         alternates.Set("MovPeriod2", 9);
 
         alternates.Set("CrossL1/Enabled", true);
-        alternates.Set("CrossL1/AvgChange", 0.32M);
+        alternates.Set("CrossL1/AvgChange", 0.24M);
         alternates.Set("CrossL1/PreChange", 0);
-        alternates.Set("CrossL1/Dynamic", true);
+        alternates.Set("CrossL1/Dynamic", false);
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL1/QuantityRatio", 1);
-        alternates.Set("CrossL1/RsiMax", 55.6);
-        alternates.Set("CrossL1/RsiMin",  45.4);
+        alternates.Set("CrossL1/QuantityRatio", 1);        
+        alternates.Set("CrossL1/RsiMax", 0);
+        alternates.Set("CrossL1/RsiMin",  0);
+        alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec5);
+        alternates.Set("CrossL1/SignalSensitivity", 10);
 
         alternates.Set("CrossL2/Enabled", false);
-        alternates.Set("CrossL2/AvgChange", 0.32M);
+        alternates.Set("CrossL2/AvgChange", 0.20M);
         alternates.Set("CrossL2/Dynamic", true);
         alternates.Set("CrossL2/PowerThreshold", 88);
         alternates.Set("CrossL2/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL2/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL2/QuantityRatio", 1);
-        alternates.Set("CrossL2/RsiMax", 52.6);
-        alternates.Set("CrossL2/RsiMin", 48.4);
+        alternates.Set("CrossL2/RsiMax", 55);
+        alternates.Set("CrossL2/RsiMin", 45);
 
         // cross rsi
-        alternates.Set("RsiValue/SignalSensitivity", 4.0);
+        alternates.Set("RsiValue/SignalSensitivity", 5.0);
 
-        // general
-        alternates.Set("DailyClose/Enabled", true);     
+      
+          
 
 
         // System

@@ -1,4 +1,5 @@
 ﻿// algo
+using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,13 @@ namespace Kalitte.Trading
         
         static Helper()
         {
+            symbolPeriodCache.Add(BarPeriod.Sec.ToString(), 1);
+            symbolPeriodCache.Add(BarPeriod.Sec5.ToString(), 5);
+            symbolPeriodCache.Add(BarPeriod.Sec10.ToString(), 10);
+            symbolPeriodCache.Add(BarPeriod.Sec15.ToString(), 15);
+            symbolPeriodCache.Add(BarPeriod.Sec20.ToString(), 20);
+            symbolPeriodCache.Add(BarPeriod.Sec30.ToString(), 30);
+            symbolPeriodCache.Add(BarPeriod.Sec45.ToString(), 45);
             symbolPeriodCache.Add(BarPeriod.Min.ToString(), 60);
             symbolPeriodCache.Add(BarPeriod.Min5.ToString(), 5 * 60);
             symbolPeriodCache.Add(BarPeriod.Min10.ToString(), 10 * 60);
@@ -95,6 +103,11 @@ namespace Kalitte.Trading
             }
             return 0;
         }
+
+        //public static CandlePart ToCandle(OHLCType ohlc)
+        //{
+        //    return (CandlePart)ohlc;
+        //}
 
         public static void Shuffle<T>(IList<T> list)
         {

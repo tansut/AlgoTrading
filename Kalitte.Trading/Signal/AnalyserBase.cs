@@ -33,6 +33,9 @@ namespace Kalitte.Trading
 
         [AlgoParam(1.0)]
         public decimal SignalSensitivity { get; set; }
+
+        [AlgoParam(BarPeriod.Sec)]
+        public BarPeriod AnalysePeriod { get; set; }
     }
 
     public class AnalyserBase<C> : Signal<C> where C : AnalyserConfig
@@ -99,7 +102,7 @@ namespace Kalitte.Trading
             {
                 if (CollectList.Ready)
                 {
-                    collectedValues.Add(new XDate(t), (double)CollectList.LastValue);
+                    collectedValues.Add(new XDate(t), (double)CollectList.LastValue());
                     collectRawValues.Add(new XDate(t), (double)collectValue);
                 }
             }
@@ -131,7 +134,7 @@ namespace Kalitte.Trading
         {
             if (TrackStart <= t && TrackEnd >= t)
             {
-                if (AnalyseList.Ready) analyseValues.Add(new XDate(t), (double)AnalyseList.LastValue);
+                if (AnalyseList.Ready) analyseValues.Add(new XDate(t), (double)AnalyseList.LastValue());
             }
             else if (TrackStart != DateTime.MaxValue && analyseValues.Count > 0)
             {
@@ -159,8 +162,8 @@ namespace Kalitte.Trading
         protected virtual void AdjustSensitivityInternal(double ratio, string reason)
         {
             AnalyseSize = Config.InitialAnalyseSize + Convert.ToInt32((Config.InitialAnalyseSize * (decimal)ratio));
-            CollectSize = Config.InitialCollectSize + Convert.ToInt32((Config.InitialCollectSize * (decimal)ratio));
-            CollectList.Resize(CollectSize);
+            //CollectSize = Config.InitialCollectSize + Convert.ToInt32((Config.InitialCollectSize * (decimal)ratio));
+            //CollectList.Resize(CollectSize);
             AnalyseList.Resize(AnalyseSize);
             Watch("sensitivity/collectsize", (decimal)CollectSize);
             Watch("sensitivity/analysesize", (decimal)AnalyseSize);
@@ -186,6 +189,7 @@ namespace Kalitte.Trading
             AnalyseSize = Convert.ToInt32(Config.InitialAnalyseSize * Config.SignalSensitivity);
             CollectList = new AnalyseList(CollectSize, Config.CollectAverage);
             AnalyseList = new AnalyseList(AnalyseSize, Config.AnalyseAverage);
+            AnalyseList.Period = Config.AnalysePeriod;
             ResetInternal();
             MonitorInit("sensitivity/collectsize", (decimal)CollectSize);
             MonitorInit("sensitivity/analysesize", (decimal)AnalyseSize);

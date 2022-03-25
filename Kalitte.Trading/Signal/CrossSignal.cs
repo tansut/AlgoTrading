@@ -344,7 +344,7 @@ namespace Kalitte.Trading
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
                     var rsiQuotes = rsiList.Select(p => new MyQuote() { Date = p.Date, Close = p.Rsi.HasValue ? (decimal)p.Rsi.Value : 0 }).ToList();
-                    var rsiOfRsiList = rsiQuotes.GetRsi(12);
+                    var rsiOfRsiList = rsiQuotes.GetRsi(30);
                     var rsiOfRsiListLast = rsiOfRsiList.Last();
                     var rsiOfRsi = result.Rsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
 
@@ -355,8 +355,8 @@ namespace Kalitte.Trading
                     var avgChangeL1 = AvgChange;
                     var avgChangeL2 = AvgChange / 4;
 
-                    var topL1 = lastAvg > avgChangeL1 && lastAvg < avgChangeL1 * 2;
-                    var belowL1 = lastAvg < -avgChangeL1 && lastAvg > -avgChangeL1 * 2;
+                    var topL1 = lastAvg > avgChangeL1 /*&& lastAvg < avgChangeL1 * 2*/;
+                    var belowL1 = lastAvg < -avgChangeL1 /*&& lastAvg > -avgChangeL1 * 2*/;
 
                     var topL2 = lastAvg > avgChangeL2 && lastAvg < avgChangeL2 * 2;
                     var belowL2 = lastAvg < -avgChangeL2 && lastAvg > -avgChangeL2 * 2;

@@ -136,20 +136,13 @@ public class Program
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);        
-        alternates.Set("CrossL1/RsiMax", 55.6);
-        alternates.Set("CrossL1/RsiMin",  45.4);
+        //alternates.Set("CrossL1/RsiMax", 55.6);
+        //alternates.Set("CrossL1/RsiMin",  45.4);
         alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec5);
         alternates.Set("CrossL1/SignalSensitivity", 10);
 
         alternates.Set("CrossL2/Enabled", false);
-        alternates.Set("CrossL2/AvgChange", 0.20M);
-        alternates.Set("CrossL2/Dynamic", true);
-        alternates.Set("CrossL2/PowerThreshold", 88);
-        alternates.Set("CrossL2/PowerNegativeMultiplier", 1.3);
-        alternates.Set("CrossL2/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL2/QuantityRatio", 1);
-        alternates.Set("CrossL2/RsiMax", 55);
-        alternates.Set("CrossL2/RsiMin", 45);
+
 
         // cross rsi
         alternates.Set("RsiValue/SignalSensitivity", 5.0);

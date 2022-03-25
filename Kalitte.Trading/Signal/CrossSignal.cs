@@ -335,7 +335,7 @@ namespace Kalitte.Trading
 
                 if (AnalyseList.Count > 0 /*&& (LastCross != 0 || !FirstCrossRequired)*/)
                 {
-                    var averages = AnalyseList.Averages(120, OHLCType.Close);
+                    var averages = AnalyseList.Averages(30, OHLCType.HL2);
                     lastAvg = averages.Last().Close;
                     result.Dif = lastAvg;
 
@@ -390,6 +390,8 @@ namespace Kalitte.Trading
                         Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi / 10);
                         Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi / 10);
                         Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 5);
+                        Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);
+                        Chart("Value").Serie("navg").SetColor(Color.DarkOrange).Add(time, -avgChangeL1);
 
                         Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol(result.preResult.HasValue ? ZedGraph.SymbolType.Plus : ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1) : 0);
                         Chart("Value").Serie("final").SetColor(Color.DarkGreen).SetSymbol(result.finalResult.HasValue ? ZedGraph.SymbolType.HDash : ZedGraph.SymbolType.None).Add(time, result.finalResult.HasValue ? (result.finalResult == BuySell.Buy ? 1 : -1) : 0);
@@ -397,7 +399,7 @@ namespace Kalitte.Trading
 
                     }
 
-                    if (time.Hour % 2 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                    if (time.Hour % 1 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         SaveCharts(time);
                     }

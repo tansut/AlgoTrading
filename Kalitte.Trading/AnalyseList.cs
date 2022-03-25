@@ -69,8 +69,7 @@ namespace Kalitte.Trading
         {
             if (Period == BarPeriod.Sec)
             {
-                var q = new MyQuote() { Date = date };
-                q.Set(value, Candle);
+                var q = MyQuote.Create(date, value, Candle);
                 this.List.Push(q);
             }
             else

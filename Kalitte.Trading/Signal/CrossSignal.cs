@@ -52,7 +52,8 @@ namespace Kalitte.Trading
         public decimal MarketPrice { get; set; }
         public bool MorningSignal { get; set; } = false;
         public CrossType? CrossType { get; set; }
-
+        public decimal LastCross { get; set; }
+        public decimal Cross { get; set; }
         public CrossSignalResult(SignalBase signal, DateTime t) : base(signal, t)
         {
         }
@@ -322,13 +323,15 @@ namespace Kalitte.Trading
                 AnalyseList.Collect(l1 - l2, time);
                 crossBars.Push(l1 - l2);
 
-                var cross = Helper.Cross(crossBars.ToArray, 0);
+                var cross = result.Cross = Helper.Cross(crossBars.ToArray, 0);
 
                 if (LastCross == 0 && cross != 0)
                 {
                     LastCross = cross;
                     Log($"First cross identified: {cross}", LogLevel.Debug, t);
                 }
+                else if (cross != 0) LastCross = cross;
+                result.LastCross = LastCross;
 
                 if (AnalyseList.Count > 0 /*&& (LastCross != 0 || !FirstCrossRequired)*/)
                 {
@@ -348,25 +351,31 @@ namespace Kalitte.Trading
                     var rsiReady = result.RsiReady = rsi > 0 && rsiOfRsi > 0;
                     var down = rsiOfRsi < 50 & rsi < 50;
                     var up = rsiOfRsi > 50 & rsi > 50;
-                    var after = lastAvg > AvgChange && lastAvg < AvgChange * 2;
-                    var before = lastAvg < -AvgChange && lastAvg > -AvgChange * 2;
 
-                    if (after && (!rsiReady || up))
+                    var avgChangeL1 = AvgChange;
+                    var avgChangeL2 = AvgChange / 4;
+
+                    var topL1 = lastAvg > avgChangeL1 && lastAvg < avgChangeL1 * 2;
+                    var belowL1 = lastAvg < -avgChangeL1 && lastAvg > -avgChangeL1 * 2;
+
+                    var topL2 = lastAvg > avgChangeL2 && lastAvg < avgChangeL2 * 2;
+                    var belowL2 = lastAvg < -avgChangeL2 && lastAvg > -avgChangeL2 * 2;
+
+                    if (topL1 && (!rsiReady || up))
                     {
                         result.CrossType = CrossType.AfterUp;
                         result.finalResult = BuySell.Buy;
                     }
-                    else if (after && (!rsiReady || down))
+                    else if (topL2 && (!rsiReady || down))
                     {
-                        result.CrossType = CrossType.BeforeDown;
-                        result.finalResult = BuySell.Sell;
-                    }
-                    else if (before && (!rsiReady || down))
-                    {
+                        result.CrossType = CrossType.AfterDown;
                         result.preResult = BuySell.Sell;
+                    }
+                    else if (belowL1 && (!rsiReady || down))
+                    {
+                        result.finalResult = BuySell.Sell;
                         result.CrossType = CrossType.BeforeDown;
-                    } else
-                    if (before && (!rsiReady || up))
+                    } else if (belowL2 && (!rsiReady || up))
                     {
                         result.preResult = BuySell.Buy;
                         result.CrossType = CrossType.BeforeUp;
@@ -388,7 +397,7 @@ namespace Kalitte.Trading
 
                     }
 
-                    if (time.Hour % 6 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                    if (time.Hour % 3 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         SaveCharts(time);
                     }

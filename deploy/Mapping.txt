@@ -2307,6 +2307,10 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_MorningSignal[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_CrossType[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_CrossType[1]( [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.CrossType> ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_LastCross[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_LastCross[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::get_Cross[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::set_Cross[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::ToString[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::GetHashCode[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.CrossSignalResult::.ctor[2]( [Kalitte.Trading]Kalitte.Trading.SignalBase, [mscorlib]System.DateTime ) skipped:  special name
@@ -2322,6 +2326,8 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<MarketPrice>k__BackingField -> D
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignalResult::<MorningSignal>k__BackingField -> a
 	System.Nullable`1<Kalitte.Trading.CrossType> [Kalitte.Trading]System.Nullable`1<Kalitte.Trading.CrossType> Kalitte.Trading.CrossSignalResult::<CrossType>k__BackingField -> A
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<LastCross>k__BackingField -> d
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::<Cross>k__BackingField -> E
 
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::i1Val skipped:  KeepPublicApi option in configuration
@@ -2335,6 +2341,8 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::MarketPrice skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignalResult::MorningSignal skipped:  KeepPublicApi option in configuration
 	System.Nullable`1<Kalitte.Trading.CrossType> [Kalitte.Trading]System.Nullable`1<Kalitte.Trading.CrossType> Kalitte.Trading.CrossSignalResult::CrossType skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::LastCross skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignalResult::Cross skipped:  KeepPublicApi option in configuration
 }
 
 [Kalitte.Trading]Kalitte.Trading.GradientSignalResult skipped:  KeepPublicApi option in configuration

@@ -138,8 +138,8 @@ public class Program
         alternates.Set("CrossL1/QuantityRatio", 1);        
         alternates.Set("CrossL1/RsiMax", 0);
         alternates.Set("CrossL1/RsiMin",  0);
-        alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec);
-        alternates.Set("CrossL1/SignalSensitivity", 5);
+        alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec5);
+        alternates.Set("CrossL1/SignalSensitivity", 10);
 
         alternates.Set("CrossL2/Enabled", false);
         alternates.Set("CrossL2/AvgChange", 0.20M);

@@ -335,7 +335,7 @@ namespace Kalitte.Trading
 
                 if (AnalyseList.Count > 0 /*&& (LastCross != 0 || !FirstCrossRequired)*/)
                 {
-                    var averages = AnalyseList.Averages(30, OHLCType.HL2);
+                    var averages = AnalyseList.Averages(60, OHLCType.HL2);
                     lastAvg = averages.Last().Close;
                     result.Dif = lastAvg;
 
@@ -344,7 +344,7 @@ namespace Kalitte.Trading
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
                     var rsiQuotes = rsiList.Select(p => new MyQuote() { Date = p.Date, Close = p.Rsi.HasValue ? (decimal)p.Rsi.Value : 0 }).ToList();
-                    var rsiOfRsiList = rsiQuotes.GetRsi(6);
+                    var rsiOfRsiList = rsiQuotes.GetRsi(12);
                     var rsiOfRsiListLast = rsiOfRsiList.Last();
                     var rsiOfRsi = result.Rsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
 
@@ -366,7 +366,7 @@ namespace Kalitte.Trading
                         result.CrossType = CrossType.AfterUp;
                         result.finalResult = BuySell.Buy;
                     }
-                    else if (topL2 && (!rsiReady || down))
+                    else if (topL2 && (rsiReady && down))
                     {
                         result.CrossType = CrossType.AfterDown;
                         result.preResult = BuySell.Sell;
@@ -375,7 +375,7 @@ namespace Kalitte.Trading
                     {
                         result.finalResult = BuySell.Sell;
                         result.CrossType = CrossType.BeforeDown;
-                    } else if (belowL2 && (!rsiReady || up))
+                    } else if (belowL2 && (rsiReady && up))
                     {
                         result.preResult = BuySell.Buy;
                         result.CrossType = CrossType.BeforeUp;

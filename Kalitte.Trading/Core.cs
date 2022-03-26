@@ -97,6 +97,7 @@ namespace Kalitte.Trading
 
     public enum BarPeriod
     {
+        NotSet = 0,
         Sec = 1,
         Sec5 = 2,
         Sec10 = 3,

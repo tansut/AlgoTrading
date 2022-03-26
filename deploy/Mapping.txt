@@ -702,6 +702,7 @@ Skipped Types:
 {
 
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.BarPeriod::value__ skipped:  special name
+	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::NotSet skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec5 skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.BarPeriod [Kalitte.Trading]Kalitte.Trading.BarPeriod Kalitte.Trading.BarPeriod::Sec10 skipped:  KeepPublicApi option in configuration

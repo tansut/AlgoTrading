@@ -301,8 +301,8 @@ namespace Kalitte.Trading.Algos
                 if (item.AnalyseSize == 0) item.AnalyseSize = DataAnalysisSize;
                 item.CollectAverage = DataCollectAverage;
                 item.AnalyseAverage = DataAnalysisAverage;
-                item.Lookback = DataAnalysisLookback;
-                item.AnalysePeriod = DataAnalysisPeriods;
+                if (item.Lookback == 0) item.Lookback = DataAnalysisLookback;
+                if (item.AnalysePeriod == BarPeriod.NotSet) item.AnalysePeriod = DataAnalysisPeriods;
             }
         }
 

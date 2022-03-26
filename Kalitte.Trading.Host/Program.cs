@@ -150,7 +150,7 @@ public class Program
 
 
         // cross rsi
-        alternates.Set("RsiValue/SignalSensitivity", 5.0);
+        alternates.Set("RsiValue/Lookback", 240);
 
       
           

@@ -31,10 +31,10 @@ namespace Kalitte.Trading
         [AlgoParam(Average.Sma)]
         public Average AnalyseAverage { get; set; }
 
-        [AlgoParam(120)]
+        [AlgoParam(0)]
         public int Lookback { get; set; }
 
-        [AlgoParam(BarPeriod.Sec)]
+        [AlgoParam(BarPeriod.NotSet)]
         public BarPeriod AnalysePeriod { get; set; }
     }
 

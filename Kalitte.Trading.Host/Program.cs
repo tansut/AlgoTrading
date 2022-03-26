@@ -20,7 +20,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 25);
+        settings.Start = new DateTime(2022, 3, 1);
         settings.Finish = new DateTime(2022, 3, 25);
         settings.AutoClosePositions = true;
         
@@ -143,7 +143,7 @@ public class Program
         alternates.Set("CrossL1/QuantityRatio", 1);        
         alternates.Set("CrossL1/RsiMax", 0);
         alternates.Set("CrossL1/RsiMin",  0);
-        alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec15);
+        alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec10);
         //alternates.Set("CrossL1/SignalSensitivity", 10);
 
         alternates.Set("CrossL2/Enabled", false);

@@ -25,7 +25,7 @@ namespace Kalitte.Trading
         public FinanceList<MyQuote> SpeedHistory { get; private set; }
         public BarPeriod Period { get; set; } = BarPeriod.Sec;
         public MyQuote Current { get; set; }
-
+        
 
         public OHLCType Candle { get; private set; }
 
@@ -35,6 +35,7 @@ namespace Kalitte.Trading
             this.List = new FinanceList<MyQuote>(size);
             this.SpeedHistory = new FinanceList<MyQuote>(60 * (int)SpeedMinutes + 1);
             this.Candle = candle;
+            
         }
 
         public void SetPeriods(DateTime date, decimal? value = null)
@@ -117,21 +118,32 @@ namespace Kalitte.Trading
             return lookback <= 1 ? 0 : (decimal)list.GetRsi(lookback).Last().Rsi.Value;
         }
 
-        public List<MyQuote> Averages(int lookback = 0, OHLCType? ohlc = null)
+        public IList<MyQuote> Averages(int lookback = 0, OHLCType? ohlc = null, IList<MyQuote> wamupList = null)
         {
             ohlc = ohlc ?? Candle;
             var list = this.List.List;
             var count = list.Count;
             lookback = lookback == 0 ? count : Math.Min(lookback, count);
+            List<MyQuote> resultList = null;
+
+            //if (lookback == 0) return new List<MyQuote> { Current };
+            //else if (lookback == count) lookback = 5;
             if (this.Average == Average.Ema)
             {
                 var result = list.GetEma(lookback, (CandlePart)ohlc);
-                return result.Select(p => new MyQuote() { Date = p.Date, Close = p.Ema.HasValue ? (decimal)p.Ema.Value:0 }).ToList();
+                resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Ema.HasValue ? (decimal)p.Ema.Value:0 }).ToList();
             } else
             {
                 var result = list.GetSma(lookback, (CandlePart)ohlc);
-                return result.Select(p => new MyQuote() { Date = p.Date, Close = p.Sma.HasValue ? (decimal)p.Sma.Value:0 }).ToList();
+                resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Sma.HasValue ? (decimal)p.Sma.Value:0 }).ToList();
             }
+
+            if (count <= lookback && wamupList != null)
+            {
+                wamupList.Add(resultList.Last());
+                return wamupList;
+            }
+            else return resultList;
         }
 
 
@@ -178,6 +190,11 @@ namespace Kalitte.Trading
             Speed.Collect(value, time);
             return Speed.LastValue();
             //return value;
+        }
+
+        internal void ResetWarmup()
+        {
+            WarmupList.Clear();
         }
     }
 

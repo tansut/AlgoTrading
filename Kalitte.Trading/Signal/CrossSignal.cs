@@ -109,7 +109,8 @@ namespace Kalitte.Trading
 
 
         private FinanceList<decimal> crossBars;
-        private FinanceList<MyQuote> rsiBars;
+        private List<MyQuote> closeWarmupList;
+        private List<MyQuote> ohlcWarmupList;
 
         public bool FirstCrossRequired { get; set; } = true;
 
@@ -129,7 +130,8 @@ namespace Kalitte.Trading
         protected override void ResetInternal()
         {
             crossBars.Clear();
-            rsiBars.Clear();
+            closeWarmupList.Clear();
+            ohlcWarmupList.Clear();
             Filter = new UKF();
             LastCross = 0;
             AvgChange = Config.AvgChange;
@@ -160,7 +162,8 @@ namespace Kalitte.Trading
             AvgChange = Config.AvgChange;
             PreChange = Config.PreChange;
             crossBars = new FinanceList<decimal>(60 * 10);
-            rsiBars = new FinanceList<MyQuote>(60 * 10);
+            closeWarmupList = new List<MyQuote>();
+            ohlcWarmupList = new List<MyQuote>();
             this.Indicators.Add(i1k);
             this.Indicators.Add(i2k);
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
@@ -336,11 +339,13 @@ namespace Kalitte.Trading
 
                 if (AnalyseList.Count > 0)
                 {
-                    var closeAverages = AnalyseList.Averages(Config.Lookback, OHLCType.Close);
-                    var closeRsiList = closeAverages.GetRsi(Config.Lookback);
+
+                    var closeAverages = AnalyseList.Averages(Config.Lookback, OHLCType.Close, closeWarmupList);
+                    var closeLast = closeAverages.Last().Close;
+                    var closeRsiList = closeAverages.GetRsi(Math.Min(closeAverages.Count > 1 ? closeAverages.Count-1: 1, Config.Lookback));
                     var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
                     var ohlc = closeRsi == 0 ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
-                    var rsiEffect = closeRsi == 0 ? 0: Math.Abs(50 - closeRsi) / 100;
+                    var rsiEffect = closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
 
                     if (Config.Dynamic)
                     {
@@ -351,12 +356,13 @@ namespace Kalitte.Trading
 
 
                     var totalSize = Convert.ToInt32(Lookback - (rsiEffect) * (Lookback));
-                    var averages = AnalyseList.Averages(totalSize);
+                    //AnalyseList.ResetWarmup();
+                    var averages = AnalyseList.Averages(totalSize, ohlc, ohlcWarmupList);
                     var maAvg = averages.Last().Close;
                     lastAvg = result.Dif = maAvg;
 
 
-                    var rsiList = averages.GetRsi(totalSize);
+                    var rsiList = averages.GetRsi(Math.Min(averages.Count > 1 ? averages.Count - 1 : 1, totalSize));
                     var rsiListLast = rsiList.Last();
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
@@ -404,7 +410,7 @@ namespace Kalitte.Trading
                     if (Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
-                        Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
+                        //Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
                         Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
                         //Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
                         Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.025M);
@@ -419,11 +425,12 @@ namespace Kalitte.Trading
 
                     }
 
-                    if (time.Hour % 3 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                    if (time.Hour % 1 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         SaveCharts(time);
                     }
                 }
+                
             }
 
 

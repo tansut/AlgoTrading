@@ -56,7 +56,20 @@ namespace Kalitte.Trading
         }
 
 
-        
+        public static MyQuote Create(MyQuote source)
+        {
+            return new MyQuote()
+            {
+                Date = source.Date,
+                Close = source.Close,
+                Volume = source.Volume,
+                High = source.High,
+                Low = source.Low,
+                Open = source.Open
+            };
+        }
+
+
 
         public void Set(decimal value, OHLCType candle)
         {

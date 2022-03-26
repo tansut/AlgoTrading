@@ -302,9 +302,9 @@ namespace Kalitte.Trading
         protected override void OrderCompletedByAlgo(OrderEventArgs e)
         {
 
-            if (Algo.Simulation && !Algo.MultipleTestOptimization)
+            if (Algo.Simulation && !Algo.MultipleTestOptimization && e.Order.SignalResult.Signal == this)
             {
-                Chart("Value").Serie("order").SetColor(Color.Chocolate).Add(e.Order.LastUpdate, 8);
+                Chart("Value").Serie("order").SetColor(Color.Chocolate).SetSymbol(ZedGraph.SymbolType.Diamond).Add(e.Order.LastUpdate, 5);
             }
         }
 
@@ -349,9 +349,9 @@ namespace Kalitte.Trading
 
                     var closeAverages = AnalyseList.Averages(Config.Lookback, OHLCType.Close, closeWarmupList);
                     var closeLast = closeAverages.Last().Close;
-                    var closeRsiList = closeAverages.GetRsi(Math.Min(closeAverages.Count > 1 ? closeAverages.Count-1: 1, Config.Lookback));
+                    var closeRsiList = closeAverages.GetRsi(Math.Min(closeAverages.Count > 1 ? closeAverages.Count - 1 : 1, Config.Lookback));
                     var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
-                    var ohlc = closeRsi == 0 ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
+                    var ohlc = (closeRsi == 0 || closeRsi == 100) ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
                     var rsiEffect = closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
 
                     if (Config.Dynamic)
@@ -373,11 +373,11 @@ namespace Kalitte.Trading
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
                     var rsiQuotes = rsiList.Select(p => new MyQuote() { Date = p.Date, Close = p.Rsi.HasValue ? (decimal)p.Rsi.Value : 0 }).ToList();
-                    var rsiOfRsiList = rsiQuotes.GetRsi(Math.Max(Lookback / 6, 6));
+                    var rsiOfRsiList = rsiQuotes.GetRsi(Math.Max(totalSize / 3, 3));
                     var rsiOfRsiListLast = rsiOfRsiList.Last();
                     var rsiOfRsi = result.Rsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
 
-                    var rsiReady = result.RsiReady = rsi > 0 && rsiOfRsi > 0;
+                    var rsiReady = result.RsiReady = rsi > 0 && rsi < 100 && rsiOfRsi > 0 && rsiOfRsi < 100;
                     var down = rsiOfRsi < 50 & rsi < 50;
                     var up = rsiOfRsi > 50 & rsi > 50;
 
@@ -417,13 +417,15 @@ namespace Kalitte.Trading
                     {
                         Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
                         //Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
-                        if (result.Sensitivity != null)
-                            Chart("Value").Serie("volume").SetColor(Color.DarkOrange).Add(time, result.Sensitivity.VolumePower * 0.025M);
+                        //if (result.Sensitivity != null)
+                        //    Chart("Value").Serie("volume").SetColor(Color.DarkOrange).Add(time, result.Sensitivity.VolumePower * 0.1M);
                         Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
                         //Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
-                        Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.025M);
-                        Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.025M);
-                        Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 1.25M);
+                        Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.1M);
+                        Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.1M);
+                        //Chart("Value").Serie("rsit").SetColor(Color.DimGray).Add(time, 10);
+                        Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 5);
+                        
                         Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);
                         Chart("Value").Serie("navg").SetColor(Color.DarkOrange).Add(time, -avgChangeL1);
 

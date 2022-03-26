@@ -24,7 +24,6 @@ namespace Kalitte.Trading
         public AnalyseList Speed { get; set; }
         public FinanceList<MyQuote> SpeedHistory { get; private set; }
         public BarPeriod Period { get; set; } = BarPeriod.Sec;
-        public MyQuote Current { get; set; }
         public List<MyQuote> WarmupList { get; set; }
 
         public OHLCType Candle { get; private set; }
@@ -46,20 +45,21 @@ namespace Kalitte.Trading
                 Helper.SymbolSeconds(this.Period.ToString(), out int seconds);
                 var t1 = Helper.RoundDown(date, TimeSpan.FromSeconds(seconds));
                 var t2 = Helper.RoundUp(date, TimeSpan.FromSeconds(seconds));
-                if (Current == null && value.HasValue)
+                var lastItem = List.Last;
+                if (lastItem == null && value.HasValue)
                 {
-                    Current = MyQuote.Create(t1, value.Value, Candle);
+                    lastItem = MyQuote.Create(t1, value.Value, Candle);
+                    List.Push(lastItem);
                 }
-                else if (Current != null)
+                else if (lastItem != null)
                 {
-                    if (Current.Date == t1)
+                    if (lastItem.Date == t1)
                     {
-                        if (value.HasValue) Current.Update(value.Value, Candle);
+                        if (value.HasValue) lastItem.Update(value.Value, Candle);
                     }
-                    else if (Current.Date < t1)
+                    else if (lastItem.Date < t1)
                     {
-                        this.List.Push(Current);
-                        if (value.HasValue) Current = MyQuote.Create(t1, value.Value, Candle);
+                        if (value.HasValue) List.Push(MyQuote.Create(t1, value.Value, Candle));
                     }
                 }
             }
@@ -129,21 +129,19 @@ namespace Kalitte.Trading
             lookback = lookback == 0 ? count : Math.Min(lookback, count);
             List<MyQuote> resultList = null;
 
-            //if (lookback == 0) return new List<MyQuote> { Current };
-            //else if (lookback == count) lookback = 5;
             if (this.Average == Average.Ema)
             {
                 var result = list.GetEma(lookback, (CandlePart)ohlc);
                 resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Ema.HasValue ? (decimal)p.Ema.Value:0 }).ToList();
             } else
-            {
+            {                
                 var result = list.GetSma(lookback, (CandlePart)ohlc);
                 resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Sma.HasValue ? (decimal)p.Sma.Value:0 }).ToList();
             }
             wamupList = wamupList ?? this.WarmupList;
             if (count <= lookback && wamupList != null)
             {
-                wamupList.Add(count == 0 ? Current:  resultList.Last());
+                wamupList.Add(resultList.Last());
                 return wamupList;
             }
             else return resultList;
@@ -152,7 +150,7 @@ namespace Kalitte.Trading
 
         public decimal LastValue(int lookback = 0, OHLCType? ohlc = null, List<MyQuote> warmupList = null)
         {
-            return Count == 0 ? Current.Get(Candle): Averages(lookback, ohlc, warmupList).Last().Close;
+            return Averages(lookback, ohlc, warmupList).Last().Close;
         }
 
         public int Count => List.Count;

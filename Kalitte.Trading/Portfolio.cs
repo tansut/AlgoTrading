@@ -133,7 +133,7 @@ namespace Kalitte.Trading
 
         public override string ToString()
         {
-            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost} Total: {Total} PL: {PL} Commission: {Commission} NetPL: {PL - Commission}";
+            return $"{this.Symbol}:{SideStr}/{Quantity}/Cost: {AvgCost.ToCurrency()} Total: {Total} PL: {PL.ToCurrency()} Commission: {Commission.ToCurrency()} NetPL: {PL.ToCurrency() - Commission.ToCurrency()}";
         }
 
         public PortfolioItem(string symbol, BuySell side, decimal quantity, decimal unitPrice)

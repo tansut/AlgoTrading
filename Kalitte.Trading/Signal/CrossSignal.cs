@@ -355,8 +355,7 @@ namespace Kalitte.Trading
                     }
 
 
-                    var totalSize = Convert.ToInt32(Lookback - (rsiEffect) * (Lookback));
-                    //AnalyseList.ResetWarmup();
+                    var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
                     var averages = AnalyseList.Averages(totalSize, ohlc, ohlcWarmupList);
                     var maAvg = averages.Last().Close;
                     lastAvg = result.Dif = maAvg;

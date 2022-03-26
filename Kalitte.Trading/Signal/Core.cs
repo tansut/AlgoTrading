@@ -293,7 +293,7 @@ namespace Kalitte.Trading
                 }
                 catch (Exception ex)
                 {
-                    Log($"Signal {this.Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
+                    Log($"Signal {this.Name}/{this.GetType().Name} got exception. {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
                     return null;
                 }
             }

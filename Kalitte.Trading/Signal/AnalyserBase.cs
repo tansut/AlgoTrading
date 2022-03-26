@@ -20,10 +20,10 @@ namespace Kalitte.Trading
     public class AnalyserConfig : SignalConfig
     {
         [AlgoParam(0, "AnalyseSize")]
-        public int InitialAnalyseSize { get; set; }
+        public int AnalyseSize { get; set; }
 
         [AlgoParam(0, "CollectSize")]
-        public int InitialCollectSize { get; set; }
+        public int CollectSize { get; set; }
 
         [AlgoParam(Average.Ema)]
         public Average CollectAverage { get; set; }
@@ -31,8 +31,8 @@ namespace Kalitte.Trading
         [AlgoParam(Average.Sma)]
         public Average AnalyseAverage { get; set; }
 
-        [AlgoParam(1.0)]
-        public decimal SignalSensitivity { get; set; }
+        [AlgoParam(120)]
+        public int Lookback { get; set; }
 
         [AlgoParam(BarPeriod.Sec)]
         public BarPeriod AnalysePeriod { get; set; }
@@ -52,7 +52,7 @@ namespace Kalitte.Trading
 
         public int CollectSize { get; set; }
         public int AnalyseSize { get; set; }
-
+        public int Lookback { get; set; }
 
 
 
@@ -161,12 +161,13 @@ namespace Kalitte.Trading
 
         protected virtual void AdjustSensitivityInternal(double ratio, string reason)
         {
-            AnalyseSize = Config.InitialAnalyseSize + Convert.ToInt32((Config.InitialAnalyseSize * (decimal)ratio));
+            //AnalyseSize = Config.AnalyseSize + Convert.ToInt32((Config.AnalyseSize * (decimal)ratio));
             //CollectSize = Config.InitialCollectSize + Convert.ToInt32((Config.InitialCollectSize * (decimal)ratio));
             //CollectList.Resize(CollectSize);
-            AnalyseList.Resize(AnalyseSize);
-            Watch("sensitivity/collectsize", (decimal)CollectSize);
-            Watch("sensitivity/analysesize", (decimal)AnalyseSize);
+            //AnalyseList.Resize(AnalyseSize);
+            this.Lookback = Convert.ToInt32(this.Lookback * (decimal)ratio);
+            Watch("sensitivity/lookback", (decimal)Lookback);
+            //Watch("sensitivity/analysesize", (decimal)AnalyseSize);
         }
 
         public void AdjustSensitivity(double ratio, string reason)
@@ -185,8 +186,9 @@ namespace Kalitte.Trading
 
         public override void Init()
         {
-            CollectSize = Convert.ToInt32(Config.InitialCollectSize /** Config.SignalSensitivity*/);
-            AnalyseSize = Convert.ToInt32(Config.InitialAnalyseSize * Config.SignalSensitivity);
+            CollectSize = Convert.ToInt32(Config.CollectSize);
+            AnalyseSize = Convert.ToInt32(Config.AnalyseSize);
+            Lookback = Convert.ToInt32(Config.Lookback);
             CollectList = new AnalyseList(CollectSize, Config.CollectAverage);
             AnalyseList = new AnalyseList(AnalyseSize, Config.AnalyseAverage);
             AnalyseList.Period = Config.AnalysePeriod;
@@ -201,8 +203,9 @@ namespace Kalitte.Trading
         {
             CollectList.Clear();
             AnalyseList.Clear();
-            CollectSize = Convert.ToInt32(Config.InitialCollectSize /** Config.SignalSensitivity*/);
-            AnalyseSize = Convert.ToInt32(Config.InitialAnalyseSize * Config.SignalSensitivity);
+            CollectSize = Convert.ToInt32(Config.CollectSize);
+            AnalyseSize = Convert.ToInt32(Config.AnalyseSize);
+            Lookback = Convert.ToInt32(Config.Lookback);
             CollectList.Resize(CollectSize);
             AnalyseList.Resize(AnalyseSize);
             base.ResetInternal();

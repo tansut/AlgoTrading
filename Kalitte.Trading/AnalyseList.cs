@@ -137,7 +137,7 @@ namespace Kalitte.Trading
 
         public decimal LastValue(int lookback = 0, OHLCType? ohlc = null)
         {
-            return Averages(lookback, ohlc).Last().Close;
+            return Count == 0 ? Current.Get(Candle): Averages(lookback, ohlc).Last().Close;
             //ohlc = ohlc ?? Candle;
             //var list = this.List.List;
             //var count = list.Count;

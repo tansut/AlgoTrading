@@ -49,9 +49,11 @@ public class Program
 
         // analyser defaults
         alternates.Set("DataCollectSize", 6);
-        alternates.Set("DataAnalysisSize", 60);
+        alternates.Set("DataAnalysisSize", 600);
         alternates.Set("DataCollectAverage", Average.Ema);
         alternates.Set("DataAnalysisAverage", Average.Ema);
+        alternates.Set("DataAnalysisLookback", 120);
+        alternates.Set("DataAnalysisPeriods", BarPeriod.Sec5);
 
         // profit && loss
 
@@ -139,7 +141,7 @@ public class Program
         //alternates.Set("CrossL1/RsiMax", 55.6);
         //alternates.Set("CrossL1/RsiMin",  45.4);
         alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec5);
-        alternates.Set("CrossL1/SignalSensitivity", 10);
+        //alternates.Set("CrossL1/SignalSensitivity", 10);
 
         alternates.Set("CrossL2/Enabled", false);
 

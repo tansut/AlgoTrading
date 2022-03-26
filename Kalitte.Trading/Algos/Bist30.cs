@@ -193,6 +193,11 @@ namespace Kalitte.Trading.Algos
         public Average DataCollectAverage { get; set; }
         [AlgoParam(Average.Sma)]
         public Average DataAnalysisAverage { get; set; }
+        [AlgoParam(120)]
+        public int DataAnalysisLookback { get; set; }
+        [AlgoParam(BarPeriod.Sec5)]
+        public BarPeriod DataAnalysisPeriods { get; set; }
+        
 
 
         [AlgoParam(0.015)]
@@ -286,10 +291,12 @@ namespace Kalitte.Trading.Algos
         {
             foreach (var item in configs)
             {
-                if (item.InitialCollectSize == 0) item.InitialCollectSize = DataCollectSize;
-                if (item.InitialAnalyseSize == 0) item.InitialAnalyseSize = DataAnalysisSize;
+                if (item.CollectSize == 0) item.CollectSize = DataCollectSize;
+                if (item.AnalyseSize == 0) item.AnalyseSize = DataAnalysisSize;
                 item.CollectAverage = DataCollectAverage;
                 item.AnalyseAverage = DataAnalysisAverage;
+                item.Lookback = DataAnalysisLookback;
+                item.AnalysePeriod = DataAnalysisPeriods;
             }
         }
 

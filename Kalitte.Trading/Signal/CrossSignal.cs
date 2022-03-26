@@ -135,8 +135,11 @@ namespace Kalitte.Trading
             Filter = new UKF();
             LastCross = 0;
             AvgChange = Config.AvgChange;
-            PreChange = Config.PreChange;
+            PreChange = Config.PreChange;            
             base.ResetInternal();
+
+            //TODO: Check for other signal
+            //AnalyseList.Init(i1k.Results.Where(p => p.Value.HasValue).Select(p => MyQuote.Create(p.Date, p.Value.Value, OHLCType.Close)));
         }
 
         public void ResetCross()
@@ -349,7 +352,8 @@ namespace Kalitte.Trading
 
                     var closeAverages = AnalyseList.Averages(Config.Lookback, OHLCType.Close, closeWarmupList);
                     var closeLast = closeAverages.Last().Close;
-                    var closeRsiList = closeAverages.GetRsi(Math.Min(closeAverages.Count > 1 ? closeAverages.Count - 1 : 1, Config.Lookback));
+
+                    var closeRsiList = closeAverages.GetRsi(AnalyseList.BestLookback(closeAverages.Count, Config.Lookback));
                     var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
                     var ohlc = (closeRsi == 0 || closeRsi == 100) ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
                     var rsiEffect = closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
@@ -368,12 +372,12 @@ namespace Kalitte.Trading
                     lastAvg = result.Dif = maAvg;
 
 
-                    var rsiList = averages.GetRsi(Math.Min(averages.Count > 1 ? averages.Count - 1 : 1, totalSize));
+                    var rsiList = averages.GetRsi(AnalyseList.BestLookback(averages.Count, Config.Lookback));
                     var rsiListLast = rsiList.Last();
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
                     var rsiQuotes = rsiList.Select(p => new MyQuote() { Date = p.Date, Close = p.Rsi.HasValue ? (decimal)p.Rsi.Value : 0 }).ToList();
-                    var rsiOfRsiList = rsiQuotes.GetRsi(Math.Max(totalSize / 3, 3));
+                    var rsiOfRsiList = rsiQuotes.GetRsi(AnalyseList.BestLookback(rsiList.Count(), Config.Lookback / 5));
                     var rsiOfRsiListLast = rsiOfRsiList.Last();
                     var rsiOfRsi = result.Rsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
 

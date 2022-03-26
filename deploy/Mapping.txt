@@ -14,6 +14,7 @@ Renamed Types:
 {
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::<Averages>b__50_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.EmaResult ) -> A
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::<Averages>b__50_1[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.SmaResult ) -> A
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::<Averages>b__50_2[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::.ctor[0]( ) skipped:  special name
@@ -21,15 +22,16 @@ Renamed Types:
 	Kalitte.Trading.AnalyseList/<>c [Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c Kalitte.Trading.AnalyseList/<>c::<>9 -> A
 	System.Func`2<Skender.Stock.Indicators.EmaResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.EmaResult,Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList/<>c::<>9__50_0 -> A
 	System.Func`2<Skender.Stock.Indicators.SmaResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.SmaResult,Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList/<>c::<>9__50_1 -> A
+	System.Func`2<Kalitte.Trading.MyQuote,System.Decimal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.MyQuote,System.Decimal> Kalitte.Trading.AnalyseList/<>c::<>9__50_2 -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass56_0 -> [Kalitte.Trading]Kalitte.Trading.AnalyseList/a
+[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass58_0 -> [Kalitte.Trading]Kalitte.Trading.AnalyseList/a
 {
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass56_0::<CalculateSpeed>b__0[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) -> A
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass58_0::<CalculateSpeed>b__0[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) -> A
 
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass56_0::.ctor[0]( ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass58_0::.ctor[0]( ) skipped:  special name
 
-	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.AnalyseList/<>c__DisplayClass56_0::fDate -> A
+	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.AnalyseList/<>c__DisplayClass58_0::fDate -> A
 }
 
 [Kalitte.Trading]Kalitte.Trading.Backtest/<>c__DisplayClass17_0 -> [Kalitte.Trading]Kalitte.Trading.Backtest/A
@@ -482,6 +484,7 @@ Skipped Types:
 
 [Kalitte.Trading]Kalitte.Trading.AnalyseList skipped:  KeepPublicApi option in configuration
 {
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Init[1]( [mscorlib]System.Collections.Generic.IEnumerable`1<[Kalitte.Trading]Kalitte.Trading.MyQuote> ) -> A
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::ResetSpeed[2]( [mscorlib]System.Decimal, [mscorlib]System.DateTime ) -> A
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::UpdateSpeed[2]( [mscorlib]System.DateTime, [mscorlib]System.Decimal ) -> A
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::CalculateSpeed[1]( [mscorlib]System.DateTime ) -> A
@@ -516,6 +519,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Resize[1]( [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Rsi[1]( [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Averages[3]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType>, [mscorlib]System.Collections.Generic.IList`1<[Kalitte.Trading]Kalitte.Trading.MyQuote> ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::BestLookback[2]( [mscorlib]System.Int32, [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::LastValue[3]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType>, [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.MyQuote> ) skipped:  KeepPublicApi option in configuration
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyseList::<SpeedMinutes>k__BackingField -> A
@@ -3333,7 +3337,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.MyQuote::ToString[0]( ) skipped:  external base class or interface
 	[Kalitte.Trading]Kalitte.Trading.MyQuote::.ctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.MyQuote::Create[3]( [mscorlib]System.DateTime, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.OHLCType ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.MyQuote::Create[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.MyQuote::Create[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.IQuote ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.MyQuote::Set[2]( [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.OHLCType ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.MyQuote::Get[1]( [Kalitte.Trading]Kalitte.Trading.OHLCType ) skipped:  KeepPublicApi option in configuration
 }

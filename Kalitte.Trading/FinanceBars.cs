@@ -56,7 +56,7 @@ namespace Kalitte.Trading
         }
 
 
-        public static MyQuote Create(MyQuote source)
+        public static MyQuote Create(IQuote source)
         {
             return new MyQuote()
             {

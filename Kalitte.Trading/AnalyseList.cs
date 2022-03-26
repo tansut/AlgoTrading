@@ -35,7 +35,7 @@ namespace Kalitte.Trading
             this.SpeedHistory = new FinanceList<MyQuote>(60 * (int)SpeedMinutes + 1);
             this.Candle = candle;
             WarmupList = new List<MyQuote>();
-            
+
         }
 
         public void SetPeriods(DateTime date, decimal? value = null)
@@ -126,27 +126,50 @@ namespace Kalitte.Trading
             ohlc = ohlc ?? Candle;
             var list = this.List.List;
             var count = list.Count;
-            lookback = lookback == 0 ? count : Math.Min(lookback, count);
+            //lookback = lookback == 0 ? Math.Max(1, count / 2) : lookback;
+            lookback = BestLookback(count, lookback);
             List<MyQuote> resultList = null;
 
             if (this.Average == Average.Ema)
             {
                 var result = list.GetEma(lookback, (CandlePart)ohlc);
-                resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Ema.HasValue ? (decimal)p.Ema.Value:0 }).ToList();
-            } else
-            {                
+                resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Ema.HasValue ? (decimal)p.Ema.Value : 0 }).ToList();
+            }
+            else
+            {
                 var result = list.GetSma(lookback, (CandlePart)ohlc);
-                resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Sma.HasValue ? (decimal)p.Sma.Value:0 }).ToList();
+                resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Sma.HasValue ? (decimal)p.Sma.Value : 0 }).ToList();
             }
             wamupList = wamupList ?? this.WarmupList;
             if (count <= lookback && wamupList != null)
             {
-                wamupList.Add(resultList.Last());
+                var last = resultList.Last();
+                var sum = wamupList.Sum(p => p.Close) + last.Close;
+                var avg = sum / (wamupList.Count + 1);
+                wamupList.Add(MyQuote.Create(last.Date, avg, Candle));
                 return wamupList;
             }
-            else return resultList;
+            else
+                return resultList;
         }
 
+        public int BestLookback(int listSize, int lookback)
+        {
+            if (lookback == 0) lookback = Math.Max(listSize / 2, 1);
+            var dif = lookback - listSize;
+            if (dif < 0) return lookback;
+            return Math.Max(1, listSize - 1);
+        }
+
+        internal void Init(IEnumerable<MyQuote> list)
+        {
+            List.Clear();
+            foreach (var item in list)
+            {
+                List.Push(MyQuote.Create(item));
+            }
+
+        }
 
         public decimal LastValue(int lookback = 0, OHLCType? ohlc = null, List<MyQuote> warmupList = null)
         {

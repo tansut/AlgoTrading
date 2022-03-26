@@ -206,26 +206,26 @@ namespace Kalitte.Trading
 
             try
             {
-                var b12 = i1k.Results[i1k.Results.Count - 2];
-                var b22 = i2k.Results[i2k.Results.Count - 2];
+                //var b12 = i1k.Results[i1k.Results.Count - 2];
+                //var b22 = i2k.Results[i2k.Results.Count - 2];
 
 
-                var rl1 = b12.Value.Value;
-                var rl2 = b22.Value.Value;
+                //var rl1 = b12.Value.Value;
+                //var rl2 = b22.Value.Value;
 
-                var b1 = i1k.Results.Last();
-                var b2 = i2k.Results.Last();
+                //var b1 = i1k.Results.Last();
+                //var b2 = i2k.Results.Last();
 
-                var r1 = b1.Value;
-                var r2 = b2.Value;
+                //var r1 = b1.Value;
+                //var r2 = b2.Value;
 
-                var dl = rl1 - rl2;
-                var d = r1 - r2;
+                //var dl = rl1 - rl2;
+                //var d = r1 - r2;
 
-                var dt = Math.Abs((dl - d).Value);
-                var da = Math.Abs(((dl + d) / 2).Value);
+                //var dt = Math.Abs((dl - d).Value);
+                //var da = Math.Abs(((dl + d) / 2).Value);
 
-                var max = Config.AvgChange * 1M;
+                //var max = Config.AvgChange * 1M;
 
                 var powerRatio = 0M;
                 var powerNote = "";
@@ -246,10 +246,10 @@ namespace Kalitte.Trading
 
                 var dtRatio = 0M;
 
-                if (dt < max && da < max)
-                {
-                    dtRatio = ((max - dt) / max);
-                }
+                //if (dt < max && da < max)
+                //{
+                //    dtRatio = ((max - dt) / max);
+                //}
 
 
                 var divide = 0;
@@ -266,9 +266,9 @@ namespace Kalitte.Trading
                     }
                 }
 
-                Watch("sensitivity/trendRatio", dtRatio);
+                //Watch("sensitivity/trendRatio", dtRatio);
                 Watch("sensitivity/volumePower", usedPower);
-                result.TrendRatio = dtRatio;
+                //result.TrendRatio = dtRatio;
                 result.Result = average;
             }
             catch (Exception exc)
@@ -367,7 +367,7 @@ namespace Kalitte.Trading
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
                     var rsiQuotes = rsiList.Select(p => new MyQuote() { Date = p.Date, Close = p.Rsi.HasValue ? (decimal)p.Rsi.Value : 0 }).ToList();
-                    var rsiOfRsiList = rsiQuotes.GetRsi(Lookback / 6);
+                    var rsiOfRsiList = rsiQuotes.GetRsi(Math.Max(Lookback / 6, 6));
                     var rsiOfRsiListLast = rsiOfRsiList.Last();
                     var rsiOfRsi = result.Rsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
 

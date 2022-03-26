@@ -38,7 +38,7 @@ namespace Kalitte.Trading
 
         [AlgoParam(0)]
         public decimal L1 { get; set; }
-        
+
         [AlgoParam(0)]
         public decimal L2 { get; set; }
     }
@@ -83,18 +83,9 @@ namespace Kalitte.Trading
                 result.IndicatorValue = iVal;
 
                 AnalyseList.Collect(iVal, time);
-                
-                if (AnalyseList.Ready)
-                { 
-                    result.Gradient = grad.Step(AnalyseList.LastValue());
-                }
+                result.Gradient = grad.Step(AnalyseList.LastValue(Lookback));
             }
 
-            if (mp > 0)
-            {
-                TrackAnalyseList(time);
-                TrackCollectList(time, mp);
-            }
 
             if (result.Gradient != null)
             {

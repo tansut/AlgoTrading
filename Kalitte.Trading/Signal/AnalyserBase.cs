@@ -165,7 +165,7 @@ namespace Kalitte.Trading
             //CollectSize = Config.InitialCollectSize + Convert.ToInt32((Config.InitialCollectSize * (decimal)ratio));
             //CollectList.Resize(CollectSize);
             //AnalyseList.Resize(AnalyseSize);
-            this.Lookback = Convert.ToInt32(this.Lookback * (decimal)ratio);
+            this.Lookback = Config.Lookback + Convert.ToInt32(Config.Lookback * (decimal)ratio);
             Watch("sensitivity/lookback", (decimal)Lookback);
             //Watch("sensitivity/analysesize", (decimal)AnalyseSize);
         }

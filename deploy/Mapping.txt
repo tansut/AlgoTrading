@@ -227,13 +227,13 @@ Renamed Types:
 
 [Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c -> [Kalitte.Trading]Kalitte.Trading.CrossSignal/A
 {
-	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::<CheckInternal>b__43_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.RsiResult ) -> A
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::<CheckInternal>b__44_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.RsiResult ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::.ctor[0]( ) skipped:  special name
 
 	Kalitte.Trading.CrossSignal/<>c [Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c Kalitte.Trading.CrossSignal/<>c::<>9 -> A
-	System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> Kalitte.Trading.CrossSignal/<>c::<>9__43_0 -> A
+	System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> Kalitte.Trading.CrossSignal/<>c::<>9__44_0 -> A
 }
 
 [Kalitte.Trading]Kalitte.Trading.PLSignal/<>c -> [Kalitte.Trading]Kalitte.Trading.PLSignal/A
@@ -485,7 +485,6 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::ResetSpeed[2]( [mscorlib]System.Decimal, [mscorlib]System.DateTime ) -> A
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::UpdateSpeed[2]( [mscorlib]System.DateTime, [mscorlib]System.Decimal ) -> A
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::CalculateSpeed[1]( [mscorlib]System.DateTime ) -> A
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList::ResetWarmup[0]( ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::get_SpeedMinutes[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::set_SpeedMinutes[1]( [mscorlib]System.Decimal ) skipped:  skip by property
@@ -518,8 +517,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Clear[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Resize[1]( [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Rsi[1]( [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Averages[2]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType> ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList::LastValue[2]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType> ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Averages[3]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType>, [mscorlib]System.Collections.Generic.IList`1<[Kalitte.Trading]Kalitte.Trading.MyQuote> ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::LastValue[3]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType>, [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.MyQuote> ) skipped:  KeepPublicApi option in configuration
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AnalyseList::<SpeedMinutes>k__BackingField -> A
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.AnalyseList::<SpeedAnalyse>k__BackingField -> A
@@ -1701,7 +1700,8 @@ Skipped Types:
 	Kalitte.Trading.PowerSignal [Kalitte.Trading]Kalitte.Trading.PowerSignal Kalitte.Trading.CrossSignal::<PowerSignal>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::<InitialCross>k__BackingField -> A
 	Kalitte.Trading.FinanceList`1<System.Decimal> [Kalitte.Trading]Kalitte.Trading.FinanceList`1<System.Decimal> Kalitte.Trading.CrossSignal::crossBars -> A
-	Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> [Kalitte.Trading]Kalitte.Trading.FinanceList`1<Kalitte.Trading.MyQuote> Kalitte.Trading.CrossSignal::rsiBars -> A
+	System.Collections.Generic.List`1<Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.MyQuote> Kalitte.Trading.CrossSignal::closeWarmupList -> A
+	System.Collections.Generic.List`1<Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.MyQuote> Kalitte.Trading.CrossSignal::ohlcWarmupList -> a
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignal::<FirstCrossRequired>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::<LastCross>k__BackingField -> a
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignal::<LastCalculatedSensitivity>k__BackingField -> A
@@ -2791,6 +2791,10 @@ Skipped Types:
 
 	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::get_Total[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::set_Total[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::get_ProfitLimitEnabled[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::set_ProfitLimitEnabled[1]( [mscorlib]System.Boolean ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::get_LossLimitEnabled[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::set_LossLimitEnabled[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::get_ProfitLimit[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::set_ProfitLimit[1]( [mscorlib]System.Decimal[] ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::get_ProfitRatio[0]( ) skipped:  skip by property
@@ -2808,6 +2812,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.OrderConfig::.ctor[0]( ) skipped:  special name
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.OrderConfig::<Total>k__BackingField -> A
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.OrderConfig::<ProfitLimitEnabled>k__BackingField -> A
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.OrderConfig::<LossLimitEnabled>k__BackingField -> a
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.OrderConfig::<ProfitLimit>k__BackingField -> A
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.OrderConfig::<ProfitRatio>k__BackingField -> a
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.OrderConfig::<LossLimit>k__BackingField -> B
@@ -2818,6 +2824,8 @@ Skipped Types:
 
 
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.OrderConfig::Total skipped:  KeepPublicApi option in configuration
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.OrderConfig::ProfitLimitEnabled skipped:  KeepPublicApi option in configuration
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.OrderConfig::LossLimitEnabled skipped:  KeepPublicApi option in configuration
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.OrderConfig::ProfitLimit skipped:  KeepPublicApi option in configuration
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.OrderConfig::ProfitRatio skipped:  KeepPublicApi option in configuration
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.OrderConfig::LossLimit skipped:  KeepPublicApi option in configuration

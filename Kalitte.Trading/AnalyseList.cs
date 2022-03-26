@@ -25,7 +25,7 @@ namespace Kalitte.Trading
         public FinanceList<MyQuote> SpeedHistory { get; private set; }
         public BarPeriod Period { get; set; } = BarPeriod.Sec;
         public MyQuote Current { get; set; }
-        
+        public List<MyQuote> WarmupList { get; set; }
 
         public OHLCType Candle { get; private set; }
 
@@ -35,6 +35,7 @@ namespace Kalitte.Trading
             this.List = new FinanceList<MyQuote>(size);
             this.SpeedHistory = new FinanceList<MyQuote>(60 * (int)SpeedMinutes + 1);
             this.Candle = candle;
+            WarmupList = new List<MyQuote>();
             
         }
 
@@ -93,6 +94,7 @@ namespace Kalitte.Trading
         public void Clear()
         {
             List.Clear();
+            WarmupList.Clear();
             if (Speed != null) Speed.Clear();
         }
 
@@ -108,6 +110,7 @@ namespace Kalitte.Trading
         public void Resize(int newSize)
         {
             List.Resize(newSize);
+            WarmupList.Clear();
         }
 
         public decimal Rsi(int lookback = 0)
@@ -137,31 +140,19 @@ namespace Kalitte.Trading
                 var result = list.GetSma(lookback, (CandlePart)ohlc);
                 resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Sma.HasValue ? (decimal)p.Sma.Value:0 }).ToList();
             }
-
+            wamupList = wamupList ?? this.WarmupList;
             if (count <= lookback && wamupList != null)
             {
-                wamupList.Add(resultList.Last());
+                wamupList.Add(count == 0 ? Current:  resultList.Last());
                 return wamupList;
             }
             else return resultList;
         }
 
 
-        public decimal LastValue(int lookback = 0, OHLCType? ohlc = null)
+        public decimal LastValue(int lookback = 0, OHLCType? ohlc = null, List<MyQuote> warmupList = null)
         {
-            return Count == 0 ? Current.Get(Candle): Averages(lookback, ohlc).Last().Close;
-            //ohlc = ohlc ?? Candle;
-            //var list = this.List.List;
-            //var count = list.Count;
-            //lookback = lookback == 0 ? count : Math.Min(lookback, count);
-            //if (this.Average == Average.Ema)
-            //{
-            //    return list.GetEma(lookback, (CandlePart)ohlc).Last().Ema.Value;
-            //}
-            //else
-            //{
-            //    return list.GetSma(lookback, (CandlePart)ohlc).Last().Sma.Value;
-            //}
+            return Count == 0 ? Current.Get(Candle): Averages(lookback, ohlc, warmupList).Last().Close;
         }
 
         public int Count => List.Count;
@@ -192,10 +183,7 @@ namespace Kalitte.Trading
             //return value;
         }
 
-        internal void ResetWarmup()
-        {
-            WarmupList.Clear();
-        }
+
     }
 
 }

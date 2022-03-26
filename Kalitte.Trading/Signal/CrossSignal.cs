@@ -13,7 +13,7 @@ using Kalitte.Trading.Indicators;
 using Skender.Stock.Indicators;
 using Kalitte.Trading.Algos;
 using System.Drawing;
-
+using Kalitte.Trading.Numeric;
 
 namespace Kalitte.Trading
 {
@@ -120,6 +120,7 @@ namespace Kalitte.Trading
         }
 
         public Sensitivity LastCalculatedSensitivity { get; set; }
+        public UKF Filter { get; set; }
 
 
 
@@ -129,6 +130,7 @@ namespace Kalitte.Trading
         {
             crossBars.Clear();
             rsiBars.Clear();
+            Filter = new UKF();
             LastCross = 0;
             AvgChange = Config.AvgChange;
             PreChange = Config.PreChange;
@@ -290,6 +292,11 @@ namespace Kalitte.Trading
             }
         }
 
+        protected override void LoadNewBars(object sender, ListEventArgs<IQuote> e)
+        {
+            base.LoadNewBars(sender, e);
+        }
+
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
@@ -324,7 +331,6 @@ namespace Kalitte.Trading
                 crossBars.Push(l1 - l2);
 
                 var cross = result.Cross = Helper.Cross(crossBars.ToArray, 0);
-
                 if (LastCross == 0 && cross != 0)
                 {
                     LastCross = cross;
@@ -335,16 +341,27 @@ namespace Kalitte.Trading
 
                 if (AnalyseList.Count > 0 /*&& (LastCross != 0 || !FirstCrossRequired)*/)
                 {
-                    var averages = AnalyseList.Averages(30, OHLCType.HL2);
-                    lastAvg = averages.Last().Close;
-                    result.Dif = lastAvg;
+                    Helper.SymbolSeconds(Algo.SymbolPeriod.ToString(), out int periodSeconds);
+                    Helper.SymbolSeconds(AnalyseList.Period.ToString(), out int analyseSeconds); 
+                    var closeAverages = AnalyseList.Averages(periodSeconds / analyseSeconds, OHLCType.Close);
+                    var closeRsiList = closeAverages.GetRsi(periodSeconds / analyseSeconds);
+                    var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
+                    var ohlc = closeRsi == 0 ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
+                    var rsiEffect = closeRsi == 0 ? 0: Math.Abs(50 - closeRsi) / 100;
+                    var totalSize = Convert.ToInt32(periodSeconds / analyseSeconds - (rsiEffect) * (periodSeconds / analyseSeconds));
+                    var averages = AnalyseList.Averages(totalSize);
+                    var maAvg = averages.Last().Close;
 
-                    var rsiList = averages.GetRsi(120);
+                    //Filter.Update(new[] { AnalyseList.List.LastItems(90).Average(p => (double)p.Close) }); // averages.Last().Close;
+                    //result.Dif = lastAvg = (decimal)Filter.getState()[0];
+
+                    lastAvg = result.Dif = maAvg;
+                    var rsiList = averages.GetRsi(totalSize);
                     var rsiListLast = rsiList.Last();
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
                     var rsiQuotes = rsiList.Select(p => new MyQuote() { Date = p.Date, Close = p.Rsi.HasValue ? (decimal)p.Rsi.Value : 0 }).ToList();
-                    var rsiOfRsiList = rsiQuotes.GetRsi(30);
+                    var rsiOfRsiList = rsiQuotes.GetRsi(analyseSeconds * 6);
                     var rsiOfRsiListLast = rsiOfRsiList.Last();
                     var rsiOfRsi = result.Rsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
 
@@ -375,7 +392,8 @@ namespace Kalitte.Trading
                     {
                         result.finalResult = BuySell.Sell;
                         result.CrossType = CrossType.BeforeDown;
-                    } else if (belowL2 && (rsiReady && up))
+                    }
+                    else if (belowL2 && (rsiReady && up))
                     {
                         result.preResult = BuySell.Buy;
                         result.CrossType = CrossType.BeforeUp;
@@ -386,10 +404,12 @@ namespace Kalitte.Trading
                     if (Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
+                        Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
                         Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
-                        Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi / 10);
-                        Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi / 10);
-                        Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 5);
+                        Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
+                        Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.025M);
+                        Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.025M);
+                        Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 1.25M);
                         Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);
                         Chart("Value").Serie("navg").SetColor(Color.DarkOrange).Add(time, -avgChangeL1);
 
@@ -399,7 +419,7 @@ namespace Kalitte.Trading
 
                     }
 
-                    if (time.Hour % 1 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                    if (time.Hour % 3 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         SaveCharts(time);
                     }

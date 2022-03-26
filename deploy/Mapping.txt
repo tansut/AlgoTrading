@@ -227,13 +227,13 @@ Renamed Types:
 
 [Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c -> [Kalitte.Trading]Kalitte.Trading.CrossSignal/A
 {
-	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::<CheckInternal>b__38_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.RsiResult ) -> A
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::<CheckInternal>b__43_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.RsiResult ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c::.ctor[0]( ) skipped:  special name
 
 	Kalitte.Trading.CrossSignal/<>c [Kalitte.Trading]Kalitte.Trading.CrossSignal/<>c Kalitte.Trading.CrossSignal/<>c::<>9 -> A
-	System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> Kalitte.Trading.CrossSignal/<>c::<>9__38_0 -> A
+	System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.RsiResult,Kalitte.Trading.MyQuote> Kalitte.Trading.CrossSignal/<>c::<>9__43_0 -> A
 }
 
 [Kalitte.Trading]Kalitte.Trading.PLSignal/<>c -> [Kalitte.Trading]Kalitte.Trading.PLSignal/A
@@ -1676,6 +1676,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_LastCross[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::get_LastCalculatedSensitivity[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_LastCalculatedSensitivity[1]( [Kalitte.Trading]Kalitte.Trading.Sensitivity ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal::get_Filter[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_Filter[1]( [Kalitte.Trading]Kalitte.Trading.Numeric.UKF ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::get_Usage[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_Usage[1]( [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::ToString[0]( ) skipped:  external base class or interface
@@ -1683,6 +1685,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::Init[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::ResetInternal[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::CheckInternal[1]( [mscorlib]System.Nullable`1<[mscorlib]System.DateTime> ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal::LoadNewBars[2]( [mscorlib]System.Object, [Kalitte.Trading]Kalitte.Trading.ListEventArgs`1<[Skender.Stock.Indicators]Skender.Stock.Indicators.IQuote> ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::.ctor[4]( [mscorlib]System.String, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase, [Kalitte.Trading]Kalitte.Trading.CrossSignalConfig ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::ResetCross[0]( ) skipped:  KeepPublicApi option in configuration
 
@@ -1693,6 +1696,7 @@ Skipped Types:
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignal::<FirstCrossRequired>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::<LastCross>k__BackingField -> a
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignal::<LastCalculatedSensitivity>k__BackingField -> A
+	Kalitte.Trading.Numeric.UKF [Kalitte.Trading]Kalitte.Trading.Numeric.UKF Kalitte.Trading.CrossSignal::<Filter>k__BackingField -> A
 
 	Kalitte.Trading.Indicators.ITechnicalIndicator [Kalitte.Trading]Kalitte.Trading.Indicators.ITechnicalIndicator Kalitte.Trading.CrossSignal::i1k skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Indicators.ITechnicalIndicator [Kalitte.Trading]Kalitte.Trading.Indicators.ITechnicalIndicator Kalitte.Trading.CrossSignal::i2k skipped:  KeepPublicApi option in configuration
@@ -1705,6 +1709,7 @@ Skipped Types:
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.CrossSignal::FirstCrossRequired skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::LastCross skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignal::LastCalculatedSensitivity skipped:  KeepPublicApi option in configuration
+	Kalitte.Trading.Numeric.UKF [Kalitte.Trading]Kalitte.Trading.Numeric.UKF Kalitte.Trading.CrossSignal::Filter skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.CrossSignal::Usage skipped:  KeepPublicApi option in configuration
 }
 
@@ -1970,6 +1975,34 @@ Skipped Types:
 	System.Nullable`1<System.DateTime> [Kalitte.Trading]System.Nullable`1<System.DateTime> Kalitte.Trading.SystemTime::Time -> dropped
 
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.SystemTime::Now2 skipped:  KeepPublicApi option in configuration
+}
+
+[Kalitte.Trading]Kalitte.Trading.Numeric.UKF skipped:  KeepPublicApi option in configuration
+{
+	[Kalitte.Trading]Kalitte.Trading.Numeric.UKF::init[0]( ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Numeric.UKF::UnscentedTransform[5]( [MathNet.Numerics]MathNet.Numerics.LinearAlgebra.Matrix`1<[mscorlib]System.Double>, [MathNet.Numerics]MathNet.Numerics.LinearAlgebra.Matrix`1<[mscorlib]System.Double>, [MathNet.Numerics]MathNet.Numerics.LinearAlgebra.Matrix`1<[mscorlib]System.Double>, [mscorlib]System.Int32, [MathNet.Numerics]MathNet.Numerics.LinearAlgebra.Matrix`1<[mscorlib]System.Double> ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Numeric.UKF::GetSigmaPoints[3]( [MathNet.Numerics]MathNet.Numerics.LinearAlgebra.Matrix`1<[mscorlib]System.Double>, [MathNet.Numerics]MathNet.Numerics.LinearAlgebra.Matrix`1<[mscorlib]System.Double>, [mscorlib]System.Double ) -> A
+
+	[Kalitte.Trading]Kalitte.Trading.Numeric.UKF::.ctor[1]( [mscorlib]System.Int32 ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.Numeric.UKF::Update[1]( [mscorlib]System.Double[] ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.Numeric.UKF::getState[0]( ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.Numeric.UKF::getCovariance[0]( ) skipped:  KeepPublicApi option in configuration
+
+	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Numeric.UKF::L -> A
+	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Numeric.UKF::m -> a
+	System.Double [Kalitte.Trading]System.Double Kalitte.Trading.Numeric.UKF::alpha -> A
+	System.Double [Kalitte.Trading]System.Double Kalitte.Trading.Numeric.UKF::ki -> a
+	System.Double [Kalitte.Trading]System.Double Kalitte.Trading.Numeric.UKF::beta -> B
+	System.Double [Kalitte.Trading]System.Double Kalitte.Trading.Numeric.UKF::lambda -> b
+	System.Double [Kalitte.Trading]System.Double Kalitte.Trading.Numeric.UKF::c -> C
+	MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> [Kalitte.Trading]MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> Kalitte.Trading.Numeric.UKF::Wm -> A
+	MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> [Kalitte.Trading]MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> Kalitte.Trading.Numeric.UKF::Wc -> a
+	MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> [Kalitte.Trading]MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> Kalitte.Trading.Numeric.UKF::x -> B
+	MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> [Kalitte.Trading]MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> Kalitte.Trading.Numeric.UKF::P -> b
+	System.Double [Kalitte.Trading]System.Double Kalitte.Trading.Numeric.UKF::q -> c
+	System.Double [Kalitte.Trading]System.Double Kalitte.Trading.Numeric.UKF::r -> D
+	MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> [Kalitte.Trading]MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> Kalitte.Trading.Numeric.UKF::Q -> C
+	MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> [Kalitte.Trading]MathNet.Numerics.LinearAlgebra.Matrix`1<System.Double> Kalitte.Trading.Numeric.UKF::R -> c
 }
 
 [Kalitte.Trading]Kalitte.Trading.Indicators.CustomResult skipped:  KeepPublicApi option in configuration

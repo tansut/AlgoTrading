@@ -131,7 +131,7 @@ public class Program
         alternates.Set("CrossL1/Enabled", true);
         alternates.Set("CrossL1/AvgChange", 0.32M);
         alternates.Set("CrossL1/PreChange", 0);
-        alternates.Set("CrossL1/Dynamic", true);
+        alternates.Set("CrossL1/Dynamic", false);
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);

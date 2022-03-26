@@ -193,7 +193,6 @@ namespace Kalitte.Trading
         {
             if (sensitivity != null)
             {
-                //if (sensitivity == null) AdjustSensitivity(0, "reverted");
                 AdjustSensitivityInternal((double)sensitivity.Result, "Calculation");
                 LastCalculatedSensitivity = sensitivity;
             }
@@ -262,7 +261,7 @@ namespace Kalitte.Trading
                     var difRatio = (double)(Math.Abs(LastCross) / Config.AvgChange);
                     if (difRatio > 2.0)
                     {
-                        average = -(decimal)(1 / (1 + Math.Pow(Math.E, -(1 * difRatio))));
+                        average = -(decimal)(1 / (1 + Math.Pow(Math.E, -(0.6 * difRatio))));
                     }
                 }
 
@@ -300,6 +299,14 @@ namespace Kalitte.Trading
             base.LoadNewBars(sender, e);
         }
 
+        protected override void OrderCompletedByAlgo(OrderEventArgs e)
+        {
+
+            if (Algo.Simulation && !Algo.MultipleTestOptimization)
+            {
+                Chart("Value").Serie("order").SetColor(Color.Chocolate).Add(e.Order.LastUpdate, 8);
+            }
+        }
 
         protected override SignalResult CheckInternal(DateTime? t = null)
         {
@@ -410,6 +417,8 @@ namespace Kalitte.Trading
                     {
                         Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
                         //Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
+                        if (result.Sensitivity != null)
+                            Chart("Value").Serie("volume").SetColor(Color.DarkOrange).Add(time, result.Sensitivity.VolumePower * 0.025M);
                         Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
                         //Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
                         Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.025M);
@@ -424,7 +433,7 @@ namespace Kalitte.Trading
 
                     }
 
-                    if (time.Hour % 1 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                    if (time.Hour % 3 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         SaveCharts(time);
                     }

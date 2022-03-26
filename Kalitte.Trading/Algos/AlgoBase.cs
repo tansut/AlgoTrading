@@ -71,11 +71,20 @@ namespace Kalitte.Trading.Algos
         public string LastSignal { get; set; }
     }
 
+    public class OrderEventArgs: EventArgs
+    {
+        public ExchangeOrder Order { get; set; }
+        public PortfolioItem Portfolio { get; set; }
+    }       
+
+
     public abstract class AlgoBase : ILogProvider
     {
         private object signalLock = new object();
         private object decideLock = new object();
         private object orderLock = new object();
+
+        public event EventHandler<OrderEventArgs> OrderCompleted;
 
         Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");
 
@@ -355,6 +364,11 @@ namespace Kalitte.Trading.Algos
                     this.positionRequest = null;
                     orderCounter++;                    
                     CompletedOrder(savePosition);
+                    if (OrderCompleted != null) OrderCompleted(this, new OrderEventArgs()
+                    {
+                        Order = savePosition,
+                        Portfolio = portfolio
+                    });
                 }
             }
             finally

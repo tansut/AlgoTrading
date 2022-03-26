@@ -343,6 +343,28 @@ namespace Kalitte.Trading
                     file.Delete();
                 }
             }
+
+            Algo.OrderCompleted += Algo_OrderCompleted;
+        }
+
+        protected virtual void OrderCompletedByAlgo(OrderEventArgs e)
+        {
+
+        }
+
+        private void Algo_OrderCompleted(object sender, OrderEventArgs e)
+        {
+            Log($"Entering order completed: {e.Order.Id}", LogLevel.Verbose);
+            Monitor.Enter(OperationLock);
+            try
+            {
+                OrderCompletedByAlgo(e);
+                Log($"Done order completed: {e.Order.Id}", LogLevel.Verbose);
+            }
+            finally
+            {
+                Monitor.Exit(OperationLock);
+            }
         }
 
         public bool BarDifferenceNegligible(DateTime t, DateTime expected, DateTime existing, BarPeriod period)

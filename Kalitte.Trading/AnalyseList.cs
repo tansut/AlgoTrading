@@ -121,13 +121,17 @@ namespace Kalitte.Trading
             return lookback <= 1 ? 0 : (decimal)list.GetRsi(lookback).Last().Rsi.Value;
         }
 
+        public IEnumerable<RsiResult> RsiList(int lookback)
+        {
+            return this.List.List.GetRsi(lookback);
+        }
+
         public IList<MyQuote> Averages(int lb = 0, OHLCType? ohlc = null, List<MyQuote> wamupList = null)
         {
             ohlc = ohlc ?? Candle;
             var list = this.List.List;
             var count = list.Count;
-            var lookback = lb == 0 ? Math.Max(1, count/2) : count <= lb ? Math.Max(1, count) : lb;
-            //lookback = BestLookback(count, lookback);
+            var lookback = lb == 0 ? Math.Max(1, count / 2) : count <= lb ? Math.Max(1, count) : lb;
             List<MyQuote> resultList = null;
             wamupList = wamupList ?? this.WarmupList;
 
@@ -141,18 +145,21 @@ namespace Kalitte.Trading
                 var result = list.GetSma(lookback, (CandlePart)ohlc);
                 resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Sma.HasValue ? (decimal)p.Sma.Value : 0 }).ToList();
             }
-            if (count <= lb && wamupList != null)
-            {
-                var last = resultList.Last();
-                //var sum = wamupList.Sum(p => p.Close) + last.Close;
-                // var avg = sum / (wamupList.Count + 1);
-                var newLast = last; // MyQuote.Create(last.Date, avg, Candle);
-                var i = wamupList.FindIndex(p => p.Date == last.Date);
-                if (i == -1)
-                    wamupList.Add(newLast);
-                else wamupList[i] = newLast;
-                return wamupList;
-            } else return resultList;
+            return resultList;
+            //if (count <= lb && wamupList != null)
+            //{
+            //    var last = resultList.Last();
+            //    var newLast = last; 
+            //    var i = wamupList.FindIndex(p => p.Date == last.Date);
+            //    if (i == -1)
+            //        wamupList.Add(newLast);
+            //    else wamupList[i] = newLast;
+            //    return wamupList;
+            //}
+            //else
+            //{
+            //    return resultList;
+            //}
         }
 
         public int BestLookback(int listSize, int lookback)
@@ -170,12 +177,11 @@ namespace Kalitte.Trading
             {
                 List.Push(MyQuote.Create(item));
             }
-
         }
 
         public decimal LastValue(int lookback = 0, OHLCType? ohlc = null, List<MyQuote> warmupList = null)
         {
-            return Averages(lookback, ohlc, warmupList).Last().Close;
+            return Averages(lookback, ohlc, warmupList).Last().Get(Candle);
         }
 
         public int Count => List.Count;

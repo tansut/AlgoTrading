@@ -54,6 +54,8 @@ namespace Kalitte.Trading
         public CrossType? CrossType { get; set; }
         public decimal LastCross { get; set; }
         public decimal Cross { get; set; }
+
+
         public CrossSignalResult(SignalBase signal, DateTime t) : base(signal, t)
         {
         }
@@ -111,8 +113,10 @@ namespace Kalitte.Trading
         private FinanceList<decimal> crossBars;
         private List<MyQuote> closeWarmupList;
         private List<MyQuote> ohlcWarmupList;
+        public AnalyseList RsiList { get; set; }
+        public AnalyseList RsiOfRsiList { get; set; }
 
-        public bool FirstCrossRequired { get; set; } = true;
+        //public bool FirstCrossRequired { get; set; } = true;
 
         public decimal LastCross { get; private set; } = 0;
 
@@ -135,7 +139,9 @@ namespace Kalitte.Trading
             Filter = new UKF();
             LastCross = 0;
             AvgChange = Config.AvgChange;
-            PreChange = Config.PreChange;            
+            PreChange = Config.PreChange;
+            RsiList.Clear();
+            RsiOfRsiList.Clear();
             base.ResetInternal();
 
             //TODO: Check for other signal
@@ -149,7 +155,6 @@ namespace Kalitte.Trading
             {
                 crossBars.Clear();
                 LastCross = 0;
-                FirstCrossRequired = true;
                 Log($"Cross reset", LogLevel.Debug);
             }
             finally
@@ -169,6 +174,10 @@ namespace Kalitte.Trading
             ohlcWarmupList = new List<MyQuote>();
             this.Indicators.Add(i1k);
             this.Indicators.Add(i2k);
+            RsiList = new AnalyseList(Config.Lookback * 5, Average.Sma);
+            RsiOfRsiList = new AnalyseList(Config.Lookback * 5, Average.Sma);
+            RsiList.Period = Config.AnalysePeriod;
+            RsiOfRsiList.Period = Config.AnalysePeriod;
             this.i1k.InputBars.ListEvent += base.InputbarsChanged;
             MonitorInit("sensitivity/volumePower", 0);
             MonitorInit("sensitivity/avgchange", AvgChange);
@@ -176,6 +185,21 @@ namespace Kalitte.Trading
             base.Init();
         }
 
+        public override void Start()
+        {
+            //if (AnalyseList.Count == 0)
+            //{
+            //    var lastBar = i1k.InputBars.Last.Date;
+            //    Helper.SymbolSeconds(i1k.InputBars.Period.ToString(), out int seconds);
+            //    var maxBar = lastBar.AddSeconds(seconds);
+            //    //AnalyseList.Init(i1k.Results.Where(p => p.Value.HasValue).Select(p => MyQuote.Create(p.Date, p.Value.Value, OHLCType.Close)));
+            //    //for(var t = lastBar; t < maxBar;t=t.AddSeconds(1))
+            //    //{
+
+            //    //}
+            //}
+            base.Start();
+        }
 
 
         protected override void AdjustSensitivityInternal(double ratio, string reason)
@@ -349,11 +373,11 @@ namespace Kalitte.Trading
 
                 if (AnalyseList.Count > 0)
                 {
-                    var closeAverages = AnalyseList.Averages(Config.Lookback, OHLCType.Close, closeWarmupList);
-                    var closeLast = closeAverages.Last().Close;
+                    //var closeAverages = AnalyseList.Averages(Config.Lookback, OHLCType.Close, closeWarmupList);
+                    //var closeLast = closeAverages.Last().Close;
 
-                    var closeRsiList = closeAverages.GetRsi(AnalyseList.BestLookback(closeAverages.Count, Config.Lookback));
-                    var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
+                    //var closeRsiList = closeAverages.GetRsi(AnalyseList.BestLookback(closeAverages.Count, Config.Lookback));
+                    //var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
                     var ohlc = OHLCType.Close; // (closeRsi == 0 || closeRsi == 100) ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
                     var rsiEffect = 0; //closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
 
@@ -365,19 +389,20 @@ namespace Kalitte.Trading
                     }
 
                     var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
-                    var averages = AnalyseList.Averages(totalSize, ohlc, ohlcWarmupList);
+                    lastAvg = result.Dif = AnalyseList.LastValue(Lookback);
 
-                    var maAvg = averages.Last().Close;
-                    lastAvg = result.Dif = maAvg;
-
-                    var rsiList = averages.GetRsi(AnalyseList.BestLookback(averages.Count, Config.Lookback));
+                    RsiList.Collect(lastAvg, time);                    
+                    var rsiList = RsiList.RsiList(Config.Lookback);
                     var rsiListLast = rsiList.Last();
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
-
-                    var rsiQuotes = rsiList.Select(p => new MyQuote() { Date = p.Date, Close = p.Rsi.HasValue ? (decimal)p.Rsi.Value : 0 }).ToList();
-                    var rsiOfRsiList = rsiQuotes.GetRsi(AnalyseList.BestLookback(rsiList.Count(), Config.Lookback/2 ));
-                    var rsiOfRsiListLast = rsiOfRsiList.Last();
-                    var rsiOfRsi = result.Rsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
+                    var rsiOfRsi = 0M;
+                    if (rsi != 0)
+                    {
+                        RsiOfRsiList.Collect(rsi, time);
+                        var rsiOfRsiList = RsiOfRsiList.RsiList(Config.Lookback/2);
+                        var rsiOfRsiListLast = rsiOfRsiList.Last();
+                        rsiOfRsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
+                    }
 
                     var rsiReady = result.RsiReady = rsi > 0 && rsi < 100 && rsiOfRsi > 0 && rsiOfRsi < 100;
                     var down = rsiOfRsi < 50 & rsi < 50;
@@ -425,7 +450,7 @@ namespace Kalitte.Trading
                         //Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
                         Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.1M);
                         Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.1M);
-                        Chart("Value").Serie("rsit").SetColor(Color.DimGray).Add(time, 10);
+                        //Chart("Value").Serie("rsit").SetColor(Color.DimGray).Add(time, 10);
                         Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 5);
                         
                         Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);

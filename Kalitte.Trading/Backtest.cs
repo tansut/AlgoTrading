@@ -1,5 +1,4 @@
 ﻿using Kalitte.Trading.Algos;
-using Kalitte.Trading.Algos;
 using Newtonsoft.Json;
 using Skender.Stock.Indicators;
 using System;

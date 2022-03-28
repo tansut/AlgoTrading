@@ -389,7 +389,7 @@ namespace Kalitte.Trading
                     }
 
                     var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
-                    lastAvg = result.Dif = AnalyseList.LastValue(Lookback);
+                    lastAvg = result.Dif = AnalyseList.LastValue(Lookback, OHLCType.Close);
 
                     RsiList.Collect(lastAvg, time);                    
                     var rsiList = RsiList.RsiList(Config.Lookback);
@@ -447,11 +447,12 @@ namespace Kalitte.Trading
                         //Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
                         //if (result.Sensitivity != null)
                         //    Chart("Value").Serie("volume").SetColor(Color.DarkOrange).Add(time, result.Sensitivity.VolumePower * 0.1M);
-                        //Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
-                        Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.1M);
-                        Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.1M);
+                        if (i1k.Results.Last().Date.Hour <= time.Hour)
+                            Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
+                        //Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.1M);
+                        //Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.1M);
                         //Chart("Value").Serie("rsit").SetColor(Color.DimGray).Add(time, 10);
-                        Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 5);
+                        //Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 5);
                         
                         Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);
                         Chart("Value").Serie("navg").SetColor(Color.DarkOrange).Add(time, -avgChangeL1);
@@ -462,7 +463,7 @@ namespace Kalitte.Trading
 
                     }
 
-                    if (time.Hour % 1 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                    if (time.Hour % 6 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         SaveCharts(time);
                     }

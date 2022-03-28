@@ -354,8 +354,8 @@ namespace Kalitte.Trading
 
                     var closeRsiList = closeAverages.GetRsi(AnalyseList.BestLookback(closeAverages.Count, Config.Lookback));
                     var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
-                    var ohlc = (closeRsi == 0 || closeRsi == 100) ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
-                    var rsiEffect = closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
+                    var ohlc = OHLCType.Close; // (closeRsi == 0 || closeRsi == 100) ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
+                    var rsiEffect = 0; //closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
 
                     if (Config.Dynamic)
                     {
@@ -366,10 +366,11 @@ namespace Kalitte.Trading
 
                     var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
                     var averages = AnalyseList.Averages(totalSize, ohlc, ohlcWarmupList);
+
                     var maAvg = averages.Last().Close;
                     lastAvg = result.Dif = maAvg;
 
-                    var rsiList = averages.GetRsi(AnalyseList.BestLookback(averages.Count, Config.Lookback*2));
+                    var rsiList = averages.GetRsi(AnalyseList.BestLookback(averages.Count, Config.Lookback));
                     var rsiListLast = rsiList.Last();
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
@@ -416,11 +417,11 @@ namespace Kalitte.Trading
 
                     if (Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
+                        Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
                         Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
                         //Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
                         //if (result.Sensitivity != null)
                         //    Chart("Value").Serie("volume").SetColor(Color.DarkOrange).Add(time, result.Sensitivity.VolumePower * 0.1M);
-                        Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
                         //Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
                         Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.1M);
                         Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.1M);
@@ -436,7 +437,7 @@ namespace Kalitte.Trading
 
                     }
 
-                    if (time.Hour % 3 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                    if (time.Hour % 1 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         SaveCharts(time);
                     }

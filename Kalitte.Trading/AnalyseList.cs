@@ -121,14 +121,15 @@ namespace Kalitte.Trading
             return lookback <= 1 ? 0 : (decimal)list.GetRsi(lookback).Last().Rsi.Value;
         }
 
-        public IList<MyQuote> Averages(int lookback = 0, OHLCType? ohlc = null, IList<MyQuote> wamupList = null)
+        public IList<MyQuote> Averages(int lb = 0, OHLCType? ohlc = null, List<MyQuote> wamupList = null)
         {
             ohlc = ohlc ?? Candle;
             var list = this.List.List;
             var count = list.Count;
-            //lookback = lookback == 0 ? Math.Max(1, count / 2) : lookback;
-            lookback = BestLookback(count, lookback);
+            var lookback = lb == 0 ? Math.Max(1, count/2) : count <= lb ? Math.Max(1, count) : lb;
+            //lookback = BestLookback(count, lookback);
             List<MyQuote> resultList = null;
+            wamupList = wamupList ?? this.WarmupList;
 
             if (this.Average == Average.Ema)
             {
@@ -140,17 +141,18 @@ namespace Kalitte.Trading
                 var result = list.GetSma(lookback, (CandlePart)ohlc);
                 resultList = result.Select(p => new MyQuote() { Date = p.Date, Close = p.Sma.HasValue ? (decimal)p.Sma.Value : 0 }).ToList();
             }
-            wamupList = wamupList ?? this.WarmupList;
-            if (count <= lookback && wamupList != null)
+            if (count <= lb && wamupList != null)
             {
                 var last = resultList.Last();
-                var sum = wamupList.Sum(p => p.Close) + last.Close;
-                var avg = sum / (wamupList.Count + 1);
-                wamupList.Add(MyQuote.Create(last.Date, avg, Candle));
+                //var sum = wamupList.Sum(p => p.Close) + last.Close;
+                // var avg = sum / (wamupList.Count + 1);
+                var newLast = last; // MyQuote.Create(last.Date, avg, Candle);
+                var i = wamupList.FindIndex(p => p.Date == last.Date);
+                if (i == -1)
+                    wamupList.Add(newLast);
+                else wamupList[i] = newLast;
                 return wamupList;
-            }
-            else
-                return resultList;
+            } else return resultList;
         }
 
         public int BestLookback(int listSize, int lookback)

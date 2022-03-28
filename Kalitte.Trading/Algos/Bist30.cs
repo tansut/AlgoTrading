@@ -734,7 +734,7 @@ namespace Kalitte.Trading.Algos
 
             if (OrderConfig.Total != target)
             {
-                Log($"Daily order limit adjusted to {target} for {Now.Date}, Todays orders: {stats.Total}, NetPL: {stats.NetPl}", LogLevel.Debug);
+                Log($"Daily order limit adjusted to {target} for {Now.Date}, Todays orders: {stats.Total}, NetPL: {stats.NetPl}", LogLevel.Test);
                 this.OrderConfig.Total = target;
             }
 

@@ -14,7 +14,6 @@ Renamed Types:
 {
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::<Averages>b__50_0[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.EmaResult ) -> A
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::<Averages>b__50_1[1]( [Skender.Stock.Indicators]Skender.Stock.Indicators.SmaResult ) -> A
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::<Averages>b__50_2[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) -> A
 
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c::.ctor[0]( ) skipped:  special name
@@ -22,10 +21,18 @@ Renamed Types:
 	Kalitte.Trading.AnalyseList/<>c [Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c Kalitte.Trading.AnalyseList/<>c::<>9 -> A
 	System.Func`2<Skender.Stock.Indicators.EmaResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.EmaResult,Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList/<>c::<>9__50_0 -> A
 	System.Func`2<Skender.Stock.Indicators.SmaResult,Kalitte.Trading.MyQuote> [Kalitte.Trading]System.Func`2<Skender.Stock.Indicators.SmaResult,Kalitte.Trading.MyQuote> Kalitte.Trading.AnalyseList/<>c::<>9__50_1 -> A
-	System.Func`2<Kalitte.Trading.MyQuote,System.Decimal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.MyQuote,System.Decimal> Kalitte.Trading.AnalyseList/<>c::<>9__50_2 -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass58_0 -> [Kalitte.Trading]Kalitte.Trading.AnalyseList/a
+[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass50_0 -> [Kalitte.Trading]Kalitte.Trading.AnalyseList/a
+{
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass50_0::<Averages>b__2[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) -> A
+
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass50_0::.ctor[0]( ) skipped:  special name
+
+	Kalitte.Trading.MyQuote [Kalitte.Trading]Kalitte.Trading.MyQuote Kalitte.Trading.AnalyseList/<>c__DisplayClass50_0::last -> A
+}
+
+[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass58_0 -> [Kalitte.Trading]Kalitte.Trading.AnalyseList/B
 {
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList/<>c__DisplayClass58_0::<CalculateSpeed>b__0[1]( [Kalitte.Trading]Kalitte.Trading.MyQuote ) -> A
 
@@ -461,7 +468,7 @@ Renamed Types:
 	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.Algos.Bist30/<>c__DisplayClass139_0::fib -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.K
+[Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.k
 {
 
 	[Kalitte.Trading]Kalitte.Trading.LossSignal::get_Usage[0]( ) skipped:  skip by property
@@ -518,7 +525,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Clear[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Resize[1]( [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Rsi[1]( [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Averages[3]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType>, [mscorlib]System.Collections.Generic.IList`1<[Kalitte.Trading]Kalitte.Trading.MyQuote> ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.AnalyseList::Averages[3]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType>, [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.MyQuote> ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::BestLookback[2]( [mscorlib]System.Int32, [mscorlib]System.Int32 ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.AnalyseList::LastValue[3]( [mscorlib]System.Int32, [mscorlib]System.Nullable`1<[Kalitte.Trading]Kalitte.Trading.OHLCType>, [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.MyQuote> ) skipped:  KeepPublicApi option in configuration
 

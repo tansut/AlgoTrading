@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 25);
+        settings.Start = new DateTime(2022, 3, 28);
+        settings.Finish = new DateTime(2022, 3, 28);
         settings.AutoClosePositions = true;
         
 
@@ -37,13 +37,13 @@ public class Program
 
         // global order
         alternates.Set("Orders/Total", 10);
-        alternates.Set("Orders/ProfitLimitEnabled", false);
+        alternates.Set("Orders/ProfitLimitEnabled", true);
         alternates.Set("Orders/ProfitLimit", new decimal[] { 100, 150, 200 });
-        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.4M, 0.2M, 0 });
+        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.6M, 0.2M, 0 });
 
-        alternates.Set("Orders/LossLimitEnabled", false);
-        alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 2500 });
-        alternates.Set("Orders/LossRatio", new decimal[] { 1, 0.6M, 0.2M });
+        alternates.Set("Orders/LossLimitEnabled", true);
+        alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 250 });
+        alternates.Set("Orders/LossRatio", new decimal[] { 0.4M, 0.0M, 0.0M });
 
         alternates.Set("Orders/NightRatio", 1);        
         alternates.Set("Orders/KeepRatio", 0.2);
@@ -141,9 +141,9 @@ public class Program
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);        
-        alternates.Set("CrossL1/RsiMax", 0);
-        alternates.Set("CrossL1/RsiMin",  0);
-        alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec10);
+        alternates.Set("CrossL1/RsiMax", 55);
+        alternates.Set("CrossL1/RsiMin",  45);
+        alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec5);
         //alternates.Set("CrossL1/SignalSensitivity", 10);
 
         alternates.Set("CrossL2/Enabled", false);

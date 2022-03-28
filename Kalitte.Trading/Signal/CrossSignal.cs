@@ -389,9 +389,9 @@ namespace Kalitte.Trading
                     }
 
                     var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
-                    lastAvg = result.Dif = AnalyseList.LastValue(Lookback, OHLCType.HLC3);
+                    lastAvg = result.Dif = AnalyseList.LastValue(Lookback, OHLCType.HL2C4);
 
-                    RsiList.Collect(lastAvg, time);                    
+                    RsiList.Collect(lastAvg, time);
                     var rsiList = RsiList.RsiList(Config.Lookback);
                     var rsiListLast = rsiList.Last();
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;

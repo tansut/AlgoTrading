@@ -449,10 +449,10 @@ namespace Kalitte.Trading
                         //    Chart("Value").Serie("volume").SetColor(Color.DarkOrange).Add(time, result.Sensitivity.VolumePower * 0.1M);
                         if (i1k.Results.Last().Date.Hour <= time.Hour)
                             Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
-                        //Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.1M);
-                        //Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.1M);
+                        Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.1M);
+                        Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.1M);
                         //Chart("Value").Serie("rsit").SetColor(Color.DimGray).Add(time, 10);
-                        //Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 5);
+                        Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 5);
                         
                         Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);
                         Chart("Value").Serie("navg").SetColor(Color.DarkOrange).Add(time, -avgChangeL1);

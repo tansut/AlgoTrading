@@ -394,21 +394,12 @@ namespace Kalitte.Trading
                 RsiOfRsiList.Period = BarPeriod.Sec10;
                 decimal rsi = 0;
                 var rsiOfRsi = 0M;
-                if (LastCross != 0)
-                {
-                    if (Math.Sign(LastCross) == Math.Sign(lastAvg))
-                    {
-                        RsiList.Collect(lastAvg, time);
-                        var rsiList = RsiList.RsiList(LastCrossTime);
-                        var rsiListLast = rsiList.Last();
-                        rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
-                    } else
-                    {
-                        RsiList.Collect(0, LastCrossTime);
-                        //RsiList.Clear();
-                    }
+                RsiList.Collect(lastAvg, time);
+                var rsiList = RsiList.RsiList(30);
+                var rsiListLast = rsiList.Last();
+                rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
 
-                }
+
                 if (rsi > 0 && rsi < 100)
                 {
                     RsiOfRsiList.Collect(rsi, time);
@@ -458,7 +449,7 @@ namespace Kalitte.Trading
 
                 if (Algo.Simulation && !Algo.MultipleTestOptimization)
                 {
-                    //Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
+                    Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, AnalyseList.List.Last.Close);
                     Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
                     //Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
                     //if (result.Sensitivity != null)
@@ -466,7 +457,7 @@ namespace Kalitte.Trading
                     //if (i1k.Results.Last().Date.Hour <= time.Hour)
                     //    Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
                     Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.05M);
-                    //Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.05M);
+                    Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.05M);
                     //Chart("Value").Serie("rsit").SetColor(Color.DimGray).Add(time, 10);
                     Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 2.5M);
 

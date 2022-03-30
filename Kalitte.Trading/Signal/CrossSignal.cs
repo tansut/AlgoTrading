@@ -368,7 +368,7 @@ namespace Kalitte.Trading
                 AnalyseList.Collect(l1 - l2, time);
                 crossBars.Push(l1 - l2);
 
-                var cross = result.Cross = Helper.Cross(crossBars.ToArray, 0, 0.1M);
+                var cross = result.Cross = Helper.Cross(crossBars.ToArray, 0, 0.05M);
                 if (cross != 0 && Math.Sign(LastCross) != Math.Sign(cross))
                 {
                     LastCross = cross;
@@ -382,9 +382,10 @@ namespace Kalitte.Trading
 
                 if (Config.Dynamic)
                 {
-                    var sensitivity = CalculateSensitivity();
-                    applySensitivity(sensitivity);
-                    result.Sensitivity = sensitivity;
+
+                    //var sensitivity = CalculateSensitivity();
+                    //applySensitivity(sensitivity);
+                    //result.Sensitivity = sensitivity;
                 }
 
                 var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
@@ -397,21 +398,27 @@ namespace Kalitte.Trading
                 RsiList.Collect(lastAvg, time);
                 var rsiList = RsiList.RsiList(30);
                 var rsiListLast = rsiList.Last();
-                rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
+                rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : -1;
 
 
                 if (rsi > 0 && rsi < 100)
                 {
                     RsiOfRsiList.Collect(rsi, time);
-                    var rsiOfRsiList = RsiOfRsiList.RsiList(60);
+                    var rsiOfRsiList = RsiOfRsiList.RsiList(30);
                     var rsiOfRsiListLast = rsiOfRsiList.Last();
-                    rsiOfRsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
+                    rsiOfRsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : -1;
                 }
 
-                var rsiReady = result.RsiReady = rsi > 0 && rsi < 100 && rsiOfRsi > 0 && rsiOfRsi < 100;
+                var rsiReady = result.RsiReady = rsi >= 0 && rsiOfRsi >= 0;
+
+                if (Config.Dynamic && rsiReady)
+                {
+                    AvgChange = Config.AvgChange - Config.AvgChange * (Math.Abs((50 - rsi) / 100) +  2 * Math.Abs((50 - rsiOfRsi) / 100) / 3);
+                }
+
                 var down = LastCross < 0;
                 var up = LastCross > 0;
-                var signalCheck = Math.Sign(SignalCrossValue) != Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
+                var signalCheck = true;// Math.Sign(SignalCrossValue) != Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
 
                 var avgChangeL1 = AvgChange;
                 var avgChangeL2 = AvgChange / 4;
@@ -422,7 +429,10 @@ namespace Kalitte.Trading
                 var topL2 = lastAvg > avgChangeL2 && lastAvg < avgChangeL2 * 2;
                 var belowL2 = lastAvg < -avgChangeL2 && lastAvg > -avgChangeL2 * 2;
 
-                if (topL1 && signalCheck && up)
+                var rsiMin = 30;
+                var rsiMax = 70;
+
+                if (topL1 && signalCheck && up && (!rsiReady || (rsi > rsiMax && rsiOfRsi > rsiMax)))
                 {
                     result.CrossType = CrossType.AfterUp;
                     result.finalResult = BuySell.Buy;
@@ -433,7 +443,7 @@ namespace Kalitte.Trading
                     result.CrossType = CrossType.AfterDown;
                     result.preResult = BuySell.Sell;
                 }
-                else if (belowL1 && signalCheck && down)
+                else if (belowL1 && signalCheck && down && (!rsiReady || (rsi < rsiMin && rsiOfRsi < rsiMin)))
                 {
                     result.finalResult = BuySell.Sell;
                     result.CrossType = CrossType.BeforeDown;

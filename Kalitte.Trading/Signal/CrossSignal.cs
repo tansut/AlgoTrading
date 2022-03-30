@@ -419,6 +419,7 @@ namespace Kalitte.Trading
                 var down = LastCross < 0;
                 var up = LastCross > 0 ;
                 var signalCheck = Math.Sign(SignalCrossValue) != Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
+                //var signalCheckBefore = Math.Sign(SignalCrossValue) == Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
 
                 var avgChangeL1 = AvgChange;
                 var avgChangeL2 = AvgChange / 4;
@@ -426,33 +427,33 @@ namespace Kalitte.Trading
                 var topL1 = lastAvg > avgChangeL1;
                 var belowL1 = lastAvg < -avgChangeL1;
 
-                var topL2 = lastAvg > avgChangeL2 && lastAvg < avgChangeL2 * 2;
-                var belowL2 = lastAvg < -avgChangeL2 && lastAvg > -avgChangeL2 * 2;
+                var topL2 = lastAvg > avgChangeL2;
+                var belowL2 = lastAvg < -avgChangeL2;
 
-                var rsiMin = 5;
-                var rsiMax = 95;
+                var rsiMin = 25;
+                var rsiMax = 75;
 
-                var rsiTop = false && rsiReady && (rsiAverage > rsiMax && rsiOfRsi > rsiMax);
-                var rsiDown = false && rsiReady && (rsiAverage < rsiMin && rsiOfRsi < rsiMin);
+                var rsiTop = rsiReady && (rsiAverage > rsiMax && rsiOfRsi > rsiMax);
+                var rsiDown = rsiReady && (rsiAverage < rsiMin && rsiOfRsi < rsiMin);
 
-                if ((topL1 && signalCheck && up) || rsiTop)
+                if ((topL1 && signalCheck && up))
                 {
                     result.CrossType = CrossType.AfterUp;
                     result.finalResult = BuySell.Buy;
                     SignalCrossValue = LastCross;
                 }
-                else if (topL2 && (rsiReady && down))
+                else if (topL2 && rsiDown)
                 {
-                    result.CrossType = CrossType.AfterDown;
+                    result.CrossType = CrossType.BeforeDown;
                     result.preResult = BuySell.Sell;
                 }
-                else if ((belowL1 && signalCheck && down) || rsiDown)
+                else if ((belowL1 && signalCheck && down))
                 {
                     result.finalResult = BuySell.Sell;
-                    result.CrossType = CrossType.BeforeDown;
+                    result.CrossType = CrossType.AfterDown;
                     SignalCrossValue = LastCross;
                 }
-                else if (belowL2 && (rsiReady && up))
+                else if (belowL2 && rsiTop)
                 {
                     result.preResult = BuySell.Buy;
                     result.CrossType = CrossType.BeforeUp;
@@ -462,7 +463,7 @@ namespace Kalitte.Trading
 
                 if (Algo.Simulation && !Algo.MultipleTestOptimization)
                 {
-                    Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, AnalyseList.List.Last.Close);
+                    //Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, AnalyseList.List.Last.Close);
                     Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
                     if (rsiReady)
                     {
@@ -485,13 +486,13 @@ namespace Kalitte.Trading
                     Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);
                     Chart("Value").Serie("navg").SetColor(Color.DarkOrange).Add(time, -avgChangeL1);
 
-                    //Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol(result.preResult.HasValue ? ZedGraph.SymbolType.Plus : ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1) : 0);
+                    Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol(result.preResult.HasValue ? ZedGraph.SymbolType.Plus : ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1) : 0);
                     Chart("Value").Serie("final").SetColor(Color.DarkGreen).SetSymbol(result.finalResult.HasValue ? ZedGraph.SymbolType.HDash : ZedGraph.SymbolType.None).Add(time, result.finalResult.HasValue ? (result.finalResult == BuySell.Buy ? 1 : -1) : 0);
 
 
                 }
 
-                if (time.Hour % 1 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                if (time.Hour % 3 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                 {
                     SaveCharts(time);
                 }

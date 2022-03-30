@@ -389,24 +389,24 @@ namespace Kalitte.Trading
                 var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
                 lastAvg = result.Dif = AnalyseList.LastValue(Lookback, OHLCType.HL2C4);
 
-                RsiList.Period = BarPeriod.Sec10;
-                RsiOfRsiList.Period = BarPeriod.Sec10;
+                RsiList.Period = BarPeriod.Sec5;
+                RsiOfRsiList.Period = BarPeriod.Sec5;
                 decimal rsi = 0;
                 var rsiOfRsi = 0M;
                 RsiList.Collect(lastAvg, time);
-                var rsiList = RsiList.RsiList(30);                
+                var rsiList = RsiList.RsiList(60);                
                 rsi = result.Rsi = rsiList.Count > 0 ? rsiList.List.Last.Close : -1;
-                var rsiAverage = rsi >= 0 ? rsiList.LastValue(30) : -1;
+                var rsiAverage = rsi >= 0 ? rsiList.LastValue(60) : -1;
                 if (rsi >= 0)
                 {
                     RsiOfRsiList.Collect(rsiAverage, time);
-                    var rsiOfRsiList = RsiOfRsiList.RsiList(30);                    
+                    var rsiOfRsiList = RsiOfRsiList.RsiList(60);                    
                     rsiOfRsi = rsiOfRsiList.Count > 0 ? rsiOfRsiList.List.Last.Close : -1;
                 }
 
                 var rsiReady = result.RsiReady = rsi >= 0 && rsiOfRsi >= 0;                
                 
-                var rsiOfRsiAverage = rsiReady ? RsiOfRsiList.LastValue(30): -1;
+                var rsiOfRsiAverage = rsiReady ? RsiOfRsiList.LastValue(60): -1;
 
                 if (Config.Dynamic && rsiReady)
                 {
@@ -421,10 +421,10 @@ namespace Kalitte.Trading
                 var avgChangeL1 = AvgChange;
                 var avgChangeL2 = Config.AvgChange;
 
-                var topL1 = lastAvg > avgChangeL1;
+                var topL1 = lastAvg > avgChangeL1 && (!rsiReady || rsiAverage > 98);
                 var belowL1 = lastAvg < -avgChangeL1;
 
-                var topL2 = lastAvg > 0 && lastAvg < avgChangeL2;
+                var topL2 = lastAvg > 0 && lastAvg < avgChangeL2 && (!rsiReady || rsiAverage < 2);
                 var belowL2 = lastAvg < 0 && lastAvg > -avgChangeL2;
 
                 var rsiMin = 25;

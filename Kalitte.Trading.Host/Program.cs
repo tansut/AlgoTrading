@@ -54,9 +54,9 @@ public class Program
         alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 600);
         alternates.Set("DataCollectAverage", Average.Ema);
-        alternates.Set("DataAnalysisAverage", Average.Sma);
-        alternates.Set("DataAnalysisLookback", 120);
-        alternates.Set("DataAnalysisPeriods", BarPeriod.Sec5);
+        alternates.Set("DataAnalysisAverage", Average.Ema);
+        alternates.Set("DataAnalysisLookback", 60);
+        alternates.Set("DataAnalysisPeriods", BarPeriod.Sec10);
 
         // profit && loss
 

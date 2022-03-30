@@ -391,15 +391,19 @@ namespace Kalitte.Trading
                     var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
                     lastAvg = result.Dif = AnalyseList.LastValue(Lookback, OHLCType.HL2C4);
 
+                    RsiList.Period = BarPeriod.Sec30;
+                    RsiOfRsiList.Period = BarPeriod.Sec30;
+
                     RsiList.Collect(lastAvg, time);
-                    var rsiList = RsiList.RsiList(Config.Lookback);
+                    var rsiList = RsiList.RsiList(6);
                     var rsiListLast = rsiList.Last();
                     var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
                     var rsiOfRsi = 0M;
-                    if (rsi != 0)
+
+                    if (rsi > 0 && rsi < 100)
                     {
                         RsiOfRsiList.Collect(rsi, time);
-                        var rsiOfRsiList = RsiOfRsiList.RsiList(Config.Lookback/2);
+                        var rsiOfRsiList = RsiOfRsiList.RsiList(3);
                         var rsiOfRsiListLast = rsiOfRsiList.Last();
                         rsiOfRsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
                     }
@@ -463,7 +467,7 @@ namespace Kalitte.Trading
 
                     }
 
-                    if (time.Hour % 6 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                    if (time.Hour % 4 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                     {
                         SaveCharts(time);
                     }

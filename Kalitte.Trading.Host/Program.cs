@@ -20,7 +20,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 25);
+        settings.Start = new DateTime(2022, 3, 28);
         settings.Finish = new DateTime(2022, 3, 28);
         settings.AutoClosePositions = true;
         
@@ -37,11 +37,11 @@ public class Program
 
         // global order
         alternates.Set("Orders/Total", 10);
-        alternates.Set("Orders/ProfitLimitEnabled", true);
+        alternates.Set("Orders/ProfitLimitEnabled", false);
         alternates.Set("Orders/ProfitLimit", new decimal[] { 100, 150, 200 });
         alternates.Set("Orders/ProfitRatio", new decimal [] { 0.6M, 0.2M, 0 });
 
-        alternates.Set("Orders/LossLimitEnabled", true);
+        alternates.Set("Orders/LossLimitEnabled", false);
         alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 250 });
         alternates.Set("Orders/LossRatio", new decimal[] { 0.4M, 0.0M, 0.0M });
 
@@ -51,10 +51,10 @@ public class Program
         alternates.Set("DailyClose/Enabled", true);
 
         // analyser defaults
-        alternates.Set("DataCollectSize", 6);
+        alternates.Set("DataCollectSize", 12);
         alternates.Set("DataAnalysisSize", 600);
         alternates.Set("DataCollectAverage", Average.Ema);
-        alternates.Set("DataAnalysisAverage", Average.Ema);
+        alternates.Set("DataAnalysisAverage", Average.Sma);
         alternates.Set("DataAnalysisLookback", 120);
         alternates.Set("DataAnalysisPeriods", BarPeriod.Sec5);
 
@@ -88,34 +88,39 @@ public class Program
         // rsi
         alternates.Set("Rsi", 14);
 
+        alternates.Set("RsiOrderHighL1/Enabled", false);
         alternates.Set("RsiOrderHighL1/MakeRatio", 0.1);
         alternates.Set("RsiOrderHighL1/Action", RsiPositionAction.IfEmpty);
         alternates.Set("RsiOrderHighL1/L1", 73.00);
         alternates.Set("RsiOrderHighL1/L2", 76.50);
 
+        alternates.Set("RsiOrderHighL2/Enabled", false);
         alternates.Set("RsiOrderHighL2/KeepRatio", 0.1);
         alternates.Set("RsiOrderHighL2/MakeRatio", 0.3);
         alternates.Set("RsiOrderHighL2/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderHighL2/L1", 76.51);
         alternates.Set("RsiOrderHighL2/L2", 84.50);
 
+        alternates.Set("RsiOrderHighL3/Enabled", false);
         alternates.Set("RsiOrderHighL3/MakeRatio", 0.4);
         alternates.Set("RsiOrderHighL3/Action", RsiPositionAction.Radical);
         alternates.Set("RsiOrderHighL3/L1", 84.51);
         alternates.Set("RsiOrderHighL3/L2", 100);
 
-
+        alternates.Set("RsiOrderLowL1/Enabled", false);
         alternates.Set("RsiOrderLowL1/MakeRatio", 0.1);
         alternates.Set("RsiOrderLowL1/ActionRatio", RsiPositionAction.IfEmpty);
         alternates.Set("RsiOrderLowL1/L1", 33.00);
         alternates.Set("RsiOrderLowL1/L2", 29.00);
 
+        alternates.Set("RsiOrderLowL2/Enabled", false);
         alternates.Set("RsiOrderLowL2/KeepRatio", 0.1);
         alternates.Set("RsiOrderLowL2/MakeRatio", 0.3);
         alternates.Set("RsiOrderLowL2/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderLowL2/L1", 28.99);
         alternates.Set("RsiOrderLowL2/L2", 23.00);
 
+        alternates.Set("RsiOrderLowL3/Enabled", false);
         alternates.Set("RsiOrderLowL3/MakeRatio", 0.4);
         alternates.Set("RsiOrderLowL3/ActionRatio", RsiPositionAction.Radical);
         alternates.Set("RsiOrderLowL3/L1", 22.99);

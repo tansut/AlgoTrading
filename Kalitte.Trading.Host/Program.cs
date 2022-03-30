@@ -21,7 +21,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 3, 28);
-        settings.Finish = new DateTime(2022, 3, 28);
+        settings.Finish = new DateTime(2022, 3, 29);
         settings.AutoClosePositions = true;
         
 
@@ -46,7 +46,7 @@ public class Program
         alternates.Set("Orders/LossRatio", new decimal[] { 0.4M, 0.0M, 0.0M });
 
         alternates.Set("Orders/NightRatio", 1);        
-        alternates.Set("Orders/KeepRatio", 0.2);
+        alternates.Set("Orders/KeepRatio", 0);
         alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);
         alternates.Set("DailyClose/Enabled", true);
 

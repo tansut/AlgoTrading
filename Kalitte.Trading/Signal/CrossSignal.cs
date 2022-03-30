@@ -374,19 +374,10 @@ namespace Kalitte.Trading
                     LastCross = cross;
                     LastCrossTime = time;
                     Log($"Cross identified: {cross}", LogLevel.Debug, t);
-                    //crossBars.Clear();
-                    RsiList.Clear();
-                    RsiOfRsiList.Clear();
+                    //RsiList.Clear();
+                    //RsiOfRsiList.Clear();
                 }
                 result.LastCross = LastCross;
-
-
-                //var closeAverages = AnalyseList.Averages(Config.Lookback, OHLCType.Close, closeWarmupList);
-                //var closeLast = closeAverages.Last().Close;
-
-                //var closeRsiList = closeAverages.GetRsi(AnalyseList.BestLookback(closeAverages.Count, Config.Lookback));
-                //var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
-                var ohlc = OHLCType.Close; // (closeRsi == 0 || closeRsi == 100) ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
                 var rsiEffect = 0; //closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
 
                 if (Config.Dynamic)
@@ -399,19 +390,29 @@ namespace Kalitte.Trading
                 var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
                 lastAvg = result.Dif = AnalyseList.LastValue(Lookback, OHLCType.HL2C4);
 
-                RsiList.Period = BarPeriod.Sec5;
-                RsiOfRsiList.Period = BarPeriod.Sec5;
-
-                RsiList.Collect(lastAvg, time);
-                var rsiList = RsiList.RsiList(24);
-                var rsiListLast = rsiList.Last();
-                var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
+                RsiList.Period = BarPeriod.Sec10;
+                RsiOfRsiList.Period = BarPeriod.Sec10;
+                decimal rsi = 0;
                 var rsiOfRsi = 0M;
+                if (LastCross != 0)
+                {
+                    if (Math.Sign(LastCross) == Math.Sign(lastAvg))
+                    {
+                        RsiList.Collect(lastAvg, time);
+                        var rsiList = RsiList.RsiList(LastCrossTime);
+                        var rsiListLast = rsiList.Last();
+                        rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
+                    } else
+                    {
+                        RsiList.Collect(0, LastCrossTime);
+                        //RsiList.Clear();
+                    }
 
+                }
                 if (rsi > 0 && rsi < 100)
                 {
                     RsiOfRsiList.Collect(rsi, time);
-                    var rsiOfRsiList = RsiOfRsiList.RsiList(20);
+                    var rsiOfRsiList = RsiOfRsiList.RsiList(60);
                     var rsiOfRsiListLast = rsiOfRsiList.Last();
                     rsiOfRsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
                 }
@@ -478,7 +479,7 @@ namespace Kalitte.Trading
 
                 }
 
-                if (time.Hour % 6 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                if (time.Hour % 1 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
                 {
                     SaveCharts(time);
                 }

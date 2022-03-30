@@ -218,7 +218,7 @@ namespace Kalitte.Trading
         }
 
 
-        public IList<T> List
+        public List<T> List
         {
             get
             {

@@ -374,8 +374,6 @@ namespace Kalitte.Trading
                     LastCross = cross;
                     LastCrossTime = time;
                     Log($"Cross identified: {cross}", LogLevel.Debug, t);
-                    //RsiList.Clear();
-                    //RsiOfRsiList.Clear();
                 }
                 result.LastCross = LastCross;
                 var rsiEffect = 0; //closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
@@ -422,13 +420,13 @@ namespace Kalitte.Trading
                 //var signalCheckBefore = Math.Sign(SignalCrossValue) == Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
 
                 var avgChangeL1 = AvgChange;
-                var avgChangeL2 = AvgChange / 4;
+                var avgChangeL2 = AvgChange;
 
                 var topL1 = lastAvg > avgChangeL1;
                 var belowL1 = lastAvg < -avgChangeL1;
 
-                var topL2 = lastAvg > avgChangeL2;
-                var belowL2 = lastAvg < -avgChangeL2;
+                var topL2 = lastAvg < avgChangeL2;
+                var belowL2 = lastAvg > -avgChangeL2;
 
                 var rsiMin = 25;
                 var rsiMax = 75;

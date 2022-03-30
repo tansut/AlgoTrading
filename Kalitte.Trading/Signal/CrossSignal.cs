@@ -396,20 +396,20 @@ namespace Kalitte.Trading
                 decimal rsi = 0;
                 var rsiOfRsi = 0M;
                 RsiList.Collect(lastAvg, time);
-                var rsiList = RsiList.RsiList(30);
-                var rsiListLast = rsiList.Last();
-                rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : -1;
+                var rsiList = RsiList.RsiList(30);                
+                rsi = result.Rsi = rsiList.Count > 0 ? rsiList.List.Last.Close : -1;
 
 
-                if (rsi > 0 && rsi < 100)
+                if (rsi >= 0)
                 {
                     RsiOfRsiList.Collect(rsi, time);
-                    var rsiOfRsiList = RsiOfRsiList.RsiList(30);
-                    var rsiOfRsiListLast = rsiOfRsiList.Last();
-                    rsiOfRsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : -1;
+                    var rsiOfRsiList = RsiOfRsiList.RsiList(30);                    
+                    rsiOfRsi = rsiOfRsiList.Count > 0 ? rsiOfRsiList.List.Last.Close : -1;
                 }
 
-                var rsiReady = result.RsiReady = rsi >= 0 && rsiOfRsi >= 0;
+                var rsiReady = result.RsiReady = rsi >= 0 && rsiOfRsi >= 0;                
+                var rsiAverage = rsiReady ? rsiList.LastValue(30): -1;
+                var rsiOfRsiAverage = rsiReady ? RsiOfRsiList.LastValue(30): -1;
 
                 if (Config.Dynamic && rsiReady)
                 {
@@ -417,8 +417,8 @@ namespace Kalitte.Trading
                 }
 
                 var down = LastCross < 0;
-                var up = LastCross > 0;
-                var signalCheck = true;// Math.Sign(SignalCrossValue) != Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
+                var up = LastCross > 0 ;
+                var signalCheck = Math.Sign(SignalCrossValue) != Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
 
                 var avgChangeL1 = AvgChange;
                 var avgChangeL2 = AvgChange / 4;
@@ -429,10 +429,13 @@ namespace Kalitte.Trading
                 var topL2 = lastAvg > avgChangeL2 && lastAvg < avgChangeL2 * 2;
                 var belowL2 = lastAvg < -avgChangeL2 && lastAvg > -avgChangeL2 * 2;
 
-                var rsiMin = 30;
-                var rsiMax = 70;
+                var rsiMin = 5;
+                var rsiMax = 95;
 
-                if (topL1 && signalCheck && up && (!rsiReady || (rsi > rsiMax && rsiOfRsi > rsiMax)))
+                var rsiTop = false && rsiReady && (rsiAverage > rsiMax && rsiOfRsi > rsiMax);
+                var rsiDown = false && rsiReady && (rsiAverage < rsiMin && rsiOfRsi < rsiMin);
+
+                if ((topL1 && signalCheck && up) || rsiTop)
                 {
                     result.CrossType = CrossType.AfterUp;
                     result.finalResult = BuySell.Buy;
@@ -443,7 +446,7 @@ namespace Kalitte.Trading
                     result.CrossType = CrossType.AfterDown;
                     result.preResult = BuySell.Sell;
                 }
-                else if (belowL1 && signalCheck && down && (!rsiReady || (rsi < rsiMin && rsiOfRsi < rsiMin)))
+                else if ((belowL1 && signalCheck && down) || rsiDown)
                 {
                     result.finalResult = BuySell.Sell;
                     result.CrossType = CrossType.BeforeDown;
@@ -461,20 +464,28 @@ namespace Kalitte.Trading
                 {
                     Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, AnalyseList.List.Last.Close);
                     Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
+                    if (rsiReady)
+                    {
+                        Chart("Value").Serie("rsia").SetColor(Color.Yellow).Add(time, rsiAverage * 0.05M);
+                        Chart("Value").Serie("rsiaa").SetColor(Color.GreenYellow).Add(time, rsiOfRsiAverage * 0.05M);
+                    }
                     //Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
                     //if (result.Sensitivity != null)
                     //    Chart("Value").Serie("volume").SetColor(Color.DarkOrange).Add(time, result.Sensitivity.VolumePower * 0.1M);
                     //if (i1k.Results.Last().Date.Hour <= time.Hour)
                     //    Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
-                    Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.05M);
-                    Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.05M);
+                    if (rsiReady)
+                    {
+                        Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.05M);
+                        Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.05M);
+                    }
                     //Chart("Value").Serie("rsit").SetColor(Color.DimGray).Add(time, 10);
                     Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 2.5M);
 
                     Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);
                     Chart("Value").Serie("navg").SetColor(Color.DarkOrange).Add(time, -avgChangeL1);
 
-                    Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol(result.preResult.HasValue ? ZedGraph.SymbolType.Plus : ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1) : 0);
+                    //Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol(result.preResult.HasValue ? ZedGraph.SymbolType.Plus : ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1) : 0);
                     Chart("Value").Serie("final").SetColor(Color.DarkGreen).SetSymbol(result.finalResult.HasValue ? ZedGraph.SymbolType.HDash : ZedGraph.SymbolType.None).Add(time, result.finalResult.HasValue ? (result.finalResult == BuySell.Buy ? 1 : -1) : 0);
 
 

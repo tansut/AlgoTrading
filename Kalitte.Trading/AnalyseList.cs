@@ -121,9 +121,15 @@ namespace Kalitte.Trading
             return lookback <= 1 ? 0 : (decimal)list.GetRsi(lookback).Last().Rsi.Value;
         }
 
-        public IEnumerable<RsiResult> RsiList(int lookback)
+        public AnalyseList RsiList(int lookback)
         {
-            return this.List.List.GetRsi(lookback);
+            var rsiList = this.List.List.GetRsi(lookback);
+            var result = new AnalyseList(0, Average.Ema);
+            foreach (var item in rsiList)
+            {
+                if (item.Rsi.HasValue) result.Collect((decimal)item.Rsi.Value, item.Date);
+            }
+            return result;
         }
 
         public IEnumerable<RsiResult> RsiList(DateTime lastTime)

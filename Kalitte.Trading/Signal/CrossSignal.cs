@@ -119,6 +119,8 @@ namespace Kalitte.Trading
         //public bool FirstCrossRequired { get; set; } = true;
 
         public decimal LastCross { get; private set; } = 0;
+        public decimal SignalCrossValue { get; private set; } = 0;
+        public DateTime LastCrossTime { get; private set; } = DateTime.MinValue;
 
         public CrossSignal(string name, string symbol, AlgoBase owner, CrossSignalConfig config) : base(name, symbol, owner, config)
         {
@@ -138,6 +140,8 @@ namespace Kalitte.Trading
             ohlcWarmupList.Clear();
             Filter = new UKF();
             LastCross = 0;
+            LastCrossTime = DateTime.MinValue;
+            SignalCrossValue = 0;
             AvgChange = Config.AvgChange;
             PreChange = Config.PreChange;
             RsiList.Clear();
@@ -155,6 +159,8 @@ namespace Kalitte.Trading
             {
                 crossBars.Clear();
                 LastCross = 0;
+                LastCrossTime = DateTime.MinValue;
+                SignalCrossValue = 0;
                 Log($"Cross reset", LogLevel.Debug);
             }
             finally
@@ -362,117 +368,122 @@ namespace Kalitte.Trading
                 AnalyseList.Collect(l1 - l2, time);
                 crossBars.Push(l1 - l2);
 
-                var cross = result.Cross = Helper.Cross(crossBars.ToArray, 0);
-                if (LastCross == 0 && cross != 0)
+                var cross = result.Cross = Helper.Cross(crossBars.ToArray, 0, 0.1M);
+                if (cross != 0 && Math.Sign(LastCross) != Math.Sign(cross))
                 {
                     LastCross = cross;
-                    Log($"First cross identified: {cross}", LogLevel.Debug, t);
+                    LastCrossTime = time;
+                    Log($"Cross identified: {cross}", LogLevel.Debug, t);
+                    //crossBars.Clear();
+                    RsiList.Clear();
+                    RsiOfRsiList.Clear();
                 }
-                else if (cross != 0) LastCross = cross;
                 result.LastCross = LastCross;
 
-                if (AnalyseList.Count > 0)
+
+                //var closeAverages = AnalyseList.Averages(Config.Lookback, OHLCType.Close, closeWarmupList);
+                //var closeLast = closeAverages.Last().Close;
+
+                //var closeRsiList = closeAverages.GetRsi(AnalyseList.BestLookback(closeAverages.Count, Config.Lookback));
+                //var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
+                var ohlc = OHLCType.Close; // (closeRsi == 0 || closeRsi == 100) ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
+                var rsiEffect = 0; //closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
+
+                if (Config.Dynamic)
                 {
-                    //var closeAverages = AnalyseList.Averages(Config.Lookback, OHLCType.Close, closeWarmupList);
-                    //var closeLast = closeAverages.Last().Close;
-
-                    //var closeRsiList = closeAverages.GetRsi(AnalyseList.BestLookback(closeAverages.Count, Config.Lookback));
-                    //var closeRsi = result.Rsi = closeRsiList.Last().Rsi.HasValue ? (decimal)closeRsiList.Last().Rsi.Value : 0;
-                    var ohlc = OHLCType.Close; // (closeRsi == 0 || closeRsi == 100) ? OHLCType.Close : (closeRsi > 50 ? OHLCType.High : OHLCType.Low);
-                    var rsiEffect = 0; //closeRsi == 0 ? 0 : Math.Abs(50 - closeRsi) / 100;
-
-                    if (Config.Dynamic)
-                    {
-                        var sensitivity = CalculateSensitivity();
-                        applySensitivity(sensitivity);
-                        result.Sensitivity = sensitivity;
-                    }
-
-                    var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
-                    lastAvg = result.Dif = AnalyseList.LastValue(Lookback, OHLCType.HL2C4);
-
-                    RsiList.Period = BarPeriod.Sec30;
-                    RsiOfRsiList.Period = BarPeriod.Sec30;
-
-                    RsiList.Collect(lastAvg, time);
-                    var rsiList = RsiList.RsiList(6);
-                    var rsiListLast = rsiList.Last();
-                    var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
-                    var rsiOfRsi = 0M;
-
-                    if (rsi > 0 && rsi < 100)
-                    {
-                        RsiOfRsiList.Collect(rsi, time);
-                        var rsiOfRsiList = RsiOfRsiList.RsiList(3);
-                        var rsiOfRsiListLast = rsiOfRsiList.Last();
-                        rsiOfRsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
-                    }
-
-                    var rsiReady = result.RsiReady = rsi > 0 && rsi < 100 && rsiOfRsi > 0 && rsiOfRsi < 100;
-                    var down = rsiOfRsi < 50 & rsi < 50;
-                    var up = rsiOfRsi > 50 & rsi > 50;
-
-                    var avgChangeL1 = AvgChange;
-                    var avgChangeL2 = AvgChange / 4;
-
-                    var topL1 = lastAvg > avgChangeL1/* && (result.MorningSignal || (lastAvg < Config.AvgChange * 2))*/;
-                    var belowL1 = lastAvg < -avgChangeL1 /* && (result.MorningSignal || (lastAvg > -Config.AvgChange * 2))*/;
-
-                    var topL2 = lastAvg > avgChangeL2 && lastAvg < avgChangeL2 * 2;
-                    var belowL2 = lastAvg < -avgChangeL2 && lastAvg > -avgChangeL2 * 2;
-
-                    if (topL1 && (!rsiReady || up))
-                    {
-                        result.CrossType = CrossType.AfterUp;
-                        result.finalResult = BuySell.Buy;
-                    }
-                    else if (topL2 && (rsiReady && down))
-                    {
-                        result.CrossType = CrossType.AfterDown;
-                        result.preResult = BuySell.Sell;
-                    }
-                    else if (belowL1 && (!rsiReady || down))
-                    {
-                        result.finalResult = BuySell.Sell;
-                        result.CrossType = CrossType.BeforeDown;
-                    }
-                    else if (belowL2 && (rsiReady && up))
-                    {
-                        result.preResult = BuySell.Buy;
-                        result.CrossType = CrossType.BeforeUp;
-                    }
-
-
-
-                    if (Algo.Simulation && !Algo.MultipleTestOptimization)
-                    {
-                        Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
-                        Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
-                        //Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
-                        //if (result.Sensitivity != null)
-                        //    Chart("Value").Serie("volume").SetColor(Color.DarkOrange).Add(time, result.Sensitivity.VolumePower * 0.1M);
-                        if (i1k.Results.Last().Date.Hour <= time.Hour)
-                            Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
-                        Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.1M);
-                        Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.1M);
-                        //Chart("Value").Serie("rsit").SetColor(Color.DimGray).Add(time, 10);
-                        Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 5);
-                        
-                        Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);
-                        Chart("Value").Serie("navg").SetColor(Color.DarkOrange).Add(time, -avgChangeL1);
-
-                        Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol(result.preResult.HasValue ? ZedGraph.SymbolType.Plus : ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1) : 0);
-                        Chart("Value").Serie("final").SetColor(Color.DarkGreen).SetSymbol(result.finalResult.HasValue ? ZedGraph.SymbolType.HDash : ZedGraph.SymbolType.None).Add(time, result.finalResult.HasValue ? (result.finalResult == BuySell.Buy ? 1 : -1) : 0);
-
-
-                    }
-
-                    if (time.Hour % 4 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
-                    {
-                        SaveCharts(time);
-                    }
+                    var sensitivity = CalculateSensitivity();
+                    applySensitivity(sensitivity);
+                    result.Sensitivity = sensitivity;
                 }
-                
+
+                var totalSize = Math.Max(Convert.ToInt32(Lookback - (rsiEffect) * (Lookback)), 1);
+                lastAvg = result.Dif = AnalyseList.LastValue(Lookback, OHLCType.HL2C4);
+
+                RsiList.Period = BarPeriod.Sec5;
+                RsiOfRsiList.Period = BarPeriod.Sec5;
+
+                RsiList.Collect(lastAvg, time);
+                var rsiList = RsiList.RsiList(24);
+                var rsiListLast = rsiList.Last();
+                var rsi = result.Rsi = rsiListLast.Rsi.HasValue ? (decimal)rsiListLast.Rsi.Value : 0;
+                var rsiOfRsi = 0M;
+
+                if (rsi > 0 && rsi < 100)
+                {
+                    RsiOfRsiList.Collect(rsi, time);
+                    var rsiOfRsiList = RsiOfRsiList.RsiList(20);
+                    var rsiOfRsiListLast = rsiOfRsiList.Last();
+                    rsiOfRsi = rsiOfRsiListLast.Rsi.HasValue ? (decimal)rsiOfRsiListLast.Rsi.Value : 0;
+                }
+
+                var rsiReady = result.RsiReady = rsi > 0 && rsi < 100 && rsiOfRsi > 0 && rsiOfRsi < 100;
+                var down = LastCross < 0;
+                var up = LastCross > 0;
+                var signalCheck = Math.Sign(SignalCrossValue) != Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
+
+                var avgChangeL1 = AvgChange;
+                var avgChangeL2 = AvgChange / 4;
+
+                var topL1 = lastAvg > avgChangeL1;
+                var belowL1 = lastAvg < -avgChangeL1;
+
+                var topL2 = lastAvg > avgChangeL2 && lastAvg < avgChangeL2 * 2;
+                var belowL2 = lastAvg < -avgChangeL2 && lastAvg > -avgChangeL2 * 2;
+
+                if (topL1 && signalCheck && up)
+                {
+                    result.CrossType = CrossType.AfterUp;
+                    result.finalResult = BuySell.Buy;
+                    SignalCrossValue = LastCross;
+                }
+                else if (topL2 && (rsiReady && down))
+                {
+                    result.CrossType = CrossType.AfterDown;
+                    result.preResult = BuySell.Sell;
+                }
+                else if (belowL1 && signalCheck && down)
+                {
+                    result.finalResult = BuySell.Sell;
+                    result.CrossType = CrossType.BeforeDown;
+                    SignalCrossValue = LastCross;
+                }
+                else if (belowL2 && (rsiReady && up))
+                {
+                    result.preResult = BuySell.Buy;
+                    result.CrossType = CrossType.BeforeUp;
+                }
+
+
+
+                if (Algo.Simulation && !Algo.MultipleTestOptimization)
+                {
+                    //Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, l1);
+                    Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
+                    //Chart("Value").Serie("ohlc").SetColor(Color.Aqua).Add(time, (decimal)ohlc);
+                    //if (result.Sensitivity != null)
+                    //    Chart("Value").Serie("volume").SetColor(Color.DarkOrange).Add(time, result.Sensitivity.VolumePower * 0.1M);
+                    //if (i1k.Results.Last().Date.Hour <= time.Hour)
+                    //    Chart("Value").Serie("bar").SetColor(Color.DarkCyan).Add(i1k.Results.Last().Date, i1k.Results.Last().Value.Value);
+                    Chart("Value").Serie("rsi").SetColor(Color.Black).Add(time, rsi * 0.05M);
+                    //Chart("Value").Serie("rsi2").SetColor(Color.Silver).Add(time, rsiOfRsi * 0.05M);
+                    //Chart("Value").Serie("rsit").SetColor(Color.DimGray).Add(time, 10);
+                    Chart("Value").Serie("rsil").SetColor(Color.Black).Add(time, 2.5M);
+
+                    Chart("Value").Serie("avg").SetColor(Color.DarkOrange).Add(time, avgChangeL1);
+                    Chart("Value").Serie("navg").SetColor(Color.DarkOrange).Add(time, -avgChangeL1);
+
+                    Chart("Value").Serie("pre").SetColor(Color.DarkGoldenrod).SetSymbol(result.preResult.HasValue ? ZedGraph.SymbolType.Plus : ZedGraph.SymbolType.None).Add(time, result.preResult.HasValue ? (result.preResult == BuySell.Buy ? 1 : -1) : 0);
+                    Chart("Value").Serie("final").SetColor(Color.DarkGreen).SetSymbol(result.finalResult.HasValue ? ZedGraph.SymbolType.HDash : ZedGraph.SymbolType.None).Add(time, result.finalResult.HasValue ? (result.finalResult == BuySell.Buy ? 1 : -1) : 0);
+
+
+                }
+
+                if (time.Hour % 6 == 0 && time.Minute == 1 && time.Second == 1 && Algo.Simulation && !Algo.MultipleTestOptimization)
+                {
+                    SaveCharts(time);
+                }
+
+
             }
 
 

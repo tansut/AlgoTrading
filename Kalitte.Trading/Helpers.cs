@@ -90,18 +90,25 @@ namespace Kalitte.Trading
             return new DateTime((dt.Ticks + d.Ticks - 1) / d.Ticks * d.Ticks, dt.Kind);
         }
 
-        public static decimal Cross(decimal[] list, decimal baseVal)
+        public static decimal Cross(decimal[] list, decimal baseVal, decimal delta = 0)
         {            
             var i = list.Length;
-
+            var cv = 0M;
+            decimal max = Decimal.MinValue;
+            decimal min = Decimal.MaxValue;
             while (--i >= 1)
             {
                 decimal cdif = list[i] - baseVal;
                 decimal pdif = list[i - 1] - baseVal;
-                if (cdif > 0 && pdif < 0) return cdif;
-                else if (cdif < 0 && pdif > 0) return cdif;
+                max = cdif > max ? cdif : max;
+                min = cdif < min ? cdif : min;
+                if (cdif > 0 && pdif < 0) { cv = cdif; break; }
+                else if (cdif < 0 && pdif > 0) { cv = cdif; break; }
             }
-            return 0;
+            if (cv > 0 && max > delta) return cv;
+            if (cv < 0 && min < delta) return cv;
+            return 0M;
+            //return cv;
         }
 
         //public static CandlePart ToCandle(OHLCType ohlc)

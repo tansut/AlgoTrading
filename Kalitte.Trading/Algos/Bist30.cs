@@ -587,7 +587,7 @@ namespace Kalitte.Trading.Algos
             //    MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity * 0.80M), portfolio.Side, $"[{signalResult.Signal.Name}/pre", signalResult);
             //    return;
             //}
-            if (!signalResult.finalResult.HasValue /*|| signalResult.LastCross == 0*/)
+            if (!signalResult.finalResult.HasValue || signalResult.LastCross == 0)
                 return;
 
             var keepPosition = lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal;

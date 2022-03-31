@@ -212,7 +212,7 @@ namespace Kalitte.Trading
         {
             AvgChange = Config.AvgChange + (Config.AvgChange * (decimal)ratio);
             Watch("sensitivity/avgchange", AvgChange);
-            base.AdjustSensitivityInternal(ratio, reason);
+            //base.AdjustSensitivityInternal(ratio, reason);
         }
 
 

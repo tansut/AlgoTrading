@@ -368,6 +368,7 @@ namespace Kalitte.Trading
                 AnalyseList.Collect(l1 - l2, time);
                 crossBars.Push(l1 - l2);
 
+
                 var cross = result.Cross = Helper.Cross(crossBars.ToArray, 0, 0.05M);
                 if (cross != 0 && Math.Sign(LastCross) != Math.Sign(cross))
                 {
@@ -380,7 +381,6 @@ namespace Kalitte.Trading
 
                 if (Config.Dynamic)
                 {
-
                     var sensitivity = CalculateSensitivity();
                     applySensitivity(sensitivity);
                     result.Sensitivity = sensitivity;
@@ -418,11 +418,13 @@ namespace Kalitte.Trading
                 var signalCheck = Math.Sign(SignalCrossValue) != Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
                 //var signalCheckBefore = Math.Sign(SignalCrossValue) == Math.Sign(LastCross) && Math.Sign(lastAvg) == Math.Sign(LastCross);
 
+                var ready = AnalyseList.Count > Config.Lookback && rsiReady;
+
                 var avgChangeL1 = AvgChange;
                 var avgChangeL2 = Config.AvgChange;
 
-                var topL1 = lastAvg > avgChangeL1 /*&& (!rsiReady || rsiAverage > 98)*/;
-                var belowL1 = lastAvg < -avgChangeL1;
+                var topL1 = lastAvg > avgChangeL1 && rsiReady && rsiAverage > 50;
+                var belowL1 = lastAvg < -avgChangeL1 && rsiReady && rsiAverage < 50; 
 
                 var topL2 = lastAvg > 0 && lastAvg < avgChangeL2 /*&& (!rsiReady || rsiAverage < 2)*/;
                 var belowL2 = lastAvg < 0 && lastAvg > -avgChangeL2;
@@ -433,13 +435,13 @@ namespace Kalitte.Trading
                 var rsiTop = rsiReady && (rsiAverage > rsiMax && rsiOfRsi > rsiMax);
                 var rsiDown = rsiReady && (rsiAverage < rsiMin && rsiOfRsi < rsiMin);
 
-                if ((topL1 && signalCheck && up))
+                if (ready && topL1 && signalCheck && up)
                 {
                     result.CrossType = CrossType.AfterUp;
                     result.finalResult = BuySell.Buy;
                     SignalCrossValue = LastCross;
                 }
-                else if ((belowL1 && signalCheck && down))
+                else if (ready && belowL1 && signalCheck && down)
                 {
                     result.finalResult = BuySell.Sell;
                     result.CrossType = CrossType.AfterDown;

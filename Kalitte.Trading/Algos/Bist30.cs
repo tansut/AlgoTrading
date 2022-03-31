@@ -640,7 +640,7 @@ namespace Kalitte.Trading.Algos
                         }
                     }
 
-                    if (cancelCross)
+                    if (cancelCross && portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
                     {
                         var offSetMax = valueSet + 0.05M * valueSet;
                         var offSetMin = valueSet - 0.05M * valueSet;

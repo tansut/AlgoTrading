@@ -132,13 +132,13 @@ namespace Kalitte.Trading
             return result;
         }
 
-        public IEnumerable<RsiResult> RsiList(DateTime lastTime)
+        public AnalyseList RsiList(DateTime lastTime)
         {
             Helper.SymbolSeconds(this.Period.ToString(), out int seconds);
             var t = Helper.RoundDown(lastTime, TimeSpan.FromSeconds(seconds));
             var i = List.List.FindIndex(p => p.Date == t);
             var lb = Math.Max(1, i == -1 ? List.Count  : List.Count - i - 1);
-            return this.List.List.GetRsi(lb);
+            return this.RsiList(lb);
         }
 
         public IList<MyQuote> Averages(int lb = 0, OHLCType? ohlc = null, List<MyQuote> wamupList = null)

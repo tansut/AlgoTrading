@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 28);
-        settings.Finish = new DateTime(2022, 3, 30);
+        settings.Start = new DateTime(2022, 3, 3);
+        settings.Finish = new DateTime(2022, 3, 3);
         settings.AutoClosePositions = true;
         
 
@@ -39,22 +39,22 @@ public class Program
         alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/ProfitLimitEnabled", false);
         alternates.Set("Orders/ProfitLimit", new decimal[] { 100, 150, 200 });
-        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.6M, 0.2M, 0 });
+        alternates.Set("Orders/ProfitRatio", new decimal [] { 0.4M, 0.2M, 0 });
 
         alternates.Set("Orders/LossLimitEnabled", false);
-        alternates.Set("Orders/LossLimit", new decimal[] { 150, 200, 250 });
-        alternates.Set("Orders/LossRatio", new decimal[] { 0.4M, 0.0M, 0.0M });
+        alternates.Set("Orders/LossLimit", new decimal[] { 200, 250, 300 });
+        alternates.Set("Orders/LossRatio", new decimal[] { 0.6M, 0.4M, 0.0M });
 
-        alternates.Set("Orders/NightRatio", 1);        
+        alternates.Set("Orders/NightRatio", 0.4);        
         alternates.Set("Orders/KeepRatio", 0);
         alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);
         alternates.Set("DailyClose/Enabled", true);
 
         // analyser defaults
         alternates.Set("DataCollectSize", 12);
-        alternates.Set("DataAnalysisSize", 600);
+        alternates.Set("DataAnalysisSize", 240);
         alternates.Set("DataCollectAverage", Average.Ema);
-        alternates.Set("DataAnalysisAverage", Average.Ema);
+        alternates.Set("DataAnalysisAverage", Average.Sma);
         alternates.Set("DataAnalysisLookback", 10);
         alternates.Set("DataAnalysisPeriods", BarPeriod.Sec30);
 
@@ -139,7 +139,7 @@ public class Program
         alternates.Set("MovPeriod2", 9);
 
         alternates.Set("CrossL1/Enabled", true);
-        alternates.Set("CrossL1/AvgChange", 0.18M);
+        alternates.Set("CrossL1/AvgChange", 0.3M);
         alternates.Set("CrossL1/PreChange", 0);
         alternates.Set("CrossL1/Dynamic", true);
         alternates.Set("CrossL1/PowerThreshold", 88);
@@ -148,8 +148,8 @@ public class Program
         alternates.Set("CrossL1/QuantityRatio", 1);        
         alternates.Set("CrossL1/RsiMax", 55);
         alternates.Set("CrossL1/RsiMin",  45);
-        alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec30);
-        alternates.Set("CrossL1/Lookback", 10);
+        alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec5);
+        alternates.Set("CrossL1/Lookback", 90);
 
         alternates.Set("CrossL2/Enabled", false);
 

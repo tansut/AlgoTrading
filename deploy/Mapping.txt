@@ -1689,6 +1689,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_SignalCrossValue[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::get_LastCrossTime[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_LastCrossTime[1]( [mscorlib]System.DateTime ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal::get_LastSignalTime[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_LastSignalTime[1]( [mscorlib]System.DateTime ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::get_LastCalculatedSensitivity[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::set_LastCalculatedSensitivity[1]( [Kalitte.Trading]Kalitte.Trading.Sensitivity ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.CrossSignal::get_Filter[0]( ) skipped:  skip by property
@@ -1716,6 +1718,7 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::<LastCross>k__BackingField -> a
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::<SignalCrossValue>k__BackingField -> B
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.CrossSignal::<LastCrossTime>k__BackingField -> A
+	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.CrossSignal::<LastSignalTime>k__BackingField -> a
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignal::<LastCalculatedSensitivity>k__BackingField -> A
 	Kalitte.Trading.Numeric.UKF [Kalitte.Trading]Kalitte.Trading.Numeric.UKF Kalitte.Trading.CrossSignal::<Filter>k__BackingField -> A
 
@@ -1732,6 +1735,7 @@ Skipped Types:
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::LastCross skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.CrossSignal::SignalCrossValue skipped:  KeepPublicApi option in configuration
 	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.CrossSignal::LastCrossTime skipped:  KeepPublicApi option in configuration
+	System.DateTime [Kalitte.Trading]System.DateTime Kalitte.Trading.CrossSignal::LastSignalTime skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Sensitivity [Kalitte.Trading]Kalitte.Trading.Sensitivity Kalitte.Trading.CrossSignal::LastCalculatedSensitivity skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.Numeric.UKF [Kalitte.Trading]Kalitte.Trading.Numeric.UKF Kalitte.Trading.CrossSignal::Filter skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.OrderUsage [Kalitte.Trading]Kalitte.Trading.OrderUsage Kalitte.Trading.CrossSignal::Usage skipped:  KeepPublicApi option in configuration

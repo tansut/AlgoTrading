@@ -464,6 +464,7 @@ namespace Kalitte.Trading.Algos
         public bool CheckBeforeDecide()
         {
             CheckNightSettings();
+            AdjustDailyProfitLoss();
             if (OrderConfig.Total == 0)
             {
                 if (!UserPortfolioList.GetPortfolio(Symbol).IsEmpty) ClosePositions(Symbol, null);
@@ -620,18 +621,18 @@ namespace Kalitte.Trading.Algos
                 }
                 else if (config.RsiShortEnabled && signalResult.finalResult == BuySell.Sell)
                 {
-                    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
+                    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiShort, config.RsiShortMultiplier);
                 }
 
 
-                if (rsiOrderMultiplier < 1)
-                {
-                    if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
-                    {
-                        Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Test);
-                        return;
-                    }
-                }
+                //if (rsiOrderMultiplier < 1)
+                //{
+                //    if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
+                //    {
+                //        Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Test);
+                //        return;
+                //    }
+                //}
             }
             //}
 
@@ -642,6 +643,35 @@ namespace Kalitte.Trading.Algos
             MakePortfolio(Symbol, quantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*" : "")}/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);
 
         }
+
+
+        public void AdjustDailyProfitLoss()
+        {
+            var portfolio = UserPortfolioList.GetPortfolio(Symbol);
+            var stats = portfolio.GetDailyStats(Now.Date);
+            decimal target = this.OrderConfig.Total;
+
+            if (OrderConfig.ProfitLimitEnabled)
+            {
+                var ratio = Helper.GetMultiplier(stats.NetPl, OrderConfig.ProfitLimit, OrderConfig.ProfitRatio);
+                var newtarget = RoundQuantity(InitialQuantity * ratio);
+                if (newtarget < target) target = newtarget;
+            }
+
+            if (OrderConfig.LossLimitEnabled)
+            {
+                var ratio = Helper.GetMultiplier(stats.NetPl, OrderConfig.LossLimit, OrderConfig.LossRatio);
+                var newtarget = RoundQuantity(InitialQuantity * ratio);
+                if (newtarget < target) target = newtarget;
+            }
+
+            if (OrderConfig.Total != target)
+            {
+                Log($"Daily order limit adjusted to {target} for {Now.Date}, Todays orders: {stats.Total}, NetPL: {stats.NetPl}", LogLevel.Test);
+                this.OrderConfig.Total = target;
+            }
+        }
+
 
 
         public override void CompletedOrder(ExchangeOrder order)
@@ -663,49 +693,16 @@ namespace Kalitte.Trading.Algos
             {
                 Signals.Where(p => p is PLSignal).Select(p => (PLSignal)p).ToList().ForEach(p => p.ResetOrders());
             }
-            if (portfolio.IsEmpty)
-            {
-                if (portfolio.LastOrderIsLoss && portfolio.IsLastPositionOrderInstanceOf(typeof(GradientSignal)))
-                {
-                    Log($"Skipping cross reset since last order is position close by loss/rsi", LogLevel.Debug);
-                }
-                else Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
-            }
+            //if (portfolio.IsEmpty)
+            //{
+            //    if (portfolio.LastOrderIsLoss && portfolio.IsLastPositionOrderInstanceOf(typeof(GradientSignal)))
+            //    {
+            //        Log($"Skipping cross reset since last order is position close by loss/rsi", LogLevel.Debug);
+            //    }
+            //    else Signals.Where(p => p is CrossSignal).Select(p => (CrossSignal)p).ToList().ForEach(p => p.ResetCross());
+            //}
 
-            var stats = portfolio.GetDailyStats(Now.Date);
-            decimal target = this.OrderConfig.Total;
-
-            if (OrderConfig.ProfitLimitEnabled)
-            {
-                for (var i = OrderConfig.ProfitLimit.Length - 1; i >= 0; i--)
-                {
-                    if (stats.NetPl > OrderConfig.ProfitLimit[i])
-                    {
-                        var newtarget = RoundQuantity(InitialQuantity * OrderConfig.ProfitRatio[i]);
-                        if (newtarget < target) target = newtarget;
-                        break;
-                    }
-                }
-            }
-
-            if (OrderConfig.LossLimitEnabled)
-            {
-                for (var i = OrderConfig.LossLimit.Length - 1; i >= 0; i--)
-                {
-                    if (stats.NetPl < -OrderConfig.LossLimit[i])
-                    {
-                        var newtarget = RoundQuantity(InitialQuantity * OrderConfig.LossRatio[i]);
-                        if (newtarget < target) target = newtarget;
-                        break;
-                    }
-                }
-            }
-
-            if (OrderConfig.Total != target)
-            {
-                Log($"Daily order limit adjusted to {target} for {Now.Date}, Todays orders: {stats.Total}, NetPL: {stats.NetPl}", LogLevel.Test);
-                this.OrderConfig.Total = target;
-            }
+            AdjustDailyProfitLoss();
 
             base.CompletedOrder(order);
         }

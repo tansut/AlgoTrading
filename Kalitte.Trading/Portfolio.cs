@@ -311,8 +311,8 @@ namespace Kalitte.Trading
                     if (result.Count > 0) break;
                     continue;
                 }
-                if (types.Length == 0) result.Add(CompletedOrders[i]);
-                else if (types.Any(t => t.IsAssignableFrom(type))) result.Add(CompletedOrders[i]);
+                if (types.Length == 0) result.Insert(0, CompletedOrders[i]);
+                else if (types.Any(t => t.IsAssignableFrom(type))) result.Insert(0, CompletedOrders[i]);
                 else break;
             }
             return result;

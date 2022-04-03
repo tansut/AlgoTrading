@@ -99,14 +99,23 @@ namespace Kalitte.Trading.Algos
     {
         public Bist30 Algo { get; set; }
 
-        [AlgoParam(0)]
-        public decimal RsiMax { get; set; }
+        [AlgoParam(false)]
+        public bool RsiLongEnabled { get; set; }
 
-        [AlgoParam(0)]
-        public decimal RsiMin { get; set; }
+        [AlgoParam(false)]
+        public bool RsiShortEnabled { get; set; }
 
-        [AlgoParam(0.5)]
-        public decimal RsiOrderMultiplier { get; set; }
+        [AlgoParam(null)]
+        public decimal [] RsiLong { get; set; }
+
+        [AlgoParam(null)]
+        public decimal [] RsiShort { get; set; }
+
+        [AlgoParam(null)]
+        public decimal [] RsiLongMultiplier { get; set; }
+
+        [AlgoParam(null)]
+        public decimal [] RsiShortMultiplier { get; set; }
 
 
 
@@ -595,8 +604,8 @@ namespace Kalitte.Trading.Algos
 
             var currentRsi = 0M;
             var config = (CrossOrderConfig)signal.Config;
-            var cancelCross = false;
-
+            
+            var rsiOrderMultiplier = 1M;
             //if (!signalResult.MorningSignal)
             //{
             var rsi = rsiValue.LastSignalResult as IndicatorAnalyserResult;
@@ -604,17 +613,18 @@ namespace Kalitte.Trading.Algos
             {
                 currentRsi = rsi.Value.Value;
 
-                if (config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi > config.RsiMax)
+                if (config.RsiLongEnabled && signalResult.finalResult == BuySell.Buy)
                 {
-                    cancelCross = true;
+                    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
+                    //cancelCross = true;
                 }
-                else if (config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi < config.RsiMin)
+                else if (config.RsiShortEnabled && signalResult.finalResult == BuySell.Sell)
                 {
-                    cancelCross = true;
+                    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
                 }
 
 
-                if (cancelCross)
+                if (rsiOrderMultiplier < 1)
                 {
                     if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
                     {
@@ -626,12 +636,8 @@ namespace Kalitte.Trading.Algos
             //}
 
             
-            var quantity = config.Quantity;            
+            var quantity = RoundQuantity(rsiOrderMultiplier * config.Quantity);            
 
-            if (cancelCross)
-            {
-                quantity = RoundQuantity(config.RsiOrderMultiplier * quantity);
-            }
 
             MakePortfolio(Symbol, quantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*" : "")}/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);
 

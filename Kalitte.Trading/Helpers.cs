@@ -116,6 +116,16 @@ namespace Kalitte.Trading
         //    return (CandlePart)ohlc;
         //}
 
+        public static decimal GetMultiplier(decimal value, decimal [] ranges, decimal [] multipliers)
+        {
+            for(var i = 0; i < ranges.Length; i++)
+            {
+                var next = i + 1;
+                if (value < ranges[i]) return multipliers[i];
+            }
+            return multipliers.Last();
+        }
+
         public static void Shuffle<T>(IList<T> list)
         {
             RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();

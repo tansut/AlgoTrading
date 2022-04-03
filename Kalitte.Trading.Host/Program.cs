@@ -146,8 +146,9 @@ public class Program
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);        
-        alternates.Set("CrossL1/RsiMax", 56.60);
-        alternates.Set("CrossL1/RsiMin",  43.40);
+        alternates.Set("CrossL1/RsiMax", 54.60);
+        alternates.Set("CrossL1/RsiMin",  45.40);
+        alternates.Set("CrossL1/RsiOrderMultiplier",  0.4);
         //alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec10);
         //alternates.Set("CrossL1/Lookback", 50);        
 
@@ -155,8 +156,8 @@ public class Program
         // cross rsi
         //alternates.Set("RsiValue/Lookback", 240);
 
-      
-          
+
+
 
 
         // System

@@ -3226,6 +3226,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::set_RsiMax[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::get_RsiMin[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::set_RsiMin[1]( [mscorlib]System.Decimal ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::get_RsiOrderMultiplier[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::set_RsiOrderMultiplier[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::get_QuantityRatio[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::set_QuantityRatio[1]( [mscorlib]System.Decimal ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::get_Quantity[0]( ) skipped:  skip by property
@@ -3234,12 +3236,14 @@ Skipped Types:
 	Kalitte.Trading.Algos.Bist30 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30 Kalitte.Trading.Algos.CrossOrderConfig::<Algo>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::<RsiMax>k__BackingField -> A
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::<RsiMin>k__BackingField -> a
-	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::<QuantityRatio>k__BackingField -> B
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::<RsiOrderMultiplier>k__BackingField -> B
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::<QuantityRatio>k__BackingField -> b
 
 
 	Kalitte.Trading.Algos.Bist30 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30 Kalitte.Trading.Algos.CrossOrderConfig::Algo skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::RsiMax skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::RsiMin skipped:  KeepPublicApi option in configuration
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::RsiOrderMultiplier skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::QuantityRatio skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.CrossOrderConfig::Quantity skipped:  KeepPublicApi option in configuration
 }

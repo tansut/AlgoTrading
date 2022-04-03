@@ -105,6 +105,11 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(0)]
         public decimal RsiMin { get; set; }
 
+        [AlgoParam(0.5)]
+        public decimal RsiOrderMultiplier { get; set; }
+
+
+
         [AlgoParam(0)]
         public decimal QuantityRatio { get; set; }
 
@@ -201,7 +206,7 @@ namespace Kalitte.Trading.Algos
         public int DataAnalysisLookback { get; set; }
         [AlgoParam(BarPeriod.Sec5)]
         public BarPeriod DataAnalysisPeriods { get; set; }
-        
+
 
 
         [AlgoParam(0.015)]
@@ -592,44 +597,44 @@ namespace Kalitte.Trading.Algos
             var config = (CrossOrderConfig)signal.Config;
             var cancelCross = false;
 
-            if (!signalResult.MorningSignal)
+            //if (!signalResult.MorningSignal)
+            //{
+            var rsi = rsiValue.LastSignalResult as IndicatorAnalyserResult;
+            if (rsi != null && rsi.Value.HasValue)
             {
-                var rsi = rsiValue.LastSignalResult as IndicatorAnalyserResult;
-                if (rsi != null && rsi.Value.HasValue)
+                currentRsi = rsi.Value.Value;
+
+                if (config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi > config.RsiMax)
                 {
-                    currentRsi = rsi.Value.Value;
-
-                    if (config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi > config.RsiMax)
-                    {
-                        cancelCross = true;
-                    }
-                    else if (config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi < config.RsiMin)
-                    {
-                        cancelCross = true;
-                    }
+                    cancelCross = true;
+                }
+                else if (config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi < config.RsiMin)
+                {
+                    cancelCross = true;
+                }
 
 
-                    if (cancelCross)
+                if (cancelCross)
+                {
+                    if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
                     {
-                        if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
-                        {
-                            Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Test);
-                            return;
-                        }
+                        Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Test);
+                        return;
                     }
                 }
-            }            
-
-            var orderQuantity = portfolio.Quantity + (cancelCross ? RoundQuantity(config.Quantity / 2): config.Quantity);
-
-            if (!keepPosition && !portfolio.IsEmpty && portfolio.Side == signalResult.finalResult)
-            {
-                orderQuantity = config.Quantity - portfolio.Quantity;
             }
-            if (orderQuantity > 0)
+            //}
+
+            
+            var quantity = config.Quantity;            
+
+            if (cancelCross)
             {
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*" : "")}/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);
+                quantity = RoundQuantity(config.RsiOrderMultiplier * quantity);
             }
+
+            MakePortfolio(Symbol, quantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*" : "")}/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);
+
         }
 
 

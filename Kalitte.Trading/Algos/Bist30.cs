@@ -171,8 +171,6 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(null, "CrossL1")]
         public CrossOrderConfig CrossL1Config { get; set; } = new CrossOrderConfig() { };
 
-        [AlgoParam(null, "CrossL2")]
-        public CrossOrderConfig CrossL2Config { get; set; } = new CrossOrderConfig();
 
         [AlgoParam(null, "VolumePower")]
         public PowerSignalConfig VolumePowerConfig { get; set; } = new PowerSignalConfig();
@@ -215,7 +213,6 @@ namespace Kalitte.Trading.Algos
 
 
         CrossSignal maCrossL1 = null;
-        CrossSignal maCrossL2 = null;
 
         ProfitSignal profitSignal = null;
         LossSignal rsiLossSignal = null;
@@ -242,10 +239,6 @@ namespace Kalitte.Trading.Algos
             maCrossL1.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, 9);
             maCrossL1.i2k = new Custom((q) => 0, periodData.Periods);
             maCrossL1.PowerSignal = powerSignal;
-
-            maCrossL2.i1k = new Macd(periodData.Periods, MovPeriod, MovPeriod2, 9);
-            maCrossL2.i2k = maCrossL1.i2k;
-            maCrossL2.PowerSignal = powerSignal;
 
             var rsi = new Rsi(periodData.Periods, Rsi);
 
@@ -331,7 +324,6 @@ namespace Kalitte.Trading.Algos
             this.Signals.Add(this.rsiLowL3 = CreateRsiPositionSignal("rsi-low-l3", Symbol, RsiOrderLowL3, BuySell.Buy));
 
             this.Signals.Add(this.maCrossL1 = new CrossSignal("ema59-L1", Symbol, this, CrossL1Config));
-            this.Signals.Add(this.maCrossL2 = new CrossSignal("ema59-L2", Symbol, this, CrossL2Config));
 
 
             this.Signals.Add(this.profitSignal = CreateProfitSignal("profit", Symbol, ProfitConfig));
@@ -597,11 +589,8 @@ namespace Kalitte.Trading.Algos
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
             var currentRsi = 0M;
-            var rsiSpeed = 0M;
-            var rsiAcc = 0M;
-
             var config = (CrossOrderConfig)signal.Config;
-
+            var cancelCross = false;
 
             if (!signalResult.MorningSignal)
             {
@@ -609,60 +598,28 @@ namespace Kalitte.Trading.Algos
                 if (rsi != null && rsi.Value.HasValue)
                 {
                     currentRsi = rsi.Value.Value;
-                    rsiSpeed = rsi.Speed;
-                    rsiAcc = rsi.Acceleration;
-
-                    var cancelCross = false;
-                    var valueSet = 0M;
-
-
 
                     if (config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi > config.RsiMax)
                     {
-                        valueSet = config.RsiMax;
                         cancelCross = true;
                     }
                     else if (config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi < config.RsiMin)
                     {
-                        valueSet = config.RsiMin;
                         cancelCross = true;
                     }
-                    else if (config == CrossL1Config && CrossL2Config.Enabled)
-                    {
-                        if (config.RsiMax != 0 && CrossL1Config.RsiMax != 0 && signalResult.finalResult == BuySell.Buy && currentRsi <= CrossL2Config.RsiMax)
-                        {
-                            config = CrossL2Config;
 
-                        }
-                        else if (config.RsiMin != 0 && CrossL1Config.RsiMin != 0 && signalResult.finalResult == BuySell.Sell && currentRsi >= CrossL2Config.RsiMin)
-                        {
-                            config = CrossL2Config;
-                        }
-                    }
-
-                    if (cancelCross && portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
+                    if (cancelCross)
                     {
-                        var offSetMax = valueSet + 0.05M * valueSet;
-                        var offSetMin = valueSet - 0.05M * valueSet;
-                        //var discardRsi = currentRsi > offSetMin && currentRsi < offSetMax && rsi.Speed > 0.2M;
-                        //if (!discardRsi) discardRsi = rsi.Speed >= 1M;
-                        var discardRsi = false;
-                        //Console.WriteLine($"{discardRsi} {signalResult.SignalTime}, speed: {rsi.Speed} acceleration:{rsi.Acceleration} value: {rsi.Value}");
-                        if (!discardRsi)
+                        if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
                         {
-                            Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Debug);
+                            Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Test);
                             return;
-                        }
-                        else
-                        {
-                            Log($"Rsi Limit cancelled: {signalResult.SignalTime}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Warning);
                         }
                     }
                 }
-            }
-            else if (CrossL2Config.Enabled) config = CrossL2Config;
+            }            
 
-            var orderQuantity = portfolio.Quantity + config.Quantity;
+            var orderQuantity = portfolio.Quantity + (cancelCross ? RoundQuantity(config.Quantity / 2): config.Quantity);
 
             if (!keepPosition && !portfolio.IsEmpty && portfolio.Side == signalResult.finalResult)
             {
@@ -670,7 +627,7 @@ namespace Kalitte.Trading.Algos
             }
             if (orderQuantity > 0)
             {
-                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*" : "")}/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()},{rsiSpeed.ToCurrency()},{rsiAcc.ToCurrency()}]", signalResult);
+                sendOrder(Symbol, orderQuantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*" : "")}/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);
             }
         }
 

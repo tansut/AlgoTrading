@@ -135,9 +135,12 @@ namespace Kalitte.Trading
 
         public void SaveChart(string name, string id = "", bool clear = true)
         {
-            var dir =  Path.Combine(Algo.Appdir, "charts", this.Name);
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-            Chart(name).Save(Path.Combine(dir, $"{id}{(!string.IsNullOrEmpty(id) ? "-" : "")}{name}.png"), clear);            
+            if (!Algo.MultipleTestOptimization)
+            {
+                var dir = Path.Combine(Algo.Appdir, "charts", this.Name);
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                Chart(name).Save(Path.Combine(dir, $"{id}{(!string.IsNullOrEmpty(id) ? "-" : "")}{name}.png"), clear);
+            }
         }
 
         public void SaveChart(string name, DateTime time, bool clear = true)
@@ -335,7 +338,7 @@ namespace Kalitte.Trading
         {
             var dir = Path.Combine(Algo.Appdir, "charts", this.Name);
 
-            if (Directory.Exists(dir))
+            if (Directory.Exists(dir) && !Algo.MultipleTestOptimization)
             {
                 System.IO.DirectoryInfo di = new DirectoryInfo(dir);
                 foreach (FileInfo file in di.GetFiles())

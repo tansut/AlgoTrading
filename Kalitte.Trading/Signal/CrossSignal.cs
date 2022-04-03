@@ -474,7 +474,7 @@ namespace Kalitte.Trading
 
                 if (Algo.Simulation && !Algo.MultipleTestOptimization)
                 {
-                    //Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, AnalyseList.List.Last.Close);
+                    Chart("Value").Serie("i1").SetColor(Color.Blue).Add(time, AnalyseList.List.Last.Close);
                     Chart("Value").Serie("Dif").SetColor(Color.Red).Add(time, result.Dif);
                     if (rsiReady)
                     {

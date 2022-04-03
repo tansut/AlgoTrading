@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 14);
+        settings.Start = new DateTime(2022, 3, 15);
+        settings.Finish = new DateTime(2022, 3, 31);
         settings.AutoClosePositions = true;
 
 
@@ -38,7 +38,7 @@ public class Program
         // global order
         alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/PLEnabled", true);
-        alternates.Set("Orders/PL", new decimal[] { -150, -100 });
+        alternates.Set("Orders/PL", new decimal[] { -200, -150 });
         alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.6M, 1 });
 
 
@@ -79,27 +79,27 @@ public class Program
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);
-        alternates.Set("RsiLoss/StartAt", 0.8);
-        alternates.Set("RsiLoss/Step", 0.1);
+        alternates.Set("RsiLoss/StartAt", 0.7);
+        alternates.Set("RsiLoss/Step", 0.15);
 
         // rsi
         alternates.Set("Rsi", 14);
 
         alternates.Set("RsiOrderHighL1/Enabled", true);
-        alternates.Set("RsiOrderHighL1/MakeRatio", 0.1);
+        alternates.Set("RsiOrderHighL1/MakeRatio", 0);
         alternates.Set("RsiOrderHighL1/Action", RsiPositionAction.IfEmpty);
         alternates.Set("RsiOrderHighL1/L1", 73.00);
         alternates.Set("RsiOrderHighL1/L2", 76.50);
 
         alternates.Set("RsiOrderHighL2/Enabled", true);
         alternates.Set("RsiOrderHighL2/KeepRatio", 0.1);
-        alternates.Set("RsiOrderHighL2/MakeRatio", 0.3);
+        alternates.Set("RsiOrderHighL2/MakeRatio", 0.1);
         alternates.Set("RsiOrderHighL2/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderHighL2/L1", 76.51);
         alternates.Set("RsiOrderHighL2/L2", 84.50);
 
         alternates.Set("RsiOrderHighL3/Enabled", true);
-        alternates.Set("RsiOrderHighL3/MakeRatio", 0.4);
+        alternates.Set("RsiOrderHighL3/MakeRatio", 0.1);
         alternates.Set("RsiOrderHighL3/Action", RsiPositionAction.Radical);
         alternates.Set("RsiOrderHighL3/L1", 84.51);
         alternates.Set("RsiOrderHighL3/L2", 100);
@@ -112,13 +112,13 @@ public class Program
 
         alternates.Set("RsiOrderLowL2/Enabled", true);
         alternates.Set("RsiOrderLowL2/KeepRatio", 0.1);
-        alternates.Set("RsiOrderLowL2/MakeRatio", 0.3);
+        alternates.Set("RsiOrderLowL2/MakeRatio", 0.1);
         alternates.Set("RsiOrderLowL2/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderLowL2/L1", 28.99);
         alternates.Set("RsiOrderLowL2/L2", 23.00);
 
         alternates.Set("RsiOrderLowL3/Enabled", true);
-        alternates.Set("RsiOrderLowL3/MakeRatio", 0.4);
+        alternates.Set("RsiOrderLowL3/MakeRatio", 0.1);
         alternates.Set("RsiOrderLowL3/ActionRatio", RsiPositionAction.Radical);
         alternates.Set("RsiOrderLowL3/L1", 22.99);
         alternates.Set("RsiOrderLowL3/L2", 0);
@@ -144,12 +144,12 @@ public class Program
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);
         alternates.Set("CrossL1/RsiLongEnabled", true);
-        alternates.Set("CrossL1/RsiLong", new[] { 45, 50M, 55M, 60 });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.4M, 1M, 0.8M, 0.2M, 0 });
+        alternates.Set("CrossL1/RsiLong", new[] { 50M, 55M, 60 });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.4M, 1M, 0.2M, 0 });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
-        alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 50, 55});
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0, 0.2M, 0.8M, 1M, 0.4M });
+        alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 55});
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0, 0.2M, 1M, 0.4M });
         //alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec10);
         //alternates.Set("CrossL1/Lookback", 50);        
 

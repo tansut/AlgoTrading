@@ -207,8 +207,8 @@ namespace Kalitte.Trading
             var targetChange = (costStatus.AverageCost * (UsedPriceChange / 100M)).ToCurrency();
             var keepQuantity = costStatus.AverageQuantity;
 
-            var closePositions = costStatus.Orders.Where(p => p.SignalResult.Signal is ClosePositionsSignal).ToList();
-            var others = costStatus.Orders.Where(p => !(p.SignalResult.Signal is ClosePositionsSignal)).ToList();
+            var closePositions = costStatus.PositionOrders.Where(p => p.SignalResult.Signal is ClosePositionsSignal).ToList();
+            var others = costStatus.PositionOrders.Where(p => !(p.SignalResult.Signal is ClosePositionsSignal)).ToList();
 
             if (others.Count > 0 && closePositions.Count > 0)
             {

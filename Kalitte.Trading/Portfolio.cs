@@ -15,12 +15,31 @@ namespace Kalitte.Trading
 
     public class AverageCostResult
     {
-        public List<ExchangeOrder> Orders { get; set; }
+        public List<ExchangeOrder> PositionOrders { get; set; }
+
+        public List<ExchangeOrder> CostEffectiveOrders
+        {
+            get
+            {
+                var list = new List<ExchangeOrder>();
+                for(var i = PositionOrders.Count-1 ; i >= 0; i--)
+                {
+                    var o = PositionOrders[i];
+                    if (o.DirectionChangedQuantity > 0)
+                    {
+                        list.Add(o);
+                        break;
+                    } else list.Add(o);
+                }
+                return list;
+            }
+        }
+
         public decimal TotalQuantity
         {
             get
             {
-                return Orders.Sum(p => (p.FilledQuantity - p.DirectionChangedQuantity));
+                return CostEffectiveOrders.Sum(p => (p.FilledQuantity - p.DirectionChangedQuantity));
             }
         }
 
@@ -28,8 +47,8 @@ namespace Kalitte.Trading
         {
             get
             {
-                if (Orders.Count == 0) return 0;
-                return TotalQuantity / Orders.Count;
+                if (CostEffectiveOrders.Count == 0) return 0;
+                return TotalQuantity / CostEffectiveOrders.Count;
             }
         }
 
@@ -37,7 +56,7 @@ namespace Kalitte.Trading
         {
             get
             {
-                return Orders.Sum(p => (p.FilledUnitPrice * (p.FilledQuantity - p.DirectionChangedQuantity)));
+                return CostEffectiveOrders.Sum(p => (p.FilledUnitPrice * (p.FilledQuantity - p.DirectionChangedQuantity)));
             }
         }
         public decimal AverageCost
@@ -158,7 +177,7 @@ namespace Kalitte.Trading
         }
 
         private void SetDailyStats(decimal pl, ExchangeOrder order)
-        {            
+        {
             DailyStats.TryGetValue(order.Sent.Date, out Statistics stats);
             if (stats == null) stats = new Statistics();
             stats.NetPl = stats.NetPl + pl - order.CommissionPaid;
@@ -200,7 +219,8 @@ namespace Kalitte.Trading
                     if (this.Quantity == 0)
                     {
                         this.AvgCost = 0;
-                    } else
+                    }
+                    else
                     {
                         // ? new avgcost?
                     }
@@ -276,13 +296,13 @@ namespace Kalitte.Trading
         public AverageCostResult LastAverageCost(params SignalBase[] signals)
         {
             var res = new AverageCostResult();
-            res.Orders = GetLastPositionOrders(signals);
+            res.PositionOrders = GetLastPositionOrders(signals);
             return res;
         }
 
-        public List<ExchangeOrder> GetLastPositionOrders( Type[] types)
+        public List<ExchangeOrder> GetLastPositionOrders(Type[] types)
         {
-            var result = new List<ExchangeOrder>();            
+            var result = new List<ExchangeOrder>();
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
                 var type = CompletedOrders[i].SignalResult.Signal.GetType();
@@ -301,7 +321,7 @@ namespace Kalitte.Trading
         public List<ExchangeOrder> GetLastPositionOrders(params SignalBase[] signals)
         {
             var result = new List<ExchangeOrder>();
-            
+
             for (var i = CompletedOrders.Count - 1; i >= 0; i--)
             {
                 var type = CompletedOrders[i].SignalResult.Signal.GetType();
@@ -310,8 +330,8 @@ namespace Kalitte.Trading
                     if (result.Count > 0) break;
                     continue;
                 }
-                if (signals.Length == 0) result.Add(CompletedOrders[i]);
-                else if (signals.Any(s => s == CompletedOrders[i].SignalResult.Signal)) result.Add(CompletedOrders[i]);                
+                if (signals.Length == 0) result.Insert(0, CompletedOrders[i]);
+                else if (signals.Any(s => s == CompletedOrders[i].SignalResult.Signal)) result.Insert(0, CompletedOrders[i]);
                 else break;
             }
             return result;
@@ -414,7 +434,7 @@ namespace Kalitte.Trading
         public PortfolioItem OrderCompleted(ExchangeOrder position, bool keepPortfolio = false)
         {
             var portfolio = this.GetPortfolio(position.Symbol);
-            if (keepPortfolio) portfolio.CompletedOrders.Add(position); else portfolio.OrderCompleted(position);            
+            if (keepPortfolio) portfolio.CompletedOrders.Add(position); else portfolio.OrderCompleted(position);
             return portfolio;
         }
 

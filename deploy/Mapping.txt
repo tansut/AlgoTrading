@@ -191,15 +191,15 @@ Renamed Types:
 
 [Kalitte.Trading]Kalitte.Trading.AverageCostResult/<>c -> [Kalitte.Trading]Kalitte.Trading.AverageCostResult/A
 {
-	[Kalitte.Trading]Kalitte.Trading.AverageCostResult/<>c::<get_TotalQuantity>b__5_0[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> A
-	[Kalitte.Trading]Kalitte.Trading.AverageCostResult/<>c::<get_Total>b__9_0[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> a
+	[Kalitte.Trading]Kalitte.Trading.AverageCostResult/<>c::<get_TotalQuantity>b__7_0[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> A
+	[Kalitte.Trading]Kalitte.Trading.AverageCostResult/<>c::<get_Total>b__11_0[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> a
 
 	[Kalitte.Trading]Kalitte.Trading.AverageCostResult/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.AverageCostResult/<>c::.ctor[0]( ) skipped:  special name
 
 	Kalitte.Trading.AverageCostResult/<>c [Kalitte.Trading]Kalitte.Trading.AverageCostResult/<>c Kalitte.Trading.AverageCostResult/<>c::<>9 -> A
-	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> Kalitte.Trading.AverageCostResult/<>c::<>9__5_0 -> A
-	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> Kalitte.Trading.AverageCostResult/<>c::<>9__9_0 -> a
+	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> Kalitte.Trading.AverageCostResult/<>c::<>9__7_0 -> A
+	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> Kalitte.Trading.AverageCostResult/<>c::<>9__11_0 -> a
 }
 
 [Kalitte.Trading]Kalitte.Trading.PortfolioItem/<>c__DisplayClass63_0 -> [Kalitte.Trading]Kalitte.Trading.PortfolioItem/A
@@ -1300,18 +1300,20 @@ Skipped Types:
 [Kalitte.Trading]Kalitte.Trading.AverageCostResult skipped:  KeepPublicApi option in configuration
 {
 
-	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::get_Orders[0]( ) skipped:  skip by property
-	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::set_Orders[1]( [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.ExchangeOrder> ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::get_PositionOrders[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::set_PositionOrders[1]( [mscorlib]System.Collections.Generic.List`1<[Kalitte.Trading]Kalitte.Trading.ExchangeOrder> ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::get_CostEffectiveOrders[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::get_TotalQuantity[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::get_AverageQuantity[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::get_Total[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::get_AverageCost[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.AverageCostResult::.ctor[0]( ) skipped:  special name
 
-	System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> Kalitte.Trading.AverageCostResult::<Orders>k__BackingField -> A
+	System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> Kalitte.Trading.AverageCostResult::<PositionOrders>k__BackingField -> A
 
 
-	System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> Kalitte.Trading.AverageCostResult::Orders skipped:  KeepPublicApi option in configuration
+	System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> Kalitte.Trading.AverageCostResult::PositionOrders skipped:  KeepPublicApi option in configuration
+	System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> [Kalitte.Trading]System.Collections.Generic.List`1<Kalitte.Trading.ExchangeOrder> Kalitte.Trading.AverageCostResult::CostEffectiveOrders skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AverageCostResult::TotalQuantity skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AverageCostResult::AverageQuantity skipped:  KeepPublicApi option in configuration
 	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.AverageCostResult::Total skipped:  KeepPublicApi option in configuration

@@ -20,5 +20,10 @@ namespace Kalitte.Trading.DataVisualization
             Items.Add(name, chart);
             return chart;
         }
+
+        internal void Clear()
+        {
+            Items.Clear();
+        }
     }
 }

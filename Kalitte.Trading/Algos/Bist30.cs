@@ -608,6 +608,7 @@ namespace Kalitte.Trading.Algos
                         cancelCross = true;
                     }
 
+
                     if (cancelCross)
                     {
                         if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)

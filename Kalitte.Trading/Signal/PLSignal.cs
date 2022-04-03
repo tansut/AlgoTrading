@@ -315,7 +315,7 @@ namespace Kalitte.Trading
                     if (!valid) return null;
                 }
 
-                var price = GetMarketPrice();
+                var price = Algo.GetMarketPrice(Symbol, t);
                 if (price == 0)
                 {
                     return null;

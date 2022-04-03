@@ -95,7 +95,7 @@ namespace Kalitte.Trading
         protected System.Timers.Timer _timer = null;
         public ChartList Charts  { get; set; } = new ChartList();
         protected object OperationLock = new object();
-        public AnalyseList PriceList { get; private set; } = new AnalyseList(4, Average.Ema);
+        //public AnalyseList PriceList { get; private set; } = new AnalyseList(4, Average.Ema);
 
         public string Name { get; set; }
         public AlgoBase Algo { get; set; }
@@ -148,7 +148,7 @@ namespace Kalitte.Trading
             var id = time.ToString("dd-MM-yyyy-HH-mm-ss");
             SaveChart(name, id, clear);
         }
-
+        
         public void SaveCharts(DateTime time, bool clear = true)
         {
             foreach (var c in Charts.Items)
@@ -169,20 +169,20 @@ namespace Kalitte.Trading
             }
         }
 
-        public decimal GetMarketPrice()
-        {
-            var price = Algo.GetMarketPrice(Symbol);
-            if (price == 0)
-            {
-                PriceList.Clear();
-                return price;
-            }
-            else
-            {
-                PriceList.Collect(price, Algo.Now);
-                return PriceList.LastValue();
-            }
-        }
+        //public decimal GetMarketPrice()
+        //{
+        //    var price = Algo.GetMarketPrice(Symbol);
+        //    if (price == 0)
+        //    {
+        //        PriceList.Clear();
+        //        return price;
+        //    }
+        //    else
+        //    {
+        //        PriceList.Collect(price, Algo.Now);
+        //        return PriceList.LastValue();
+        //    }
+        //}
 
         public virtual void ResetOrdersInternal()
         {
@@ -318,6 +318,7 @@ namespace Kalitte.Trading
         protected virtual void ResetInternal()
         {
             ResetOrdersInternal();
+            Charts.Clear();
         }
 
         public virtual void Reset()

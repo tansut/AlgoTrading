@@ -85,7 +85,7 @@ public class Program
         // rsi
         alternates.Set("Rsi", 14);
 
-        alternates.Set("RsiOrderHighL1/Enabled", true);
+        alternates.Set("RsiOrderHighL1/Enabled", false);
         alternates.Set("RsiOrderHighL1/MakeRatio", 0);
         alternates.Set("RsiOrderHighL1/Action", RsiPositionAction.IfEmpty);
         alternates.Set("RsiOrderHighL1/L1", 73.00);
@@ -93,7 +93,7 @@ public class Program
 
         alternates.Set("RsiOrderHighL2/Enabled", true);
         alternates.Set("RsiOrderHighL2/KeepRatio", 0.1);
-        alternates.Set("RsiOrderHighL2/MakeRatio", 0.1);
+        alternates.Set("RsiOrderHighL2/MakeRatio", 0);
         alternates.Set("RsiOrderHighL2/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderHighL2/L1", 76.51);
         alternates.Set("RsiOrderHighL2/L2", 84.50);
@@ -104,7 +104,7 @@ public class Program
         alternates.Set("RsiOrderHighL3/L1", 84.51);
         alternates.Set("RsiOrderHighL3/L2", 100);
 
-        alternates.Set("RsiOrderLowL1/Enabled", true);
+        alternates.Set("RsiOrderLowL1/Enabled", false);
         alternates.Set("RsiOrderLowL1/MakeRatio", 0.1);
         alternates.Set("RsiOrderLowL1/ActionRatio", RsiPositionAction.IfEmpty);
         alternates.Set("RsiOrderLowL1/L1", 33.00);
@@ -112,7 +112,7 @@ public class Program
 
         alternates.Set("RsiOrderLowL2/Enabled", true);
         alternates.Set("RsiOrderLowL2/KeepRatio", 0.1);
-        alternates.Set("RsiOrderLowL2/MakeRatio", 0.1);
+        alternates.Set("RsiOrderLowL2/MakeRatio", 0);
         alternates.Set("RsiOrderLowL2/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderLowL2/L1", 28.99);
         alternates.Set("RsiOrderLowL2/L2", 23.00);

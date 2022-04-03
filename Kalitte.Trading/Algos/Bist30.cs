@@ -38,22 +38,15 @@ namespace Kalitte.Trading.Algos
         public decimal Total { get; set; }
 
         [AlgoParam(false)]
-        public bool ProfitLimitEnabled { get; set; }
+        public bool PLEnabled { get; set; }
 
-        [AlgoParam(false)]
-        public bool LossLimitEnabled { get; set; }
 
         [AlgoParam(null)]
-        public decimal[] ProfitLimit { get; set; }
+        public decimal[] PL { get; set; }
 
         [AlgoParam(null)]
-        public decimal[] ProfitRatio { get; set; }
+        public decimal[] PLMultiplier { get; set; }
 
-        [AlgoParam(null)]
-        public decimal[] LossLimit { get; set; }
-
-        [AlgoParam(null)]
-        public decimal[] LossRatio { get; set; }
 
         [AlgoParam(0.5)]
         public decimal NightRatio { get; set; }
@@ -651,16 +644,9 @@ namespace Kalitte.Trading.Algos
             var stats = portfolio.GetDailyStats(Now.Date);
             decimal target = this.OrderConfig.Total;
 
-            if (OrderConfig.ProfitLimitEnabled)
+            if (OrderConfig.PLEnabled)
             {
-                var ratio = Helper.GetMultiplier(stats.NetPl, OrderConfig.ProfitLimit, OrderConfig.ProfitRatio);
-                var newtarget = RoundQuantity(InitialQuantity * ratio);
-                if (newtarget < target) target = newtarget;
-            }
-
-            if (OrderConfig.LossLimitEnabled)
-            {
-                var ratio = Helper.GetMultiplier(stats.NetPl, OrderConfig.LossLimit, OrderConfig.LossRatio);
+                var ratio = Helper.GetMultiplier(stats.NetPl, OrderConfig.PL, OrderConfig.PLMultiplier);
                 var newtarget = RoundQuantity(InitialQuantity * ratio);
                 if (newtarget < target) target = newtarget;
             }

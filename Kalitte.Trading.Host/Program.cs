@@ -23,7 +23,7 @@ public class Program
         settings.Start = new DateTime(2022, 3, 1);
         settings.Finish = new DateTime(2022, 3, 14);
         settings.AutoClosePositions = true;
-        
+
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
         var alternates = settings.Alternates = new AlternateValues(initValues);
@@ -38,11 +38,11 @@ public class Program
         // global order
         alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/PLEnabled", true);
-        alternates.Set("Orders/PL", new decimal[] {-150, -100, 100, 150, 200 });
-        alternates.Set("Orders/PLMultiplier", new decimal [] {0, 0.6M, 1, 0.4M, 0.2M, 0 });
+        alternates.Set("Orders/PL", new decimal[] { -150, -100 });
+        alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.6M, 1 });
 
 
-        alternates.Set("Orders/NightRatio", 0.4);        
+        alternates.Set("Orders/NightRatio", 0.4);
         alternates.Set("Orders/KeepRatio", 0);
         alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);
         alternates.Set("DailyClose/Enabled", true);
@@ -62,9 +62,9 @@ public class Program
 
         alternates.Set("Profit/InitialQuantity", 50);
         alternates.Set("Profit/QuantityStep", 10);
-        alternates.Set("Profit/KeepQuantity", 30);        
+        alternates.Set("Profit/KeepQuantity", 30);
         alternates.Set("Profit/QuantityStepMultiplier", 1);
-        alternates.Set("Profit/StartAt", 0.45);        
+        alternates.Set("Profit/StartAt", 0.45);
         alternates.Set("Profit/Step", 0.15);
 
         alternates.Set("GlobalLoss/InitialQuantity", 50);
@@ -131,7 +131,7 @@ public class Program
         alternates.Set("PowerLookback", 5);
 
         // ma cross
-        
+
         alternates.Set("MovPeriod", 5);
         alternates.Set("MovPeriod2", 9);
 
@@ -142,14 +142,14 @@ public class Program
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
-        alternates.Set("CrossL1/QuantityRatio", 1);        
+        alternates.Set("CrossL1/QuantityRatio", 1);
         alternates.Set("CrossL1/RsiLongEnabled", true);
-        alternates.Set("CrossL1/RsiLong", new[] { 50M, 55.0M });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.4M, 1M, 0.2M });
+        alternates.Set("CrossL1/RsiLong", new[] { 45, 50M, 55M, 60 });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.4M, 1M, 0.8M, 0.2M, 0 });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
-        alternates.Set("CrossL1/RsiShort", new[] { 42M, 50 });        
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] {0M, 1M, 0.6M });
+        alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 50, 55});
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0, 0.2M, 0.8M, 1M, 0.4M });
         //alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec10);
         //alternates.Set("CrossL1/Lookback", 50);        
 
@@ -162,14 +162,14 @@ public class Program
 
 
         // System
-        alternates.Set("LoggingLevel", LogLevel.Verbose);        
+        alternates.Set("LoggingLevel", LogLevel.Verbose);
         alternates.Set("Symbol", "F_XU0300422");
         alternates.Set("SymbolPeriod", BarPeriod.Min10);
 
         // save to read to use files.
         alternates.Set("LogConsole", false);
         alternates.Set("UILoggingLevel", LogLevel.Debug);
-        alternates.SaveToFile($"c:\\kalitte\\Bist30-test.json");    
+        alternates.SaveToFile($"c:\\kalitte\\Bist30-test.json");
 
         // lastrun
         alternates.Set("LoggingLevel", LogLevel.Order);
@@ -209,13 +209,14 @@ public class Program
                 settings = OptimizerSettings.LoadFromFile(args[0]);
                 var firstValues = settings.Alternates.Lean();
                 settings.Alternates = new AlternateValues(firstValues);
-            } else
+            }
+            else
             {
                 Console.WriteLine("Unknown option");
                 return;
             }
         }
-        
+
         var optimize = new Optimizer<Bist30>(settings, typeof(Bist30));
         optimize.Start();
     }

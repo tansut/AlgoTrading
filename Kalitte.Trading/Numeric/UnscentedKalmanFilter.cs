@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics.LinearAlgebra;
+﻿// algo
+using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using System;
@@ -45,22 +46,22 @@ namespace Kalitte.Trading.Numeric
         /// <summary>
         /// Means weights
         /// </summary>
-        private Matrix<double> Wm;
+        private MathNet.Numerics.LinearAlgebra.Matrix<double> Wm;
 
         /// <summary>
         /// Covariance weights
         /// </summary>
-        private Matrix<double> Wc;
+        private MathNet.Numerics.LinearAlgebra.Matrix<double> Wc;
 
         /// <summary>
 		/// State
 		/// </summary>
-        private Matrix<double> x;
+        private MathNet.Numerics.LinearAlgebra.Matrix<double> x;
 
         /// <summary>
 		/// Covariance
 		/// </summary>
-        private Matrix<double> P;
+        private MathNet.Numerics.LinearAlgebra.Matrix<double> P;
 
         /// <summary>
 		/// Std of process 
@@ -75,12 +76,12 @@ namespace Kalitte.Trading.Numeric
         /// <summary>
 		/// Covariance of process
 		/// </summary>
-        private Matrix<double> Q;
+        private MathNet.Numerics.LinearAlgebra.Matrix<double> Q;
 
         /// <summary>
 		/// Covariance of measurement 
 		/// </summary>
-        private Matrix<double> R;
+        private MathNet.Numerics.LinearAlgebra.Matrix<double> R;
 
         /// <summary>
         /// Constructor of Unscented Kalman Filter
@@ -97,11 +98,11 @@ namespace Kalitte.Trading.Numeric
             q = 0.05;
             r = 0.3;
 
-            x = q * Matrix.Build.Random(L, 1); //initial state with noise
-            P = Matrix.Build.Diagonal(L, L, 1); //initial state covraiance
+            x = q * MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Random(L, 1); //initial state with noise
+            P = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Diagonal(L, L, 1); //initial state covraiance
 
-            Q = Matrix.Build.Diagonal(L, L, q * q); //covariance of process
-            R = Matrix.Build.Dense(m, m, r * r); //covariance of measurement  
+            Q = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Diagonal(L, L, q * q); //covariance of process
+            R = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Dense(m, m, r * r); //covariance of measurement  
 
             alpha = 1e-3f;
             ki = 0;
@@ -110,11 +111,11 @@ namespace Kalitte.Trading.Numeric
             c = L + lambda;
 
             //weights for means
-            Wm = Matrix.Build.Dense(1, (2 * L + 1), 0.5 / c);
+            Wm = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Dense(1, (2 * L + 1), 0.5 / c);
             Wm[0, 0] = lambda / c;
 
             //weights for covariance
-            Wc = Matrix.Build.Dense(1, (2 * L + 1));
+            Wc = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Dense(1, (2 * L + 1));
             Wm.CopyTo(Wc);
             Wc[0, 0] = Wm[0, 0] + 1 - alpha * alpha + beta;
 
@@ -134,32 +135,32 @@ namespace Kalitte.Trading.Numeric
                 }
             }
 
-            var z = Matrix.Build.Dense(m, 1, 0);
+            var z = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Dense(m, 1, 0);
             z.SetColumn(0, measurements);
 
             //sigma points around x
-            Matrix<double> X = GetSigmaPoints(x, P, c);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> X = GetSigmaPoints(x, P, c);
 
             //unscented transformation of process
             // X1=sigmas(x1,P1,c) - sigma points around x1
             //X2=X1-x1(:,ones(1,size(X1,2))) - deviation of X1
-            Matrix<double>[] ut_f_matrices = UnscentedTransform(X, Wm, Wc, L, Q);
-            Matrix<double> x1 = ut_f_matrices[0];
-            Matrix<double> X1 = ut_f_matrices[1];
-            Matrix<double> P1 = ut_f_matrices[2];
-            Matrix<double> X2 = ut_f_matrices[3];
+            MathNet.Numerics.LinearAlgebra.Matrix<double>[] ut_f_matrices = UnscentedTransform(X, Wm, Wc, L, Q);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> x1 = ut_f_matrices[0];
+            MathNet.Numerics.LinearAlgebra.Matrix<double> X1 = ut_f_matrices[1];
+            MathNet.Numerics.LinearAlgebra.Matrix<double> P1 = ut_f_matrices[2];
+            MathNet.Numerics.LinearAlgebra.Matrix<double> X2 = ut_f_matrices[3];
 
             //unscented transformation of measurments
-            Matrix<double>[] ut_h_matrices = UnscentedTransform(X1, Wm, Wc, m, R);
-            Matrix<double> z1 = ut_h_matrices[0];
-            Matrix<double> Z1 = ut_h_matrices[1];
-            Matrix<double> P2 = ut_h_matrices[2];
-            Matrix<double> Z2 = ut_h_matrices[3];
+            MathNet.Numerics.LinearAlgebra.Matrix<double>[] ut_h_matrices = UnscentedTransform(X1, Wm, Wc, m, R);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> z1 = ut_h_matrices[0];
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Z1 = ut_h_matrices[1];
+            MathNet.Numerics.LinearAlgebra.Matrix<double> P2 = ut_h_matrices[2];
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Z2 = ut_h_matrices[3];
 
             //transformed cross-covariance
-            Matrix<double> P12 = (X2.Multiply(Matrix.Build.Diagonal(Wc.Row(0).ToArray()))).Multiply(Z2.Transpose());
+            MathNet.Numerics.LinearAlgebra.Matrix<double> P12 = (X2.Multiply(MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Diagonal(Wc.Row(0).ToArray()))).Multiply(Z2.Transpose());
 
-            Matrix<double> K = P12.Multiply(P2.Inverse());
+            MathNet.Numerics.LinearAlgebra.Matrix<double> K = P12.Multiply(P2.Inverse());
 
             //state update
             x = x1.Add(K.Multiply(z.Subtract(z1)));
@@ -187,11 +188,13 @@ namespace Kalitte.Trading.Numeric
         /// <param name="n">numer of outputs of f</param>
         /// <param name="R">additive covariance</param>
         /// <returns>[transformed mean, transformed smapling points, transformed covariance, transformed deviations</returns>
-        private Matrix<double>[] UnscentedTransform(Matrix<double> X, Matrix<double> Wm, Matrix<double> Wc, int n, Matrix<double> R)
+        private Matrix<double>[] UnscentedTransform(MathNet.Numerics.LinearAlgebra.Matrix<double> X,
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Wm, MathNet.Numerics.LinearAlgebra.Matrix<double> Wc, int n,
+            MathNet.Numerics.LinearAlgebra.Matrix<double> R)
         {
             int L = X.ColumnCount;
-            Matrix<double> y = Matrix.Build.Dense(n, 1, 0);
-            Matrix<double> Y = Matrix.Build.Dense(n, L, 0);
+            Matrix<double> y = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Dense(n, 1, 0);
+            Matrix<double> Y = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Dense(n, L, 0);
 
             Matrix<double> row_in_X;
             for (int k = 0; k < L; k++)
@@ -201,8 +204,8 @@ namespace Kalitte.Trading.Numeric
                 y = y.Add(Y.SubMatrix(0, Y.RowCount, k, 1).Multiply(Wm[0, k]));
             }
 
-            Matrix<double> Y1 = Y.Subtract(y.Multiply(Matrix.Build.Dense(1, L, 1)));
-            Matrix<double> P = Y1.Multiply(Matrix.Build.Diagonal(Wc.Row(0).ToArray()));
+            Matrix<double> Y1 = Y.Subtract(y.Multiply(MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Dense(1, L, 1)));
+            Matrix<double> P = Y1.Multiply(MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Diagonal(Wc.Row(0).ToArray()));
             P = P.Multiply(Y1.Transpose());
             P = P.Add(R);
 
@@ -217,28 +220,28 @@ namespace Kalitte.Trading.Numeric
         /// <param name="P">covariance</param>
         /// <param name="c">coefficient</param>
         /// <returns>Sigma points</returns>
-        private Matrix<double> GetSigmaPoints(Matrix<double> x, Matrix<double> P, double c)
+        private MathNet.Numerics.LinearAlgebra.Matrix<double> GetSigmaPoints(MathNet.Numerics.LinearAlgebra.Matrix<double> x, MathNet.Numerics.LinearAlgebra.Matrix<double> P, double c)
         {
-            Matrix<double> A = P.Cholesky().Factor;
+            MathNet.Numerics.LinearAlgebra.Matrix<double> A = P.Cholesky().Factor;
 
             A = A.Multiply(c);
             A = A.Transpose();
 
             int n = x.RowCount;
 
-            Matrix<double> Y = Matrix.Build.Dense(n, n, 1);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Y = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Dense(n, n, 1);
             for (int j = 0; j < n; j++)
             {
                 Y.SetSubMatrix(0, n, j, 1, x);
             }
 
-            Matrix<double> X = Matrix.Build.Dense(n, (2 * n + 1));
+            MathNet.Numerics.LinearAlgebra.Matrix<double> X = MathNet.Numerics.LinearAlgebra.Double.Matrix.Build.Dense(n, (2 * n + 1));
             X.SetSubMatrix(0, n, 0, 1, x);
 
-            Matrix<double> Y_plus_A = Y.Add(A);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Y_plus_A = Y.Add(A);
             X.SetSubMatrix(0, n, 1, n, Y_plus_A);
 
-            Matrix<double> Y_minus_A = Y.Subtract(A);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Y_minus_A = Y.Subtract(A);
             X.SetSubMatrix(0, n, n + 1, n, Y_minus_A);
 
             return X;

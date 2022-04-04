@@ -560,8 +560,6 @@ namespace Kalitte.Trading.Algos
         public virtual void InitializeBars(string symbol, BarPeriod period, DateTime? t = null)
         {
             var periodBars = GetPeriodBars(symbol, period, t);
-            //var existing = this.Symbols.Select(p => p.Symbol == symbol).FirstOrDefault();
-            //if (existing)
             this.Symbols.Add(new SymbolData(symbol, periodBars));
             Log($"Initialized total {periodBars.Count} for {symbol}/{period} using time {t}. Last bar is: {periodBars.Last}", LogLevel.Debug, t);
         }
@@ -595,7 +593,7 @@ namespace Kalitte.Trading.Algos
             }
             catch (Exception ex)
             {
-                Log($"Error initializing bars {ex.Message}", LogLevel.Error, t);
+                Log($"Error initializing bars {ex.Message}/{ex.StackTrace}", LogLevel.Error, t);
             }
 
             return periodBars;

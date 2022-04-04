@@ -42,8 +42,10 @@ namespace Kalitte.Trading.Matrix
 
         public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t)
         {
+            var mPeriod = (SymbolPeriod)Enum.Parse(typeof(SymbolPeriod), period.ToString());
+            Algo.Log($"getperiod {symbol} {period} {mPeriod}", LogLevel.Error);
             var periodBars = new FinanceBars(symbol, period);
-            var bd = GetBarData(symbol, (SymbolPeriod)Enum.Parse(typeof(BarPeriod), period.ToString()));
+            var bd = GetBarData(symbol, mPeriod);
             if (bd != null && bd.BarDataIndexer != null)
             {
                 for (var i = 0; i < bd.BarDataIndexer.LastBarIndex; i++)

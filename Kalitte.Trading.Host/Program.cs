@@ -20,7 +20,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 4);
+        settings.Start = new DateTime(2022, 3, 1);
         settings.Finish = new DateTime(2022, 3, 4);
         settings.AutoClosePositions = true;
 
@@ -136,7 +136,7 @@ public class Program
         alternates.Set("MovPeriod2", 9);
 
         alternates.Set("CrossL1/Enabled", true);
-        alternates.Set("CrossL1/AvgChange", 0.36M);
+        alternates.Set("CrossL1/AvgChange", 0.4M);
         alternates.Set("CrossL1/PreChange", 0);
         alternates.Set("CrossL1/Dynamic", true);
         alternates.Set("CrossL1/PowerThreshold", 88);
@@ -145,11 +145,11 @@ public class Program
         alternates.Set("CrossL1/QuantityRatio", 1);
         alternates.Set("CrossL1/RsiLongEnabled", true);
         alternates.Set("CrossL1/RsiLong", new[] { 50M, 55M, 60 });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.6M, 1M, 0.6M, 0.8M });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.6M, 1M, 0.6M, 1M });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
         alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 55});
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.8M, 0.6M, 1M, 0.6M });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1M, 0.6M, 1M, 0.6M });
         //alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec10);
         //alternates.Set("CrossL1/Lookback", 50);        
 

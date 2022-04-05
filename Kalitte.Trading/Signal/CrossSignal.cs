@@ -115,11 +115,12 @@ namespace Kalitte.Trading
         private List<MyQuote> ohlcWarmupList;
         public AnalyseList RsiList { get; set; }
         public AnalyseList RsiOfRsiList { get; set; }
-
-
-
         public decimal LastCross { get; private set; } = 0;
         public DateTime LastCrossTime { get; private set; } = DateTime.MinValue;
+        public decimal MaxAvgChange { get; set; } = decimal.MinValue;
+        public decimal MinAvgChange { get; set; } = decimal.MaxValue;
+
+
         public CrossSignalResult LastCrossSignal { get; private set; } = null;
 
         public CrossSignal(string name, string symbol, AlgoBase owner, CrossSignalConfig config) : base(name, symbol, owner, config)
@@ -146,6 +147,8 @@ namespace Kalitte.Trading
             PreChange = Config.PreChange;
             RsiList.Clear();
             RsiOfRsiList.Clear();
+            MaxAvgChange = decimal.MinValue;
+            MinAvgChange = decimal.MaxValue;
             base.ResetInternal();
 
             //TODO: Check for other signal
@@ -315,7 +318,8 @@ namespace Kalitte.Trading
             decimal lastAvg = 0M, l1 = 0M, l2 = 0M, mpAverage = 0M;
             var result = new CrossSignalResult(this, t ?? DateTime.Now);
 
-            if (RsiList.Count == 0) FillRsiList(time);
+            if (RsiList.Count == 0) InitializeLists(time);
+            
 
             result.MorningSignal = Algo.IsMorningStart(time);
             if (result.MorningSignal) FillMorningCross(time);
@@ -351,24 +355,27 @@ namespace Kalitte.Trading
                 }
 
                 lastAvg = result.AverageDif = AnalyseList.LastValue(Lookback, OHLCType.Close);
+                MaxAvgChange = lastAvg > MaxAvgChange ? lastAvg : MaxAvgChange;
+                MinAvgChange = lastAvg < MinAvgChange ? lastAvg : MinAvgChange;
                 decimal rsi = -1, rsiEma = -1;
                 RsiList.Collect(mpAverage, time);
 
-                var rsiList = RsiList.RsiList(60);
+                var rsiList = RsiList.RsiList(30);
                 rsi = result.Rsi = rsiList.Count > 0 ? rsiList.List.Last.Close : -1;
                 rsiEma = rsi >= 0 ? rsiList.LastValue(10) : -1;
                 result.Rsi = rsi;
                 result.RsiEma = rsiEma;
 
-                var up = LastCross > 0;
+                var up = LastCross > 0 && rsi >= 50;
+                var down = LastCross < 0 && rsi <= 50;
 
                 var signalCheck = (LastCrossSignal == null || (Math.Sign(LastCrossSignal.LastCross) != Math.Sign(LastCross))) && Math.Sign(lastAvg) == Math.Sign(LastCross);
 
                 var avgChangeL1 = AvgChange;
                 var avgChangeL2 = Config.AvgChange;
 
-                var topL1 = lastAvg > avgChangeL1;
-                var belowL1 = lastAvg < -avgChangeL1;
+                var topL1 = lastAvg > avgChangeL1 && (result.MorningSignal || MinAvgChange < -Config.AvgChange);
+                var belowL1 = lastAvg < -avgChangeL1 && (result.MorningSignal || MaxAvgChange > Config.AvgChange);
 
 
                 var sinceLastSignal = LastCrossSignal == null ? TimeSpan.Zero : time - LastCrossSignal.SignalTime;
@@ -378,20 +385,20 @@ namespace Kalitte.Trading
                     result.CrossType = CrossType.AfterUp;
                     result.finalResult = BuySell.Buy;
                 }
-                else if (belowL1 && signalCheck && !up)
+                else if (belowL1 && signalCheck && down)
                 {
                     result.finalResult = BuySell.Sell;
                     result.CrossType = CrossType.AfterDown;
                 }
                 else if (LastCrossSignal != null)
                 {
-                    var minElapse = TimeSpan.FromMinutes(4);
+                    var minElapse = TimeSpan.FromMinutes(5);
                     var rsiChange = rsiEma - LastCrossSignal.RsiEma;
                     var priceChange = (mpAverage - LastCrossSignal.AveragePrice) / LastCrossSignal.AveragePrice;
                     var changePerMin = sinceLastSignal.TotalMinutes > 0 ? rsiChange / (decimal)sinceLastSignal.TotalMinutes : 0;
-                    var deltaRsi = 0.05M; // (decimal)sinceLastSignal.TotalMinutes * 0.02M;
-                    var deltaPrice = 0.0015M;
-                    if (sinceLastSignal > minElapse)
+                    var deltaRsi = 0.1M; // (decimal)sinceLastSignal.TotalMinutes * 0.02M;
+                    var deltaPrice = 0.002M;
+                    if (sinceLastSignal > minElapse && Math.Abs(lastAvg) < Config.AvgChange * 2)
                     {
                         if (LastCrossSignal.finalResult == BuySell.Sell && lastAvg < 0)
                         {
@@ -471,10 +478,15 @@ namespace Kalitte.Trading
             return result;
         }
 
-        private void FillRsiList(DateTime time)
+        private void InitializeLists(DateTime time)
         {
+            RsiList.Clear();            
+            AnalyseList.Clear();
             var bars = Algo.GetPeriodBars(Symbol, RsiList.Period).LastItems(time, RsiList.List.QueSize);
             bars.ToList().ForEach(bar => RsiList.Collect(bar.Close, bar.Date));
+            var macds = bars.ToList().GetMacd(5, 9, 9).ToList();
+            macds.ForEach(m => { if (m.Macd.HasValue) AnalyseList.Collect(m.Macd.Value, m.Date); });
+            
         }
     }
 }

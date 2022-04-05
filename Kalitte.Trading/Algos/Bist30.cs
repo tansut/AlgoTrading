@@ -594,9 +594,8 @@ namespace Kalitte.Trading.Algos
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-            var currentRsi = signalResult.RsiEma;
+            var currentRsi = 0M;
             var config = (CrossOrderConfig)signal.Config;
-
             var rsiOrderMultiplier = 1M;
             if (!signalResult.MorningSignal)
             {
@@ -613,16 +612,6 @@ namespace Kalitte.Trading.Algos
                     {
                         rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiShort, config.RsiShortMultiplier);
                     }
-
-
-                    //if (rsiOrderMultiplier < 1)
-                    //{
-                    //    if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
-                    //    {
-                    //        Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Test);
-                    //        return;
-                    //    }
-                    //}
                 }
             }
 

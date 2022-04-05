@@ -457,7 +457,6 @@ namespace Kalitte.Trading.Algos
         public bool CheckBeforeDecide()
         {
             CheckNightSettings();
-            AdjustDailyProfitLoss();
             if (OrderConfig.Total == 0)
             {
                 if (!UserPortfolioList.GetPortfolio(Symbol).IsEmpty) ClosePositions(Symbol, null);
@@ -580,13 +579,12 @@ namespace Kalitte.Trading.Algos
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
             var lastPositionOrder = portfolio.LastPositionOrder;
 
-            //if (!signalResult.MorningSignal && signalResult.preResult.HasValue && lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal &&
-            //    lastPositionOrder.SignalResult is CrossSignalResult && !((CrossSignalResult)lastPositionOrder.SignalResult).preResult.HasValue && portfolio.Quantity >= ((CrossOrderConfig)signal.Config).Quantity && portfolio.Side != signalResult.preResult)
-            //{
-            //    Log($"{signalResult.SignalTime} {signalResult.preResult} {signalResult.Rsi}", LogLevel.Debug);
-            //    MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity * 0.80M), portfolio.Side, $"[{signalResult.Signal.Name}/pre", signalResult);
-            //    return;
-            //}
+            if (lastOrder != null && lastOrder.SignalResult.Signal == signal && signalResult.preResult.HasValue && !portfolio.IsEmpty && portfolio.Side != signalResult.preResult)
+            {
+                MakePortfolio(Symbol, 0, signalResult.preResult.Value, $"[{signalResult.Signal.Name}*/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{signalResult.Rsi.ToCurrency()}]", signalResult);
+                return;
+            } 
+
             if (!signalResult.finalResult.HasValue || signalResult.LastCross == 0)
                 return;
 
@@ -607,15 +605,14 @@ namespace Kalitte.Trading.Algos
             {
                 currentRsi = rsi.Value.Value;
 
-                if (config.RsiLongEnabled && signalResult.finalResult == BuySell.Buy)
-                {
-                    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
-                    //cancelCross = true;
-                }
-                else if (config.RsiShortEnabled && signalResult.finalResult == BuySell.Sell)
-                {
-                    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiShort, config.RsiShortMultiplier);
-                }
+                //if (config.RsiLongEnabled && signalResult.finalResult == BuySell.Buy)
+                //{
+                //    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
+                //}
+                //else if (config.RsiShortEnabled && signalResult.finalResult == BuySell.Sell)
+                //{
+                //    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiShort, config.RsiShortMultiplier);
+                //}
 
 
                 //if (rsiOrderMultiplier < 1)

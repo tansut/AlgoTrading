@@ -18,6 +18,7 @@ namespace Kalitte.Trading.DataVisualization
         public PointPairList Points = new PointPairList();
         public Color Color { get; set; } = Color.Black;
         public SymbolType SymbolType { get; set; } = SymbolType.None;
+        public bool Y2Axis { get; set; }
 
         public ChartSerie SetColor(Color color)
         {
@@ -30,6 +31,13 @@ namespace Kalitte.Trading.DataVisualization
             this.SymbolType = symbol;
             return this;
         }
+
+        public ChartSerie IsY2(bool val)
+        {
+            this.Y2Axis = val;
+            return this;
+        }
+
 
         public void Add(DateTime t, decimal value)
         {
@@ -61,6 +69,7 @@ namespace Kalitte.Trading.DataVisualization
             foreach (var item in Series)
             {
                 var li = myPane.AddCurve(item.Value.Title ?? item.Value.Name, item.Value.Points, item.Value.Color, item.Value.SymbolType);
+                li.IsY2Axis = item.Value.Y2Axis;
                 
             }
             myPane.XAxis.Type = AxisType.Date;

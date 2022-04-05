@@ -106,7 +106,7 @@ namespace Kalitte.Trading
                 else if (cdif < 0 && pdif > 0) { cv = cdif; break; }
             }
             if (cv > 0 && max > delta) return cv;
-            if (cv < 0 && min < delta) return cv;
+            if (cv < 0 && min < -delta) return cv;
             return 0M;
             //return cv;
         }

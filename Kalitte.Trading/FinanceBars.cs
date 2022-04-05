@@ -28,7 +28,7 @@ namespace Kalitte.Trading
     }
 
     [Serializable]
-    public class MyQuote : Quote 
+    public class MyQuote : Quote
     {
         //public decimal? Value { get => Close; set { Close = value.Value; } }
 
@@ -37,7 +37,7 @@ namespace Kalitte.Trading
             return $"d: {Date} o: {Open} h: {High} l: {Low} c:{Close} v:{Volume}";
         }
 
-        public MyQuote(): base()
+        public MyQuote() : base()
         {
 
         }
@@ -95,7 +95,7 @@ namespace Kalitte.Trading
                 case OHLCType.Close: { return this.Close; }
                 case OHLCType.HL2: { return (this.High + this.Low) / 2; }
                 case OHLCType.HLC3: { return (this.High + this.Low + this.Close) / 3; }
-                case OHLCType.HL2C4: { return (this.High + this.Low + 2*this.Close) / 4; }
+                case OHLCType.HL2C4: { return (this.High + this.Low + 2 * this.Close) / 4; }
                 default: { return this.Close; }
             }
         }
@@ -189,6 +189,8 @@ namespace Kalitte.Trading
         {
 
         }
+
+
 
         public List<T> LastItems(int n)
         {
@@ -313,7 +315,7 @@ namespace Kalitte.Trading
                 rvl.AcquireReaderLock(timeOut);
                 try
                 {
-                    return items.Count == 0 ? default(T): items[items.Count - 1];
+                    return items.Count == 0 ? default(T) : items[items.Count - 1];
                 }
                 finally
                 {
@@ -353,7 +355,7 @@ namespace Kalitte.Trading
                     evtRemove = new ListEventArgs<T>() { Action = ListAction.ItemRemoved, Item = existing };
                 }
                 items.Add(item);
-                evtAdd = new ListEventArgs<T>() { Action = ListAction.ItemAdded, Item = item };              
+                evtAdd = new ListEventArgs<T>() { Action = ListAction.ItemAdded, Item = item };
             }
             finally
             {
@@ -375,10 +377,11 @@ namespace Kalitte.Trading
                 try
                 {
                     return this.Count >= QueSize;
-                } finally
+                }
+                finally
                 {
                     rvl.ReleaseReaderLock();
-                }                
+                }
             }
         }
 
@@ -430,6 +433,29 @@ namespace Kalitte.Trading
         protected ReaderWriterLock cvl = new ReaderWriterLock();
         private MyQuote current = null;
 
+        public List<IQuote> LastItems(DateTime start, int toBack)
+        {
+            rvl.AcquireReaderLock(timeOut);
+            var result = new List<IQuote>();
+            try
+            {
+                for (var i = items.Count - 1; i >= 0; i--)
+                {
+                    var item = items[i];
+                    if (item.Date <= start)
+                    {
+                        result.Insert(0, item);
+                        if (result.Count >= toBack) break;
+                    }
+                }
+                return result;
+            }
+            finally
+            {
+                rvl.ReleaseReaderLock();
+            }
+        }
+
         public MyQuote Current
         {
             get
@@ -472,16 +498,16 @@ namespace Kalitte.Trading
                     current = new MyQuote();
                 current.Date = date;
                 current.Close = close;
-                current.Volume = volume.HasValue ? volume.Value: Current.Volume;
+                current.Volume = volume.HasValue ? volume.Value : Current.Volume;
                 current.Low = close < Current.Low ? close : Current.Low;
                 current.High = close > Current.High ? close : Current.Low;
-                Current.Open = Current.Open == 0 ? close: Current.Open;
+                Current.Open = Current.Open == 0 ? close : Current.Open;
                 return Current;
             }
-            finally 
+            finally
             {
                 cvl.ReleaseWriterLock();
-            }            
+            }
         }
 
         public FinanceBars(string symbol, BarPeriod period, int maxSize = 0) : base(maxSize)

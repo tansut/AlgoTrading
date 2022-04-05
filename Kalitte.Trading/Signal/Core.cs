@@ -31,8 +31,9 @@ namespace Kalitte.Trading
 
     public class SignalResult
     {
-        public BuySell? finalResult = null;
+        public BuySell? finalResult { get; set; }
         public BuySell? preResult { get; set; }
+        public int Confidence { get; set; } = 0;
         public SignalBase Signal { get; set; }
         public DateTime SignalTime { get; set; }
 
@@ -53,6 +54,7 @@ namespace Kalitte.Trading
             var hash = 17;
             hash = hash * 23 + finalResult.GetHashCode();
             hash = hash * 23 + preResult.GetHashCode();
+            hash = hash * 23 + Confidence.GetHashCode();
             return hash;
         }
     }

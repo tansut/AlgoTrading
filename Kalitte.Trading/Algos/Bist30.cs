@@ -99,16 +99,16 @@ namespace Kalitte.Trading.Algos
         public bool RsiShortEnabled { get; set; }
 
         [AlgoParam(null)]
-        public decimal [] RsiLong { get; set; }
+        public decimal[] RsiLong { get; set; }
 
         [AlgoParam(null)]
-        public decimal [] RsiShort { get; set; }
+        public decimal[] RsiShort { get; set; }
 
         [AlgoParam(null)]
-        public decimal [] RsiLongMultiplier { get; set; }
+        public decimal[] RsiLongMultiplier { get; set; }
 
         [AlgoParam(null)]
-        public decimal [] RsiShortMultiplier { get; set; }
+        public decimal[] RsiShortMultiplier { get; set; }
 
 
 
@@ -454,10 +454,10 @@ namespace Kalitte.Trading.Algos
             }
         }
 
-        public bool CheckBeforeDecide()
+        public bool CheckBeforeDecide(bool ignoreOrderLimits)
         {
             CheckNightSettings();
-            if (OrderConfig.Total == 0)
+            if (OrderConfig.Total == 0 && !ignoreOrderLimits)
             {
                 if (!UserPortfolioList.GetPortfolio(Symbol).IsEmpty) ClosePositions(Symbol, null);
                 return false;
@@ -477,7 +477,7 @@ namespace Kalitte.Trading.Algos
                 Log($"Process [{data.Result.Signal.Name}] using {data.Result} from ", LogLevel.Debug);
             }
 
-            if (!CheckBeforeDecide()) return;
+            if (!CheckBeforeDecide(signal is ClosePositionsSignal)) return;
 
             var result = data.Result;
 
@@ -583,9 +583,9 @@ namespace Kalitte.Trading.Algos
             {
                 MakePortfolio(Symbol, 0, signalResult.preResult.Value, $"[{signalResult.Signal.Name}*/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{signalResult.Rsi.ToCurrency()}]", signalResult);
                 return;
-            } 
+            }
 
-            if (!signalResult.finalResult.HasValue || signalResult.LastCross == 0)
+            if (!signalResult.finalResult.HasValue)
                 return;
 
             var keepPosition = lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal;
@@ -594,40 +594,40 @@ namespace Kalitte.Trading.Algos
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-            var currentRsi = 0M;
+            var currentRsi = signalResult.RsiEma;
             var config = (CrossOrderConfig)signal.Config;
-            
+
             var rsiOrderMultiplier = 1M;
-            //if (!signalResult.MorningSignal)
-            //{
-            var rsi = rsiValue.LastSignalResult as IndicatorAnalyserResult;
-            if (rsi != null && rsi.Value.HasValue)
+            if (!signalResult.MorningSignal)
             {
-                currentRsi = rsi.Value.Value;
+                var rsi = rsiValue.LastSignalResult as IndicatorAnalyserResult;
+                if (rsi != null && rsi.Value.HasValue)
+                {
+                    currentRsi = rsi.Value.Value;
 
-                //if (config.RsiLongEnabled && signalResult.finalResult == BuySell.Buy)
-                //{
-                //    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
-                //}
-                //else if (config.RsiShortEnabled && signalResult.finalResult == BuySell.Sell)
-                //{
-                //    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiShort, config.RsiShortMultiplier);
-                //}
+                    if (config.RsiLongEnabled && signalResult.finalResult == BuySell.Buy)
+                    {
+                        rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
+                    }
+                    else if (config.RsiShortEnabled && signalResult.finalResult == BuySell.Sell)
+                    {
+                        rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiShort, config.RsiShortMultiplier);
+                    }
 
 
-                //if (rsiOrderMultiplier < 1)
-                //{
-                //    if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
-                //    {
-                //        Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Test);
-                //        return;
-                //    }
-                //}
+                    //if (rsiOrderMultiplier < 1)
+                    //{
+                    //    if (portfolio.IsEmpty || portfolio.Side == signalResult.finalResult)
+                    //    {
+                    //        Log($"Cross cancelled: {signalResult.finalResult}, speed: { rsi.Speed}  acceleration: { rsi.Acceleration} value: { rsi.Value}", LogLevel.Test);
+                    //        return;
+                    //    }
+                    //}
+                }
             }
-            //}
 
-            
-            var quantity = RoundQuantity(rsiOrderMultiplier * config.Quantity);            
+
+            var quantity = RoundQuantity(rsiOrderMultiplier * config.Quantity);
 
 
             MakePortfolio(Symbol, quantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*" : "")}/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);

@@ -389,7 +389,7 @@ namespace Kalitte.Trading
                     var rsiChange = rsiEma - LastCrossSignal.RsiEma;
                     var priceChange = (mpAverage - LastCrossSignal.AveragePrice) / LastCrossSignal.AveragePrice;
                     var changePerMin = sinceLastSignal.TotalMinutes > 0 ? rsiChange / (decimal)sinceLastSignal.TotalMinutes : 0;
-                    var deltaRsi = 0.08M; // (decimal)sinceLastSignal.TotalMinutes * 0.02M;
+                    var deltaRsi = 0.05M; // (decimal)sinceLastSignal.TotalMinutes * 0.02M;
                     var deltaPrice = 0.0015M;
                     if (sinceLastSignal > minElapse)
                     {

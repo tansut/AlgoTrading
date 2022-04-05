@@ -3043,7 +3043,7 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::SetAnalyserDefaults[1]( [Kalitte.Trading]Kalitte.Trading.AnalyserConfig[] ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::CreateSignals[0]( ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::CheckNightSettings[0]( ) skipped:  KeepPublicApi option in configuration
-	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::CheckBeforeDecide[0]( ) skipped:  KeepPublicApi option in configuration
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::CheckBeforeDecide[1]( [mscorlib]System.Boolean ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::MakePortfolio[6]( [mscorlib]System.String, [mscorlib]System.Decimal, [Kalitte.Trading]Kalitte.Trading.BuySell, [mscorlib]System.String, [Kalitte.Trading]Kalitte.Trading.SignalResult, [Kalitte.Trading]Kalitte.Trading.OrderUsage ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::HandleDailyCloseSignal[2]( [Kalitte.Trading]Kalitte.Trading.ClosePositionsSignal, [Kalitte.Trading]Kalitte.Trading.ClosePositionsSignalResult ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30::HandleCrossSignal[2]( [Kalitte.Trading]Kalitte.Trading.CrossSignal, [Kalitte.Trading]Kalitte.Trading.CrossSignalResult ) skipped:  KeepPublicApi option in configuration

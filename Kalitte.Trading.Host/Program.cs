@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 28);
-        settings.Finish = new DateTime(2022, 3, 31);
+        settings.Start = new DateTime(2022, 3, 4);
+        settings.Finish = new DateTime(2022, 3, 4);
         settings.AutoClosePositions = true;
 
 
@@ -43,8 +43,8 @@ public class Program
 
 
         alternates.Set("Orders/NightRatio", 0.4);
-        alternates.Set("Orders/KeepRatio", 0);
-        alternates.Set("Orders/KeepSide", ClosePositionSide.KeepSide);
+        alternates.Set("Orders/KeepRatio", 0.2);
+        alternates.Set("Orders/KeepSide", ClosePositionSide.UseCross);
         alternates.Set("DailyClose/Enabled", true);
 
         // analyser defaults
@@ -64,8 +64,8 @@ public class Program
         alternates.Set("Profit/QuantityStep", 10);
         alternates.Set("Profit/KeepQuantity", 30);
         alternates.Set("Profit/QuantityStepMultiplier", 1);
-        alternates.Set("Profit/StartAt", 0.45);
-        alternates.Set("Profit/Step", 0.15);
+        alternates.Set("Profit/StartAt", 0.48);
+        alternates.Set("Profit/Step", 0.18);
 
         alternates.Set("GlobalLoss/InitialQuantity", 50);
         alternates.Set("GlobalLoss/QuantityStep", 25);
@@ -145,11 +145,11 @@ public class Program
         alternates.Set("CrossL1/QuantityRatio", 1);
         alternates.Set("CrossL1/RsiLongEnabled", true);
         alternates.Set("CrossL1/RsiLong", new[] { 50M, 55M, 60 });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.4M, 1M, 0.4M, 0.2M });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.6M, 1M, 0.6M, 0.8M });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
         alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 55});
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.2M, 0.4M, 1M, 0.4M });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.8M, 0.6M, 1M, 0.6M });
         //alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec10);
         //alternates.Set("CrossL1/Lookback", 50);        
 

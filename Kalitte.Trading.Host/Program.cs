@@ -21,7 +21,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 4);
+        settings.Finish = new DateTime(2022, 3, 31);
         settings.AutoClosePositions = true;
 
 
@@ -136,7 +136,7 @@ public class Program
         alternates.Set("MovPeriod2", 9);
 
         alternates.Set("CrossL1/Enabled", true);
-        alternates.Set("CrossL1/AvgChange", 0.4M);
+        alternates.Set("CrossL1/AvgChange", 0.5M);
         alternates.Set("CrossL1/PreChange", 0);
         alternates.Set("CrossL1/Dynamic", true);
         alternates.Set("CrossL1/PowerThreshold", 88);

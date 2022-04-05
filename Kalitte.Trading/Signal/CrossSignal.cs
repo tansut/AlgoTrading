@@ -398,7 +398,7 @@ namespace Kalitte.Trading
                     var changePerMin = sinceLastSignal.TotalMinutes > 0 ? rsiChange / (decimal)sinceLastSignal.TotalMinutes : 0;
                     var deltaRsi = 0.1M; // (decimal)sinceLastSignal.TotalMinutes * 0.02M;
                     var deltaPrice = 0.002M;
-                    if (sinceLastSignal > minElapse && Math.Abs(lastAvg) < Config.AvgChange * 2)
+                    if (sinceLastSignal > minElapse && Math.Abs(lastAvg) < Config.AvgChange)
                     {
                         if (LastCrossSignal.finalResult == BuySell.Sell && lastAvg < 0)
                         {

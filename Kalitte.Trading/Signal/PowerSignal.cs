@@ -142,7 +142,7 @@ namespace Kalitte.Trading
                     return result;
                 }
 
-                if (CollectList.Ready)
+                if (CollectList.Count > 0)
                 {
                     var collectValue = CollectList.LastValue();
                     AnalyseList.Collect(collectValue, time);

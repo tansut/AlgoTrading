@@ -29,7 +29,7 @@ namespace Kalitte.Trading.Matrix
         public override void OnInit()
         {
             AddSymbol(Algo.Symbol, (SymbolPeriod)Enum.Parse(typeof(SymbolPeriod), Algo.SymbolPeriod.ToString()));
-            //AddSymbol(Symbol, SymbolPeriod.Min);
+            AddSymbol(Algo.Symbol, SymbolPeriod.Min);
             WorkWithPermanentSignal(true);
             SendOrderSequential(false);
             AddSymbolMarketData(Algo.Symbol);

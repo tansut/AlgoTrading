@@ -98,6 +98,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool RsiShortEnabled { get; set; }
 
+        [AlgoParam(false)]
+        public bool PreOrderEnabled { get; set; }
+
         [AlgoParam(null)]
         public decimal[] RsiLong { get; set; }
 
@@ -578,8 +581,9 @@ namespace Kalitte.Trading.Algos
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
             var lastPositionOrder = portfolio.LastPositionOrder;
+            var config = (CrossOrderConfig)signal.Config;
 
-            if (lastOrder != null && lastOrder.SignalResult.Signal == signal && signalResult.preResult.HasValue && !portfolio.IsEmpty && portfolio.Side != signalResult.preResult)
+            if (config.PreOrderEnabled && lastOrder != null && lastOrder.SignalResult.Signal == signal && signalResult.preResult.HasValue && !portfolio.IsEmpty && portfolio.Side != signalResult.preResult)
             {
                 MakePortfolio(Symbol, 0, signalResult.preResult.Value, $"[{signalResult.Signal.Name}*/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{signalResult.Rsi.ToCurrency()}]", signalResult);
                 return;
@@ -595,7 +599,7 @@ namespace Kalitte.Trading.Algos
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
             var currentRsi = 0M;
-            var config = (CrossOrderConfig)signal.Config;
+            
             var rsiOrderMultiplier = 1M;
             if (!signalResult.MorningSignal)
             {

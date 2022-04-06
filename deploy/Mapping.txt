@@ -3231,6 +3231,8 @@ Skipped Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::set_RsiLongEnabled[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::get_RsiShortEnabled[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::set_RsiShortEnabled[1]( [mscorlib]System.Boolean ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::get_PreOrderEnabled[0]( ) skipped:  skip by property
+	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::set_PreOrderEnabled[1]( [mscorlib]System.Boolean ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::get_RsiLong[0]( ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::set_RsiLong[1]( [mscorlib]System.Decimal[] ) skipped:  skip by property
 	[Kalitte.Trading]Kalitte.Trading.Algos.CrossOrderConfig::get_RsiShort[0]( ) skipped:  skip by property
@@ -3247,6 +3249,7 @@ Skipped Types:
 	Kalitte.Trading.Algos.Bist30 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30 Kalitte.Trading.Algos.CrossOrderConfig::<Algo>k__BackingField -> A
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.CrossOrderConfig::<RsiLongEnabled>k__BackingField -> A
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.CrossOrderConfig::<RsiShortEnabled>k__BackingField -> a
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.CrossOrderConfig::<PreOrderEnabled>k__BackingField -> B
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.CrossOrderConfig::<RsiLong>k__BackingField -> A
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.CrossOrderConfig::<RsiShort>k__BackingField -> a
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.CrossOrderConfig::<RsiLongMultiplier>k__BackingField -> B
@@ -3257,6 +3260,7 @@ Skipped Types:
 	Kalitte.Trading.Algos.Bist30 [Kalitte.Trading]Kalitte.Trading.Algos.Bist30 Kalitte.Trading.Algos.CrossOrderConfig::Algo skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.CrossOrderConfig::RsiLongEnabled skipped:  KeepPublicApi option in configuration
 	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.CrossOrderConfig::RsiShortEnabled skipped:  KeepPublicApi option in configuration
+	System.Boolean [Kalitte.Trading]System.Boolean Kalitte.Trading.Algos.CrossOrderConfig::PreOrderEnabled skipped:  KeepPublicApi option in configuration
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.CrossOrderConfig::RsiLong skipped:  KeepPublicApi option in configuration
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.CrossOrderConfig::RsiShort skipped:  KeepPublicApi option in configuration
 	System.Decimal[] [Kalitte.Trading]System.Decimal[] Kalitte.Trading.Algos.CrossOrderConfig::RsiLongMultiplier skipped:  KeepPublicApi option in configuration

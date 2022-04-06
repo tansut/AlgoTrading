@@ -374,9 +374,12 @@ namespace Kalitte.Trading
                 var avgChangeL1 = AvgChange;
                 var avgChangeL2 = Config.AvgChange;
 
-                var topL1 = lastAvg > avgChangeL1 && (result.MorningSignal || MinAvgChange < -Config.AvgChange);
-                var belowL1 = lastAvg < -avgChangeL1 && (result.MorningSignal || MaxAvgChange > Config.AvgChange);
+                //var topL1 = lastAvg > avgChangeL1 && (result.MorningSignal || MinAvgChange < -Config.AvgChange);
+                //var belowL1 = lastAvg < -avgChangeL1 && (result.MorningSignal || MaxAvgChange > Config.AvgChange);
 
+
+                var topL1 = lastAvg > avgChangeL1;
+                var belowL1 = lastAvg < -avgChangeL1;
 
                 var sinceLastSignal = LastCrossSignal == null ? TimeSpan.Zero : time - LastCrossSignal.SignalTime;
 

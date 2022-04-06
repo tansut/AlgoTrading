@@ -84,6 +84,10 @@ namespace Kalitte.Trading.Algos
         private object decideLock = new object();
         private object orderLock = new object();
 
+        private static volatile int AlgoCounter = 0;
+
+        public int UniqueID { get; private set; }
+
         public event EventHandler<OrderEventArgs> OrderCompleted;
 
         Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");
@@ -124,7 +128,7 @@ namespace Kalitte.Trading.Algos
 
         public StateSettings LoadStateSettings()
         {
-            var file = Path.Combine(LogDir, Symbol, $"state{(MultipleTestOptimization ? Thread.CurrentThread.ManagedThreadId.ToString() : "")}.json");
+            var file = Path.Combine(LogDir, Symbol, $"state{(MultipleTestOptimization ? UniqueID.ToString() : "")}.json");
             if (File.Exists(file)) {
                 return JsonConvert.DeserializeObject<StateSettings>(File.ReadAllText(file));
             } else return new StateSettings();
@@ -133,7 +137,7 @@ namespace Kalitte.Trading.Algos
         public void SaveStateSettings(StateSettings settings)
         {
             var content =JsonConvert.SerializeObject(settings);
-            var file = Path.Combine(LogDir, Symbol, $"state{(MultipleTestOptimization ? Thread.CurrentThread.ManagedThreadId.ToString() : "")}.json");
+            var file = Path.Combine(LogDir, Symbol, $"state{(MultipleTestOptimization ? UniqueID.ToString() : "")}.json");
             File.WriteAllText(file, content);
         }
 
@@ -609,10 +613,11 @@ namespace Kalitte.Trading.Algos
 
         public AlgoBase(Dictionary<string, object> initValues)
         {
+            this.UniqueID = Interlocked.Increment(ref AlgoBase.AlgoCounter);
             this.ApplyProperties(initValues);
             RandomGenerator random = new RandomGenerator();
             this.InstanceName = this.GetType().Name + "-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + (random.Next(1000000, 9999999));
-            //if (Simulation && )
+            
         }
 
         public Boolean WaitForOrder(string message)

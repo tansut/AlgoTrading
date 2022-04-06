@@ -272,7 +272,7 @@ namespace Kalitte.Trading.Algos
 
         public override void InitializeBars(string symbol, BarPeriod period, DateTime? t = null)
         {
-            var time = t ?? DateTime.Now;
+            var time = t ?? Now;
             //var tm = new DateTime(time.Year, time.Month, time.Day, time.Hour, 59, 0);
             //var minBars = GetPeriodBars(symbol, BarPeriod.Min, tm);
             //this.Symbols.Add(new SymbolData(symbol, minBars));                   

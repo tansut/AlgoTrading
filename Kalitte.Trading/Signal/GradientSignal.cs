@@ -76,16 +76,15 @@ namespace Kalitte.Trading
 
             var mp = Algo.GetMarketPrice(Symbol, t);
 
-            if (mp > 0) CollectList.Collect(mp, time);
-
-            if (CollectList.Ready && mp > 0)
+            if (mp > 0)
             {
+                CollectList.Collect(mp, time);
                 decimal mpAverage = CollectList.LastValue();
                 var iVal = Indicator.NextValue(mpAverage).Value.Value;
                 result.IndicatorValue = iVal;
-
                 AnalyseList.Collect(iVal, time);
-                result.Gradient = grad.Step(AnalyseList.LastValue(Lookback));
+                var checkValue = AnalyseList.LastValue(Lookback);
+                result.Gradient = grad.Step(checkValue);
             }
 
 

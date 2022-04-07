@@ -38,8 +38,8 @@ public class Program
         // global order
         alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/PLEnabled", true);
-        alternates.Set("Orders/PL", new decimal[] { -200, -150 });
-        alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.6M, 1 });
+        alternates.Set("Orders/PL", new decimal[] { -200, -150, 100, 150, 200 });
+        alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.6M, 1, 0.4M, 0.2M, 0 });
 
 
         alternates.Set("Orders/NightRatio", 0.4);
@@ -102,7 +102,7 @@ public class Program
         alternates.Set("RsiOrderHighL3/MakeRatio", 0.1);
         alternates.Set("RsiOrderHighL3/Action", RsiPositionAction.Radical);
         alternates.Set("RsiOrderHighL3/L1", 84.51);
-        alternates.Set("RsiOrderHighL3/L2", 100);
+        alternates.Set("RsiOrderHighL3/L2", 100);        
 
         alternates.Set("RsiOrderLowL1/Enabled", false);
         alternates.Set("RsiOrderLowL1/MakeRatio", 0.1);
@@ -136,10 +136,10 @@ public class Program
         alternates.Set("MovPeriod2", 9);
 
         alternates.Set("CrossL1/Enabled", true);
-        alternates.Set("CrossL1/AvgChange", 0.4M, 0.6M, 0.8M, 1M);
+        alternates.Set("CrossL1/AvgChange", 0.6M);
         alternates.Set("CrossL1/PreChange", 0);
         alternates.Set("CrossL1/Dynamic", true);
-        alternates.Set("CrossL1/PreOrderEnabled", true);        
+        alternates.Set("CrossL1/PreOrder", 0.4);        
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
@@ -150,15 +150,7 @@ public class Program
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
         alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 55});
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1M, 0.6M, 1M, 0.6M });
-        //alternates.Set("CrossL1/AnalysePeriod",  BarPeriod.Sec10);
-        //alternates.Set("CrossL1/Lookback", 50);        
-
-
-        // cross rsi
-        //alternates.Set("RsiValue/Lookback", 240);
-
-
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1M, 0.6M, 1M, 0.6M });     
 
 
 

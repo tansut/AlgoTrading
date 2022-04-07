@@ -98,8 +98,8 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(false)]
         public bool RsiShortEnabled { get; set; }
 
-        [AlgoParam(false)]
-        public bool PreOrderEnabled { get; set; }
+        [AlgoParam(0)]
+        public decimal PreOrder { get; set; }
 
         [AlgoParam(null)]
         public decimal[] RsiLong { get; set; }
@@ -239,6 +239,8 @@ namespace Kalitte.Trading.Algos
         GradientSignal rsiLowL1;
         GradientSignal rsiLowL2;
         GradientSignal rsiLowL3;
+
+        CrossSignalResult usedCross4PreOrder = null;
 
 
         public void InitSignals()
@@ -583,9 +585,30 @@ namespace Kalitte.Trading.Algos
             var lastPositionOrder = portfolio.LastPositionOrder;
             var config = (CrossOrderConfig)signal.Config;
 
-            if (config.PreOrderEnabled && lastOrder != null && lastOrder.SignalResult.Signal == signal && signalResult.preResult.HasValue && !portfolio.IsEmpty && portfolio.Side != signalResult.preResult)
+            var currentRsi = 0M;
+
+            var rsiOrderMultiplier = 1M;
+
+            var rsi = rsiValue.LastSignalResult as IndicatorAnalyserResult;
+            if (rsi != null && rsi.Value.HasValue)
             {
-                MakePortfolio(Symbol, 0, signalResult.preResult.Value, $"[{signalResult.Signal.Name}*/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{signalResult.Rsi.ToCurrency()}]", signalResult);
+                currentRsi = rsi.Value.Value;
+
+                if (!signalResult.MorningSignal && config.RsiLongEnabled && signalResult.finalResult == BuySell.Buy)
+                {
+                    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
+                }
+                else if (!signalResult.MorningSignal && config.RsiShortEnabled && signalResult.finalResult == BuySell.Sell)
+                {
+                    rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiShort, config.RsiShortMultiplier);
+                }
+            }
+
+
+            if (usedCross4PreOrder == null && config.PreOrder < 1 && lastOrder != null && lastOrder.SignalResult.Signal == signal && signalResult.preResult.HasValue && !portfolio.IsEmpty && portfolio.Side != signalResult.preResult)
+            {
+                usedCross4PreOrder = signalResult;
+                MakePortfolio(Symbol, portfolio.Quantity * config.PreOrder, portfolio.Side, $"[{signalResult.Signal.Name}*/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);
                 return;
             }
 
@@ -598,26 +621,7 @@ namespace Kalitte.Trading.Algos
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
-            var currentRsi = 0M;
-            
-            var rsiOrderMultiplier = 1M;
-            if (!signalResult.MorningSignal)
-            {
-                var rsi = rsiValue.LastSignalResult as IndicatorAnalyserResult;
-                if (rsi != null && rsi.Value.HasValue)
-                {
-                    currentRsi = rsi.Value.Value;
 
-                    if (config.RsiLongEnabled && signalResult.finalResult == BuySell.Buy)
-                    {
-                        rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
-                    }
-                    else if (config.RsiShortEnabled && signalResult.finalResult == BuySell.Sell)
-                    {
-                        rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiShort, config.RsiShortMultiplier);
-                    }
-                }
-            }
 
 
             var quantity = RoundQuantity(rsiOrderMultiplier * config.Quantity);
@@ -668,6 +672,11 @@ namespace Kalitte.Trading.Algos
             else
             {
                 Signals.Where(p => p is PLSignal).Select(p => (PLSignal)p).ToList().ForEach(p => p.ResetOrders());
+            }
+
+            if (cross != null && cross.finalResult.HasValue)
+            {
+                usedCross4PreOrder = null;
             }
             //if (portfolio.IsEmpty)
             //{

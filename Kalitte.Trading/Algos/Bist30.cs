@@ -608,7 +608,7 @@ namespace Kalitte.Trading.Algos
             if (usedCross4PreOrder == null && config.PreOrder < 1 && lastOrder != null && lastOrder.SignalResult.Signal == signal && signalResult.preResult.HasValue && !portfolio.IsEmpty && portfolio.Side != signalResult.preResult)
             {
                 usedCross4PreOrder = signalResult;
-                MakePortfolio(Symbol, portfolio.Quantity * config.PreOrder, portfolio.Side, $"[{signalResult.Signal.Name}*/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);
+                MakePortfolio(Symbol, RoundQuantity(portfolio.Quantity * config.PreOrder), portfolio.Side, $"[{signalResult.Signal.Name}*/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);
                 return;
             }
 

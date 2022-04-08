@@ -11,7 +11,6 @@
   <ItemGroup>
     <Compile Remove="Indicators\Volume.cs" />
     <Compile Remove="MAProfit.cs" />
-    <Compile Remove="Matrix\MarketDataLogger.cs" />
     <Compile Remove="Signal\SignalTask.cs" />
   </ItemGroup>
 
@@ -31,10 +30,6 @@
     <Reference Include="ZedGraph">
       <HintPath>..\third.party\ZedGraph.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Matrix\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 4, 1);
-        settings.Finish = new DateTime(2022, 4, 6);
+        settings.Start = new DateTime(2022, 3, 1);
+        settings.Finish = new DateTime(2022, 3, 31);
         settings.AutoClosePositions = true;
 
 
@@ -38,12 +38,14 @@ public class Program
         // global order
         alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/PLEnabled", true);
-        alternates.Set("Orders/PL", new decimal[] { -200, -150, 100, 150, 200 });
-        alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.6M, 1, 0.4M, 0.2M, 0 });
+        //alternates.Set("Orders/PL", new decimal[] { -200, -150, 100, 150, 200 });
+        //alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.4M, 0.2M, 0 });
+        alternates.Set("Orders/PL", new decimal[] { -200, -150 });
+        alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1 });
 
 
         alternates.Set("Orders/NightRatio", 0.4);
-        alternates.Set("Orders/KeepRatio", 0.2);
+        alternates.Set("Orders/KeepRatio", 0);
         alternates.Set("Orders/KeepSide", ClosePositionSide.UseCross);
         alternates.Set("DailyClose/Enabled", true);
 
@@ -138,21 +140,20 @@ public class Program
         alternates.Set("MovPeriod2", 9);
 
         alternates.Set("CrossL1/Enabled", true);
-        alternates.Set("CrossL1/AvgChange", 0.6M);
-        alternates.Set("CrossL1/PreChange", 0);
+        alternates.Set("CrossL1/AvgChange", 0.5M);
         alternates.Set("CrossL1/Dynamic", true);
-        alternates.Set("CrossL1/PreOrder", 0.8);        
+        alternates.Set("CrossL1/PreOrder", 0.6);        
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);
         alternates.Set("CrossL1/RsiLongEnabled", true);
-        alternates.Set("CrossL1/RsiLong", new[] { 50M, 55.5M, 60 });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.6M, 1M, 0.4M, 1 });
+        alternates.Set("CrossL1/RsiLong", new[] { 50M, 55M, 60 });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.8M, 1M, 0.2M, 1 });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
-        alternates.Set("CrossL1/RsiShort", new[] { 40, 45.4M, 55 });
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1, 0.4M, 1M, 0.6M });
+        alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 55 });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1, 0.2M, 1M, 0.8M });
 
 
 

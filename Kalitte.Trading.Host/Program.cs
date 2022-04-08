@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 31);
+        settings.Start = new DateTime(2022, 4, 1);
+        settings.Finish = new DateTime(2022, 4, 6);
         settings.AutoClosePositions = true;
 
 
@@ -43,7 +43,7 @@ public class Program
 
 
         alternates.Set("Orders/NightRatio", 0.4);
-        alternates.Set("Orders/KeepRatio", 0.2, 0);
+        alternates.Set("Orders/KeepRatio", 0.2);
         alternates.Set("Orders/KeepSide", ClosePositionSide.UseCross);
         alternates.Set("DailyClose/Enabled", true);
 
@@ -85,9 +85,9 @@ public class Program
         // rsi
         alternates.Set("Rsi", 14);
 
-        alternates.Set("RsiOrderHighL1/Enabled", true);
+        alternates.Set("RsiOrderHighL1/Enabled", false);
         alternates.Set("RsiOrderHighL1/MakeRatio", 0);
-        alternates.Set("RsiOrderHighL2/KeepRatio", 0.2);
+        alternates.Set("RsiOrderHighL1/KeepRatio", 0.2);
         alternates.Set("RsiOrderHighL1/Action", RsiPositionAction.Additional);
         alternates.Set("RsiOrderHighL1/L1", 73.00);
         alternates.Set("RsiOrderHighL1/L2", 75.00);
@@ -105,8 +105,8 @@ public class Program
         alternates.Set("RsiOrderHighL3/L1", 85.51);
         alternates.Set("RsiOrderHighL3/L2", 100);        
 
-        alternates.Set("RsiOrderLowL1/Enabled", true);
-        alternates.Set("RsiOrderLowL2/KeepRatio", 0.2);
+        alternates.Set("RsiOrderLowL1/Enabled", false);
+        alternates.Set("RsiOrderLowL1/KeepRatio", 0.2);
         alternates.Set("RsiOrderLowL1/MakeRatio", 0);
         alternates.Set("RsiOrderLowL1/ActionRatio", RsiPositionAction.Additional);
         alternates.Set("RsiOrderLowL1/L1", 33.00);
@@ -141,18 +141,18 @@ public class Program
         alternates.Set("CrossL1/AvgChange", 0.6M);
         alternates.Set("CrossL1/PreChange", 0);
         alternates.Set("CrossL1/Dynamic", true);
-        alternates.Set("CrossL1/PreOrder", 0.4, 0.2, 0, 1);        
+        alternates.Set("CrossL1/PreOrder", 0.8);        
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);
         alternates.Set("CrossL1/RsiLongEnabled", true);
-        alternates.Set("CrossL1/RsiLong", new[] { 50M, 55M, 60 });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, 1M, 0.4M, 1M });
+        alternates.Set("CrossL1/RsiLong", new[] { 50M, 55.5M, 60 });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.6M, 1M, 0.4M, 1 });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
-        alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 55});
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1M, 0.4M, 1M, 1M });     
+        alternates.Set("CrossL1/RsiShort", new[] { 40, 45.4M, 55 });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1, 0.4M, 1M, 0.6M });
 
 
 

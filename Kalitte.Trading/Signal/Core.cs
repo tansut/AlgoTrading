@@ -438,7 +438,7 @@ namespace Kalitte.Trading
             Monitor.Enter(OperationLock);
             try
             {
-                if (Enabled && TimerEnabled)
+                if (TimerEnabled)
                 {
                     _timer = new System.Timers.Timer(1000);
                     _timer.Elapsed += this.onTick;

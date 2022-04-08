@@ -439,7 +439,7 @@ namespace Kalitte.Trading.Algos
                 var list = signals.Length == 0 ? Signals.ToArray() : signals;
                 foreach (var signal in list)
                 {
-                    if (!signal.Enabled) continue;
+                    //if (!signal.Enabled) continue;
                     signal.Start();
                     Log($"Started signal {signal}", LogLevel.Info);
                 }
@@ -460,7 +460,7 @@ namespace Kalitte.Trading.Algos
                 var list = signals.Length == 0 ? Signals.ToArray() : signals;
                 foreach (var signal in list)
                 {
-                    if (!signal.Enabled) continue;
+                    //if (!signal.Enabled) continue;
                     signal.Stop();
                     Log($"Stopped signal {signal}", LogLevel.Info);
                 }

@@ -192,21 +192,21 @@ namespace Kalitte.Trading
             base.Init();
         }
 
-        public override void Start()
-        {
-            //if (AnalyseList.Count == 0)
-            //{
-            //    var lastBar = i1k.InputBars.Last.Date;
-            //    Helper.SymbolSeconds(i1k.InputBars.Period.ToString(), out int seconds);
-            //    var maxBar = lastBar.AddSeconds(seconds);
-            //    //AnalyseList.Init(i1k.Results.Where(p => p.Value.HasValue).Select(p => MyQuote.Create(p.Date, p.Value.Value, OHLCType.Close)));
-            //    //for(var t = lastBar; t < maxBar;t=t.AddSeconds(1))
-            //    //{
+        //public override void Start()
+        //{
+        //    //if (AnalyseList.Count == 0)
+        //    //{
+        //    //    var lastBar = i1k.InputBars.Last.Date;
+        //    //    Helper.SymbolSeconds(i1k.InputBars.Period.ToString(), out int seconds);
+        //    //    var maxBar = lastBar.AddSeconds(seconds);
+        //    //    //AnalyseList.Init(i1k.Results.Where(p => p.Value.HasValue).Select(p => MyQuote.Create(p.Date, p.Value.Value, OHLCType.Close)));
+        //    //    //for(var t = lastBar; t < maxBar;t=t.AddSeconds(1))
+        //    //    //{
 
-            //    //}
-            //}
-            base.Start();
-        }
+        //    //    //}
+        //    //}
+        //    base.Start();
+        //}
 
 
         protected override void AdjustSensitivityInternal(double ratio, string reason)

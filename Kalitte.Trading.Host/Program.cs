@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 31);
+        settings.Start = new DateTime(2022, 4, 1);
+        settings.Finish = new DateTime(2022, 4, 7);
         settings.AutoClosePositions = true;
 
 
@@ -81,8 +81,15 @@ public class Program
         alternates.Set("RsiLoss/InitialQuantity", 80);
         alternates.Set("RsiLoss/QuantityStep", 10);
         alternates.Set("RsiLoss/KeepQuantity", 0);
-        alternates.Set("RsiLoss/StartAt", 0.7);
+        alternates.Set("RsiLoss/StartAt", 0.5);
         alternates.Set("RsiLoss/Step", 0.15);
+
+        alternates.Set("CrossLoss/Enabled", false);
+        alternates.Set("CrossLoss/InitialQuantity", 80);
+        alternates.Set("CrossLoss/QuantityStep", 10);
+        alternates.Set("CrossLoss/KeepQuantity", 0);
+        alternates.Set("CrossLoss/StartAt", 0.4);
+        alternates.Set("CrossLoss/Step", 0.1);
 
         // rsi
         alternates.Set("Rsi", 14);
@@ -147,15 +154,21 @@ public class Program
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);
+        //alternates.Set("CrossL1/RsiLongEnabled", true);
+        //alternates.Set("CrossL1/RsiLong", new[] { 50M, 55M, 60 });
+        //alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.8M, 1M, 0.2M, 1 });
+
+        //alternates.Set("CrossL1/RsiShortEnabled", true);
+        //alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 55 });
+        //alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1, 0.2M, 1M, 0.8M });
+
         alternates.Set("CrossL1/RsiLongEnabled", true);
-        alternates.Set("CrossL1/RsiLong", new[] { 50M, 55M, 60 });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.8M, 1M, 0.2M, 1 });
+        alternates.Set("CrossL1/RsiLong", new[] {  55M });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, -1M });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
-        alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 55 });
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1, 0.2M, 1M, 0.8M });
-
-
+        alternates.Set("CrossL1/RsiShort", new[] { 45M });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { -1M, 1M });
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);

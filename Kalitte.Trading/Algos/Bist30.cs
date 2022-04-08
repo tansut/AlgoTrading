@@ -174,6 +174,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(null, "Profit")]
         public PLSignalConfig ProfitConfig { get; set; } = new PLSignalConfig();
 
+        [AlgoParam(null, "CrossLoss")]
+        public PLSignalConfig CrossLossConfig { get; set; } = new PLSignalConfig();
+
         [AlgoParam(null, "GlobalLoss")]
         public PLSignalConfig GlobalLossConfig { get; set; } = new PLSignalConfig();
 
@@ -226,6 +229,7 @@ namespace Kalitte.Trading.Algos
 
         ProfitSignal profitSignal = null;
         LossSignal rsiLossSignal = null;
+        LossSignal crossLossSignal = null;
         LossSignal globalLossSignal = null;
 
         IndicatorAnalyser rsiValue = null;
@@ -341,6 +345,10 @@ namespace Kalitte.Trading.Algos
             this.Signals.Add(this.profitSignal = CreateProfitSignal("profit", Symbol, ProfitConfig));
             this.Signals.Add(this.rsiLossSignal = new LossSignal("rsi-loss", Symbol, this, RsiLossConfig));
             this.rsiLossSignal.LimitingSignalTypes.Add(typeof(GradientSignal));
+
+            this.Signals.Add(this.crossLossSignal = new LossSignal("cross-loss", Symbol, this, CrossLossConfig));
+            this.crossLossSignal.LimitingSignalTypes.Add(typeof(CrossSignal));
+            this.crossLossSignal.CostSignals.Add(maCrossL1);
 
             this.Signals.Add(this.globalLossSignal = new LossSignal("global-loss", Symbol, this, GlobalLossConfig));
 
@@ -541,7 +549,6 @@ namespace Kalitte.Trading.Algos
                 finalPosition = signalResult.finalResult.Value;
 
             MakePortfolio(Symbol, finalQuantity, finalPosition, $"{signal.Name}[{signalResult}]", signalResult, usage);
-
         }
 
         public void MakePortfolio(string symbol, decimal quantity, BuySell side, string comment, SignalResult result, OrderUsage usage = OrderUsage.Unknown)
@@ -597,10 +604,20 @@ namespace Kalitte.Trading.Algos
                 if (!signalResult.MorningSignal && config.RsiLongEnabled && signalResult.finalResult == BuySell.Buy)
                 {
                     rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiLong, config.RsiLongMultiplier);
+                    if (rsiOrderMultiplier < 0 && signalResult.finalResult.HasValue)
+                    {
+                        crossLossSignal.Enabled = true;
+                        return;
+                    }
                 }
                 else if (!signalResult.MorningSignal && config.RsiShortEnabled && signalResult.finalResult == BuySell.Sell)
                 {
                     rsiOrderMultiplier = Helper.GetMultiplier(currentRsi, config.RsiShort, config.RsiShortMultiplier);
+                    if (rsiOrderMultiplier < 0 && signalResult.finalResult.HasValue)
+                    {
+                        crossLossSignal.Enabled= true;
+                        return;
+                    }
                 }
             }
 
@@ -677,6 +694,9 @@ namespace Kalitte.Trading.Algos
             if (cross != null && cross.finalResult.HasValue)
             {
                 usedCross4PreOrder = null;
+            } else if (cross != null)
+            {
+                crossLossSignal.Enabled = false;
             }
             //if (portfolio.IsEmpty)
             //{

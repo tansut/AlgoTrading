@@ -90,7 +90,7 @@ namespace Kalitte.Trading.Algos
 
         public event EventHandler<OrderEventArgs> OrderCompleted;
 
-        Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext");
+        Mutex simulationFileMutext = new Mutex(false, "simulationFileMutext2");
 
         Dictionary<string, MarketDataFileLogger> dataProviders = new Dictionary<string, MarketDataFileLogger>();
         
@@ -679,7 +679,7 @@ namespace Kalitte.Trading.Algos
             foreach (var prop in properties)
             {
                 var attr = (AlgoParam)prop.GetCustomAttributes(true).Where(p => p is AlgoParam).First();
-                if (prop.PropertyType.IsClass && prop.PropertyType != typeof(string))
+                if (prop.PropertyType.IsClass && prop.PropertyType != typeof(string) && !prop.PropertyType.IsArray)
                 {
                     var subClassProps = GetConfigValues(prop.GetValue(target));
                     foreach (var subClassProp in subClassProps) result.Add($"{attr.Name ?? prop.Name}/{subClassProp.Key}", subClassProp.Value);
@@ -939,7 +939,15 @@ namespace Kalitte.Trading.Algos
                         var ul = UserPortfolioList.First().Value;
                         sb.Append($"{ul.SideStr}\t{ul.Quantity}\t{ul.AvgCost}\t{ul.Total}\t{ul.PL}\t{ul.Commission}\t{ul.PL - ul.Commission}\t{orderCounter}\t{LogFile}\t");
                     }
-                    foreach (var v in dictionary) sb.Append(Helper.ToString(v.Value) + "\t");
+                    foreach (var v in dictionary)
+                    {
+                        if (v.Value != null && v.Value.GetType().IsArray)
+                        {
+                            sb.Append(Helper.ToString(v.Value) + "\t");
+                        }
+                        else 
+                        sb.Append(Helper.ToString(v.Value) + "\t");
+                    }
                     sb.Append(Environment.NewLine);
                     File.AppendAllText(SimulationFile, sb.ToString());
                 }

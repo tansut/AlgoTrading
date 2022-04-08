@@ -63,7 +63,20 @@ namespace Kalitte.Trading
     public static class Helper
     {
         private static Dictionary<string, int> symbolPeriodCache = new Dictionary<string, int>();
-        
+
+
+        public static string ToString(object val)
+        {
+            if (val == null) return "null";
+
+            if (val.GetType().IsArray)
+            {
+                var values = (System.Collections.IEnumerable)val;
+                val = string.Join(", ", values.OfType<object>());
+            }
+            return val.ToString();
+        }
+
         static Helper()
         {
             symbolPeriodCache.Add(BarPeriod.Sec.ToString(), 1);

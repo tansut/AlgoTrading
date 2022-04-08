@@ -58,7 +58,11 @@ namespace Kalitte.Trading
             var properties = this.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(AlgoParam), true));
             var sb = new StringBuilder();
             foreach (var prop in properties)
-                sb.Append($"{prop.Name}: {prop.GetValue(this)} ");
+            {
+                var val = prop.GetValue(this);
+                sb.Append($"{prop.Name}: {Helper.ToString(val)} ");
+            }
+
             return sb.ToString();
         }
     }
@@ -137,7 +141,7 @@ namespace Kalitte.Trading
         DiffPercent = 17,
         Undivided = 18,
         Other = 19,
-  
+
     }
 
     public enum OrderIcon

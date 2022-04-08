@@ -21,7 +21,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 3, 4);
-        settings.Finish = new DateTime(2022, 3, 31);
+        settings.Finish = new DateTime(2022, 3, 4);
         settings.AutoClosePositions = true;
 
 
@@ -167,8 +167,8 @@ public class Program
         alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, -1M, 0.4M });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
-        alternates.Set("CrossL1/RsiShort", new[] { 40, 45M });
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.4M, -1M, 1M });
+        alternates.Set("CrossL1/RsiShort", new[] { 40, 45M }, new[] { 45M });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.4M, -1M, 1M }, new[] { -1M, 1M });
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);

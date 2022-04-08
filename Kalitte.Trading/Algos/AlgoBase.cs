@@ -939,7 +939,7 @@ namespace Kalitte.Trading.Algos
                         var ul = UserPortfolioList.First().Value;
                         sb.Append($"{ul.SideStr}\t{ul.Quantity}\t{ul.AvgCost}\t{ul.Total}\t{ul.PL}\t{ul.Commission}\t{ul.PL - ul.Commission}\t{orderCounter}\t{LogFile}\t");
                     }
-                    foreach (var v in dictionary) sb.Append(v.Value + "\t");
+                    foreach (var v in dictionary) sb.Append(Helper.ToString(v.Value) + "\t");
                     sb.Append(Environment.NewLine);
                     File.AppendAllText(SimulationFile, sb.ToString());
                 }

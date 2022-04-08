@@ -123,43 +123,43 @@ Renamed Types:
 
 [Kalitte.Trading]Kalitte.Trading.Helper/<>c -> [Kalitte.Trading]Kalitte.Trading.Helper/A
 {
-	[Kalitte.Trading]Kalitte.Trading.Helper/<>c::<Cartesian>b__9_0[1]( [mscorlib]System.Collections.Generic.IEnumerable`1<[mscorlib]System.Object> ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Helper/<>c::<Cartesian>b__9_1[1]( [mscorlib]System.Collections.Generic.IEnumerator`1<[mscorlib]System.Object> ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Helper/<>c::<Cartesian>b__9_2[1]( [mscorlib]System.Collections.Generic.IEnumerator`1<[mscorlib]System.Object> ) -> a
+	[Kalitte.Trading]Kalitte.Trading.Helper/<>c::<Cartesian>b__10_0[1]( [mscorlib]System.Collections.Generic.IEnumerable`1<[mscorlib]System.Object> ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Helper/<>c::<Cartesian>b__10_1[1]( [mscorlib]System.Collections.Generic.IEnumerator`1<[mscorlib]System.Object> ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Helper/<>c::<Cartesian>b__10_2[1]( [mscorlib]System.Collections.Generic.IEnumerator`1<[mscorlib]System.Object> ) -> a
 
 	[Kalitte.Trading]Kalitte.Trading.Helper/<>c::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.Helper/<>c::.ctor[0]( ) skipped:  special name
 
 	Kalitte.Trading.Helper/<>c [Kalitte.Trading]Kalitte.Trading.Helper/<>c Kalitte.Trading.Helper/<>c::<>9 -> A
-	System.Func`2<System.Collections.Generic.IEnumerable`1<System.Object>,System.Collections.Generic.IEnumerator`1<System.Object>> [Kalitte.Trading]System.Func`2<System.Collections.Generic.IEnumerable`1<System.Object>,System.Collections.Generic.IEnumerator`1<System.Object>> Kalitte.Trading.Helper/<>c::<>9__9_0 -> A
-	System.Func`2<System.Collections.Generic.IEnumerator`1<System.Object>,System.Boolean> [Kalitte.Trading]System.Func`2<System.Collections.Generic.IEnumerator`1<System.Object>,System.Boolean> Kalitte.Trading.Helper/<>c::<>9__9_1 -> A
-	System.Func`2<System.Collections.Generic.IEnumerator`1<System.Object>,System.Object> [Kalitte.Trading]System.Func`2<System.Collections.Generic.IEnumerator`1<System.Object>,System.Object> Kalitte.Trading.Helper/<>c::<>9__9_2 -> A
+	System.Func`2<System.Collections.Generic.IEnumerable`1<System.Object>,System.Collections.Generic.IEnumerator`1<System.Object>> [Kalitte.Trading]System.Func`2<System.Collections.Generic.IEnumerable`1<System.Object>,System.Collections.Generic.IEnumerator`1<System.Object>> Kalitte.Trading.Helper/<>c::<>9__10_0 -> A
+	System.Func`2<System.Collections.Generic.IEnumerator`1<System.Object>,System.Boolean> [Kalitte.Trading]System.Func`2<System.Collections.Generic.IEnumerator`1<System.Object>,System.Boolean> Kalitte.Trading.Helper/<>c::<>9__10_1 -> A
+	System.Func`2<System.Collections.Generic.IEnumerator`1<System.Object>,System.Object> [Kalitte.Trading]System.Func`2<System.Collections.Generic.IEnumerator`1<System.Object>,System.Object> Kalitte.Trading.Helper/<>c::<>9__10_2 -> A
 }
 
-[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__9 -> [Kalitte.Trading]Kalitte.Trading.Helper/a
+[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__10 -> [Kalitte.Trading]Kalitte.Trading.Helper/a
 {
-	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__9::System.IDisposable.Dispose[0]( ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__9::System.Collections.Generic.IEnumerator<System.Object>.get_Current[0]( ) -> a
-	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__9::System.Collections.IEnumerator.Reset[0]( ) -> B
-	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__9::System.Collections.IEnumerator.get_Current[0]( ) -> b
-	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__9::System.Collections.Generic.IEnumerable<System.Object>.GetEnumerator[0]( ) -> C
-	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__9::System.Collections.IEnumerable.GetEnumerator[0]( ) -> c
+	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__10::System.IDisposable.Dispose[0]( ) -> A
+	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__10::System.Collections.Generic.IEnumerator<System.Object>.get_Current[0]( ) -> a
+	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__10::System.Collections.IEnumerator.Reset[0]( ) -> B
+	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__10::System.Collections.IEnumerator.get_Current[0]( ) -> b
+	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__10::System.Collections.Generic.IEnumerable<System.Object>.GetEnumerator[0]( ) -> C
+	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__10::System.Collections.IEnumerable.GetEnumerator[0]( ) -> c
 
-	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__9::.ctor[1]( [mscorlib]System.Int32 ) skipped:  special name
-	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__9::MoveNext[0]( ) skipped:  external base class or interface
+	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__10::.ctor[1]( [mscorlib]System.Int32 ) skipped:  special name
+	[Kalitte.Trading]Kalitte.Trading.Helper/<Cartesian>d__10::MoveNext[0]( ) skipped:  external base class or interface
 
-	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Helper/<Cartesian>d__9::<>1__state -> A
-	System.Object [Kalitte.Trading]System.Object Kalitte.Trading.Helper/<Cartesian>d__9::<>2__current -> A
-	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Helper/<Cartesian>d__9::<>l__initialThreadId -> a
-	System.Collections.Generic.IEnumerable`1<System.Collections.Generic.IEnumerable`1<System.Object>> [Kalitte.Trading]System.Collections.Generic.IEnumerable`1<System.Collections.Generic.IEnumerable`1<System.Object>> Kalitte.Trading.Helper/<Cartesian>d__9::items -> A
-	System.Collections.Generic.IEnumerable`1<System.Collections.Generic.IEnumerable`1<System.Object>> [Kalitte.Trading]System.Collections.Generic.IEnumerable`1<System.Collections.Generic.IEnumerable`1<System.Object>> Kalitte.Trading.Helper/<Cartesian>d__9::<>3__items -> a
-	System.Collections.Generic.IEnumerator`1<System.Object>[] [Kalitte.Trading]System.Collections.Generic.IEnumerator`1<System.Object>[] Kalitte.Trading.Helper/<Cartesian>d__9::<slots>5__1 -> A
-	System.Collections.Generic.IEnumerator`1<System.Object>[] [Kalitte.Trading]System.Collections.Generic.IEnumerator`1<System.Object>[] Kalitte.Trading.Helper/<Cartesian>d__9::<>s__2 -> a
-	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Helper/<Cartesian>d__9::<>s__3 -> B
-	System.Collections.Generic.IEnumerator`1<System.Object> [Kalitte.Trading]System.Collections.Generic.IEnumerator`1<System.Object> Kalitte.Trading.Helper/<Cartesian>d__9::<slot>5__4 -> A
+	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Helper/<Cartesian>d__10::<>1__state -> A
+	System.Object [Kalitte.Trading]System.Object Kalitte.Trading.Helper/<Cartesian>d__10::<>2__current -> A
+	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Helper/<Cartesian>d__10::<>l__initialThreadId -> a
+	System.Collections.Generic.IEnumerable`1<System.Collections.Generic.IEnumerable`1<System.Object>> [Kalitte.Trading]System.Collections.Generic.IEnumerable`1<System.Collections.Generic.IEnumerable`1<System.Object>> Kalitte.Trading.Helper/<Cartesian>d__10::items -> A
+	System.Collections.Generic.IEnumerable`1<System.Collections.Generic.IEnumerable`1<System.Object>> [Kalitte.Trading]System.Collections.Generic.IEnumerable`1<System.Collections.Generic.IEnumerable`1<System.Object>> Kalitte.Trading.Helper/<Cartesian>d__10::<>3__items -> a
+	System.Collections.Generic.IEnumerator`1<System.Object>[] [Kalitte.Trading]System.Collections.Generic.IEnumerator`1<System.Object>[] Kalitte.Trading.Helper/<Cartesian>d__10::<slots>5__1 -> A
+	System.Collections.Generic.IEnumerator`1<System.Object>[] [Kalitte.Trading]System.Collections.Generic.IEnumerator`1<System.Object>[] Kalitte.Trading.Helper/<Cartesian>d__10::<>s__2 -> a
+	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.Helper/<Cartesian>d__10::<>s__3 -> B
+	System.Collections.Generic.IEnumerator`1<System.Object> [Kalitte.Trading]System.Collections.Generic.IEnumerator`1<System.Object> Kalitte.Trading.Helper/<Cartesian>d__10::<slot>5__4 -> A
 
-	System.Object [Kalitte.Trading]System.Object Kalitte.Trading.Helper/<Cartesian>d__9::System.Collections.Generic.IEnumerator<System.Object>.Current -> dropped
-	System.Object [Kalitte.Trading]System.Object Kalitte.Trading.Helper/<Cartesian>d__9::System.Collections.IEnumerator.Current -> dropped
+	System.Object [Kalitte.Trading]System.Object Kalitte.Trading.Helper/<Cartesian>d__10::System.Collections.Generic.IEnumerator<System.Object>.Current -> dropped
+	System.Object [Kalitte.Trading]System.Object Kalitte.Trading.Helper/<Cartesian>d__10::System.Collections.IEnumerator.Current -> dropped
 }
 
 [Kalitte.Trading]Kalitte.Trading.PerformanceMonitor/<>c__DisplayClass28_0 -> [Kalitte.Trading]Kalitte.Trading.PerformanceMonitor/A
@@ -1064,6 +1064,7 @@ Skipped Types:
 [Kalitte.Trading]Kalitte.Trading.Helper skipped:  KeepPublicApi option in configuration
 {
 
+	[Kalitte.Trading]Kalitte.Trading.Helper::ToString[1]( [mscorlib]System.Object ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Helper::.cctor[0]( ) skipped:  special name
 	[Kalitte.Trading]Kalitte.Trading.Helper::RoundUp[2]( [mscorlib]System.DateTime, [mscorlib]System.TimeSpan ) skipped:  KeepPublicApi option in configuration
 	[Kalitte.Trading]Kalitte.Trading.Helper::Cross[3]( [mscorlib]System.Decimal[], [mscorlib]System.Decimal, [mscorlib]System.Decimal ) skipped:  KeepPublicApi option in configuration

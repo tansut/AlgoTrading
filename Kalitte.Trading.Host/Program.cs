@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 4, 1);
-        settings.Finish = new DateTime(2022, 4, 7);
+        settings.Start = new DateTime(2022, 3, 4);
+        settings.Finish = new DateTime(2022, 3, 31);
         settings.AutoClosePositions = true;
 
 
@@ -40,11 +40,11 @@ public class Program
         alternates.Set("Orders/PLEnabled", true);
         //alternates.Set("Orders/PL", new decimal[] { -200, -150, 100, 150, 200 });
         //alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.4M, 0.2M, 0 });
-        alternates.Set("Orders/PL", new decimal[] { -200, -150 });
-        alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1 });
+        alternates.Set("Orders/PL", new decimal[] { -150, -125, 150, 250 });
+        alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.6M, 0M });
 
 
-        alternates.Set("Orders/NightRatio", 0.4);
+        alternates.Set("Orders/NightRatio", 0.2);
         alternates.Set("Orders/KeepRatio", 0);
         alternates.Set("Orders/KeepSide", ClosePositionSide.UseCross);
         alternates.Set("DailyClose/Enabled", true);
@@ -64,16 +64,16 @@ public class Program
 
         alternates.Set("Profit/InitialQuantity", 50);
         alternates.Set("Profit/QuantityStep", 10);
-        alternates.Set("Profit/KeepQuantity", 30);
+        alternates.Set("Profit/KeepQuantity", 20);
         alternates.Set("Profit/QuantityStepMultiplier", 1);
-        alternates.Set("Profit/StartAt", 0.48);
+        alternates.Set("Profit/StartAt", 0.52);
         alternates.Set("Profit/Step", 0.18);
 
         alternates.Set("GlobalLoss/InitialQuantity", 50);
-        alternates.Set("GlobalLoss/QuantityStep", 25);
+        alternates.Set("GlobalLoss/QuantityStep", 10);
         alternates.Set("GlobalLoss/KeepQuantity", 0);
-        alternates.Set("GlobalLoss/StartAt", 1.0);
-        alternates.Set("GlobalLoss/Step", 0.25);
+        alternates.Set("GlobalLoss/StartAt", 0.8);
+        alternates.Set("GlobalLoss/Step", 0.1);
 
 
         // rsi loss
@@ -163,12 +163,12 @@ public class Program
         //alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1, 0.2M, 1M, 0.8M });
 
         alternates.Set("CrossL1/RsiLongEnabled", true);
-        alternates.Set("CrossL1/RsiLong", new[] {  55M });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, -1M });
+        alternates.Set("CrossL1/RsiLong", new[] {  55M, 60 });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, -1M, 0.4M });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
-        alternates.Set("CrossL1/RsiShort", new[] { 45M });
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { -1M, 1M });
+        alternates.Set("CrossL1/RsiShort", new[] { 40, 45M });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.4M, -1M, 1M });
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);

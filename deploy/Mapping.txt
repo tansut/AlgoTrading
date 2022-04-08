@@ -234,21 +234,6 @@ Renamed Types:
 	System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,Kalitte.Trading.PortfolioItem>,System.Decimal> [Kalitte.Trading]System.Func`2<System.Collections.Generic.KeyValuePair`2<System.String,Kalitte.Trading.PortfolioItem>,System.Decimal> Kalitte.Trading.PortfolioList/<>c::<>9__5_0 -> a
 }
 
-[Kalitte.Trading]Kalitte.Trading.PLSignal/<>c -> [Kalitte.Trading]Kalitte.Trading.PLSignal/A
-{
-	[Kalitte.Trading]Kalitte.Trading.PLSignal/<>c::<getResult>b__42_0[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> A
-	[Kalitte.Trading]Kalitte.Trading.PLSignal/<>c::<getResult>b__42_1[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> a
-	[Kalitte.Trading]Kalitte.Trading.PLSignal/<>c::<getResult>b__42_2[1]( [Kalitte.Trading]Kalitte.Trading.ExchangeOrder ) -> B
-
-	[Kalitte.Trading]Kalitte.Trading.PLSignal/<>c::.cctor[0]( ) skipped:  special name
-	[Kalitte.Trading]Kalitte.Trading.PLSignal/<>c::.ctor[0]( ) skipped:  special name
-
-	Kalitte.Trading.PLSignal/<>c [Kalitte.Trading]Kalitte.Trading.PLSignal/<>c Kalitte.Trading.PLSignal/<>c::<>9 -> A
-	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Boolean> Kalitte.Trading.PLSignal/<>c::<>9__42_0 -> A
-	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Boolean> Kalitte.Trading.PLSignal/<>c::<>9__42_1 -> a
-	System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> [Kalitte.Trading]System.Func`2<Kalitte.Trading.ExchangeOrder,System.Decimal> Kalitte.Trading.PLSignal/<>c::<>9__42_2 -> A
-}
-
 [Kalitte.Trading]Kalitte.Trading.Indicators.Custom/<GetResults>d__3 -> [Kalitte.Trading]Kalitte.Trading.Indicators.Custom/A
 {
 	[Kalitte.Trading]Kalitte.Trading.Indicators.Custom/<GetResults>d__3::System.IDisposable.Dispose[0]( ) -> A

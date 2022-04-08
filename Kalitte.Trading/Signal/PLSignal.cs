@@ -205,15 +205,15 @@ namespace Kalitte.Trading
             BuySell? bs = null;
             var unitPl = marketPrice - costStatus.AverageCost;
             var targetChange = (costStatus.AverageCost * (UsedPriceChange / 100M)).ToCurrency();
-            var keepQuantity = costStatus.AverageQuantity;
+            var keepQuantity = costStatus.TotalQuantity;
 
-            var closePositions = costStatus.PositionOrders.Where(p => p.SignalResult.Signal is ClosePositionsSignal).ToList();
-            var others = costStatus.PositionOrders.Where(p => !(p.SignalResult.Signal is ClosePositionsSignal)).ToList();
+            //var closePositions = costStatus.PositionOrders.Where(p => p.SignalResult.Signal is ClosePositionsSignal).ToList();
+            //var others = costStatus.PositionOrders.Where(p => !(p.SignalResult.Signal is ClosePositionsSignal)).ToList();
 
-            if (others.Count > 0 && closePositions.Count > 0)
-            {
-                keepQuantity = others.Sum(p => (p.FilledQuantity - p.DirectionChangedQuantity)) / others.Count;
-            }
+            //if (others.Count > 0 && closePositions.Count > 0)
+            //{
+            //    keepQuantity = others.Sum(p => (p.FilledQuantity - p.DirectionChangedQuantity)) / others.Count;
+            //}
 
             if (this.Usage == OrderUsage.TakeProfit)
             {
@@ -326,7 +326,7 @@ namespace Kalitte.Trading
                     LowPrice = Math.Min(LowPrice == 0 ? price: LowPrice, price);
                     var portfolioStatus = portfolio.LastAverageCost(CostSignals.ToArray());
                     var quantityRatio = this.CompletedOrder == 0 ? Config.InitialQuantity : Config.QuantityStep + Config.QuantityStep * (this.CompletedOrder-1) * Config.QuantityStepMultiplier;
-                    var quantity = Algo.RoundQuantity(Math.Max(portfolio.Quantity, portfolioStatus.AverageQuantity) * quantityRatio / 100M);
+                    var quantity = Algo.RoundQuantity(Math.Max(portfolio.Quantity, portfolioStatus.TotalQuantity) * quantityRatio / 100M);
                     return quantity == 0 || portfolioStatus.AverageCost == 0 ? null: this.getResult(portfolio, portfolioStatus, price, quantity);
                 }
             }

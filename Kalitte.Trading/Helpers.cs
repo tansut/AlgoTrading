@@ -134,7 +134,7 @@ namespace Kalitte.Trading
             for(var i = 0; i < ranges.Length; i++)
             {
                 var next = i + 1;
-                if (value < ranges[i]) return multipliers[i];
+                if (value < ranges[i]) return i < multipliers.Length ? multipliers[i]: multipliers.Last();
             }
             return multipliers.Last();
         }

@@ -20,7 +20,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
+        settings.Start = new DateTime(2022, 3, 15);
         settings.Finish = new DateTime(2022, 3, 31);
         settings.AutoClosePositions = true;
 
@@ -38,8 +38,6 @@ public class Program
         // global order
         alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/PLEnabled", true);
-        //alternates.Set("Orders/PL", new decimal[] { -200, -150, 100, 150, 200 });
-        //alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.4M, 0.2M, 0 });
         alternates.Set("Orders/PL", new decimal[] { -150, -125, 150, 250 });
         alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.6M, 0M });
 
@@ -158,12 +156,12 @@ public class Program
         //alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1, 0.2M, 1M, 0.8M });
 
         alternates.Set("CrossL1/RsiLongEnabled", true);
-        alternates.Set("CrossL1/RsiLong", new[] { 55M });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, 0.4M });
+        alternates.Set("CrossL1/RsiLong", new[] { 55M }, new[] { 50M, 55M, 60M }, new [] {55M, 60M});
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, 0.4M, 0.8M }, new[] { 1M, 0.4M, 0.8M }, new[] { 0.6M, 1, -1M, 0.4M }, new [] { 1M, 0M });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
-        alternates.Set("CrossL1/RsiShort", new[] { 45M });
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.4M, 1M });
+        alternates.Set("CrossL1/RsiShort", new[] { 45M }, new[] { 40M, 45M, 50M }, new [] {40M, 45M});
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.4M, 1M }, new[] { 0.8M, 0.4M, 1M }, new[] { 0.4M, -1, 1M, 0.6M }, new [] {0M, 1M});
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);

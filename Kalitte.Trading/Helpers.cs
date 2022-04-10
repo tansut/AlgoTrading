@@ -132,8 +132,7 @@ namespace Kalitte.Trading
         public static decimal GetMultiplier(decimal value, decimal [] ranges, decimal [] multipliers)
         {
             for(var i = 0; i < ranges.Length; i++)
-            {
-                var next = i + 1;
+            {                
                 if (value < ranges[i]) return i < multipliers.Length ? multipliers[i]: multipliers.Last();
             }
             return multipliers.Last();

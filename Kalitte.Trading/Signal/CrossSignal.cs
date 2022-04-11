@@ -131,8 +131,6 @@ namespace Kalitte.Trading
 
 
 
-
-
         protected override void ResetInternal()
         {
             crossBars.Clear();

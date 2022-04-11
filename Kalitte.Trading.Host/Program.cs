@@ -21,7 +21,7 @@ public class Program
     {
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 3, 31);
+        settings.Finish = new DateTime(2022, 4, 11);
         settings.AutoClosePositions = true;
 
 
@@ -38,8 +38,8 @@ public class Program
         // global order
         alternates.Set("Orders/Total", 10);
         alternates.Set("Orders/PLEnabled", true);
-        alternates.Set("Orders/PL", new decimal[] { -150, -125, 150, 250 });
-        alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.6M, 0M });
+        alternates.Set("Orders/PL", new decimal[] { -150, -125, 150, 250, 300 });
+        alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.6M, 0.2M, 0M });
 
 
         alternates.Set("Orders/NightRatio", 0.2);
@@ -147,21 +147,15 @@ public class Program
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
         alternates.Set("CrossL1/QuantityRatio", 1);
-        //alternates.Set("CrossL1/RsiLongEnabled", true);
-        //alternates.Set("CrossL1/RsiLong", new[] { 50M, 55M, 60 });
-        //alternates.Set("CrossL1/RsiLongMultiplier", new[] { 0.8M, 1M, 0.2M, 1 });
 
-        //alternates.Set("CrossL1/RsiShortEnabled", true);
-        //alternates.Set("CrossL1/RsiShort", new[] { 40, 45M, 55 });
-        //alternates.Set("CrossL1/RsiShortMultiplier", new[] { 1, 0.2M, 1M, 0.8M });
 
         alternates.Set("CrossL1/RsiLongEnabled", true);
         alternates.Set("CrossL1/RsiLong", new[] { 55M, 60M });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, -1M, 0.4M });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, 0M, 0.4M });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
         alternates.Set("CrossL1/RsiShort", new[] { 40M, 45M });
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.4M, -1M, 1M });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] { 0.4M, 0M, 1M });
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);

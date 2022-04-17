@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="C:\Users\tansu\source\repos\borsabot\Merge\bin\Debug\net472\merge.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading C:\Users\tansu\source\repos\borsabot\Kalitte.Trading.Matrix&#xD;&#xA;C:\Users\tansu\source\repos\borsabot\third.party\obfuscar\Obfuscar.Console.exe C:\Users\tansu\source\repos\borsabot\Kalitte.Trading\obfuscar.xml" />
+    <Exec Command="C:\Users\tansut\source\repos\borsabot\Merge\bin\Debug\net472\merge.exe C:\Users\tansut\source\repos\borsabot\Kalitte.Trading C:\Users\tansut\source\repos\borsabot\Kalitte.Trading.Matrix&#xD;&#xA;C:\Users\tansut\source\repos\borsabot\third.party\obfuscar\Obfuscar.Console.exe C:\Users\tansut\source\repos\borsabot\Kalitte.Trading\obfuscar.xml" />
   </Target>
 
 </Project>

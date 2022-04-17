@@ -172,6 +172,7 @@ namespace Kalitte.Trading
 
     public enum LogLevel
     {
+        Auto = -1,
         Verbose = 0,
         Debug = 1,
         Info = 2,

@@ -1087,7 +1087,7 @@ namespace Kalitte.Trading.Algos
                 var time = t ?? Now;
                 string opTime = level == LogLevel.FinalResult ? "" : $"[{ level}:{time.ToString("yyyy.MM.dd HH:mm:sss")}]: "; 
                 var content = $"{opTime}{text}";
-                if (Simulation) LogContent.AppendLine(content);
+                if (Simulation && MultipleTestOptimization) LogContent.AppendLine(content);
                 else
                 {
                     lock (this)

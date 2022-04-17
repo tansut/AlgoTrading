@@ -26,10 +26,10 @@
 	    <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Lean.Algotrader.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Matriks.Trader">
-	    <HintPath>..\..\borsabot2\Third.Party\Matriks.Trader.dll</HintPath>
+	    <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Trader.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Matriks.Trader.Core">
-	    <HintPath>..\..\borsabot2\Third.Party\Matriks.Trader.Core.dll</HintPath>
+	    <HintPath>..\..\..\..\..\..\MatriksIQ\Matriks.Trader.Core.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Newtonsoft.Json">
 	    <HintPath>..\third.party\Newtonsoft.Json.dll</HintPath>

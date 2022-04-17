@@ -275,7 +275,9 @@ namespace Kalitte.Trading
             var headers = CreateHeaders(this.FileName);
             Console.WriteLine($"Running tests to file {this.FileName}");
             var completed = 0;
-            //Backtest related = run(cases[0], ++completed, cases.Count, headers);            
+            //Backtest related = run(cases[0], ++completed, cases.Count, headers);
+            
+            
             Parallel.For(0, cases.Count, i =>
             {
                 var initValues = cases[i];

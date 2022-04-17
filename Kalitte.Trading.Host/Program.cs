@@ -20,8 +20,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 3, 1);
-        settings.Finish = new DateTime(2022, 4, 11);
+        settings.Start = new DateTime(2022, 4, 1);
+        settings.Finish = new DateTime(2022, 4, 1);
         settings.AutoClosePositions = true;
 
 
@@ -43,7 +43,7 @@ public class Program
 
 
         alternates.Set("Orders/NightRatio", 0.2);
-        alternates.Set("Orders/KeepRatio", 0.2);
+        alternates.Set("Orders/KeepRatio", 0);
         alternates.Set("Orders/KeepSide", ClosePositionSide.UseCross);
         alternates.Set("DailyClose/Enabled", true);
 
@@ -140,9 +140,9 @@ public class Program
         alternates.Set("MovPeriod2", 9);
 
         alternates.Set("CrossL1/Enabled", true);
-        alternates.Set("CrossL1/AvgChange", 0.5M);
+        alternates.Set("CrossL1/AvgChange", 0.45M);
         alternates.Set("CrossL1/Dynamic", true);
-        alternates.Set("CrossL1/PreOrder", 0.6);        
+        alternates.Set("CrossL1/PreOrder", 1);        
         alternates.Set("CrossL1/PowerThreshold", 88);
         alternates.Set("CrossL1/PowerNegativeMultiplier", 1.3);
         alternates.Set("CrossL1/PowerPositiveMultiplier", 2.8);
@@ -171,7 +171,7 @@ public class Program
         alternates.Set("LoggingLevel", LogLevel.Order);
         settings.SaveToFile("c:\\kalitte\\lastrun.json");
         settings = OptimizerSettings.LoadFromFile("c:\\kalitte\\lastrun.json");
-        settings.Alternates.Set("LoggingLevel", LogLevel.Debug);
+        settings.Alternates.Set("LoggingLevel", LogLevel.Warning);
         settings.Alternates.Set("LogConsole", true);
         settings.Alternates.Set("UILoggingLevel", LogLevel.Warning);
         return settings;

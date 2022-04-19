@@ -151,11 +151,11 @@ public class Program
 
         alternates.Set("CrossL1/RsiLongEnabled", true);
         alternates.Set("CrossL1/RsiLong", new[] { 55M, 57M, 60M, 65M  });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, 0.4M, 0M, 0.6M, 1M });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, 0.4M, 0M, 0.4M, 1M });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
-        alternates.Set("CrossL1/RsiShort", new[] { 35M, 40M, 43M, 45M });
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] {1M, 0.6M, 0M, 0.4M, 1M });
+        alternates.Set("CrossL1/RsiShort", new[] { 35M, 40M, 42M, 45M });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] {1M, 0.4M, 0M, 0.4M, 1M });
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);

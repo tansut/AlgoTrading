@@ -32,12 +32,6 @@ namespace Kalitte.Trading.Matrix
 
         public T Algo { get; set; }
 
-        //[Parameter(1)]
-        //public int LoggingLevel { get; set; } = 1;
-
-        //[Parameter(false)]
-        //public bool Simulation { get; set; } = false;
-
 
 
         public virtual FinanceBars GetPeriodBars(string symbol, BarPeriod period, DateTime t)

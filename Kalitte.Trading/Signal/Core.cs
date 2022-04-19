@@ -361,7 +361,7 @@ namespace Kalitte.Trading
         private void Algo_OrderCompleted(object sender, OrderEventArgs e)
         {
             Log($"Entering order completed: {e.Order.Id}", LogLevel.Verbose);
-            Monitor.Enter(OperationLock);
+            //Monitor.Enter(OperationLock);
             try
             {
                 OrderCompletedByAlgo(e);
@@ -369,7 +369,7 @@ namespace Kalitte.Trading
             }
             finally
             {
-                Monitor.Exit(OperationLock);
+                //Monitor.Exit(OperationLock);
             }
         }
 

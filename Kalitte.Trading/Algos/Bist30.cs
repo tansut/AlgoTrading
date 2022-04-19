@@ -587,16 +587,17 @@ namespace Kalitte.Trading.Algos
 
         public void HandleCrossSignal(CrossSignal signal, CrossSignalResult signalResult)
         {
+
             var portfolio = this.UserPortfolioList.GetPortfolio(Symbol);
             var lastOrder = portfolio.CompletedOrders.LastOrDefault();
             var lastPositionOrder = portfolio.LastPositionOrder;
             var config = (CrossOrderConfig)signal.Config;
-
             var currentRsi = 0M;
-
             var rsiOrderMultiplier = 1M;
-
             var rsi = rsiValue.LastSignalResult as IndicatorAnalyserResult;
+
+            Log($"StartCross: {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort}", LogLevel.Verbose);
+
             if (rsi != null && rsi.Value.HasValue)
             {
                 currentRsi = rsi.Value.Value;
@@ -633,8 +634,7 @@ namespace Kalitte.Trading.Algos
                 return;
 
             var keepPosition = lastPositionOrder != null && lastPositionOrder.SignalResult.Signal == signal;
-
-            Log($"HandleCross: {signalResult.Rsi} {signalResult.finalResult} {portfolio.IsLong} {portfolio.IsShort} {keepPosition}", LogLevel.Verbose);
+            
             if (signalResult.finalResult == BuySell.Buy && portfolio.IsLong && keepPosition) return;
             if (signalResult.finalResult == BuySell.Sell && portfolio.IsShort && keepPosition) return;
 
@@ -643,9 +643,8 @@ namespace Kalitte.Trading.Algos
 
             var quantity = RoundQuantity(rsiOrderMultiplier * config.Quantity);
 
-
+            Log($"EndCross: {quantity} {currentRsi}", LogLevel.Verbose);
             MakePortfolio(Symbol, quantity, signalResult.finalResult.Value, $"[{signalResult.Signal.Name}{(signal.Config != config ? "*" : "")}/{signal.AvgChange.ToCurrency()},{signal.Lookback}, rsi:{currentRsi.ToCurrency()}]", signalResult);
-
         }
 
 

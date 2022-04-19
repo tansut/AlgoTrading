@@ -743,6 +743,7 @@ Skipped Types:
 {
 
 	System.Int32 [Kalitte.Trading]System.Int32 Kalitte.Trading.LogLevel::value__ skipped:  special name
+	Kalitte.Trading.LogLevel [Kalitte.Trading]Kalitte.Trading.LogLevel Kalitte.Trading.LogLevel::Auto skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.LogLevel [Kalitte.Trading]Kalitte.Trading.LogLevel Kalitte.Trading.LogLevel::Verbose skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.LogLevel [Kalitte.Trading]Kalitte.Trading.LogLevel Kalitte.Trading.LogLevel::Debug skipped:  KeepPublicApi option in configuration
 	Kalitte.Trading.LogLevel [Kalitte.Trading]Kalitte.Trading.LogLevel Kalitte.Trading.LogLevel::Info skipped:  KeepPublicApi option in configuration

@@ -1,7 +1,7 @@
 ﻿<?xml version='1.0'?>
 <Obfuscator>
-	<Var name="InPath" value="C:\Users\tansu\source\repos\borsabot\Kalitte.Trading\bin\Debug\net472" />
-	<Var name="OutPath" value="C:\Users\tansu\source\repos\borsabot\deploy" />
+	<Var name="InPath" value="C:\Users\tansut\source\repos\borsabot\Kalitte.Trading\bin\Debug\net472" />
+	<Var name="OutPath" value="C:\Users\tansut\source\repos\borsabot\deploy" />
 	
 	<Module file="$(InPath)\Kalitte.Trading.dll" />
 </Obfuscator>

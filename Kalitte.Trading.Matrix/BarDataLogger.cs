@@ -6,31 +6,35 @@ using Matriks.Lean.Algotrader.Models;
 using Matriks.Symbols;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Kalitte.Trading.Matrix
 {
+    public class LogInfo
+    {
+        public string Symbol { get; set; }
+
+        public int SymbolId { get; set; }
+        public MarketDataFileLogger PriceLogger { get; set; }
+        public List<VOLUME> Volumes { get; set; }
+
+        public List<MarketDataFileLogger> BarLoggers { get; set; }
+        
+
+    }
+
     public class BarDataLogger : MatrixAlgoBase<Log>
     {
 
-        [Parameter(1)]
-        public int LogSeconds = 1;
+        List<string> SymbolList = new List<string>(new[] { "F_XU0300422", "F_XAUUSD0422", "F_XU0300622", "F_XAUUSD0622" });
 
-        [SymbolParameter("F_XU0300422")]
-        public string Symbol = "F_XU0300422";
-
-        //[Parameter(SymbolPeriod.Min10)]
-        //public SymbolPeriod SymbolPeriod = SymbolPeriod.Min10;
-
-        
-        private MarketDataFileLogger priceLogger;
-        VOLUME volume;
+        public List<LogInfo> Logs { get; set; } = new List<LogInfo> {  };
 
         List<SymbolPeriod> periodList = new List<SymbolPeriod>(new SymbolPeriod[] { SymbolPeriod.Min, SymbolPeriod.Min5, SymbolPeriod.Min10, SymbolPeriod.Min15,
             SymbolPeriod.Min20, SymbolPeriod.Min30, SymbolPeriod.Min60, SymbolPeriod.Min120, SymbolPeriod.Min180, SymbolPeriod.Min240
         });
-
-        List<IIndicator> indicatorList = new List<IIndicator>();
-        List<MarketDataFileLogger> loggerList = new List<MarketDataFileLogger>();
+        
+       
 
 
         public override void OnTimer()
@@ -39,14 +43,20 @@ namespace Kalitte.Trading.Matrix
             var t1 = new DateTime(t.Year, t.Month, t.Day, 9, 30, 0);
             var t2 = new DateTime(t.Year, t.Month, t.Day, 23, 0, 0);
 
-            volume.RefreshIndicator = true;            
-
-            if (t >= t1 && t <= t2)
+            if (t >= t1 && t <= t2 && t.DayOfWeek != System.DayOfWeek.Saturday && t.DayOfWeek != System.DayOfWeek.Sunday)
             {
-                lock(this)
-                {                    
-                    var price = GetMarketData(Symbol, SymbolUpdateField.Last);
-                    priceLogger.LogMarketData(DateTime.Now, new decimal[] { price, volume.CurrentValue });
+                lock (this)
+                {
+                    foreach (var symbol in SymbolList)
+                    {
+                        var log = Logs.Find(p=>p.Symbol == symbol);
+                        log.Volumes.ForEach(volume => volume.RefreshIndicator = true);
+                        var price = GetMarketData(symbol, SymbolUpdateField.Last);
+                        
+                        var data = log.Volumes.Select(p=>p.CurrentValue).ToList();
+                        data.Insert(0, price);
+                        log.PriceLogger.LogMarketData(DateTime.Now, data.ToArray());
+                    }
                 }
             }
         }
@@ -57,22 +67,28 @@ namespace Kalitte.Trading.Matrix
             List<ISymbolBarData> barDataList = new List<ISymbolBarData>();
             try
             {
-                foreach (var sp in periodList)
+                foreach (var symbol in SymbolList)
                 {
-                    var fbd = GetBarData(Symbol, sp);
-                    for (var i = 0; i < fbd.BarDataIndexer.LastBarIndex; i++)
+                    var log = Logs.Find(p=>p.Symbol == symbol);
+                    foreach (var sp in periodList)
                     {
-                        var bdidx = periodList.FindIndex(p => p.ToString() == fbd.PeriodInfo.ToSymbolPeriod().ToString());
-                        var logger = loggerList[bdidx];
-                        if (!logger.GetMarketData(fbd.BarDataIndexer[i]).HasValue)
-                            LogBardata(fbd, i);
+                        var fbd = GetBarData(symbol, sp);
+                        for (var i = 0; i < fbd.BarDataIndexer.LastBarIndex; i++)
+                        {
+                            var bdidx = periodList.FindIndex(p => p.ToString() == fbd.PeriodInfo.ToSymbolPeriod().ToString());
+                            var logger = log.BarLoggers[bdidx];
+                            if (!logger.GetMarketData(fbd.BarDataIndexer[i]).HasValue)
+                                LogBardata(log, fbd, i);
 
-                        //Debug($"{i} {fbd.BarDataIndexer[i].ToString()}  o:{fbd.Open[i]} h:{fbd.High[i]} l:{fbd.Low[i]} c:{fbd.Close[i]} wc:{fbd.WClose[i]} dif:{fbd.Diff[i]} dif%:{fbd.DiffPercent[i]} vol:{fbd.Volume[i]}");
+                            //Debug($"{i} {fbd.BarDataIndexer[i].ToString()}  o:{fbd.Open[i]} h:{fbd.High[i]} l:{fbd.Low[i]} c:{fbd.Close[i]} wc:{fbd.WClose[i]} dif:{fbd.Diff[i]} dif%:{fbd.DiffPercent[i]} vol:{fbd.Volume[i]}");
 
 
+                        }
                     }
                 }
-            } catch(Exception ex)
+
+            }
+            catch (Exception ex)
             {
                 Debug($"{ex.Message}");
             }
@@ -81,37 +97,68 @@ namespace Kalitte.Trading.Matrix
 
 
         public override void OnInit()
-        {           
-            AddSymbolMarketData(Symbol);
+        {            
             SetTimerInterval(1);
             WorkWithPermanentSignal(true);
 
-            this.priceLogger = new MarketDataFileLogger(Symbol, Algo.LogDir, "price");
-
-            foreach (var sp in periodList)
+            foreach (var symbol in SymbolList)
             {
-                AddSymbol(Symbol, sp);
-                var logger = new MarketDataFileLogger(Symbol, Algo.LogDir, "" + sp.ToString());
-                logger.SaveDaily = true;
-                logger.FileName = "all.txt";
-                loggerList.Add(logger);
-            }
+                AddSymbolMarketData(symbol);
+                
+                var priceLogger = new MarketDataFileLogger(symbol, Algo.LogDir, "price");
 
-            volume = VolumeIndicator(Symbol, SymbolPeriod.Min10);
-            volume.RefreshIndicator = true;
+                var log = new LogInfo();
+                Logs.Add(log);
+                log.Symbol = symbol;
+                log.SymbolId = GetSymbolId(symbol);
+                log.PriceLogger = priceLogger;
+
+                var volumes = new List<VOLUME>();
+
+                volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min10));
+                volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min15));
+                volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min20));
+                volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min30));
+                volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min60));
+                volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min120));
+
+                log.Volumes = volumes;
+                log.BarLoggers = new List<MarketDataFileLogger>();
+
+
+
+                foreach (var sp in periodList)
+                {
+                    AddSymbol(symbol, sp);
+
+                    var logger = new MarketDataFileLogger(symbol, Algo.LogDir, "" + sp.ToString());
+                    logger.SaveDaily = true;
+                    logger.FileName = "all.txt";
+                    log.BarLoggers.Add(logger);
+                }
+            }
+            
+
+
+            
+
+
+
+
         }
 
-        void LogBardata(ISymbolBarData bd, int i)
+        void LogBardata(LogInfo log, ISymbolBarData bd, int i)
         {
+            
             var bdidx = periodList.FindIndex(p => p.ToString() == bd.PeriodInfo.ToSymbolPeriod().ToString());
-            loggerList[bdidx].LogMarketData(bd.BarDataIndexer[i], new decimal[] { 
-                bd.Open[i], 
-                bd.High[i], 
-                bd.Low[i], 
-                bd.Close[i], 
-                bd.WClose[i], 
-                bd.Volume[i], 
-                bd.Diff[i], 
+            log.BarLoggers[bdidx].LogMarketData(bd.BarDataIndexer[i], new decimal[] {
+                bd.Open[i],
+                bd.High[i],
+                bd.Low[i],
+                bd.Close[i],
+                bd.WClose[i],
+                bd.Volume[i],
+                bd.Diff[i],
                 bd.DiffPercent[i]});
         }
 
@@ -119,19 +166,20 @@ namespace Kalitte.Trading.Matrix
         {
             try
             {
-               
+                var log = Logs.Find(p=>p.SymbolId == barDataEventArgs.SymbolId);
                 var bdidx = periodList.FindIndex(p => p == barDataEventArgs.PeriodInfo.ToSymbolPeriod());
 
-                var bd = GetBarData(Symbol, periodList[bdidx]);
-                var logger = loggerList[bdidx];
+                var bd = GetBarData(log.Symbol, periodList[bdidx]);
+                var logger = log.BarLoggers[bdidx];
                 var i = bd.BarDataIndexer.LastBarIndex;
-                LogBardata(bd, i);
+                LogBardata(log, bd, i);
 
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Algo.Log($"{ex.Message} / {ex.StackTrace}");
             }
-           
+
         }
 
         protected override Log createAlgoInstance()

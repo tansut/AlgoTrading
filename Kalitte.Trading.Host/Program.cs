@@ -1,17 +1,6 @@
 ﻿using Kalitte.Trading;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNet.SignalR.Client;
-using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR.Client.Transports;
-using Kalitte.Trading.Indicators;
-using Skender.Stock.Indicators;
 using Kalitte.Trading.Algos;
-using System.Reflection;
-using System.IO;
-using Newtonsoft.Json;
-using System.Diagnostics;
+using System;
 
 
 
@@ -20,9 +9,9 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 4, 19);
-        settings.Finish = new DateTime(2022, 4, 19);
-        settings.AutoClosePositions = false;
+        settings.Start = new DateTime(2022, 4, 21);
+        settings.Finish = new DateTime(2022, 4, 21);
+        settings.AutoClosePositions = true;
 
 
         var initValues = AlgoBase.GetConfigValues(typeof(Bist30));
@@ -151,16 +140,16 @@ public class Program
 
         alternates.Set("CrossL1/RsiLongEnabled", true);
         alternates.Set("CrossL1/RsiLong", new[] { 55M, 57M, 60M, 65M  });
-        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, 0.4M, 0M, 0.4M, 1M });
+        alternates.Set("CrossL1/RsiLongMultiplier", new[] { 1M, 0.4M, 0M, 0.6M, 1M });
 
         alternates.Set("CrossL1/RsiShortEnabled", true);
         alternates.Set("CrossL1/RsiShort", new[] { 35M, 40M, 42M, 45M });
-        alternates.Set("CrossL1/RsiShortMultiplier", new[] {1M, 0.4M, 0M, 0.4M, 1M });
+        alternates.Set("CrossL1/RsiShortMultiplier", new[] {1M, 0.6M, 0M, 0.4M, 1M });
 
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);
         alternates.Set("Symbol", "F_XU0300422");
-        alternates.Set("SymbolPeriod", BarPeriod.Min10);
+        alternates.Set("SymbolPeriod", BarPeriod.Min15);
 
         // save to read to use files.
         alternates.Set("LogConsole", false);

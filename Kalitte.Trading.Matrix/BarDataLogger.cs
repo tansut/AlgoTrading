@@ -26,7 +26,7 @@ namespace Kalitte.Trading.Matrix
     public class BarDataLogger : MatrixAlgoBase<Log>
     {
 
-        List<string> SymbolList = new List<string>(new[] { "F_XU0300422", "F_XAUUSD0422", "F_XU0300622", "F_XAUUSD0622" });
+        List<string> SymbolList = new List<string>(new[] { "F_XU0300422", "F_XAUUSD0422", "F_XU0300622", "F_XAUUSD0622", "F_XAGUSD0422", "F_XAGUSD0622", "F_EURUSD0422", "F_EURUSD0622" });
 
         public List<LogInfo> Logs { get; set; } = new List<LogInfo> {  };
 

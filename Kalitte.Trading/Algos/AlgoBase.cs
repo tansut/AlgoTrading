@@ -412,7 +412,7 @@ namespace Kalitte.Trading.Algos
             }
             else if (t.Hour == 19 && t.Minute < nMax)
             {
-                shouldBe = t.Date.AddHours(18).AddMinutes(10);
+                shouldBe = t.Date.AddHours(18).AddMinutes(seconds > 600 ? 0: seconds / 60);
             }
             return shouldBe;
         }
@@ -1135,13 +1135,21 @@ namespace Kalitte.Trading.Algos
 
         public virtual decimal GetVolume(string symbol, BarPeriod period, DateTime? t = null)
         {
-            var result = 0M;
+            //, SymbolPeriod.Min10));
+            //volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min15));
+            //volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min20));
+            //volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min30));
+            //volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min60));
+            //volumes.Add(VolumeIndicator(symbol, SymbolPeriod.Min120));
+
+
+       
+
+            decimal result;
             if (Simulation)
             {
                 var list = GetMarketData(symbol, SymbolPeriod, t);
-                result = list.Length > 0 ? list[1] : 0;
-
-
+                result = list.Length > 0 ? list[(int)SymbolPeriod/10 - 2] : 0;
             }
             else result = Exchange.GetVolume(symbol, period, t);
             if (result == 0) Log($"Market volume got zero", LogLevel.Debug);

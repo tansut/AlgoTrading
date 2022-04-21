@@ -26,7 +26,7 @@ namespace Kalitte.Trading
         public decimal Quantity;
         public decimal DirectionChangedQuantity;
         public string Comment;
-        public decimal ComissionRate = 0.0002M;
+        public decimal ComissionRate = 0.00015M;
         public OrderUsage Usage { get; set; }
         public bool ExtenallyLoaded { get; set; } = false;
         public decimal FilledUnitPrice

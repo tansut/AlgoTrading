@@ -403,7 +403,7 @@ namespace Kalitte.Trading
                         return false;
                     } else
                     {
-                        Log($"Wrong bar neglegted: now: {t} expected:{expected} using:{indicator.InputBars.Last.Date}", LogLevel.Warning, t);
+                        Log($"Wrong bar ignored: now: {t} expected:{expected} using:{indicator.InputBars.Last.Date}", LogLevel.Warning, t);
                     }
                 }
             }

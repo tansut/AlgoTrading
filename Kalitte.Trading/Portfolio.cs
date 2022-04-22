@@ -78,6 +78,8 @@ namespace Kalitte.Trading
     {
 
         public SortedDictionary<DateTime, Statistics> DailyStats { get; private set; } = new SortedDictionary<DateTime, Statistics>();
+        public SortedDictionary<DayOfWeek, Statistics> DayOfWeekStats { get; private set; } = new SortedDictionary<DayOfWeek, Statistics>();
+        public SortedDictionary<int, Statistics> HourlyStats { get; private set; } = new SortedDictionary<int, Statistics>();
 
         public decimal Commission { get; set; } = 0M;
 
@@ -183,6 +185,18 @@ namespace Kalitte.Trading
             stats.NetPl = stats.NetPl + pl - order.CommissionPaid;
             stats.Total++;
             DailyStats[order.Sent.Date] = stats;
+
+            HourlyStats.TryGetValue(order.Sent.Hour, out Statistics hstats);
+            if (hstats == null) hstats = new Statistics();
+            hstats.NetPl = hstats.NetPl + pl - order.CommissionPaid;
+            hstats.Total++;
+            HourlyStats[order.Sent.Hour] = hstats;
+
+            DayOfWeekStats.TryGetValue(order.Sent.Date.DayOfWeek, out Statistics dstats);
+            if (dstats == null) dstats = new Statistics();
+            dstats.NetPl = dstats.NetPl + pl - order.CommissionPaid;
+            dstats.Total++;
+            DayOfWeekStats[order.Sent.Date.DayOfWeek] = dstats;
         }
 
         public Statistics GetDailyStats(DateTime time)

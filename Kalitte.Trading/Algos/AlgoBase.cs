@@ -75,7 +75,38 @@ namespace Kalitte.Trading.Algos
     {
         public ExchangeOrder Order { get; set; }
         public PortfolioItem Portfolio { get; set; }
-    }       
+    }     
+    
+    public class OrderDayConfig
+    {
+        [AlgoParam(1)]
+        public decimal Rate { get; set; } = 1;
+
+        public decimal H00 { get; set; } = 1;
+        public decimal H01 { get; set; } = 1;
+        public decimal H02 { get; set; } = 1;
+        public decimal H03 { get; set; } = 1;
+        public decimal H04 { get; set; } = 1;
+        public decimal H05 { get; set; } = 1;
+        public decimal H06 { get; set; } = 1;
+        public decimal H07 { get; set; } = 1;
+        public decimal H08 { get; set; } = 1;
+        public decimal H09 { get; set; } = 1;
+        public decimal H10 { get; set; } = 1;
+        public decimal H11 { get; set; } = 1;
+        public decimal H12 { get; set; } = 1;
+        public decimal H13 { get; set; } = 1;
+        public decimal H14 { get; set; } = 1;
+        public decimal H15 { get; set; } = 1;
+        public decimal H16 { get; set; } = 1;
+        public decimal H17 { get; set; } = 1;
+        public decimal H18 { get; set; } = 1;
+        public decimal H19 { get; set; } = 1;
+        public decimal H20 { get; set; } = 1;
+        public decimal H21 { get; set; } = 1;
+        public decimal H22 { get; set; } = 1;
+        public decimal H23 { get; set; } = 1;
+    }
 
 
     public abstract class AlgoBase : ILogProvider
@@ -83,6 +114,9 @@ namespace Kalitte.Trading.Algos
         private object signalLock = new object();
         private object decideLock = new object();
         private object orderLock = new object();
+
+
+        
 
         private static volatile int AlgoCounter = 0;
 
@@ -777,7 +811,7 @@ namespace Kalitte.Trading.Algos
                     {
                         var subProps = init.Where(p => p.Key.StartsWith($"{paramVal.Name ?? item.Name}/")).ToList();
                         var dict = new Dictionary<string, object>();
-                        subProps.ForEach(p => dict.Add(p.Key.Split('/')[1], p.Value));
+                        subProps.ForEach(p => dict.Add(p.Key.Replace(p.Key.Split('/')[0] + "/", ""), p.Value));
                         if (item.GetValue(target) == null)
                         {
                             try
@@ -919,6 +953,16 @@ namespace Kalitte.Trading.Algos
                 foreach (var day in portfolio.DailyStats)
                 {
                     Log($"{day.Key.ToString("dd/MM/yyyy")}\t{day.Value.Total}\t{day.Value.NetPl.ToCurrency()}", LogLevel.FinalResult);
+                }
+
+                foreach (var day in portfolio.DayOfWeekStats)
+                {
+                    Log($"{day.Key}\t{day.Value.Total}\t{day.Value.NetPl.ToCurrency()}", LogLevel.FinalResult);
+                }
+
+                foreach (var day in portfolio.HourlyStats)
+                {
+                    Log($"{day.Key}\t{day.Value.Total}\t{day.Value.NetPl.ToCurrency()}", LogLevel.FinalResult);
                 }
             }
 

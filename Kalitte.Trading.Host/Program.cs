@@ -9,8 +9,8 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 4, 21);
-        settings.Finish = new DateTime(2022, 4, 21);
+        settings.Start = new DateTime(2022, 4, 22);
+        settings.Finish = new DateTime(2022, 4, 22);
         settings.AutoClosePositions = true;
 
 
@@ -26,6 +26,13 @@ public class Program
 
         // global order
         alternates.Set("Orders/Total", 10);
+
+        alternates.Set("Orders/Monday/Rate", 0.2);
+        alternates.Set("Orders/Tuesday/Rate", 0.8);
+        alternates.Set("Orders/Wednesday/Rate", 1.2);
+        alternates.Set("Orders/Thursday/Rate", 0.6);
+        alternates.Set("Orders/Friday/Rate", 0.4);
+
         alternates.Set("Orders/PLEnabled", true);
         alternates.Set("Orders/PL", new decimal[] { -175, -150, 150, 250, 350 });
         alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.6M, 0.2M, 0M });
@@ -129,7 +136,7 @@ public class Program
         alternates.Set("MovPeriod2", 9);
 
         alternates.Set("CrossL1/Enabled", true);
-        alternates.Set("CrossL1/AvgChange", 0.45M);
+        alternates.Set("CrossL1/AvgChange", 0.42);
         alternates.Set("CrossL1/Dynamic", true);
         alternates.Set("CrossL1/PreOrder", 1);        
         alternates.Set("CrossL1/PowerThreshold", 88);
@@ -149,7 +156,7 @@ public class Program
         // System
         alternates.Set("LoggingLevel", LogLevel.Verbose);
         alternates.Set("Symbol", "F_XU0300422");
-        alternates.Set("SymbolPeriod", BarPeriod.Min15);
+        alternates.Set("SymbolPeriod", BarPeriod.Min10);
 
         // save to read to use files.
         alternates.Set("LogConsole", false);

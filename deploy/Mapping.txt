@@ -436,6 +436,15 @@ Renamed Types:
 	Kalitte.Trading.Fibonacci [Kalitte.Trading]Kalitte.Trading.Fibonacci Kalitte.Trading.Algos.Bist30/<>c__DisplayClass143_0::fib -> A
 }
 
+[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass155_0 -> [Kalitte.Trading]Kalitte.Trading.Algos.Bist30/B
+{
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass155_0::<AdjustDailyProfitLoss>b__0[1]( [mscorlib]System.Decimal ) -> A
+
+	[Kalitte.Trading]Kalitte.Trading.Algos.Bist30/<>c__DisplayClass155_0::.ctor[0]( ) skipped:  special name
+
+	System.Decimal [Kalitte.Trading]System.Decimal Kalitte.Trading.Algos.Bist30/<>c__DisplayClass155_0::initialQuantity -> A
+}
+
 [Kalitte.Trading]Kalitte.Trading.LossSignal -> [Kalitte.Trading]A.K
 {
 

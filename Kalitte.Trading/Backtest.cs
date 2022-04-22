@@ -94,10 +94,14 @@ namespace Kalitte.Trading
 
             for (var p = t1; p <= t2; p = p.AddSeconds(1))
             {
+                
+                
                 if (periodBarsLoaded)
                 {
                     if (p > DateTime.Now) break;
+                    var algoNow = Algo.Now;
                     Algo.SetTime(p);
+                    if (algoNow.Day != p.Day) Algo.DayStart();
                     Algo.SetBarCurrentValues();
                     var time = Algo.Now;
                     Algo.CheckBacktestBeforeRun(time);
@@ -202,7 +206,7 @@ namespace Kalitte.Trading
                 }
                 Run(periods.Item1.Item1, periods.Item1.Item2);
                 Run(periods.Item2.Item1, periods.Item2.Item2);
-                Algo.DayStart();
+                
             }
             if (AutoClosePositions) Algo.ClosePositions(Algo.Symbol, null);
             Algo.Stop();

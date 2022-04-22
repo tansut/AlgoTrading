@@ -9,7 +9,7 @@ public class Program
     public static OptimizerSettings AppTest()
     {
         var settings = new OptimizerSettings();
-        settings.Start = new DateTime(2022, 4, 22);
+        settings.Start = new DateTime(2022, 3, 1);
         settings.Finish = new DateTime(2022, 4, 22);
         settings.AutoClosePositions = true;
 
@@ -25,16 +25,17 @@ public class Program
         alternates.Set("Portfolio/Side", BuySell.Sell);
 
         // global order
-        alternates.Set("Orders/Total", 10);
+        alternates.Set("Orders/Total", 20);
 
-        alternates.Set("Orders/Monday/Rate", 0.2);
-        alternates.Set("Orders/Tuesday/Rate", 0.8);
-        alternates.Set("Orders/Wednesday/Rate", 1.2);
-        alternates.Set("Orders/Thursday/Rate", 0.6);
-        alternates.Set("Orders/Friday/Rate", 0.4);
+        alternates.Set("Orders/Monday/Rate", 0.4);
+        alternates.Set("Orders/Tuesday/Rate", 1.5);
+        alternates.Set("Orders/Wednesday/Rate", 1.5);
+        alternates.Set("Orders/Thursday/Rate", 1);
+        alternates.Set("Orders/Friday/Rate", 0.6);
 
         alternates.Set("Orders/PLEnabled", true);
-        alternates.Set("Orders/PL", new decimal[] { -175, -150, 150, 250, 350 });
+        //alternates.Set("Orders/PL", new decimal[] { -175, -150, 150, 250, 350 });
+        alternates.Set("Orders/PL", new decimal[] { -17.5M, -15, 15, 25, 35 });
         alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.6M, 0.2M, 0M });
 
 

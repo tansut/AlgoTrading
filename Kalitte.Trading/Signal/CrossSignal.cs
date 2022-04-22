@@ -134,8 +134,6 @@ namespace Kalitte.Trading
         protected override void ResetInternal()
         {
             crossBars.Clear();
-            closeWarmupList.Clear();
-            ohlcWarmupList.Clear();
             Filter = new UKF();
             LastCross = 0;
             LastCrossTime = DateTime.MinValue;
@@ -174,8 +172,6 @@ namespace Kalitte.Trading
         {
             AvgChange = Config.AvgChange;
             crossBars = new FinanceList<decimal>(60 * 10);
-            closeWarmupList = new List<MyQuote>();
-            ohlcWarmupList = new List<MyQuote>();
             this.Indicators.Add(i1k);
             this.Indicators.Add(i2k);
             RsiList = new AnalyseList(Config.AnalyseSize * 3, Average.Ema);

@@ -683,10 +683,11 @@ namespace Kalitte.Trading.Algos
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             var stats = portfolio.GetDailyStats(Now.Date);
             decimal target = this.OrderConfig.Total;
-
+            var initialQuantity = InitialQuantity;
             if (OrderConfig.PLEnabled)
             {
-                var ratio = Helper.GetMultiplier(stats.NetPl, OrderConfig.PL, OrderConfig.PLMultiplier);
+                var pls = OrderConfig.PL.Select(p => p * initialQuantity).ToArray();
+                var ratio = Helper.GetMultiplier(stats.NetPl, pls, OrderConfig.PLMultiplier);
                 var newtarget = RoundQuantity(InitialQuantity * ratio);
                 if (newtarget < target) target = newtarget;
             }
@@ -753,7 +754,6 @@ namespace Kalitte.Trading.Algos
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             portfolio.CompletedOrders.Clear();
             InitializePositions(new List<PortfolioItem> { portfolio }, true);
-
         }
 
         public override void InitializePositions(List<PortfolioItem> portfolioItems, bool keepPortfolio = false)

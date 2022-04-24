@@ -554,7 +554,10 @@ namespace Kalitte.Trading.Algos
                     if (SignalsState == StartableState.Stopped)
                     {
                         Log($"Time seems OK, starting signals ...");
-                        if (IsMorningStart(t)) Signals.ForEach(p => p.Reset());
+                        if (IsMorningStart(t))
+                        {
+                            DayStart();                            
+                        }
                         StartSignals();
                     }
                 }

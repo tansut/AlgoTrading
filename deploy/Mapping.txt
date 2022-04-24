@@ -307,7 +307,6 @@ Renamed Types:
 [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c -> [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/A
 {
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<SeansTimer_Elapsed>b__142_0[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> A
-	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<SeansTimer_Elapsed>b__142_1[1]( [Kalitte.Trading]Kalitte.Trading.SignalBase ) -> a
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<.ctor>b__149_0[1]( [mscorlib]System.Object ) -> A
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__154_0[1]( [mscorlib]System.Reflection.PropertyInfo ) -> A
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::<GetConfigValues>b__154_1[1]( [mscorlib]System.Object ) -> a
@@ -321,8 +320,7 @@ Renamed Types:
 	[Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c::.ctor[0]( ) skipped:  special name
 
 	Kalitte.Trading.Algos.AlgoBase/<>c [Kalitte.Trading]Kalitte.Trading.Algos.AlgoBase/<>c Kalitte.Trading.Algos.AlgoBase/<>c::<>9 -> A
-	System.Action`1<Kalitte.Trading.SignalBase> [Kalitte.Trading]System.Action`1<Kalitte.Trading.SignalBase> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__142_0 -> A
-	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__142_1 -> A
+	System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> [Kalitte.Trading]System.Func`2<Kalitte.Trading.SignalBase,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__142_0 -> A
 	System.Func`2<System.Object,Kalitte.Trading.SignalResult> [Kalitte.Trading]System.Func`2<System.Object,Kalitte.Trading.SignalResult> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__149_0 -> A
 	System.Func`2<System.Reflection.PropertyInfo,System.Boolean> [Kalitte.Trading]System.Func`2<System.Reflection.PropertyInfo,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__154_0 -> A
 	System.Func`2<System.Object,System.Boolean> [Kalitte.Trading]System.Func`2<System.Object,System.Boolean> Kalitte.Trading.Algos.AlgoBase/<>c::<>9__154_1 -> A

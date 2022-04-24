@@ -27,21 +27,21 @@ public class Program
         // global order
         alternates.Set("Orders/Total", 20);
 
-        alternates.Set("Orders/Monday/Rate", 0.2, 0.4);
-        alternates.Set("Orders/Tuesday/Rate", 1.6, 1.2, 1.8);
-        alternates.Set("Orders/Wednesday/Rate", 1.6, 1.8, 1.2);
-        alternates.Set("Orders/Thursday/Rate", 0.6, 0.8, 1);
-        alternates.Set("Orders/Friday/Rate", 0.8, 1, 0.6);
+        alternates.Set("Orders/Monday/Rate", 0.4);
+        alternates.Set("Orders/Tuesday/Rate", 1.5);
+        alternates.Set("Orders/Wednesday/Rate", 1.5);
+        alternates.Set("Orders/Thursday/Rate", 1);
+        alternates.Set("Orders/Friday/Rate", 0.6);
 
         alternates.Set("Orders/PLEnabled", true);        
         alternates.Set("Orders/PL", new decimal[] { -18, -12, 16, 24, 36 });
         alternates.Set("Orders/PLMultiplier", new decimal[] { 0, 0.4M, 1, 0.6M, 0.2M, 0M });
 
 
-        alternates.Set("Orders/NightRatio", 0.2, 0.1);
-        alternates.Set("Orders/KeepRatio", 0.2, 0.1, 0);
+        alternates.Set("Orders/NightRatio", 0.2);
+        alternates.Set("Orders/KeepRatio", 0.3);
         alternates.Set("Orders/KeepSide", ClosePositionSide.UseCross);
-        alternates.Set("DailyClose/Enabled", true, false);
+        alternates.Set("DailyClose/Enabled", true);
 
         // analyser defaults
         alternates.Set("DataCollectSize", 6);
@@ -60,8 +60,8 @@ public class Program
         alternates.Set("Profit/QuantityStep", 10);
         alternates.Set("Profit/KeepQuantity", 30);
         alternates.Set("Profit/QuantityStepMultiplier", 1);
-        alternates.Set("Profit/StartAt", 0.52);
-        alternates.Set("Profit/Step", 0.18);
+        alternates.Set("Profit/StartAt", 0.54);
+        alternates.Set("Profit/Step", 0.17);
 
         alternates.Set("GlobalLoss/InitialQuantity", 50);
         alternates.Set("GlobalLoss/QuantityStep", 10);

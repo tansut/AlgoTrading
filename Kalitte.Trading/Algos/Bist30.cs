@@ -150,7 +150,9 @@ namespace Kalitte.Trading.Algos
         {
             get
             {
-                OrderDayConfig config = this.OrderConfig.GetType().GetProperty(Now.DayOfWeek.ToString()).GetValue(this.OrderConfig) as OrderDayConfig;
+                var property = this.OrderConfig.GetType().GetProperty(Now.DayOfWeek.ToString());
+                if (property == null) return OriginalQuantity; 
+                OrderDayConfig config = property.GetValue(this.OrderConfig) as OrderDayConfig;
                 if (config == null) return OriginalQuantity;
                 else return config.Rate * OriginalQuantity;
             }
@@ -750,6 +752,7 @@ namespace Kalitte.Trading.Algos
         public override void DayStart()
         {
             this.OrderConfig.Total = InitialQuantity;
+            Log($"Today order limit is {this.OrderConfig.Total}", LogLevel.Debug);
             Signals.ForEach(p => p.Reset());
             var portfolio = UserPortfolioList.GetPortfolio(Symbol);
             portfolio.CompletedOrders.Clear();

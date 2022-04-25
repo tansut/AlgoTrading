@@ -25,13 +25,19 @@ public class Program
         alternates.Set("Portfolio/Side", BuySell.Sell);
 
         // global order
-        alternates.Set("Orders/Total", 20);
+        alternates.Set("Orders/Total", 10);
 
-        alternates.Set("Orders/Monday/Rate", 0.4);
-        alternates.Set("Orders/Tuesday/Rate", 1.5);
-        alternates.Set("Orders/Wednesday/Rate", 1.5);
+        //alternates.Set("Orders/Monday/Rate", 0.4);
+        //alternates.Set("Orders/Tuesday/Rate", 1.5);
+        //alternates.Set("Orders/Wednesday/Rate", 1.5);
+        //alternates.Set("Orders/Thursday/Rate", 1);
+        //alternates.Set("Orders/Friday/Rate", 0.6);
+
+        alternates.Set("Orders/Monday/Rate", 1);
+        alternates.Set("Orders/Tuesday/Rate", 1);
+        alternates.Set("Orders/Wednesday/Rate", 1);
         alternates.Set("Orders/Thursday/Rate", 1);
-        alternates.Set("Orders/Friday/Rate", 0.6);
+        alternates.Set("Orders/Friday/Rate", 1);
 
         alternates.Set("Orders/PLEnabled", true);        
         alternates.Set("Orders/PL", new decimal[] { -18, -12, 16, 24, 36 });
@@ -39,7 +45,8 @@ public class Program
 
 
         alternates.Set("Orders/NightRatio", 0.2);
-        alternates.Set("Orders/KeepRatio", 0.3);
+        //alternates.Set("Orders/KeepRatio", 0.3);
+        alternates.Set("Orders/KeepRatio", 0.2);
         alternates.Set("Orders/KeepSide", ClosePositionSide.UseCross);
         alternates.Set("DailyClose/Enabled", true);
 

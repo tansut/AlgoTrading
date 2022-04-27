@@ -68,6 +68,9 @@ namespace Kalitte.Trading.Algos
         [AlgoParam(0.5)]
         public decimal KeepRatio { get; set; }
 
+        [AlgoParam("")]
+        public string NotifySms { get; set; }
+
         [AlgoParam(ClosePositionSide.KeepSide)]
         public ClosePositionSide KeepSide { get; set; }
     }
@@ -513,6 +516,23 @@ namespace Kalitte.Trading.Algos
             return true;
         }
 
+        public override void CancelCurrentOrder(string reason)
+        {
+            if (!string.IsNullOrEmpty(OrderConfig.NotifySms) && this.positionRequest != null && !Simulation)
+            {
+                var order = this.positionRequest;
+                try
+                {
+                    Sms.SendSms(OrderConfig.NotifySms, $"Order error {order.SideStr}/{order.Quantity}/{order.UnitPrice}. Reason: {reason}");
+                }
+                catch (Exception exc)
+                {
+
+                    Log($"Error sending SMS: {exc.Message}", LogLevel.Error);
+                }
+            }
+            base.CancelCurrentOrder(reason);
+        }
 
 
         public override void Decide(SignalBase signal, SignalEventArgs data)
@@ -743,6 +763,19 @@ namespace Kalitte.Trading.Algos
             AdjustDailyProfitLoss();
 
             if (OrderConfig.Total > InitialQuantity) OrderConfig.Total = InitialQuantity;
+
+            if (!string.IsNullOrEmpty(OrderConfig.NotifySms) && !Simulation)
+            {
+                try
+                {
+                    Sms.SendSms(OrderConfig.NotifySms, $"Order {order.SignalResult.Signal.Name}, {order.SideStr}/{order.FilledQuantity}/{order.FilledUnitPrice} successful");
+                }
+                catch (Exception exc)
+                {
+
+                    Log($"Error sending SMS: {exc.Message}", LogLevel.Error);
+                }
+            }
 
             base.CompletedOrder(order);
         }

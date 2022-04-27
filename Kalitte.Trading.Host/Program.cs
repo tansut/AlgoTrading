@@ -8,6 +8,8 @@ public class Program
 {
     public static OptimizerSettings AppTest()
     {
+   
+
         var settings = new OptimizerSettings();
         settings.Start = new DateTime(2022, 3, 1);
         settings.Finish = new DateTime(2022, 4, 22);
@@ -26,6 +28,7 @@ public class Program
 
         // global order
         alternates.Set("Orders/Total", 10);
+        alternates.Set("Orders/NotifySms", "5326274151");
 
         //alternates.Set("Orders/Monday/Rate", 0.4);
         //alternates.Set("Orders/Tuesday/Rate", 1.5);

@@ -407,6 +407,7 @@ namespace Kalitte.Trading.Algos
                         Order = savePosition,
                         Portfolio = portfolio
                     });
+                    
                 }
             }
             finally
@@ -421,7 +422,7 @@ namespace Kalitte.Trading.Algos
             return Math.Round(q);
         }
 
-        public void CancelCurrentOrder(string reason)
+        public virtual void CancelCurrentOrder(string reason)
         {
             Log($"Order rejected/cancelled [{reason}]", LogLevel.Warning);
             this.positionRequest = null;
